@@ -11,7 +11,7 @@ const FrontendFooter = () => {
         <Link href="/">
           <img
             className="footer-logo"
-            src="/assets/front-images/Logo.png"
+            src="/assets/front-images/logo.png"
             alt="EboxTickets Logo"
           />
         </Link>

@@ -12,7 +12,7 @@ import Swal from "sweetalert2";
 
 const LoginPage = () => {
   const router = useRouter();
-  const [email, setEmail] = useState('rajesh@doomshell.com');
+  const [email, setEmail] = useState('rupam@doomshell.com');
   const [password, setPassword] = useState('12345');
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
