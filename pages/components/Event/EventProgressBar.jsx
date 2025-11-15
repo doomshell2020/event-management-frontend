@@ -11,7 +11,7 @@ const EventHeaderSection = ({ eventDetails }) => {
     const [loading, setLoading] = useState(false);
 
     // console.log('//////////',eventDetails);
-    
+
 
     // Fetch Event List
     const fetchEvents = async () => {
@@ -205,12 +205,13 @@ const EventHeaderSection = ({ eventDetails }) => {
                                 return (
                                     <li key={index} className={isActive ? "active" : ""}>
                                         <Link className="fw-semibold" href={step.path}>
-                                            {step.serial}. {step.label}
+                                            {step.label}
                                         </Link>
                                     </li>
                                 );
                             })}
                         </ul>
+
                     </div>
                 </div>
             </div>
