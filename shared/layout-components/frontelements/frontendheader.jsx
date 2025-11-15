@@ -17,7 +17,7 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
   const [isActiveNow, setIsActiveNow] = useState(false);
 
   // ✅ Open cart modal
-  const handleOpenCart = () => setIsActiveNow(true);
+  const handleOpenCart = () => setIsActiveNow(false);
   // ✅ Close cart modal
   const handleCloseCart = () => setIsActiveNow(false);
 
@@ -103,10 +103,10 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
                       }}
                     >
                       Cart
-                      <span className="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-danger">
+                      {/* <span className="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-danger">
                         2
                         <span className="visually-hidden">unread messages</span>
-                      </span>
+                      </span> */}
                     </a>
                   </>
                 )}
