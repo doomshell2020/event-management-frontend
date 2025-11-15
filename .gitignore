@@ -55,7 +55,6 @@ pnpm-debug.log*
 # ======================
 .DS_Store
 Thumbs.db
-Icon?
 
 # =====================
 # ☁️ Deployment Services
@@ -64,7 +63,7 @@ Icon?
 .vercel/
 
 # ============================
-# 📚 Storybook / Other Tools (optional)
+# 📚 Storybook / Other Tools
 # ============================
 storybook-static/
 
@@ -79,3 +78,4 @@ storybook-static/
 .eslintcache
 *.tmp
 *.bak
+.cache/
