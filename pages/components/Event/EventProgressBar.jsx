@@ -10,6 +10,9 @@ const EventHeaderSection = ({ eventDetails }) => {
     const [eventData, setEventData] = useState([]);
     const [loading, setLoading] = useState(false);
 
+    // console.log('//////////',eventDetails);
+    
+
     // Fetch Event List
     const fetchEvents = async () => {
         setLoading(true);

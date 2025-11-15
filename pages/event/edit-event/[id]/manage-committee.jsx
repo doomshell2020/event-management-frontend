@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import FrontendHeader from "@/shared/layout-components/frontelements/frontendheader";
 import FrontendFooter from "@/shared/layout-components/frontelements/frontendfooter";
-import FrontLeftSideBar from "@/shared/layout-components/frontelements/front-left-side-bar";
 import Link from "next/link";
 import axios from "axios";
+import api from "@/utils/api";
 import {
     CForm,
     CCol,
@@ -18,14 +18,40 @@ import {
 import { Breadcrumb, Card, Col, Form, InputGroup, Row } from "react-bootstrap";
 import moment from "moment-timezone";
 import Swal from "sweetalert2";
+import { useRouter } from "next/router";
+import EventSidebar from "@/pages/components/Event/EventSidebar";
+import EventHeaderSection from "@/pages/components/Event/EventProgressBar";
+
 
 const MyEventsPage = () => {
 
     const [isOpen, setIsOpen] = useState(false);
     const [isLeftRight, setIsLeftRight] = useState(false);
     const [isOpenWiggins, setIsOpenWiggins] = useState(false);
-    console.log("isOpenWiggins", isOpenWiggins);
-    // const [isLeftRightWiggins, setIsLeftRightWiggins] = useState(false);
+    const [eventDetails, setEventDetails] = useState(null);
+    const router = useRouter();
+    const { id } = router.query;
+    const [loading, setLoading] = useState(false);
+
+
+    const fetchEventDetails = async (eventId) => {
+        try {
+            const res = await api.post(`/api/v1/events/event-list`, { id: eventId });
+
+            if (res.data.success && res.data.data.events.length > 0) {
+                const event = res.data.data.events[0];
+                setEventDetails(event);
+            }
+        } catch (error) {
+            console.error("Error fetching event:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (id) fetchEventDetails(id);
+    }, [id]);
 
 
 
@@ -33,209 +59,17 @@ const MyEventsPage = () => {
     return (
         <>
             <FrontendHeader backgroundImage={backgroundImage} />
-            {/* <FrontLeftSideBar /> */}
 
             <section id="myevent-deshbord">
                 <div className="d-flex">
 
-                    <div className={`event-sidebar ${isLeftRight ? 'sideBarRightLeftClosed' : ''}`}>
-                        <div className="side_menu_icon">
-                            <i className={`bi bi-arrow-${isLeftRight ? 'right' : 'left'}-short`} onClick={() => setIsLeftRight(!isLeftRight)}></i>
-                        </div>
-                        <ul className="listunstyl components2">
-                            <li className="mb-3">
-                                <Link className="text-white fw-bold"
-                                    href="/event/post-event"
-                                    style={{ backgroundColor: "#ff9800" }}
-                                >
-                                    <i className="bi bi-calendar2-event"></i>
-                                    <span className="fw-bold"> Create Event </span>
-                                </Link>
-                            </li>
-                            <li className="mb-3">
-                                <Link className="text-white fw-bold"
-                                    href="/event/post-event"
-                                    style={{ backgroundColor: "#00ad00" }}
-                                >
-                                    <i className="bi bi-eye-fill"></i>
-                                    <span className="fw-bold"> View Event </span>
-                                </Link>
-                            </li>
-                        </ul>
+                    <EventSidebar />
 
-                        <ul className="listunstyl components">
-                            <li>
-                                <Link href="/event/my-event">
-                                    <i className="bi bi-speedometer2"></i>
-                                    <span> Dashboard </span>
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/event/my-event">
-                                    <i className="bi bi-sliders"></i>
-                                    <span> Settings </span>
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/event/my-event">
-                                    <i className="bi bi-credit-card"></i>
-                                    <span> Payments </span>
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/event/my-event">
-                                    <i className="bi bi-bar-chart"></i>
-                                    <span> Analytics </span>
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/event/my-event">
-                                    <i className="bi bi-wallet2"></i>
-                                    <span> Payouts </span>
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/event/my-event">
-                                    <i className="bi bi-wallet2"></i>
-                                    <span> Export Tickets </span>
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/event/my-event">
-                                    <i className="bi bi-people"></i>
-                                    <span> Committee </span>
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/event/my-event">
-                                    <i className="fas fa-ticket-alt"></i>
-                                    <span>  Tickets </span>
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/event/my-event">
-                                    <i className="fas fa-chart-bar"></i>
-                                    <span> Ticket Reports </span>
-                                </Link>
-                            </li>
-
-                            <li className="menu_line"></li>
-
-                            <li>
-                                <ul className="dropdown-box ps-0">
-                                    <li className="dropdown">
-                                        <button
-                                            className="dropdown-toggle w-100 bg-transparent border-0 shadow-none d-flex justify-content-between align-items-center"
-                                            role="button"
-                                            onClick={() => setIsOpen(!isOpen)}
-                                            data-bs-toggle="dropdown"
-                                        >
-                                            <span> Account </span>
-                                        </button>
-
-                                        {isOpen && (
-                                            <ul className="dropdown-munubox p-0 w-100 border-0">
-                                                <li>
-                                                    <Link
-                                                        className="dropdown-item"
-                                                        href="/event/my-ticket"
-                                                    >
-                                                        <i className="fas fa-ticket-alt"></i>
-                                                        <span> My Tickets </span>
-                                                    </Link>
-                                                </li>
-                                                <li>
-                                                    <Link
-                                                        className="dropdown-item"
-                                                        href="/"
-                                                    >
-                                                        <i className="bi bi-person"></i>
-                                                        <span> Profile </span>
-                                                    </Link>
-                                                </li>
-                                                <li>
-                                                    <Link
-                                                        className="dropdown-item"
-                                                        href="/"
-                                                    >
-                                                        <i className="bi bi-box-arrow-right"></i>
-                                                        <span> Logout </span>
-                                                    </Link>
-                                                </li>
-                                            </ul>
-                                        )}
-                                    </li>
-                                </ul>
-                            </li>
-                        </ul>
-
-
-                    </div>
                     <div className="event-righcontent">
                         <div className="dsa_contant">
                             <section id="post-eventpg edit-event-page">
-                                <div className="event_names d-flex justify-content-between align-items-center p-2 px-3 mb-3">
-                                    <div className="dropdown">
-                                        <button
-                                            className="btn rounded-md text-sm text-white dropdown-toggle"
-                                            role="button"
-                                            id="dropdownMenuLink2"
-                                            data-bs-toggle="dropdown"
-                                            aria-expanded="false"
-                                            style={{ backgroundColor: "#e62d56" }}
-                                            onClick={() => setIsOpenWiggins(!isOpenWiggins)}
-                                        >
-                                            Jescie Wiggins
-                                        </button>
-                                        {isOpenWiggins && (
-                                            <ul className="dropdown-menu" aria-labelledby="dropdownMenuLink2">
-                                                <li>
-                                                    <a className="dropdown-item" href="https://eboxtickets.com/event/settings/287">
-                                                        Jescie Wiggins
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a className="dropdown-item" href="https://eboxtickets.com/event/settings/283">
-                                                        Raksha Bandhan
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a className="dropdown-item browseall_event" href="https://eboxtickets.com/event/myevent">
-                                                        Browse All Event
-                                                    </a>
-                                                </li>
-                                            </ul>
-                                        )}
-                                    </div>
 
-                                    <div className="text-center">
-                                        <h6 className="event_Heading mb-0 fs-5 fw-bold">Jescie Wiggins</h6>
-                                    </div>
-
-                                    <div className="text-right mt-1">
-                                        <a
-                                            href="https://eboxtickets.com/event/Velit-rerum-amet-ve"
-                                            target="_blank"
-                                            className="btn rounded-md text-sm text-white"
-                                            rel="noopener noreferrer"
-                                            style={{ backgroundColor: "#00b56a" }}
-                                        >
-                                            View Event
-                                        </a>
-                                    </div>
-                                </div>
-                                <div className="prosection">
-                                    <div className="table-responsive">
-                                        <div className="scroll_tab w-auto px-2">
-                                            <ul id="progressbar">
-                                                <li className="active"><Link className="fw-semibold" href="/event/event-detail/manage-event">Manage Event</Link></li>
-                                                <li><Link className="fw-semibold" href="/event/event-detail/manage-tickets">Manage Tickets</Link></li>
-                                                <li><Link className="fw-semibold" href="/event/event-detail/manage-committee">Manage Committee</Link></li>
-                                                <li><Link className="fw-semibold" href="/event/event-detail/publish-event">Publish Event</Link></li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
+                                <EventHeaderSection eventDetails={eventDetails} />
 
                                 <h4 className="text-24">Committee Manager </h4>
                                 <hr className="custom-hr" />
@@ -352,12 +186,12 @@ const MyEventsPage = () => {
                                                             Showing 0 to 0 of 0 entries
                                                         </span>
                                                         <div className="next_prew_btn">
-                                                        <Link className="next primery-button fw-normal bg-transparent text-dark" href="/">
-                                                            Previous
-                                                        </Link>
-                                                        <Link className="next primery-button fw-normal" href="/">
-                                                            Next
-                                                        </Link>
+                                                            <Link className="next primery-button fw-normal bg-transparent text-dark" href="/">
+                                                                Previous
+                                                            </Link>
+                                                            <Link className="next primery-button fw-normal" href="/">
+                                                                Next
+                                                            </Link>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -392,7 +226,7 @@ const MyEventsPage = () => {
                                             </div>
                                         </div>
                                     </div>
-<hr className="custom-hr" />
+                                    <hr className="custom-hr" />
 
                                     <div className="next_prew_btn d-flex justify-content-between mt-4">
                                         <Link className="prew primery-button fw-normal" href="/">
