@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import api from "@/utils/api"; // ✅ Make sure api is imported
+import api from "@/utils/api";
 
 const EventHeaderSection = ({ eventDetails }) => {
     const pathname = usePathname();
@@ -10,7 +10,7 @@ const EventHeaderSection = ({ eventDetails }) => {
     const [eventData, setEventData] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    // ✅ Fetch all events for organizer
+    // Fetch Event List
     const fetchEvents = async () => {
         setLoading(true);
         try {
@@ -32,43 +32,75 @@ const EventHeaderSection = ({ eventDetails }) => {
         fetchEvents();
     }, []);
 
-    // ✅ Progress bar steps
-    // Start with the base steps
-    const baseSteps = [
-        { label: "Manage Event", path: `/event/edit-event/${eventDetails?.id}` },
-        { label: "Manage Tickets", path: `/event/edit-event/${eventDetails?.id}/manage-tickets` },
-        { label: "Publish Event", path: `/event/edit-event/${eventDetails?.id}/publish-event` },
-    ];
+    // ================================
+    // STATIC MENU ORDER (SERIAL BASED)
+    // ================================
 
-    const steps = [...baseSteps];
+    let steps = [];
 
-    // Insert "Manage Date & Time" if entry type is not "event"
     if (eventDetails?.entry_type && eventDetails.entry_type !== "event") {
-        steps.splice(1, 0, {
-            label: "Manage Date & Time",
-            path: `/event/edit-event/${eventDetails?.id}/manage-date-time`,
-        });
-
-        // Insert Ticket Pricing right after Manage Date & Time
-        steps.splice(2, 0, {
-            label: "Ticket Pricing",
-            path: `/event/edit-event/${eventDetails?.id}/ticket-pricing`,
-        });
+        // CASE 1 → entry_type ≠ "event"
+        steps = [
+            {
+                serial: 1,
+                label: "Manage Event",
+                path: `/event/edit-event/${eventDetails?.id}`,
+            },
+            {
+                serial: 2,
+                label: "Manage Tickets",
+                path: `/event/edit-event/${eventDetails?.id}/manage-tickets`,
+            },
+            {
+                serial: 3,
+                label: "Manage Date & Time",
+                path: `/event/edit-event/${eventDetails?.id}/manage-date-time`,
+            },
+            {
+                serial: 4,
+                label: "Ticket Pricing",
+                path: `/event/edit-event/${eventDetails?.id}/ticket-pricing`,
+            },
+            {
+                serial: 5,
+                label: "Publish Event",
+                path: `/event/edit-event/${eventDetails?.id}/publish-event`,
+            },
+        ];
     } else {
-        steps.splice(2, 0, { label: "Manage Committee", path: `/event/edit-event/${eventDetails?.id}/manage-committee` });
+        // CASE 2 → entry_type = "event"
+        steps = [
+            {
+                serial: 1,
+                label: "Manage Event",
+                path: `/event/edit-event/${eventDetails?.id}`,
+            },
+            {
+                serial: 2,
+                label: "Manage Tickets",
+                path: `/event/edit-event/${eventDetails?.id}/manage-tickets`,
+            },
+            {
+                serial: 3,
+                label: "Manage Committee",
+                path: `/event/edit-event/${eventDetails?.id}/manage-committee`,
+            },
+            {
+                serial: 4,
+                label: "Publish Event",
+                path: `/event/edit-event/${eventDetails?.id}/publish-event`,
+            },
+        ];
     }
 
-
-    // ✅ Helper to check if step is active
+    // Highlight Active Step
     const checkActiveStep = (step) => {
         const stepSegment = step.path.split("/event/")[1];
 
-        // Default check
         if (pathname?.includes(stepSegment)) {
             return true;
         }
 
-        // Extended check for Manage Tickets subpages
         if (
             step.label == "Manage Tickets" &&
             (
@@ -88,6 +120,7 @@ const EventHeaderSection = ({ eventDetails }) => {
         <>
             {/* ===== Event Name + Dropdown + View Button ===== */}
             <div className="event_names d-flex justify-content-between align-items-center p-2 px-3 mb-3">
+
                 {/* Dropdown */}
                 <div className="dropdown">
                     <button
@@ -101,7 +134,6 @@ const EventHeaderSection = ({ eventDetails }) => {
 
                     {isDropdownOpen && (
                         <ul className="dropdown-menu show" aria-labelledby="eventDropdownMenu">
-                            {/* ✅ Loading state */}
                             {loading && (
                                 <li className="dropdown-item text-center">
                                     <div className="spinner-border spinner-border-sm text-primary me-2" role="status" />
@@ -109,12 +141,10 @@ const EventHeaderSection = ({ eventDetails }) => {
                                 </li>
                             )}
 
-                            {/* ✅ If no events found */}
                             {!loading && eventData.length == 0 && (
                                 <li className="dropdown-item text-muted text-center">No events found</li>
                             )}
 
-                            {/* ✅ Map through event list */}
                             {!loading &&
                                 eventData.map((item, index) => (
                                     <li key={index}>
@@ -128,7 +158,6 @@ const EventHeaderSection = ({ eventDetails }) => {
                                     </li>
                                 ))}
 
-                            {/* ✅ Browse all event link */}
                             <li>
                                 <Link
                                     className="dropdown-item browseall_event text-primary fw-semibold"
@@ -142,14 +171,14 @@ const EventHeaderSection = ({ eventDetails }) => {
                     )}
                 </div>
 
-                {/* Event Title */}
+                {/* Title */}
                 <div className="text-center">
                     <h6 className="event_Heading mb-0 fs-5 fw-bold">
                         {eventDetails?.name || ""}
                     </h6>
                 </div>
 
-                {/* View Event Button */}
+                {/* View Event */}
                 <div className="text-right mt-1">
                     <Link
                         href={`/event/${eventDetails?.id}/${eventDetails?.slug}`}
@@ -163,7 +192,7 @@ const EventHeaderSection = ({ eventDetails }) => {
                 </div>
             </div>
 
-            {/* ===== Progress Bar Section ===== */}
+            {/* ===== Progress Bar ===== */}
             <div className="prosection">
                 <div className="table-responsive">
                     <div className="scroll_tab w-auto px-2">
@@ -173,7 +202,7 @@ const EventHeaderSection = ({ eventDetails }) => {
                                 return (
                                     <li key={index} className={isActive ? "active" : ""}>
                                         <Link className="fw-semibold" href={step.path}>
-                                            {step.label}
+                                            {step.serial}. {step.label}
                                         </Link>
                                     </li>
                                 );

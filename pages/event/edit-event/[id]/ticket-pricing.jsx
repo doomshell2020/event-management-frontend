@@ -20,12 +20,6 @@ const ManageTicketPricing = () => {
     const [pricingList, setPricingList] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    // form fields
-    const [selectedTicket, setSelectedTicket] = useState("");
-    const [price, setPrice] = useState("");
-    const [selectedDate, setSelectedDate] = useState("");
-    const [selectedSlot, setSelectedSlot] = useState("");
-
     /* ----------------------------------------------------
         FETCH TICKETS
     ---------------------------------------------------- */
@@ -45,9 +39,6 @@ const ManageTicketPricing = () => {
             setLoading(false);
         }
     };
-
-    console.log('>>>>>>>>>>>>>', pricingList);
-
 
     /* ----------------------------------------------------
         FETCH EVENT DETAILS
@@ -109,60 +100,95 @@ const ManageTicketPricing = () => {
     /* ----------------------------------------------------
         SAVE PRICING
     ---------------------------------------------------- */
-    const handleSavePricing = async () => {
+    const [formValidated, setFormValidated] = useState(false);
+    const [price, setPrice] = useState("");
+    const [selectedTicket, setSelectedTicket] = useState(null);
+    const [selectedDate, setSelectedDate] = useState("");
+    const [selectedSlot, setSelectedSlot] = useState("");
+
+    const handleFormSubmit = async (e) => {
+        e.preventDefault();
+        const form = e.currentTarget;
+
+        // --------------------------
+        // Bootstrap form validation
+        // --------------------------
+        if (form.checkValidity() === false) {
+            e.stopPropagation();
+            setFormValidated(true);
+            return;
+        }
+
+        // Mark form as validated
+        setFormValidated(true);
+
+        // --------------------------
+        // Ticket selection validation
+        // --------------------------
         if (!selectedTicket) {
             return Swal.fire("Required!", "Please select a ticket.", "warning");
         }
 
-        if (!price || price <= 0) {
+        // Ensure price is a number
+        const numericPrice = parseFloat(price);
+        if (!numericPrice || numericPrice <= 0) {
             return Swal.fire("Required!", "Please enter a valid price.", "warning");
         }
 
-        const ticket = ticketsList.find((t) => t.id == selectedTicket);
+        const ticketType = selectedTicket.ticket_type?.toLowerCase();
 
-        // ----------------------------------------------------
-        // RULE 1: Day Type Ticket → Date Required
-        // ----------------------------------------------------
-        if (ticket?.ticket_type === "Day") {
-            if (!selectedSlot && !selectedDate) {
-                return Swal.fire(
-                    "Required!",
-                    "For day-type tickets, date is required if no slot is selected.",
-                    "warning"
-                );
+        // --------------------------
+        // Ticket-type specific validation
+        // --------------------------
+        if (ticketType === "day") {
+            if (!selectedDate) {
+                return Swal.fire("Required!", "Please select a date for day-type ticket.", "warning");
+            }
+
+            const chosenDate = new Date(selectedDate);
+            const eventStart = new Date(eventDetails.start_date);
+            const eventEnd = new Date(eventDetails.end_date);
+
+            if (chosenDate < eventStart || chosenDate > eventEnd) {
+                return Swal.fire("Invalid Date!", "Date must be within the event duration.", "warning");
             }
         }
 
-        // ----------------------------------------------------
-        // RULE 2: If slot NOT selected → date required
-        // ----------------------------------------------------
-        if (!selectedSlot && !selectedDate) {
-            return Swal.fire(
-                "Required!",
-                "Please select a date when no slot is chosen.",
-                "warning"
-            );
+        if (ticketType === "slot") {
+            if (!selectedSlot) {
+                return Swal.fire("Required!", "Please select a slot for slot-type ticket.", "warning");
+            }
         }
 
+        // --------------------------
+        // Prepare payload
+        // --------------------------
         const payload = {
             event_id: Number(id),
-            ticket_type_id: Number(selectedTicket),
-            price: Number(price)
+            ticket_type_id: Number(selectedTicket.id),
+            price: numericPrice,
         };
 
         if (selectedDate) payload.date = selectedDate;
         if (selectedSlot) payload.event_slot_id = Number(selectedSlot);
 
+        // --------------------------
+        // API call to save pricing
+        // --------------------------
         try {
             const res = await api.post(`/api/v2/tickets/ticket-pricing/set`, payload);
 
             if (res.data.success) {
                 Swal.fire("Success!", "Ticket pricing saved successfully!", "success");
 
-                // reset
+                // Reset form
                 setPrice("");
                 setSelectedSlot("");
                 setSelectedDate("");
+                setSelectedTicket(null);
+                setFormValidated(false);
+
+                // Refresh pricing list
                 fetchPricingList(id);
             } else {
                 Swal.fire("Error", res.data.message || "Failed to save pricing", "error");
@@ -195,76 +221,117 @@ const ManageTicketPricing = () => {
                                     You can manage all your ticket pricing here.
                                 </p>
 
-                                {/* ----------------------------------------------------
-                                    PRICING FORM
-                                ---------------------------------------------------- */}
+                                {/* PRICING FORM */}
                                 <div className="card p-3 mt-4 shadow-sm">
-                                    <div className="mb-3">
-                                        <Form.Label className="fw-semibold">Select Ticket Type:</Form.Label>
-                                        <Form.Select
-                                            value={selectedTicket}
-                                            onChange={(e) => setSelectedTicket(e.target.value)}
-                                        >
-                                            <option value="">-- Select Ticket --</option>
-                                            {ticketsList.map((ticket) => (
-                                                <option key={ticket.id} value={ticket.id}>
-                                                    {ticket.title} ({ticket.access_type})
-                                                </option>
-                                            ))}
-                                        </Form.Select>
-                                    </div>
-
-                                    <div className="mb-3">
-                                        <Form.Label className="fw-semibold">Price:</Form.Label>
-                                        <Form.Control
-                                            type="number"
-                                            placeholder="Enter price"
-                                            value={price}
-                                            onChange={(e) => setPrice(e.target.value)}
-                                        />
-                                    </div>
-
-                                    {ticketsList.find((t) => t.id == selectedTicket)?.ticket_type == "Day" && (
-                                        <div className="mb-3">
-                                            <Form.Label className="fw-semibold">Select Date:</Form.Label>
-                                            <Form.Control
-                                                type="date"
-                                                value={selectedDate}
-                                                onChange={(e) => setSelectedDate(e.target.value)}
-                                            />
-                                        </div>
-                                    )}
-
-                                    <div className="mb-3">
-                                        <Form.Label className="fw-semibold">Select Slot (Optional):</Form.Label>
-                                        <Form.Select
-                                            value={selectedSlot}
-                                            onChange={(e) => setSelectedSlot(e.target.value)}
-                                        >
-                                            <option value="">-- No Slot --</option>
-                                            {slotsList.map((slot) => (
-                                                <option key={slot.id} value={slot.id}>
-                                                    {slot.slot_name} ({slot.start_time} - {slot.end_time})
-                                                </option>
-                                            ))}
-                                        </Form.Select>
-                                    </div>
-
-                                    <Button
-                                        className="btn btn-primary mt-2"
-                                        style={{ background: "#e62d56", border: 0 }}
-                                        onClick={handleSavePricing}
+                                    <h5 className="fw-bold mb-3">Add Ticket Pricing</h5>
+                                    <Form
+                                        id="ticketPricingForm"
+                                        noValidate
+                                        validated={formValidated}
+                                        onSubmit={handleFormSubmit}
                                     >
-                                        Save Ticket Pricing
-                                    </Button>
+                                        <div className="row g-3">
+                                            {/* Ticket Type */}
+                                            <div className="col-md-4">
+                                                <Form.Label className="fw-semibold">Select Ticket Type:</Form.Label>
+                                                <Form.Select
+                                                    required
+                                                    value={selectedTicket?.id || ""}
+                                                    onChange={(e) => {
+                                                        const ticket = ticketsList.find(t => t.id == e.target.value);
+                                                        setSelectedTicket(ticket || null);
+                                                        setSelectedDate("");
+                                                        setSelectedSlot("");
+                                                    }}
+                                                >
+                                                    <option value="">-- Select Ticket --</option>
+                                                    {ticketsList.map((ticket) => (
+                                                        <option key={ticket.id} value={ticket.id}>
+                                                            {ticket.title} ({ticket.access_type})
+                                                        </option>
+                                                    ))}
+                                                </Form.Select>
+                                                <Form.Control.Feedback type="invalid">
+                                                    Please select a ticket type.
+                                                </Form.Control.Feedback>
+                                            </div>
+
+                                            {/* Price */}
+                                            <div className="col-md-4">
+                                                <Form.Label className="fw-semibold">Price:</Form.Label>
+                                                <Form.Control
+                                                    type="number"
+                                                    placeholder="Enter price"
+                                                    value={price}
+                                                    required
+                                                    min={0.01}
+                                                    onChange={(e) => setPrice(e.target.value ? parseFloat(e.target.value) : "")}
+                                                />
+                                                <Form.Control.Feedback type="invalid">
+                                                    Please enter a valid price.
+                                                </Form.Control.Feedback>
+                                            </div>
+
+                                            {/* Date / Slot */}
+                                            <div className="col-md-4">
+                                                {selectedTicket?.access_type?.toLowerCase() == "day" && eventDetails && (
+                                                    <>
+                                                        <Form.Label className="fw-semibold">
+                                                            Select Date <span className="text-danger">*</span>
+                                                        </Form.Label>
+                                                        <Form.Control
+                                                            type="date"
+                                                            value={selectedDate}
+                                                            required
+                                                            min={eventDetails.start_date}
+                                                            max={eventDetails.end_date}
+                                                            onChange={(e) => setSelectedDate(e.target.value)}
+                                                        />
+                                                        <Form.Control.Feedback type="invalid">
+                                                            Please select a valid date within event duration.
+                                                        </Form.Control.Feedback>
+                                                    </>
+                                                )}
+
+                                                {selectedTicket?.access_type?.toLowerCase() == "slot" && (
+                                                    <>
+                                                        <Form.Label className="fw-semibold">
+                                                            Select Slot <span className="text-danger">*</span>
+                                                        </Form.Label>
+                                                        <Form.Select
+                                                            required
+                                                            value={selectedSlot}
+                                                            onChange={(e) => setSelectedSlot(e.target.value)}
+                                                        >
+                                                            <option value="">-- Select Slot --</option>
+                                                            {slotsList.map((slot) => (
+                                                                <option key={slot.id} value={slot.id}>
+                                                                    {slot.slot_name} ({slot.start_time} - {slot.end_time})
+                                                                </option>
+                                                            ))}
+                                                        </Form.Select>
+                                                        <Form.Control.Feedback type="invalid">
+                                                            Please select a slot.
+                                                        </Form.Control.Feedback>
+                                                    </>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <Button
+                                            className="btn btn-primary mt-3"
+                                            style={{ background: "#e62d56", border: 0 }}
+                                            type="submit"
+                                        >
+                                            Save Ticket Pricing
+                                        </Button>
+                                    </Form>
                                 </div>
 
-                                {/* ----------------------------------------------------
-                                    PRICING LIST TABLE
-                                ---------------------------------------------------- */}
+
+                                {/* PRICING LIST TABLE */}
                                 <div className="card p-3 mt-4 shadow-sm">
                                     <h5 className="fw-bold mb-3">Existing Ticket Pricing</h5>
-
                                     {pricingList.length === 0 ? (
                                         <p className="text-muted">No pricing added yet.</p>
                                     ) : (
@@ -281,24 +348,10 @@ const ManageTicketPricing = () => {
                                                 <tbody>
                                                     {pricingList.map((row, index) => (
                                                         <tr key={index}>
-                                                            {/* ✅ Ticket Name */}
                                                             <td>{row?.ticket?.title || "-"}</td>
-
-                                                            {/* ✅ Price */}
-                                                            <td>
-                                                                {row.currency === "INR" ? "₹" : "$"}
-                                                                {row.price}
-                                                            </td>
-
-                                                            {/* ✅ Date */}
+                                                            <td>{row.currency === "INR" ? "₹" : "$"}{row.price}</td>
                                                             <td>{row.date || "-"}</td>
-
-                                                            {/* ✅ Slot Info */}
-                                                            <td>
-                                                                {row.slot
-                                                                    ? `${row.slot.slot_name} (${row.slot.start_time.slice(0, 5)} - ${row.slot.end_time.slice(0, 5)})`
-                                                                    : "-"}
-                                                            </td>
+                                                            <td>{row.slot ? `${row.slot.slot_name} (${row.slot.start_time.slice(0, 5)} - ${row.slot.end_time.slice(0, 5)})` : "-"}</td>
                                                         </tr>
                                                     ))}
                                                 </tbody>
@@ -306,7 +359,6 @@ const ManageTicketPricing = () => {
                                         </div>
                                     )}
                                 </div>
-
 
                             </section>
                         </div>

@@ -23,10 +23,10 @@ const ManageTickets = () => {
     // Ticket form state
     const [ticketForm, setTicketForm] = useState({
         title: "",
-        type: "",
+        type: "open_sales",
         price: "",
         count: "",
-        hidden: "",
+        hidden: "Y",
         access_type: "",
         ticketImage: null,
     });
@@ -137,12 +137,12 @@ const ManageTickets = () => {
                 });
                 setTicketForm({
                     title: "",
-                    type: "",
+                    type: "open_sales",
                     price: "",
                     count: "",
-                    hidden: "",
-                    image: null,
+                    hidden: "Y",
                     access_type: "",
+                    ticketImage: null,
                 });
                 setShow(false);
                 setTicketId(null);
@@ -243,7 +243,7 @@ const ManageTickets = () => {
                                             </div>
                                             <p className="mt-2 mb-0">Fetching tickets...</p>
                                         </div>
-                                    ) : ticketsList.length === 0 ? (
+                                    ) : ticketsList.length == 0 ? (
                                         <p className="text-muted">No tickets found for this event.</p>
                                     ) : (ticketsList.map((ticket) => (
                                         <div key={ticket.id} className="row item_bg m-0 p-2 px-3 mb-2 align-items-center">
