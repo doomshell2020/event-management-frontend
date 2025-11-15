@@ -49,7 +49,7 @@ const EventDetailPage = ({ event, slug }) => {
   const saleEnd = event ? new Date(event.sale_end?.local || event.sale_end?.utc) : null;
 
   // 🛑 Early return MUST come after hooks
-  if (!event || Object.keys(event).length === 0) {
+  if (!event || Object.keys(event).length == 0) {
     return (
       <>
         <FrontendHeader backgroundImage="/assets/front-images/about-slider_bg.jpg" />
@@ -169,7 +169,7 @@ const EventDetailPage = ({ event, slug }) => {
                   <ul className="ps-0">
                     {event?.tickets?.length > 0 ? (
                       event.tickets
-                        .filter((t) => t.status === "Y" || t.hidden === "N")
+                        .filter((t) => t.status == "Y" || t.hidden == "N")
                         .map((ticket) => (
                           <li key={ticket.id} className="list-item-none">
                             <div className="row align-items-center">
@@ -208,7 +208,7 @@ const EventDetailPage = ({ event, slug }) => {
                     <div className="form-group ticket_all">
                       <ul className="ps-0">
                         {event.addons
-                          .filter((a) => a.status === "Y" || a.hidden === "N")
+                          .filter((a) => a.status == "Y" || a.hidden == "N")
                           .map((addon) => (
                             <li key={addon.id} className="list-item-none">
                               <div className="row align-items-center">

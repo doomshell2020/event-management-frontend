@@ -21,6 +21,13 @@ export function middleware(request) {
     return NextResponse.next();
   }
 
+  const eventDetailRegex = /^\/event\/\d+\/[a-zA-Z0-9\-]+\/?$/;
+
+  if (eventDetailRegex.test(pathname)) {
+    return NextResponse.next();
+  }
+
+
   // -----------------------------
   // 🧩 ADMIN ROUTE PROTECTION
   // -----------------------------
