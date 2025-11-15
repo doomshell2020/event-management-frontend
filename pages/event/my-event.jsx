@@ -46,7 +46,7 @@ export default function OrganizerEvents({ userId }) {
             setLoading(false); // stop loading after API call
         }
     };
-    
+
     useEffect(() => {
         fetchEvents();
     }, [userId]);
@@ -54,9 +54,6 @@ export default function OrganizerEvents({ userId }) {
     const handleStatusChange = async (eventId, newStatus) => {
         const status = newStatus;
         const actionText = newStatus == "Y" ? "enable" : "disable";
-
-        // console.log(">?status",status);
-
 
         const result = await Swal.fire({
             title: "Are you sure?",
@@ -71,7 +68,6 @@ export default function OrganizerEvents({ userId }) {
         if (!result.isConfirmed) return;
 
         try {
-            // ✅ Show loading alert
             Swal.fire({
                 title: "Processing...",
                 text: "Please wait while we update the status.",
@@ -81,10 +77,24 @@ export default function OrganizerEvents({ userId }) {
                 },
             });
 
-            const response = await api.put(`/api/v2/events/update/${eventId}`, { status });
+            // 🔥 Create FormData instead of JSON
+            const formData = new FormData();
+            formData.append("status", status);
+
+            // 🔥 Send FormData
+            const response = await api.put(
+                `/api/v1/events/update/${eventId}`,
+                formData,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                }
+            );
+
             const resData = response.data;
 
-            Swal.close(); // ✅ Close loading alert once done
+            Swal.close();
 
             if (resData?.success) {
                 Swal.fire({
@@ -95,7 +105,7 @@ export default function OrganizerEvents({ userId }) {
                     showConfirmButton: false,
                 });
 
-                fetchEvents(); // ✅ refresh list
+                fetchEvents();
             } else {
                 Swal.fire({
                     icon: "error",
