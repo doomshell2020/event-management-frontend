@@ -1,0 +1,30 @@
+image: node:18
+
+pipelines:
+  branches:
+    staging:
+      - step:
+          name: 🚀 Deploy to Staging
+          script:
+            - echo "Deploying to stagingondalinda..."
+            - rsync -avz --exclude 'node_modules' --exclude '.env' -e "ssh -o StrictHostKeyChecking=no" ./ ubuntu@65.2.0.244:/var/www/html/stagingondalinda
+            - ssh -o StrictHostKeyChecking=no ubuntu@65.2.0.244 << EOF
+                cd /var/www/html/stagingondalinda &&
+                corepack enable &&
+                yarn install &&
+                yarn build
+              EOF
+
+    main:
+      - step:
+          name: 🚀 Deploy to Production Pipeline
+          script:
+            - echo "Deploying to ondalindalive..."
+            - rsync -avz --exclude 'node_modules' --exclude '.env' -e "ssh -o StrictHostKeyChecking=no" ./ ubuntu@65.2.0.244:/var/www/html/ondalindalive
+            - ssh -o StrictHostKeyChecking=no ubuntu@65.2.0.244 << EOF
+                cd /var/www/html/ondalindalive &&
+                corepack enable &&
+                yarn install &&
+                yarn build &&
+                pm2 restart app || pm2 start yarn --name 'app' -- start
+              EOF

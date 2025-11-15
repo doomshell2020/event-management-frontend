@@ -1,0 +1,33 @@
+.dashboard_section {
+    display: flex;
+    flex-direction: column;
+    margin: 30px 0px;
+}
+
+.dashboard_menu_tgl .dashboard_ul_btn {
+    width: 15%;
+    text-align: right;
+}
+
+.dashboard_pg_btm .form h2 {
+  background: #4a5362;
+  color: #fff;
+  text-transform: uppercase;
+  font-size: 16px;
+  position: relative;
+  text-align: left;
+  margin: 0;
+  border-radius: 5px 5px 0 0;
+}
+
+
+
+.dashboard_pg_btm .form h4 {
+    color: #1e8ad2;
+    display: block;
+    font-size: 20px;
+    border-bottom: 1px solid #1e8ad2;
+    margin: 0 0 25px;
+    padding: 10px 0 5px;
+    text-align: left;
+}

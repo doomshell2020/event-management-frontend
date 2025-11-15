@@ -1,0 +1,158 @@
+
+
+.loginBox {
+  display: flex;
+  max-width: 900px;
+  width: 100%;
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+  transition: transform 0.3s ease;
+}
+
+.loginBox:hover {
+  transform: translateY(-5px);
+}
+
+.leftSide {
+  flex: 1;
+  background-color: #f0f4ff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+}
+
+.illustration {
+  max-width: 100%;
+  height: auto;
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.rightSide {
+  flex: 1;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.rightSide h1 {
+  font-size: 1.5rem;
+  margin-bottom: 12px;
+  color: #111827;
+}
+
+.rightSide p {
+  margin-bottom: 20px;
+  color: #6b7280;
+}
+
+.loginForm .inputGroup {
+  margin-bottom: 13px;
+  display: flex;
+  flex-direction: column;
+}
+
+.loginForm label {
+  margin-bottom: 6px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.loginForm input {
+  padding: 6px 14px;
+  border-radius: 4px;
+  border: 1px solid #d1d5db;
+  transition: all 0.2s;
+}
+
+.loginForm input:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+  outline: none;
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  font-size: 0.95rem;
+  color: #374151;
+}
+
+.checkbox input {
+  margin-right: 10px;
+  accent-color: #ef4444;
+}
+
+.loginButton {
+  width: 100%;
+  background-color: #ef4444;
+  color: white;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-weight: 500;
+}
+
+.loginButton:hover {
+  background-color: #dc2626;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.signupText {
+  margin-top: 18px;
+  text-align: center;
+  font-size: 0.95rem;
+  color: #6b7280;
+}
+
+.signupText a {
+  color: #ef4444;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.signupText a:hover {
+  text-decoration: underline;
+}
+
+.error {
+  color: #ef4444 !important;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .loginBox {
+    flex-direction: column;
+  }
+
+  .leftSide,
+  .rightSide {
+    flex: none;
+    width: 100%;
+    padding: 25px;
+  }
+
+  .leftSide {
+    display: none;
+  }
+}

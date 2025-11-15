@@ -1,0 +1,5 @@
+{
+    "JWT_ACCESS_TOKEN_SECRET": "!@propertyservice@#$%",
+    "ACCESS_TOKEN_EXPIRES_IN": "10h",
+    "SIGN_OPTION": true
+}

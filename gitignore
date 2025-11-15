@@ -1,0 +1,83 @@
+# ===============================
+# 📦 Node & Dependency Management
+# ===============================
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+bun.lockb
+
+# ======================
+# 🔧 Build Artifacts
+# ======================
+.next/
+out/
+dist/
+build/
+
+# ====================
+# 🧪 Testing & Coverage
+# ====================
+coverage/
+test-output/
+jest-output.log
+
+# ====================
+# ⚙️ Environment Files
+# ====================
+.env
+.env.development
+.env.production
+.env.local
+# .env.*  # Catch any other env variants
+
+
+# Ignore everything inside public/
+public/**
+!public/
+!public/.gitkeep
+
+
+# ====================
+# 💻 IDE / Editor Files
+# ====================
+.vscode/
+.idea/
+*.sw?
+*.swo
+
+# ====================
+# 🧾 Logs
+# ====================
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ======================
+# 🖥️ OS/System Files
+# ======================
+.DS_Store
+Thumbs.db
+Icon?
+
+# =====================
+# ☁️ Deployment Services
+# =====================
+.netlify/
+.vercel/
+
+# ============================
+# 📚 Storybook / Other Tools (optional)
+# ============================
+storybook-static/
+
+# ========================
+# ⚠️ Miscellaneous
+# ========================
+*.local
+*.sqlite
+*.db
+.nextauth/
+*.pid

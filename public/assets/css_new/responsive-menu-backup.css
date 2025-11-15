@@ -1,0 +1,6734 @@
+@charset "utf-8";
+
+@-ms-viewport {
+  width: device-width;
+}
+
+@viewport {
+  width: device-width;
+}
+
+@supports (-webkit-touch-callout: none) {
+  #hero-new .hero-inner {
+    background-attachment: local;
+  }
+  /* 
+    #hero-new{
+        position: relative;
+        overflow: hidden;
+    } */
+}
+
+/* .navbar-collapse .show.dropdown {
+    margin-left: 44px;
+} */
+
+.yachts-sec {
+  margin: 12px;
+  border-radius: 30px;
+}
+
+.tckt-information table {
+  margin-bottom: 100px;
+}
+
+.tckt-information p.tckt-pra {
+  margin-bottom: 100px;
+}
+
+.my-tickt-sec .tckt-btn {
+  margin-bottom: 40px;
+}
+
+.past-card {
+  margin-bottom: 25px;
+}
+
+#about-footr .bottom-foot {
+  border-top: 1px solid #ffffff;
+}
+/* 
+#hero-inset .hero-inner-inset {
+position: relative;
+    margin: 12px;
+
+} */
+
+.header-btn {
+  /* width: 18%; */
+  justify-content: right;
+}
+
+/* .weblogo,
+.mn-logo-w {
+    width: 18%;
+} */
+
+.bottom-p {
+  margin-top: 3px;
+}
+
+/* .profile-image img {
+   
+    min-height: 100% !important;
+    height: auto;
+    min-width: 100% !important;
+    width: auto;
+    max-width: none !important;
+   
+} */
+/* .profile-image {
+
+    display: inline-block;} */
+
+button.fgg.text-light.p-0.btn.btn- {
+  max-width: 87px;
+  overflow: hidden;
+}
+
+.btn-tckt {
+  margin-right: 9px;
+}
+
+.service-box h3 {
+  top: -15px;
+  bottom: 0;
+}
+
+#example1_wrapper .row {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 1920px) {
+}
+
+@media (max-width: 1800px) {
+  /* #hero-new .hero-text{
+    margin-top: 260px;} */
+
+  /* #hero-new .scroll-link {
+        margin-top: 140px;
+    } */
+
+  .well-bdy-cnt-2 .well-cnt-side {
+    width: 46%;
+  }
+
+  .well-bdy-cnt-2 .well-imr-images {
+    width: 53%;
+  }
+
+  .well-bdy-cnt-1 .well-cnt-side {
+    width: 46%;
+  }
+
+  .well-bdy-cnt-1 .well-imr-images {
+    width: 53%;
+  }
+
+  .bookticketmodal .modal-xl {
+    max-width: 80% !important;
+  }
+}
+
+@media (max-width: 1600px) {
+
+  .careyes-fasion-body-cnt .creyes-fsn-dgnsec .creyes-fsn-dgnsec-inner .careyes-degn-cnt a {
+    font-size: 25px;
+}
+
+
+
+  .careyes-fasion-body-cnt .creyes-fsn-dgnsec .creyes-fsn-dgnsec-inner .careyes-degn-cnt p {
+    font-size: 25px;
+}
+.careyes-fasion-body-cnt .creyes-fsn-dgnsec {
+  margin: 0 7%;
+}
+
+
+
+
+
+  .well-bdy-cnt-2 .well-cnt-side {
+    width: 51%;
+    height: 550px;
+  }
+
+  .well-bdy-cnt-2 .well-imr-images {
+    width: 48%;
+  }
+
+  .careye-well-bdy .well-bdy-cnt-2 .cnt-inner .well-inr-para {
+    font-size: 22px;
+    line-height: 1.3;
+  }
+
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner5,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner8,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner11,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner14,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner17 {
+    height: 550px;
+  }
+
+  .careye-well-bdy .well-bdy-cnt-2 .cnt-inner .well-sub-hed {
+    font-size: 35px;
+    margin-bottom: 8px;
+  }
+
+  .careye-well-bdy .well-bdy-cnt-2 .cnt-inner .cnt-innerpara .well-inr-para {
+    font-size: 20px;
+    line-height: 1.3;
+  }
+
+  .evnt-invts-prfl {
+    width: 50px;
+    height: 50px !important;
+  }
+
+  .careye-well-bdy .well-bdy-cnt-1 .cnt-inner .well-sub-hed {
+    font-size: 35px;
+    margin-bottom: 8px;
+  }
+
+  .careye-well-bdy .well-bdy-cnt-1 .cnt-inner .cnt-innerpara .well-inr-para {
+    font-size: 20px;
+    line-height: 1.3;
+  }
+
+  .careye-well-bdy .well-bdy-cnt-1 .cnt-inner .well-inr-para {
+    font-size: 22px;
+    line-height: 1.3;
+  }
+
+  .careye-well-bdy .well-bdy-cnt-1 .cnt-inner .well-inr-para2 {
+    font-size: 26px;
+  }
+
+  .well-bdy-cnt-1 .well-cnt-side {
+    width: 51%;
+    height: 640px;
+  }
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner2,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner3,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner4,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner6,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner7,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner9,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner10,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner12,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner13,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner15,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner16,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner18,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner19 {
+    height: 640px;
+  }
+  .well-bdy-cnt-1 .well-imr-images {
+    width: 48%;
+  }
+
+  .slider-bg.careyes-wellness {
+    height: 740px !important;
+  }
+
+  .careyes-hosing-assistent-inr .caryes-heading {
+    font-size: 100px;
+  }
+  .oxcareyeshousingSecInr .caryes-heading {
+    font-size: 100px;
+  }
+
+  /* #hero-new .scroll-link {
+        margin-top: 90px;
+    } */
+  .staff-tbl {
+    display: block;
+    width: 100%;
+    overflow-x: scroll;
+  }
+  .staff-tbl table {
+    width: 1350px !important;
+  }
+}
+
+@media (max-width: 1599px) {
+  .slider-bg.careyes-wellness .slider-bnnr-pra {
+    font-size: 28px !important;
+  }
+
+  .bookticketmodal .modal-xl {
+    max-width: 90% !important;
+  }
+
+  .past-card h3 {
+    font-size: 35px;
+    font-family: "Satoshi-ragular";
+    color: #fff;
+  }
+
+  .upcom .image-mon h1 {
+    font-size: 60px;
+  }
+
+  .e-date {
+    font-size: 25px;
+  }
+
+  button.btn-tckt.tckt-btn-sld.btn.btn-.rounded-pill {
+    font-size: 12px;
+  }
+
+  button.fgg.text-light.p-0.btn.btn- {
+    font-size: 12px;
+  }
+
+  .mn-logo-w {
+    width: 10%;
+  }
+
+  /* .header-btn {
+        width: 19%;
+
+    } */
+
+  .evnt-invts-prfl {
+    width: 40px;
+    height: 40px !important;
+  }
+}
+
+@media (max-width: 1500px) {
+
+
+
+  .careyes-fasion-body-cnt .creyes-fsn-dgnsec .creyes-fsn-dgnsec-inner .careyes-degn-img {
+    width: 100%;
+    height: 356px;
+}
+
+.careyes-fasion-body-cnt .creyes-fsn-dgnsec .creyes-fsn-dgnsec-inner .careyes-degn-img img {
+  height: 360px;
+}
+
+
+
+  .well-bdy-cnt-1 .well-imr-images {
+    width: 54%;
+  }
+
+  .well-bdy-cnt-2 .well-imr-images {
+    width: 54%;
+   
+  }
+
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner, .careye-well-bdy .well-bdy-cnt-2 .img-inner5, .careye-well-bdy .well-bdy-cnt-2 .img-inner8, .careye-well-bdy .well-bdy-cnt-2 .img-inner11, .careye-well-bdy .well-bdy-cnt-2 .img-inner14, .careye-well-bdy .well-bdy-cnt-2 .img-inner17 {
+    height: 600px;
+}
+
+
+
+  .well-bdy-cnt-1 .well-cnt-side {
+    width: 48%;
+  }
+
+  .well-bdy-cnt-2 .well-cnt-side {
+    width: 48%;
+    height: 600px;
+  }
+}
+
+@media (max-width: 1440px) {
+
+  .careyes-fasion-body-cnt .creyes-fsn-dgnsec .creyes-fsn-dgnsec-inner .careyes-degn-cnt h4{
+    font-size: 28px;
+  }
+  .careyes-fasion-body-cnt .creyes-fsn-dgnsec .creyes-fsn-dgnsec-inner .careyes-degn-cnt p {
+    font-size: 23px;
+}
+
+
+.careyes-fasion-body-cnt .creyes-fsn-dgnsec .creyes-fsn-dgnsec-inner .careyes-degn-cnt a {
+  font-size: 23px;
+}
+
+
+
+
+  .well-bdy-cnt-1 .well-imr-images {
+    width: 58%;
+  }
+
+
+
+
+  .well-bdy-cnt-2 .well-imr-images {
+    width: 58%;
+  }
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner5,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner8,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner11,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner14,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner17 {
+    height: 640px;
+  }
+
+  .well-bdy-cnt-2 .well-cnt-side {
+    width: 42%;
+    height: 640px;
+  }
+  .well-bdy-cnt-1 .well-cnt-side {
+    width: 42%;
+    height: 720px;
+  }
+  .slider-bg.careyes-wellness {
+    height: 740px !important;
+  }
+
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner2,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner3,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner4,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner6,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner7,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner9,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner10,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner12,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner13,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner15,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner16,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner18,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner19 {
+    height: 720px;
+  }
+  /* #hero-new .hero-text{
+        margin-top: 210px;} */
+  /* #hero-new .scroll-link {
+            margin-top: 70px;
+        } */
+  /* .weblogo,
+    .mn-logo-w {
+        width: 13%;
+    } */
+
+  /* .header-btn.d-flex {
+        width: 21%;
+    } */
+
+  .tabletitle {
+    text-align: center;
+  }
+
+  /* .over div div h4{
+        font-size: 18px;
+    } */
+}
+
+@media (max-width: 1400px) {
+  /* #hero-new .hero-text {
+        margin-top: 164px;
+    } */
+
+  /* #hero-new .scroll-link {
+        margin-top: 114px;
+    } */
+  #oxcariyasAllEventsSec .oxcariyasEventsSingle .alendr-img {
+    height: 280px;
+  }
+  #oxcariyasAllEventsSec .oxcariyasEventsSingle .alendr-cnt p {
+    line-height: 1.7;
+  }
+}
+
+@media (max-width: 1366px) {
+
+
+  .careyes-fasion-body-cnt .creyes-fsn-dgnsec .creyes-fsn-dgnsec-inner .careyes-degn-cnt h4 {
+    font-size: 25px;
+    margin-bottom: 10px;
+}
+
+
+
+
+  .careyes-fasion-body-cnt .creyes-fsn-dgnsec .creyes-fsn-dgnsec-inner .careyes-degn-img {
+
+    height: 325px;
+}
+
+.careyes-fasion-body-cnt .creyes-fsn-dgnsec .creyes-fsn-dgnsec-inner .careyes-degn-img img {
+  height: 330px;
+}
+
+
+.careyes-fasion-body-cnt .creyes-fsn-dgnsec .creyes-fsn-dgnsec-inner .careyes-degn-cnt a {
+  font-size: 20px;
+}
+
+  .careyes-fasion-body-cnt .creyes-fsn-dgnsec .creyes-fsn-dgnsec-inner .careyes-degn-cnt p {
+    font-size: 20px;
+}
+
+
+
+
+  .careye-well-bdy .well-bdy-cnt-2 .cnt-inner .cnt-innerpara .well-inr-para {
+    font-size: 18px;
+    line-height: 1.2;
+  }
+
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner5,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner8,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner11,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner14,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner17 {
+    height: 540px;
+  }
+  .careye-well-bdy .well-bdy-cnt-2 .cnt-inner .well-sub-hed {
+    font-size: 28px;
+  }
+
+  .careye-well-bdy {
+    margin: 120px 20px;
+  }
+  .well-bdy-cnt-1 .well-imr-images {
+    width: 56%;
+  }
+  .well-bdy-cnt-2 .well-imr-images {
+    width: 56%;
+  }
+
+  .careye-well-bdy .well-bdy-cnt-1 .cnt-inner .well-sub-hed {
+    font-size: 28px;
+  }
+
+  .careye-well-bdy .well-bdy-cnt-1 .cnt-inner .well-inr-para2 {
+    font-size: 20px;
+  }
+
+  .careye-well-bdy .well-bdy-cnt-1 .cnt-inner .well-inr-para {
+    font-size: 20px;
+  }
+
+  .careye-well-bdy .well-bdy-cnt-2 .cnt-inner .well-inr-para {
+    font-size: 20px;
+  }
+
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner2,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner3,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner4,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner6,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner7,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner9,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner10,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner12,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner13,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner15,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner16,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner18,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner19 {
+    height: 640px;
+  }
+
+  .well-bdy-cnt-2 .well-cnt-side {
+    height: 540px;
+    width: 43%;
+  }
+  .well-bdy-cnt-1 .well-cnt-side {
+    height: 640px;
+    width: 43%;
+  }
+  .careye-well-bdy .well-bdy-cnt-1 .cnt-inner .cnt-innerpara .well-inr-para {
+    font-size: 18px;
+    line-height: 1.2;
+  }
+
+  .slider-bg .slider-bnnr-hd {
+    font-size: 90px;
+  }
+  .bookticketmodal .modal-xl {
+    max-width: 95% !important;
+  }
+  #oxcariyasAllEventsSec .oxcariyasEventsSingle .alendr-cnt {
+    width: 100%;
+  }
+
+  .careyes-hosing-assistent-inr .caryes-heading {
+    font-size: 90px;
+  }
+  .oxcareyeshousingSecInr .caryes-heading {
+    font-size: 90px;
+  }
+  /*  
+    .over div div h4{
+        font-size: 16px;
+    } */
+  #univer {
+    margin-top: 130px;
+    margin-bottom: 130px;
+  }
+
+  #created {
+    margin-bottom: 130px;
+  }
+
+  #eco {
+    margin-bottom: 130px;
+  }
+
+  #hero-new .hero-inner {
+    height: 660px;
+    /* height: 1200px; */
+    background-position: top;
+  }
+
+  .slider-bnnr-hd-cumm {
+    font-size: 100px;
+  }
+
+  .faq-sec .slider-bnnr-hd {
+    font-size: 100px;
+  }
+
+  .navbar-nav {
+    gap: 10px;
+  }
+
+  /* .weblogo,
+    .mn-logo-w {
+        width: 16%;
+    } */
+
+  /* .header-btn.d-flex {
+        width: 25%;
+    } */
+
+  .evnt-invts-prfl {
+    width: 55px;
+    height: 55px !important;
+  }
+}
+
+@media (max-width: 1320px) {
+  .bookticketmodal .modal-xl {
+    max-width: 98% !important;
+  }
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner5,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner8,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner11,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner14,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner17 {
+    height: 550px;
+  }
+
+  .well-bdy-cnt-2 .well-cnt-side {
+    height: 550px;
+}
+
+
+  .oredrDtl-tbl-rs {
+    width: 100%;
+    overflow-x: scroll;
+  }
+
+  .oredrDtl-tbl-rs table {
+    width: 1280px !important;
+  }
+}
+
+@media (max-width: 1300px) {
+
+
+  
+  .careyes-fasion-body-cnt .creyes-fsn-dgnsec .creyes-fsn-dgnsec-inner .careyes-degn-img {
+
+    height: 305px;
+}
+
+.careyes-fasion-body-cnt .creyes-fsn-dgnsec .creyes-fsn-dgnsec-inner .careyes-degn-img img {
+  height: 310px;
+}
+
+
+
+
+
+
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner2,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner3,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner4,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner6,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner7,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner9,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner10,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner12,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner13,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner15,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner16,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner18,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner19 {
+    height: 655px;
+  }
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner5,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner8,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner11,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner14,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner17 {
+    height: 655px;
+  }
+
+  .well-bdy-cnt-1 .well-cnt-side {
+    height: 655px;
+  }
+  .well-bdy-cnt-2 .well-cnt-side {
+    height: 655px;
+  }
+
+  .careyes-chekout-new
+    .care-new-check
+    .checkout-innr
+    .checkot-rgt
+    .checkot-tct-purcs
+    .yr-tct-dtl
+    p
+    span {
+    font-size: 11px;
+  }
+  .careyes-chekout-new
+    .care-new-check
+    .checkout-innr
+    .checkot-rgt
+    .checkot-tct-purcs
+    .yr-tct-dtl
+    p {
+    font-size: 14px;
+  }
+  .careyes-chekout-new
+    .care-new-check
+    .checkout-innr
+    .checkot-rgt
+    .checkot-tct-purcs
+    .yr-tct-dtl
+    p
+    img {
+    margin-left: 10px;
+    height: 18px;
+  }
+
+  .bookticketmodal .modal-xl {
+    max-width: auto !important;
+  }
+
+  .careyes-assistent-cnt .careyes-assitent-sb-hd {
+    width: 60%;
+  }
+}
+
+@media (max-width: 1200px) {
+
+  .careyes-fasion-body-cnt .top-hd-cnt p {
+    font-size: 26px;
+}
+
+
+
+
+  .careyes-fasion-body-cnt .creyes-fsn-dgnsec .creyes-fsn-dgnsec-inner .careyes-degn-img {
+    height: 282px;
+}
+.careyes-fasion-body-cnt .creyes-fsn-dgnsec .creyes-fsn-dgnsec-inner .careyes-degn-img img {
+  height: 290px;
+}
+
+
+
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner2,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner3,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner4,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner6,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner7,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner9,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner10,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner12,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner13,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner15,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner16,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner18,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner19 {
+    height: 500px;
+  }
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner5,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner8,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner11,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner14,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner17 {
+    height: 500px;
+  }
+  .careye-well-bdy .well-bdy-cnt-2 .cnt-inner {
+    width: 100%;
+  }
+
+  .well-bdy-cnt-1 .well-imr-images {
+    width: 100%;
+    margin-bottom: 35px;
+  }
+  .well-bdy-cnt-2 .well-imr-images {
+    width: 100%;
+    margin-bottom: 35px;
+  }
+
+  .well-bdy-cnt-1 .well-cnt-side {
+    height: auto;
+    width: 100%;
+  }
+
+  .well-bdy-cnt-2 .well-cnt-side {
+    height: auto;
+    width: 100%;
+  }
+
+  .careye-well-bdy .well-bdy-cnt-1 .well-rgstr {
+    width: 50%;
+    margin-top: 30px;
+  }
+  .careye-well-bdy .well-bdy-cnt-2 .well-rgstr {
+    width: 50%;
+    margin: 30px 0 0;
+  }
+  .careye-well-bdy .well-bdy-cnt-1 .cnt-inner {
+    width: 100%;
+  }
+
+  .careye-well-bdy .well-bdy-cnt-1 {
+    flex-direction: column-reverse;
+  }
+
+  .careye-well-bdy .well-bdy-cnt-2 {
+    flex-direction: column;
+    margin: 80px 0;
+  }
+
+  .slider-bg.careyes-wellness {
+    height: 580px !important;
+  }
+
+  /* #oxcariyasAllEventsSec .oxcariyasEventsSingle .alendr-cnt p {
+    line-height: 35px;
+  } */
+  /* .hm-sb-dropdown-menu{
+    width: 140px ;
+  }
+
+  .hm-sub-dropdown-container:hover .hm-sb-dropdown-btn{
+    width: 140px;
+  } */
+  .oxcareyes-cnt-aft-log .inner-headingt {
+    width: 80%;
+  }
+  .oxcareyeshousingPgmnCnt p {
+    width: 80%;
+  }
+  #oxcariyasAllEventsSec .oxcariyasEventsSingle ul {
+    flex-wrap: wrap;
+  }
+  #oxcariyasAllEventsSec .oxcariyasEventsSingle ul li {
+    width: 50%;
+  }
+
+  #studio-work .studio-work-item img {
+    height: 285px;
+  }
+
+  .assit-look-sec .look-lft {
+    height: 380px;
+  }
+
+  #donatPg
+    .donateCnt
+    .donateAmount
+    .yourDonationAmt
+    .btm-dnt-frm
+    > li:first-child {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  #donatPg .donateCnt .donateAmount .yourDonationAmt ul {
+    flex-wrap: wrap;
+  }
+  #donatPg
+    .donateCnt
+    .donateAmount
+    .yourDonationAmt
+    .btm-dnt-frm
+    li:first-child
+    button {
+    font-size: 14px;
+  }
+
+  .gym-execis .gym-execis-rgt {
+    width: 100%;
+  }
+
+  .food-beverag .foodNbav-inner .foodsNbav-img {
+    height: 245px;
+  }
+
+  .recomn-beach .recomn-beach-inner .recomn-beach-img {
+    height: 210px;
+  }
+  .additin-desti .kotor .kotor-rgt-img .kotor-rgt-img-inner {
+    height: 483px;
+    margin-top: 50%;
+  }
+
+  .monte-tour-exp .tour-exp-inner .tour-exp-img {
+    height: 280px;
+  }
+  .montenegro-cnt .uniqueness-monten .uniqueness-monten-rgt {
+    width: 522px;
+    height: 334px;
+  }
+
+  #donatPg .donatPgImg {
+    height: 515px;
+  }
+
+  .memberShip-bg .memb-bnnr-cnt {
+    width: 70%;
+  }
+
+  #lineup-artist .lineup-art-imgs .artist-img {
+    width: 300px;
+    height: 300px;
+    margin: auto;
+  }
+
+  /* .navbar-nav {
+        gap: 22px;
+    } */
+
+  #hero-new .hero-inner {
+    /* height: 1100px; */
+  }
+
+  .my-tickt-sec .tckt-left.mx-5,
+  .my-tickt-sec .tckt-right.mx-5 {
+    margin-left: 1rem !important;
+    margin-right: 1rem !important;
+  }
+
+  #mon-hero {
+    margin-bottom: 40px;
+  }
+
+  #past {
+    margin-bottom: 90px;
+  }
+
+  /* #video-player iframe {
+    
+        height: 526px;
+      
+    } */
+  .navbar a.px-4.link-font {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    font-size: 13px;
+  }
+
+  /* .weblogo,
+    .mn-logo-w {
+        width: 20%;
+    } */
+
+  /* .header-btn.d-flex {
+        width: 25%;
+    } */
+
+  .oredr-tbl-rs {
+    width: 100%;
+    overflow-x: scroll;
+  }
+
+  .oredr-tbl-rs table {
+    width: 1200px !important;
+  }
+  #whre-eat .whre-eat-innr {
+    width: 90%;
+  }
+
+  .evnt-mngr-tbl {
+    width: 100%;
+    overflow-x: scroll;
+  }
+
+  .evnt-mngr-tbl table {
+    width: 1200px !important;
+  }
+  #univer h3 {
+    padding: 0px 70px;
+  }
+  .margin-btn {
+    margin-top: 15px !important;
+  }
+
+  #careyes-cnt .hidden-gem .hidden-gem-rgt {
+    width: 550px;
+    top: 116px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .recomn-beach .recomn-beach-inner .recomn-beach-img {
+    height: 202px;
+  }
+}
+
+@media (max-width: 1200px) {
+  #housing-vill-hotel .vill-hotl-lft {
+    height: 380px;
+  }
+
+  #oxcariyasAllEventsSec .oxcariyasEventsSingle .alendr-img {
+    height: 250px;
+  }
+  .careyes-chekout-new
+    .care-new-check
+    .checkout-innr
+    .checkot-lft
+    .ck-adon-event
+    .adon-inr-rgt {
+    flex-wrap: wrap;
+  }
+  .careyes-hosing-assistent-inr .caryes-heading {
+    font-size: 80px;
+  }
+  .oxcareyeshousingSecInr .caryes-heading {
+    font-size: 80px;
+  }
+  #hosing-vill-img .housing-innr {
+    height: 450px;
+  }
+
+  #Home-mn-cnt .univer-pera {
+    width: 98%;
+  }
+
+  .oxcareyes-cnt .inner-headingt {
+    width: 98%;
+  }
+}
+
+@media (max-width: 1069px) {
+
+
+  .careyes-fasion-body-cnt .creyes-fsn-dgnsec .creyes-fsn-dgnsec-inner .careyes-degn-img {
+    height: 248px;
+}
+.careyes-fasion-body-cnt .creyes-fsn-dgnsec .creyes-fsn-dgnsec-inner .careyes-degn-img {
+  height: 255px;
+}
+
+  #oxcariyasAllEventsSec .oxcariyasEventsSingle .alendr-img {
+    width: 100%;
+    height: 300px;
+  }
+
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner2,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner3,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner4,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner6,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner7,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner9,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner10,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner12,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner13,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner15,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner16,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner18,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner19 {
+    height: 450px;
+  }
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner5,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner8,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner11,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner14,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner17 {
+    height: 450px;
+  }
+
+  .careyes-chekout-new
+    .care-new-check
+    .checkout-innr
+    .checkot-lft
+    .ck-event-dtl
+    .evt-innr-dtl {
+    min-height: 200px;
+  }
+
+  .my-tickt-sec .tckt-information {
+    height: 430px;
+  }
+
+  .my-tickt-sec .tckt-right .tckt-information {
+    height: 430px;
+  }
+
+  .careyes-hosing-assistent-inr .caryes-heading {
+    font-size: 60px;
+  }
+  .oxcareyeshousingSecInr .caryes-heading {
+    font-size: 60px;
+  }
+
+  .memberShip-bg .memb-bnnr-cnt {
+    width: 80%;
+  }
+  #donatPg .donateCnt .donateAmount .yourDonationAmt .btm-dnt-frm button {
+    font-size: 14px !important;
+  }
+
+  #three-member .three-member-cnt {
+    margin: 70px 50px;
+  }
+
+  /* .weblogo,
+    .mn-logo-w {
+        width: 18%;
+    } */
+  #univer {
+    margin-top: 100px;
+    margin-bottom: 100px;
+  }
+
+  .music-bg .music-hding {
+    font-size: 90px;
+  }
+
+  #univer .univer-pera {
+    font-size: 30px;
+  }
+
+  .eco-text {
+    font-size: 30px;
+  }
+
+  #created {
+    margin-bottom: 100px;
+  }
+
+  #created .created-text .created-pera span {
+    font-family: "Satoshi-ragular";
+    font-size: 30px;
+  }
+
+  #eco {
+    margin-bottom: 100px;
+  }
+
+  .eco-text span {
+    font-size: 30px;
+  }
+
+  #video-player {
+    margin-bottom: 100px;
+  }
+
+  .mon-bg .slider-bnnr-hd {
+    font-size: 100px;
+  }
+
+  .slider-bg .slider-bnnr-hd {
+    font-size: 100px;
+  }
+
+  .accomm-sec .slider-bnnr-hd {
+    font-size: 100px;
+  }
+
+  .montenegro-sec .slider-bnnr-hd {
+    font-size: 90px;
+  }
+
+  .staff-terms-sec .slider-bnnr-hd {
+    font-size: 85px;
+  }
+
+  .tranportestion-sec .slider-bnnr-hd {
+    font-size: 90px;
+  }
+
+  .navbar a.px-4.link-font {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    font-size: 13px;
+  }
+
+  .btn,
+  .sp-container button {
+    font-size: 12px;
+  }
+
+  .villa-carousel {
+    margin: 100px 0px;
+    width: 768px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .villas-cnt {
+    margin: 100px 0px;
+  }
+
+  .villas-sec .slider-bnnr-hd {
+    font-size: 50px;
+    padding: 25px;
+  }
+
+  .hotals-carousel {
+    width: 768px;
+  }
+
+  .impact-cnt {
+    /* margin: 130px auto; */
+    text-align: center;
+    width: auto;
+  }
+
+  .update-btn {
+    margin-top: 30px;
+  }
+
+  .about-cnt {
+    margin: 100px 0px;
+  }
+
+  .about-cnt .about-image {
+    margin: 60px 0px 0;
+  }
+
+  .about-cnt .about-info {
+    margin: 80px 0px 80px;
+  }
+
+  .upcom .image-mon h1 {
+    font-size: 50px;
+  }
+
+  .upcom .image-mon {
+    height: 400px;
+  }
+
+  .faq-sec .slider-bnnr-hd {
+    font-size: 90px;
+  }
+
+  .faq-accrd .accordion-button {
+    font-size: 26px !important;
+  }
+
+  .faq-accrd .accordion-body {
+    font-size: 22px;
+  }
+
+  /* #video-player iframe {
+      
+        height: 525px;
+       
+    } */
+  button.btn-tckt.tckt-btn-sld.btn.btn-.rounded-pill {
+    font-size: 11px;
+  }
+  .careyes-sec .slider-bnnr-hd {
+    font-size: 90px;
+  }
+  .navbar-nav {
+    gap: 5px;
+  }
+}
+
+@media (max-width: 992px) {
+
+  .careyes-fasion-body-cnt .top-hd-cnt h2 {
+    font-size: 34px;
+}
+.careyes-fasion-body-cnt .top-hd-cnt .toppara {
+
+  margin: 40px 0;
+}
+.careyes-fasion-body-cnt .top-hd-cnt p {
+  font-size: 24px;
+}
+
+
+  .careyes-fasion-body-cnt .creyes-fsn-dgnsec .creyes-fsn-dgnsec-inner .row .col-lg-7{
+    order: 2;
+  }
+  .careyes-fasion-body-cnt .creyes-fsn-dgnsec .creyes-fsn-dgnsec-inner .row .col-lg-5{
+    order: 1;
+  }
+  .careyes-fasion-body-cnt .creyes-fsn-dgnsec .creyes-fsn-dgnsec-inner .careyes-degn-img img {
+    height: auto;
+}
+.careyes-fasion-body-cnt .creyes-fsn-dgnsec .creyes-fsn-dgnsec-inner .careyes-degn-img {
+  height: 420px;
+  margin-bottom: 40px;
+}
+
+
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner2,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner3,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner4,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner6,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner7,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner9,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner10,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner12,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner13,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner15,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner16,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner18,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner19 {
+    height: 380px;
+  }
+
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner5,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner8,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner11,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner14,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner17 {
+    height: 380px;
+  }
+
+  /* event menu css for mobile start */
+
+  .hm-sub-dropdown-container:hover .hm-sb-dropdown-menu {
+    display: none;
+  }
+  .hm-sb-dropdown-menu,
+  .sub-dropdown-menu,
+  .sub-dropdown-menu-monte {
+    display: block !important;
+    position: inherit;
+    background-color: transparent;
+    min-width: 140px;
+    box-shadow: 0000;
+    z-index: 1;
+    font-family: "Satoshi-ragular";
+    list-style: none;
+    padding-left: 0;
+    color: #fff;
+    font-size: 14px;
+    border-bottom: 1px solid #000;
+  }
+
+  .hm-sb-dropdown-menu li a {
+    padding: 6px 3px;
+    display: block;
+    color: #fff !important;
+  }
+
+  .ox-drp-new {
+    position: inherit !important;
+  }
+  .hm-sb-dropdown-menu li:hover {
+    background-color: transparent !important;
+  }
+  .hm-sub-dropdown-container:hover .hm-sb-dropdown-btn {
+    background-color: transparent;
+    color: #fff;
+    padding: 6px 3px;
+    display: inline-block;
+    width: 140px;
+    border: 1px solid #000;
+    border-bottom: 0;
+  }
+
+  /* 
+.hm-sub-dropdown-container,
+.hm-sb-dropdown-menu,
+.sub-dropdown-menu,
+.sub-dropdown-menu-monte {
+  position: static; 
+}
+
+.hm-sb-dropdown-btn,
+.hm-sb-dropdown-menu li,
+.sub-dropdown-menu li {
+  cursor: default; 
+  padding: 10px 16px;
+}
+
+.hm-sb-dropdown-menu {
+  display: block;
+  box-shadow: none;
+  border: none;
+  margin-top: 0;
+}
+
+.sub-dropdown-menu,
+.sub-dropdown-menu-monte {
+  display: block; 
+  box-shadow: none;
+  border: none;
+}
+
+.hm-sb-dropdown-btn:hover,
+.hm-sb-dropdown-menu li:hover,
+.sub-dropdown-menu li:hover {
+  background-color: transparent; 
+  color: inherit;
+} */
+
+  /* event menu css for mobile end */
+
+  /* #oxcariyasAllEventsSec .oxcariyasEventsSingle .alendr-img {
+    height: 330px;
+  } */
+
+  /* .hm-sb-dropdown-btn {
+    font-size: 0.81568rem;
+    border: none;
+    width: 100%;
+    padding: 6px 3px;
+    text-align: left;
+  } */
+  #oxcariyasAllEventsSec .oxcariyasEventsSingle .alendr-cnt p {
+    line-height: normal;
+  }
+  #oxcariyasAllEventsSec .trm-itlc {
+    width: 100%;
+  }
+  .oxcareyes-cnt-aft-log .inner-headingt {
+    width: 100%;
+  }
+  .oxcareyeshousingPgmnCnt p {
+    width: 100%;
+  }
+
+  #oxcariyasAllEventsSec .oxcariyasEventsSingle .addOnDvTpMargin {
+    margin-top: 80px;
+  }
+
+  .oxcareyes-cnt-aft-log.oxcareyeshousingPgmnCnt .mn-hd {
+    font-size: 30px;
+  }
+  #oxcariyasAllEventsSec hgroup h2 {
+    font-size: 30px;
+  }
+  #hosing-vill-img .housing-innr {
+    height: 340px;
+  }
+
+  .careyes-chekout-new
+    .care-new-check
+    .checkout-innr
+    .checkot-lft
+    .ck-event-dtl
+    .evt-innr-dtl {
+    min-height: 200px;
+  }
+
+  .oxcareyes-cnt-aft-log.oxcareyeshousingPgmnCnt .inner-headingt br {
+    display: none;
+  }
+
+  .assit-look-sec .look-lft {
+    height: 270px;
+  }
+  .careyes-hosing-mid-img {
+    height: 500px;
+  }
+  .careyes-assistent-cnt .careyes-assitent-sb-hd {
+    width: 80%;
+  }
+
+  .oxcareyes-cnt .inner-headingt {
+    width: 100%;
+  }
+  #hosing-vill-img h4 {
+    font-size: 30px;
+  }
+
+  #Home-mn-cnt .univer-pera {
+    width: 100%;
+    font-size: 30px;
+  }
+
+  .oxcareyes-cnt-aft-log .inner-headingt {
+    font-size: 24px;
+  }
+  #housing-vill-hotel .vill-hotl-lft {
+    height: 360px;
+  }
+  #hosing-vill p {
+    font-size: 28px;
+    margin: 40px 0;
+  }
+  /* .studios h5{
+        font-size: 30px;
+    } */
+
+  #housing-vill-hotel .vill-hotl-rgt {
+    margin: 0 20px;
+  }
+
+  #housing-vill-hotel .vill-hotl-rgt p {
+    font-size: 26px;
+  }
+
+  .image-gallery-slide .image-gallery-description {
+    width: 60% !important;
+  }
+
+  .image-gallery-slide img:hover + .image-gallery-description {
+    bottom: 15px !important;
+  }
+
+  #studio-work .image-viewer .cls-btn {
+    width: calc(85% + 78px);
+  }
+  #studio-work .image-viewer .image-gallery-index {
+    display: none !important;
+  }
+
+  .image-gallery-left-nav .image-gallery-svg,
+  .image-gallery-right-nav .image-gallery-svg {
+    height: 50px !important;
+    width: 25px !important;
+  }
+
+  .image-gallery-slide .image-gallery-image {
+    width: 80% !important;
+    object-fit: cover;
+  }
+
+  #studio-work .studio-work-item img {
+    height: 220px;
+  }
+  #studio-work .studio-work-item .studio-item-cnt h5 {
+    font-size: 15px;
+  }
+  #studio-work .studio-work-item .studio-item-cnt p {
+    font-size: 13px;
+  }
+
+  #new-home-mid .created-text .created-pera {
+    padding: 0px;
+  }
+
+  #studio-appro .studio-appro-img {
+    width: 80%;
+  }
+  .studio-head {
+    font-size: 28px;
+    margin-bottom: 25px;
+  }
+  /* .studio-para {
+        font-size: 22px;
+    } */
+
+  .care-trans-midimg .mid-inner {
+    height: 370px;
+  }
+
+  #whre-eat .whre-eat-innr {
+    height: 280px;
+  }
+
+  #careyes-cnt .hidden-gem .hidden-gem-lft {
+    width: 100%;
+    padding: 40px 40px 100px;
+  }
+  #careyes-cnt .hidden-gem .hidden-gem-lft .hidden-gem-lft-inn {
+    width: 100%;
+  }
+  .slider-bg .slider-bnnr-pra {
+    font-size: 25px;
+  }
+  #careyes-cnt .hidden-gem .hidden-gem-rgt {
+    width: 80%;
+    top: 0;
+    position: inherit;
+    margin: -79px auto 0px;
+  }
+
+  #donatPg .donateCnt .donateAmount .yourDonationAmt ul {
+    flex-wrap: nowrap;
+  }
+  #donatPg
+    .donateCnt
+    .donateAmount
+    .yourDonationAmt
+    .btm-dnt-frm
+    > li:first-child {
+    width: 33%;
+    margin-bottom: 0px;
+  }
+  .additin-desti .additin-desti-inner .additin-desti-img {
+    height: 140px;
+  }
+  .gym-execis .gym-execis-lft {
+    width: 85%;
+    margin: auto;
+  }
+  .explore-more .explore-more-inner {
+    width: 100%;
+  }
+  .explore-more .explore-more-inner2 {
+    width: 100%;
+  }
+  .additin-desti .kotor .kotor-inner {
+    padding: 55px 40px;
+  }
+
+  .additin-desti .kotor .kotor-rgt-img .kotor-rgt-img-inner {
+    position: inherit;
+    width: 100%;
+    margin-top: -46px;
+  }
+
+  .monte-tour-exp .tour-exp-inner .tour-exp-img {
+    height: 210px;
+  }
+
+  .montenegro-cnt .uniqueness-monten .uniqueness-monten-lft {
+    width: 100%;
+    padding: 40px 40px 80px 40px;
+  }
+
+  .monten-mid-bg {
+    height: 420px;
+    margin-top: 150px;
+  }
+
+  .montenegro-cnt .uniqueness-monten .uniqueness-monten-rgt {
+    width: 400px;
+    height: 260px;
+    position: initial;
+    margin: -77px auto;
+  }
+
+  .montenegro-cnt
+    .uniqueness-monten
+    .uniqueness-monten-lft
+    .uniqueness-lft-inn {
+    width: 100%;
+  }
+
+  #lineup-artist .lineup-art-imgs {
+    margin-bottom: 50px;
+  }
+
+  #lineup-artist .lineup-hding p {
+    font-size: 20px;
+  }
+
+  #lineup-artist .lineup-hding h5 {
+    font-size: 30px;
+  }
+  #membr-cummuni {
+    margin-top: 80px;
+    margin-bottom: 80px;
+  }
+
+  #lineup-artist .lineup-hding {
+    margin: 80px 50px;
+  }
+
+  #lineup-artist .lineup-art-imgs {
+    margin-top: 80px;
+  }
+
+  #three-member .three-member-bnnr .member-bnnr-cnt h2 {
+    font-size: 50px;
+  }
+
+  #three-member .three-member-bnnr .member-bnnr-cnt h5 {
+    font-size: 28px;
+  }
+  #three-member .three-member-cnt {
+    margin: 70px 40px;
+  }
+
+  .memberShip-bg .memb-bnnr-cnt {
+    width: 90%;
+  }
+
+  .memberShip-bg .memb-slider-bnnr-hd {
+    font-size: 50px;
+  }
+
+  .teamrow .pe-5.col-xl-6 {
+    padding-right: 15px !important;
+  }
+
+  .teamrow .ps-5.col-xl-6 {
+    padding-left: 15px !important;
+  }
+
+  .admn-menu {
+    display: block !important;
+    position: relative !important;
+  }
+
+  .admn-mn-drp {
+    position: absolute !important;
+    width: 230px !important;
+    left: inherit !important;
+    right: 10px !important;
+  }
+
+  .transp-monte-inner {
+    width: auto !important;
+    height: auto !important;
+  }
+
+  .transp-monte-inner img {
+    margin-bottom: 0px !important;
+  }
+
+  .monte-map .mante-map-inner {
+    width: auto !important;
+    height: auto !important;
+  }
+
+  .montenegro .montenegro-inner {
+    width: auto !important;
+    height: auto !important;
+  }
+
+  #created .created-text h3 {
+    font-family: "Didot-Italic";
+    font-size: 30px;
+    color: #000;
+    text-align: justify;
+    margin-top: 60px;
+    margin-bottom: 0px;
+    padding: 0px 0px;
+  }
+
+  #new-home-mid .created-img {
+    height: 500px;
+  }
+  #careye-housing .housing-innr {
+    height: 440px;
+  }
+
+  #careye-housing h3 {
+    font-size: 30px;
+    margin: 50px 0 15px 0;
+  }
+  #careye-housing p {
+    font-size: 30px;
+  }
+
+  .header-new.fixed a.link-font {
+    color: white !important;
+  }
+  .header-new.fixed a.link-font.active {
+    color: #86e2ca !important;
+  }
+}
+
+@media (max-width: 991px) {
+  .slider-bg.careyes-hosing-assistent {
+    height: 500px !important;
+  }
+
+  .slider-bg.oxcareyeshousingSec {
+    height: 500px !important;
+  }
+  .careyes-chekout-new .care-new-check-secnd .secon-flw .scd-hd-cnt .ck-mn-hd {
+    font-size: 30px;
+  }
+
+  .contct-contnt .contct-innr-cnt {
+    padding: 0 50px;
+  }
+  #careyes-cnt .main-para7 {
+    font-size: 22px;
+  }
+  #membr-cummuni .membr-cummuni-text {
+    padding-left: 0;
+    margin-top: 50px;
+  }
+
+  #careyes-cnt h3.inner-page-cnt {
+    margin-top: 70px !important;
+    font-size: 30px;
+  }
+
+  .admn-menu {
+    display: block !important;
+  }
+
+  #hero-new .hero-inner .link-font {
+    font-size: 16px;
+  }
+
+  #linp-cnt .linp-cnt-pera22 {
+    padding: 0 10px;
+  }
+
+  .navbar-nav {
+    gap: 6px;
+  }
+
+  /* #video-player iframe {
+        height: 380px;
+    } */
+  .navbar a.px-4.link-font {
+    padding-left: 0rem !important;
+    padding-right: 0rem !important;
+  }
+
+  #hero-new .hero-text .hero-heading {
+    font-size: 100px;
+  }
+
+  #hero-new .hero-inner {
+    height: 790px;
+  }
+
+  #univer .univer-pera {
+    padding: 0px 10px;
+  }
+  #univer h3 {
+    padding: 0px 10px;
+  }
+  /* #hero-new .hero-text {
+        margin-top: 200px;
+    } */
+
+  #hero-new .hero-text .hero-sheading {
+    font-size: 30px;
+  }
+
+  #created .created-text .created-pera {
+    font-size: 24px;
+    padding: 60px 0px 0px;
+  }
+
+  .navbar-light .collapse:not(.show) {
+    display: none !important;
+  }
+
+  .navbar-light .link-font {
+    padding: 6px 3px !important;
+  }
+
+  .navbar-light .navbar-collapse {
+    flex-basis: 100%;
+    background: #F6F2E9;
+    flex-grow: 1;
+    border-radius: 30px;
+    position: absolute;
+    z-index: 99;
+    /* right: 10px; */
+    left: 50%;
+    top: 390px;
+    transform: translate(-50%, -50%);
+    width: 60%;
+    text-align: center;
+    /* height: auto; */
+    /* bottom: 260%;
+    /* padding: 20px 20px 20px; */
+  }
+
+  .header-new.white .link-font {
+    color: #000000;
+    font-size: 18px;
+}
+.hm-sub-dropdown-container:hover .hm-sb-dropdown-btn {
+  background-color: transparent;
+  color: #000000;
+  font-size: 18px;
+  padding: 6px 3px;
+  display:block;
+  width: 100%;
+  border: 0;
+  text-align: center;
+}
+
+  /* .navbar-light .navbar-collapse {
+ 
+  } */
+
+
+
+  .navbar-light .navbar-collapse .navbar-nav {
+    margin: 20px !important;
+  }
+
+  .header-btn.d-flex {
+    width: auto;
+  }
+
+  .mn-logo-w {
+    width: auto;
+  }
+
+  .header-new .navbar-toggler {
+    position: absolute;
+    top: 0px;
+    right: 3px;
+  }
+
+  .header-btn.d-flex {
+    width: auto;
+    margin-right: 45px;
+  }
+
+  /* .btn-drop {
+        position: relative;
+        z-index: 9999;
+        height: 40px;
+        background: #404040 !important;
+        color: #fff !important;
+        padding: 0px 5px 0px 24px;
+        border: 1px solid white;
+    } */
+  .header-new .link-font {
+    color: #fff;
+  }
+
+  .header-new.fixed .link-font {
+    color: #fff;
+  }
+
+  button.btn-tckt.btn.btn-.rounded-pill {
+    /* margin-bottom: 17px; */
+    /* margin-top: 12px; */
+  }
+
+  /* .btn-drop { margin-top: 15px;} */
+
+
+  .inset-head {
+    font-size: 70px;
+  }
+
+  #hero-inset .hero-inner-inset {
+    height: 450px;
+  }
+
+  /* #hero-inset .scroll-link {
+        margin-top: 54px;
+    } */
+
+  #hero-inset .header-new white .h-100 {
+    height: 90% !important;
+  }
+
+  .in-head {
+    font-size: 30px;
+  }
+
+  .hero-inner-inset .align-items-center.h-100.row {
+    height: 90% !important;
+  }
+
+  .com-inner .inset-head {
+    font-size: 100px;
+  }
+
+  .com-inner {
+    height: 350px !important;
+  }
+
+  .com-content h3 {
+    font-family: "Satoshi-Medium";
+    color: #000;
+    font-size: 30px;
+  }
+
+  .com-pera {
+    font-size: 30px;
+  }
+
+  #hero-inset {
+    padding: 0px;
+  }
+
+  #com-content {
+    margin-bottom: 60px;
+  }
+
+  .mon-bg .slider-bnnr-hd {
+    font-size: 80px;
+  }
+
+  .mon-bg .slider-bnnr-pra {
+    font-size: 30px;
+  }
+
+  .mon-bg .scrl-btn {
+    left: 0;
+    right: 0;
+  }
+
+  .mon-bg {
+    height: 550px;
+  }
+
+  .mon-bg .slider-heading {
+    height: 70%;
+  }
+
+  .montenegro-cnt {
+    margin: 80px 0px;
+  }
+
+  .montenegro-cnt .inner-page-cnt {
+    font-size: 30px;
+  }
+
+  .montenegro-cnt .main-para {
+    font-size: 30px;
+    margin-bottom: 0px !important;
+  }
+
+  .montenegro-cnt .main-bnnr-pra {
+    font-size: 28px;
+  }
+
+  .montenegro-cnt .main-para.my-5 {
+    margin-top: 2rem !important;
+  }
+
+  .montenegro-cnt .main-para.pb-5 {
+    padding-bottom: 2rem !important;
+  }
+
+  .montenegro-cnt button.rounded-pill.lg-btn.px-4.py-2.book-btn {
+    margin-top: 20px;
+  }
+
+  /* .main-dropdwn {
+        background: #404040 !important;
+        border: none !important;
+        position: absolute;
+        left: -25px !important;
+        z-index: -2 !important;
+        border-radius: 20px !important;
+        padding: 40px 6px 6px;
+        border: 1px solid #c7c7c7 !important;
+        top: -14px !important;
+    } */
+  .monte-quote .monte-acti {
+    height: 400px;
+  }
+
+  .slider-bg .slider-bnnr-hd {
+    font-size: 70px;
+    margin-bottom: 0px;
+  }
+
+  .slider-bg {
+    height: 450px;
+  }
+
+  .oxcareyes-cnt .inner-headingt {
+    font-size: 30px;
+  }
+
+  /* .oxcareyes-cnt .para1 {
+
+        font-size: 30px;
+
+    } */
+  /* 
+    .oxcareyes-cnt .para2 {
+
+        font-size: 30px;
+
+    } */
+
+  .oxcareyes-cnt {
+    margin: 100px 0px;
+  }
+
+  .oxcareyes-cnt p.para1.pb-5 {
+    padding-bottom: 0px !important;
+  }
+
+  /* #video-player iframe {
+     
+        height: 530px;
+      
+    } */
+  h1.inset-head.text-center.intrested {
+    font-size: 80px;
+  }
+
+  .user-content {
+    padding: 0px 0px;
+  }
+
+  .accomm-sec .slider-bnnr-hd {
+    font-size: 75px;
+    /* margin-bottom: 60px; */
+  }
+
+  .accomodation-cnt .main-para {
+    font-size: 30px;
+  }
+
+  .accomodation-cnt .main-para2 {
+    font-size: 30px;
+  }
+
+  .service-box h3 {
+    top: -17px;
+    font-size: 30px !important;
+  }
+
+  .accomodation-cnt .main-para {
+    font-size: 30px;
+    width: 100%;
+  }
+
+  .accomodation-cnt .main-para2 {
+    font-size: 30px;
+    width: 100%;
+  }
+
+  .montenegro-sec .slider-bnnr-hd {
+    font-size: 90px;
+  }
+
+  .tranportestion-sec .slider-bnnr-hd {
+    font-size: 80px;
+  }
+
+  /* .montenegro-sec .slider-heading {
+
+        height: 70%;
+
+    } */
+
+  .montenegro-cnt .main-para7 {
+    font-size: 22px;
+  }
+
+  .montenegro-cnt.transport-monte .main-para7 {
+    font-size: 18px;
+  }
+
+  .montenegro-cnt h3.inner-page-cnt {
+    margin-top: 70px !important;
+  }
+
+  .montenegro-cnt .main-para1 {
+    font-size: 30px;
+  }
+
+  .montenegro-cnt .main-para2 {
+    font-size: 22px;
+  }
+
+  .montenegro-cnt .main-para3 {
+    font-size: 22px;
+  }
+
+  .montenegro-cnt h4.inner-page-cnt {
+    margin-top: 60px !important;
+  }
+
+  .montenegro-cnt .main-para2 {
+    font-size: 22px;
+  }
+
+  .yachts-cnt .main-para {
+    font-size: 30px;
+  }
+
+  .yachts-cnt {
+    margin: 100px 0px;
+  }
+
+  .yachts-cnt .main-para2 {
+    font-size: 30px;
+  }
+
+  .info-para h3 {
+    font-size: 30px;
+  }
+
+  .info-para p {
+    font-size: 22px;
+  }
+
+  .info-para p a {
+    font-size: 22px;
+  }
+
+  .foot-wrapper .mn-footer {
+    padding-top: 30px;
+  }
+
+  .social-link img {
+    width: 40px;
+  }
+
+  .villas-sec {
+    height: 450px;
+  }
+
+  .villas-cnt .main-para {
+    font-size: 30px;
+  }
+
+  .villa-carousel {
+    margin: 80px 0px;
+    width: 85%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .villas-cnt {
+    margin: 80px 0px;
+  }
+
+  /* .slider-heading {
+
+        height: 75%;
+
+    } */
+
+  .villas-cnt p.main-para.my-5.pb-5 {
+    padding-bottom: 0px !important;
+  }
+
+  .slick-prev::after {
+    width: 40px;
+    background-position: center;
+    height: 40px;
+    background-size: 36px;
+    margin-left: 5px;
+  }
+
+  .slick-next::after {
+    width: 40px;
+    height: 40px;
+    background-position: center;
+    background-size: 36px;
+
+    margin-left: -21px;
+  }
+
+  .hotels-cnt .main-para1 {
+    font-size: 30px;
+
+    width: 85%;
+  }
+
+  .hotels-cnt .main-para {
+    font-size: 20px;
+
+    width: 85%;
+  }
+
+  .accom-htl-txt {
+    width: 85%;
+  }
+
+  .hotels-cnt {
+    margin: 80px 0px 40px;
+  }
+
+  .hotels-cnt .inner-page-cnt span {
+    font-size: 30px;
+  }
+
+  .hotels-cnt .info-para {
+    width: 80%;
+    margin: auto;
+  }
+
+  .hotels-cnt .info-para h3 {
+    font-size: 20px;
+    margin-top: 80px;
+  }
+
+  .hotels-cnt .info-para p {
+    margin-bottom: 10px;
+  }
+
+  .hotels-cnt .info-para p a {
+    font-size: 20px;
+  }
+
+  .hotals-carousel {
+    width: 80%;
+  }
+
+  .program-cnt {
+    margin: 100px 0px 0px;
+    padding-bottom: 100px;
+  }
+
+  .program-cnt h3.pro_heading {
+    font-size: 30px;
+  }
+
+  .program-cnt h3.pro_heading {
+    margin-bottom: 64px !important;
+  }
+
+  .program-cnt {
+    margin: 100px 0px 0px;
+    padding-bottom: 100px;
+  }
+
+  .program-cnt h3.pro_heading {
+    margin-top: 80px !important;
+    margin-bottom: 70px !important;
+  }
+
+  .program-cnt .pro_pera {
+    font-size: 22px;
+  }
+
+  .impact-cnt .para1 {
+    font-size: 30px;
+  }
+
+  .impact-cnt {
+    margin: 100px auto;
+  }
+
+  .impact-cnt p.para2.pb-5 {
+    padding-bottom: 0px !important;
+  }
+
+  .impact-cnt .para3 {
+    font-size: 30px;
+  }
+
+  img.mx-auto.d-block.login-logoimg {
+    width: 25%;
+  }
+
+  .tickt-img {
+    height: 160px;
+    margin: 0px;
+  }
+
+  .tckt-img-cnt {
+    margin-top: 10px;
+  }
+
+  .my-tickt-sec .tckt-field {
+    font-weight: 400;
+    font-size: 13px;
+  }
+
+  .my-tickt-sec .tckt-information {
+    padding: 20px 20px 20px;
+  }
+
+  .my-tickt-sec .tckt-right .tckt-information {
+    padding: 20px 20px 20px;
+    min-height: 200px;
+    height: 240px;
+  }
+
+  .my-tickt-sec .tckt-right {
+    min-height: 700px;
+  }
+  .my-tickt-sec .tckt-left.mx-5,
+  .my-tickt-sec .tckt-right.mx-5 {
+    margin-left: 10px !important;
+    margin-right: 10px !important;
+  }
+
+  .my-tickt-sec .tckt-btn {
+    margin-top: 30px;
+    margin-bottom: 30px;
+  }
+
+  .my-tickt-sec {
+    margin: 80px 0 50px;
+  }
+
+  .my-tickt-sec .tckt-right .tckt-field {
+    font-size: 13px;
+  }
+
+  .my-tickt-sec .tickt-heding h3 {
+    font-size: 30px;
+  }
+
+  .my-tickt-sec .tickt-heding p {
+    font-size: 20px;
+  }
+
+  .my-tickt-sec .tickt-heding p span {
+    font-size: 20px;
+  }
+
+  /* .profile-row {
+  
+    justify-content: start;
+} */
+  /* .profile-upbtn {
+    margin-top: 15px;
+  
+} */
+  .about-cnt {
+    margin: 80px 0px;
+  }
+
+  /* .about-cnt .para1 {
+
+        font-size: 30px;
+
+    } */
+
+  .aboutrow .pe-5 {
+    padding-right: 1rem !important;
+  }
+
+  .aboutrow .ps-5 {
+    padding-left: 1rem !important;
+  }
+
+  /* .about-cnt .para3 {
+
+        font-size: 20px;
+
+    } */
+  /* 
+    .tean-cnt h3 {
+
+        font-size: 30px;
+
+    } */
+
+  .tean-cnt {
+    padding-bottom: 60px;
+  }
+
+  #hero-inset .ordr-confirmtion {
+    height: 300px;
+  }
+
+  .odr-bnr-hrding {
+    font-size: 40px;
+    margin-top: 30px;
+  }
+
+  .odr-sb-hrding {
+    font-size: 25px;
+  }
+
+  .upcom .image-mon h1 {
+    font-size: 35px;
+  }
+
+  .upcom .image-mon {
+    height: 286px;
+  }
+
+  .image-mon hgroup {
+    margin-top: 25px;
+  }
+
+  .upcom {
+    padding: 50px 35px 40px;
+  }
+
+  .heading-all h2 {
+    font-size: 30px;
+  }
+
+  .past-card h3 {
+    font-size: 27px;
+    margin-bottom: 0px;
+  }
+
+  .past-card {
+    border-radius: 20px;
+    height: 180px;
+  }
+
+  section.faq-sec {
+    height: 300px;
+  }
+
+  .faq-sec .slider-bnnr-hd {
+    font-size: 70px;
+  }
+
+  .policy-cnt .plicy-hding {
+    font-size: 24px;
+  }
+
+  .policy-cnt .plicy-para {
+    font-size: 20px;
+
+    text-align: justify;
+  }
+
+  .policyes table tr td {
+    font-size: 20px;
+  }
+
+  .policy-cnt ol li,
+  .policy-cnt a,
+  .policy-cnt ul li {
+    font-size: 18px;
+  }
+
+  .faq-accrd .accordion-button {
+    font-size: 24px !important;
+  }
+
+  .faq-accrd .accordion-body {
+    font-size: 20px;
+  }
+
+  .event-mdl .modal-body {
+    padding: 0px 10px !important;
+  }
+
+  .modal-content {
+    border-radius: 10px !important;
+  }
+
+  #linp-cnt {
+    margin-top: 100px;
+    margin-bottom: 100px;
+  }
+
+  #linp-cnt .linp-cnt-pera {
+    font-size: 30px;
+    padding: 0px 10px;
+  }
+
+  .input-box .input-text {
+    font-size: 13px;
+  }
+  .care-log-link {
+    font-size: 30px !important;
+  }
+}
+@media (max-width: 915px) {
+  /* #oxcariyasAllEventsSec .oxcariyasEventsSingle .alendr-img {
+    height: 330px;
+  } */
+}
+@media (max-width: 834px) {
+  /* #hero-new .hero-inner{
+        background-attachment: local !important;
+        
+      } */
+  .memberShip-bg {
+    height: 530px;
+  }
+  .careyes-chekout-new
+    .care-new-check
+    .checkout-innr
+    .checkot-lft
+    .ck-event-dtl
+    .evt-innr-dtl {
+    min-height: 175px;
+  }
+
+  .careyes-hosing-assistent-inr .caryes-heading {
+    font-size: 60px;
+  }
+  .oxcareyeshousingSecInr .caryes-heading {
+    font-size: 60px;
+  }
+
+  #three-member .three-member-bnnr {
+    border-radius: 15px;
+    height: 400px;
+  }
+
+  .careyes-order-cnfm .careyes-order-cnfm-inr .ord-rgt {
+    padding: 10px 20px 20px 20px;
+  }
+}
+
+/* Collapse oversized image and pulled images after iPad breakpoint. */
+
+@media (max-width: 767px) {
+
+
+  .careyes-fasion-body-cnt .creyes-fsn-dgnsec .creyes-fsn-dgnsec-inner .careyes-degn-img {
+    height: 360px;
+}
+
+
+
+  .careyes-hosing-assistent-inr .caryes-heading {
+    font-size: 45px;
+  }
+
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner2,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner3,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner4,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner6,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner7,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner9,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner10,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner12,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner13,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner15,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner16,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner18,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner19 {
+    height: 350px;
+  }
+
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner5,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner8,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner11,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner14,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner17 {
+    height: 350px;
+  }
+
+  #oxcariyasAllEventsSec .oxcariyasEventsSingle h5 {
+    font-size: 22px;
+  }
+  #oxcariyasAllEventsSec .oxcariyasEventsSingle .addOnDvTpMargin {
+    margin-top: 60px;
+  }
+  .careyes-chekout-new .care-new-check-secnd .secon-flw .scd-hd-cnt {
+    padding: 15px;
+  }
+
+  #oxcariyasAllEventsSec .oxcariyasEventsSingle ul li {
+    width: 100%;
+  }
+
+  .oxcareyeshousingSecInr .caryes-heading {
+    font-size: 45px;
+  }
+
+  .careyes-assistent-cnt {
+    margin-top: 60px;
+  }
+
+  .careyes-hosing-mid-img {
+    margin-top: 60px;
+  }
+
+  .asstnt-btm-btn {
+    margin: 60px 0 100px 0;
+  }
+  .assit-look-sec .look-rgt h5 {
+    margin-bottom: 20px;
+  }
+
+  .assit-look-sec .look-lft {
+    width: 80%;
+    margin: auto;
+  }
+
+  .careyes-assistent-cnt .careyes-assitent-sb-hd {
+    width: 100%;
+  }
+  .careyes-order-cnfm .careyes-order-cnfm-inr .ord-rgt .lst {
+    text-align: left;
+  }
+  .contct-contnt .contct-innr-cnt h5 {
+    font-size: 20px;
+  }
+  .about-cnt .about-info {
+    margin: 60px 0px 60px;
+  }
+
+  #hosing-vill-img .housing-innr {
+    height: 250px;
+  }
+
+  #hosing-vill p {
+    font-size: 24px;
+    margin: 30px 0;
+  }
+  #hosing-vill-img h4 {
+    font-size: 26px;
+  }
+
+  #housing-vill-hotel .vill-hotl-lft {
+    width: 80%;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #careye-housing h3 {
+    font-size: 26px;
+  }
+  #careye-housing p {
+    font-size: 26px;
+  }
+  #housing-vill-hotel .vill-hotl-rgt p {
+    font-size: 22px;
+  }
+  #oxcariyasAllEventsSec hgroup p {
+    font-size: 22px;
+  }
+
+  #careye-housing {
+    margin-top: 80px;
+  }
+  #careye-housing .housing-innr {
+    height: 340px;
+  }
+  .montenegro-btn .book-btn {
+    font-size: 16px !important;
+  }
+
+  #oxcariyasAllEventsSec .oxcariyasEventsSingle h4 {
+    font-size: 22px;
+  }
+
+  #oxcariyasAllEventsSec .oxcariyasEventsSingle ul li {
+    font-size: 20px;
+  }
+  .contct-contnt .contct-innr-cnt {
+    padding: 0;
+  }
+  #studio-work .image-viewer .image-gallery-slide .image-gallery-description {
+    font-size: 15px;
+  }
+  .oxcareyes-cnt-aft-log {
+    margin-top: 80px;
+  }
+
+  /* .oxcareyes-cnt-aft-log .inner-headingt{
+        font-size: 26px;
+    } */
+  .oxcareyes-cnt-aft-log .inner-headingt {
+    margin-bottom: 25px;
+  }
+
+  .oxcareyes-cnt-aft-log.oxcareyeshousingPgmnCnt {
+    margin-top: 60px;
+  }
+  .studios h5 {
+    font-size: 24px;
+  }
+
+  #studio-work .studio-work-item img {
+    height: 240px;
+  }
+
+  #accomo-casitas-cnt {
+    margin: 30px 0 50px;
+  }
+
+  #studio-appro .studio-appro-img {
+    width: 100%;
+  }
+
+  #accomo-casitas-cnt h5 {
+    font-size: 25px;
+  }
+
+  .care-trans-midimg h5 {
+    font-size: 22px;
+  }
+
+  #accomo-casitas-cnt p {
+    font-size: 20px;
+  }
+
+  .careyes-trans-cnt {
+    margin: 60px 0;
+  }
+  .care-trans-midimg .mid-inner {
+    height: 280px;
+  }
+
+  #careyes-cnt .hidden-gem .hidden-gem-rgt {
+    height: 230px;
+  }
+  .careyes-sec .slider-bnnr-hd {
+    font-size: 70px;
+  }
+  #careyes-cnt .hidden-gem {
+    margin: 60px 0;
+  }
+  #careyes-cnt h3.inner-page-cnt {
+    margin-top: 60px !important;
+  }
+
+  .careyes-sec {
+    height: 450px;
+  }
+
+  #donatPg
+    .donateCnt
+    .donateAmount
+    .yourDonationAmt
+    .btm-dnt-frm
+    > li:first-child {
+    width: 23%;
+  }
+  .additin-desti .kotor .kotor-rgt-img .kotor-rgt-img-inner {
+    height: 320px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .gym-execis .gym-execis-lft {
+    width: 100%;
+  }
+  .montenegro-cnt .montenegro-cnt-inside {
+    width: 100%;
+  }
+  .monten-mid-bg {
+    height: 300px;
+    margin-top: 150px;
+  }
+  .monten-btm-bg {
+    height: 300px;
+  }
+
+  .additin-desti .additin-desti-inner .additin-desti-img {
+    height: 200px;
+  }
+
+  #donatPg .donatPgImg {
+    height: 430px;
+  }
+
+  .stf-tct-dtl .tckt_includs .pckg-incld h6 {
+    font-size: 16px;
+    line-height: 1.4;
+  }
+
+  .stf-tct-dtl .tckt_includs .pckg-incld p {
+    font-size: 16px;
+    line-height: 1.4;
+  }
+
+  .stf-tct-dtl .tckt_includs .pckg-incld p span {
+    font-size: 16px;
+    line-height: 1.4;
+  }
+
+  .stf-tct-dtl h5 {
+    font-size: 16px;
+  }
+
+  #lineup-artist .lineup-art-imgs .artist-img {
+    width: 250px;
+    height: 250px;
+  }
+
+  .staff-tct h3 {
+    font-size: 36px;
+  }
+
+  .staff-tct h3 .fnt-ddot {
+    font-size: 36px;
+  }
+
+  #lineup-artist .lineup-art-imgs {
+    margin-bottom: 40px;
+  }
+  #lineup-artist .lineup-hding {
+    margin: 70px 0px;
+  }
+  #lineup-artist .lineup-art-imgs {
+    margin-top: 70px;
+  }
+  .memberShip-bg .memb-bnnr-cnt {
+    width: 95%;
+  }
+
+  #three-member .three-member-cnt {
+    margin: 70px 25px;
+  }
+
+  .memberShip-bg .memb-slider-bnnr-hd {
+    font-size: 45px;
+  }
+
+  #three-member .three-member-bnnr .member-bnnr-cnt h2 {
+    font-size: 45px;
+  }
+
+  #three-member .three-member-bnnr .member-bnnr-cnt h5 {
+    font-size: 22px;
+  }
+
+  .staff-btm-btn .btn {
+    font-size: 16px;
+  }
+
+  .staff-terms {
+    margin-bottom: 30px;
+  }
+
+  .form-check.stf-trms label {
+    font-size: 16px;
+  }
+
+  .trms-hrdng {
+    font-size: 16px;
+    margin-top: 40px;
+  }
+
+  .staff-tct h4 {
+    font-size: 16px;
+  }
+
+  .staff-tct .plicy-para {
+    font-size: 16px;
+    line-height: 1.4;
+  }
+
+  /* .staff-terms li{
+        font-size: 16px !important;
+        font-family: "Satoshi-light" !important;
+        line-height: 1.4 !important;
+        margin-bottom: 20px;
+      }
+      .staff-terms h6{
+        font-size: 17px;
+        color: black;
+        font-family: "Satoshi-ragular";
+        font-weight: 600;
+        margin-top: 40px;
+      }
+    
+      .staff-terms p{
+        font-size: 16px !important;
+        font-family: "Satoshi-light" !important;
+        line-height: 1.4 !important;
+        margin-bottom: 20px;
+      } */
+
+  #aboutpagebg-1 .program-cnt .reges p {
+    font-size: 18px;
+  }
+
+  #univer h3 {
+    font-size: 28px;
+  }
+
+  #created .created-text h3 {
+    font-size: 28px;
+  }
+  .music-bg .music-hding {
+    font-size: 70px;
+  }
+
+  .tranportestion-sec {
+    height: 450px;
+  }
+
+  .music-bg {
+    height: 450px;
+  }
+
+  #aboutpagebg-1 .program-cnt .note p {
+    font-size: 18px;
+  }
+
+  #aboutpagebg-1 .program-cnt .rent p {
+    font-size: 18px;
+  }
+
+  .montenegro-cnt .main-para6 {
+    font-size: 18px;
+  }
+
+  .montenegro-cnt .main-para4 {
+    font-size: 18px;
+  }
+
+  #hero-new .hero-text .hero-heading {
+    font-size: 100px;
+  }
+
+  .membr-btn-prt .memberbtn span {
+    top: 5px;
+  }
+
+  #univer .univer-pera {
+    padding: 0px 0px;
+  }
+  #univer h3 {
+    padding: 0px 0px;
+  }
+
+  .foot-link {
+    font-size: 15px;
+  }
+
+  #about-footr .foot-link {
+    font-size: 15px;
+  }
+
+  /* .foot-wrapper .mn-footer .center-links{
+    margin-bottom: 20px;
+} */
+  #univer .univer-pera {
+    font-size: 26px;
+  }
+
+  #univer {
+    margin-top: 50px;
+    margin-bottom: 80px;
+  }
+
+  #univer .univer-pera {
+    font-size: 26px;
+  }
+
+  #linp-cnt .linp-cnt-pera {
+    font-size: 26px;
+  }
+
+  #created .created-text .created-pera span {
+    font-family: "Satoshi-ragular";
+    font-size: 26px;
+  }
+
+  #created .created-text .created-pera {
+    font-size: 22px;
+    padding: 60px 0px 0px;
+  }
+
+  #created {
+    margin-bottom: 80px;
+  }
+
+  .eco-text {
+    font-size: 26px;
+  }
+
+  .eco-text span {
+    font-size: 26px;
+  }
+
+  .com-inner .inset-head {
+    font-size: 75px;
+  }
+
+  .mon-bg .slider-bnnr-hd {
+    font-size: 60px;
+  }
+
+  .mon-bg .slider-bnnr-pra {
+    font-size: 24px;
+  }
+
+  .mon-bg {
+    height: 450px;
+  }
+
+  .mon-bg .slider-heading {
+    height: 70%;
+  }
+
+  .montenegro-cnt {
+    margin: 60px 0px;
+  }
+
+  .montenegro-cnt p.main-para.pb-5 {
+    padding-bottom: 16px;
+  }
+
+  .montenegro-cnt .inner-page-cnt {
+    font-size: 26px;
+  }
+
+  .montenegro-cnt .main-para {
+    font-size: 26px;
+  }
+
+  .montenegro-cnt .main-bnnr-pra {
+    font-size: 24px;
+  }
+
+  .montenegro-cnt .main-para.pb-5 {
+    padding-bottom: 1rem !important;
+  }
+
+  .montenegro-cnt .main-para.my-5 {
+    margin-top: 1rem !important;
+  }
+
+  .slidersub-menu ul {
+    width: 100%;
+  }
+
+  .montenegro-cnt h3.inner-page-cnt {
+    margin-top: 60px !important;
+  }
+
+  .in-pera .log-link {
+    font-size: 24px;
+  }
+
+  .slider-bnnr-hd-cumm {
+    font-size: 60px;
+  }
+
+  .monte-quote .monte-acti {
+    height: 350px;
+  }
+
+  .oxcareyes-cnt {
+    margin: 80px 0px;
+  }
+
+  /* #video-player iframe {
+    height: 290px;
+} */
+  #video-player .play-button-wrapper #circle-play-b {
+    width: 50px;
+  }
+
+  .slider-bg .slider-bnnr-hd {
+    font-size: 60px;
+  }
+
+  h1.inset-head.text-center.intrested {
+    font-size: 60px;
+  }
+
+  .new-mb-btn {
+    font-size: 14px;
+    display: flex;
+    padding: 7px 14px;
+    align-items: center;
+  }
+
+  .new-mb-btn img {
+    width: 25px;
+  }
+
+  .accomm-sec .slider-bnnr-hd {
+    font-size: 60px;
+    /* margin-bottom: 60px; */
+  }
+
+  .accomm-sec {
+    height: 450px;
+  }
+
+  .accomodation-cnt {
+    margin: 80px 0px;
+  }
+
+  .accomodation-cnt .main-para {
+    font-size: 26px;
+  }
+
+  .accomodation-cnt .main-para2 {
+    font-size: 26px;
+  }
+
+  .accomodation-cnt {
+    margin: 60px 0px;
+  }
+
+  .accomodation-cnt .pb-5 {
+    padding-bottom: 1rem !important;
+  }
+
+  .accomodation-cnt .my-5 {
+    margin-bottom: 1rem !important;
+  }
+
+  .service-box h3 {
+    font-size: 24px !important;
+  }
+
+  .montenegro-sec .slider-bnnr-hd {
+    font-size: 70px;
+  }
+
+  .staff-terms-sec .slider-bnnr-hd {
+    font-size: 70px;
+  }
+
+  .tranportestion-sec .slider-bnnr-hd {
+    font-size: 70px;
+  }
+
+  .montenegro-sec {
+    height: 450px;
+  }
+
+  .porto-novi {
+    height: 450px;
+  }
+
+  .porto-monte {
+    height: 450px;
+  }
+
+  .staff-terms-sec {
+    height: 450px;
+  }
+
+  .yachts-sec {
+    height: 400px;
+  }
+
+  /* .slider-heading {
+
+        height: 75%;
+
+    } */
+
+  .yachts-sec .slider-bnnr-hd {
+    font-size: 50px;
+    padding: 20px;
+  }
+
+  .yachts-cnt .pb-5 {
+    padding-bottom: 10px !important;
+  }
+
+  .yachts-cnt .my-5 {
+    margin-top: 10px !important;
+  }
+
+  .yachts-cnt {
+    margin: 70px 0px;
+  }
+
+  .yachts-cnt .main-para {
+    font-size: 26px;
+  }
+
+  .yachts-cnt .main-para2 {
+    font-size: 26px;
+
+    width: 100%;
+  }
+
+  .info-para h3 {
+    font-size: 26px;
+  }
+
+  .info-para p {
+    font-size: 20px;
+  }
+
+  .info-para p a {
+    font-size: 18px;
+  }
+
+  .yachts-cnt .main-para {
+    width: 100%;
+  }
+
+  .center-links.d-flex.px-0.mt-3.gap-4 {
+    gap: 10px !important;
+    margin-top: 10px !important;
+  }
+
+  .foot-wrapper .mn-footer {
+    padding-top: 70px;
+  }
+
+  .bottom-foot {
+    margin-top: 60px;
+  }
+
+  #about-footr .foot-wrapper .mn-footer {
+    padding-top: 70px;
+  }
+
+  #about-footr .bottom-foot {
+    margin-top: 60px;
+  }
+
+  .villas-cnt .main-para {
+    font-size: 26px;
+  }
+
+  .villas-cnt .main-para {
+    width: 100%;
+  }
+
+  .villas-sec {
+    height: 400px;
+  }
+
+  .villas-sec .slider-bnnr-hd {
+    font-size: 40px;
+    padding: 25px;
+  }
+
+  /* .slider-heading {
+        height: 70%;
+    } */
+
+  .hotels-cnt .inner-page-cnt span {
+    font-size: 26px;
+  }
+
+  .hotels-cnt .main-para1 {
+    font-size: 26px;
+  }
+
+  .program-cnt h3.pro_heading {
+    margin-top: 60px !important;
+    margin-bottom: 60px !important;
+  }
+
+  /* .impact-cnt .para1 {
+        font-size: 26px;
+    } */
+
+  .impact-cnt .para2 {
+    font-size: 20px;
+  }
+
+  .impact-cnt .para2 span {
+    font-size: 17px;
+  }
+
+  .impact-cnt {
+    margin: 70px auto;
+  }
+
+  .impact-cnt p.para1.my-5,
+  .impact-cnt p.para3.my-5,
+  .impact-cnt p.para4.my-5,
+  .impact-cnt p.para5.my-5 {
+    margin-top: 10px !important;
+    margin-bottom: 10px !important;
+  }
+
+  .impact-cnt p.para1.pb-5,
+  .impact-cnt p.para3.pb-4,
+  .impact-cnt p.para4.pb-4,
+  .impact-cnt p.para5.pb-5 {
+    padding-bottom: 20px !important;
+  }
+
+  .imp-video-sec {
+    margin-bottom: 60px;
+  }
+
+  .imp-video-sec {
+    margin-bottom: 60px;
+  }
+
+  /* .impact-cnt .para3 {
+        font-size: 26px;
+    } */
+
+  /* .my-tickt-sec .tckt-left {
+
+        min-height: auto;
+
+    } */
+
+  /* .my-tickt-sec .tckt-right {
+
+        min-height: auto;
+
+    } */
+
+  /* .about-cnt .para1 {
+        font-size: 26px;
+    } */
+
+  .about-cnt {
+    margin: 60px 0px;
+  }
+
+  .aboutrow .mb-5 {
+    margin-bottom: 1rem !important;
+  }
+
+  #hero-inset .ordr-confirmtion {
+    height: 250px;
+  }
+
+  .odr-scces h3 {
+    font-size: 20px;
+  }
+
+  .odr-scces p {
+    font-size: 12px;
+  }
+
+  .count-btn {
+    font-size: 12px !important;
+  }
+
+  .heading-all h2 {
+    font-size: 26px;
+  }
+
+  .upcom .image-mon h1 {
+    font-size: 25px;
+  }
+
+  .e-date {
+    font-size: 20px;
+  }
+
+  .upcom .image-mon {
+    height: 200px;
+  }
+
+  #mon-hero {
+    margin-bottom: 15px;
+  }
+
+  .past-card {
+    border-radius: 30px;
+    height: 180px;
+  }
+
+  .past-card h3 p {
+    margin-top: 0;
+    margin-bottom: 0rem;
+  }
+
+  #past {
+    margin-bottom: 60px;
+  }
+
+  section.faq-sec {
+    height: 250px;
+  }
+
+  .faq-sec .slider-bnnr-hd {
+    font-size: 50px;
+  }
+
+  .policy-cnt .plicy-hding {
+    font-size: 20px;
+  }
+
+  .policy-cnt .plicy-para {
+    font-size: 18px;
+  }
+
+  .policyes table tr td {
+    font-size: 18px;
+  }
+
+  .policy-cnt ol li,
+  .policy-cnt a,
+  .policy-cnt ul li {
+    font-size: 17px;
+  }
+
+  .faq-accrd .faq-hding {
+    font-size: 26px;
+    margin-bottom: 25px;
+  }
+
+  .accordion-button {
+    padding: 10px 0;
+  }
+
+  .faq-accrd .accordion-button {
+    font-size: 20px !important;
+  }
+
+  .faq-accrd .accordion-body {
+    font-size: 18px;
+    text-align: justify;
+  }
+
+  .faq-accrd .accordion-button::after {
+    width: 20px;
+    height: 20px;
+    background-size: 12px !important;
+  }
+
+  .faq-accrd .accordion-button:not(.collapsed)::after {
+    width: 20px;
+    height: 20px;
+    background-size: 20px;
+  }
+
+  .tean-cnt h3 {
+    font-size: 26px;
+  }
+
+  .imp_vdo {
+    padding: 43% 0 0 0;
+    border-radius: 15px;
+  }
+
+  #linp-cnt {
+    margin-top: 70px;
+    margin-bottom: 70px;
+  }
+
+  .custom-file-upload {
+    padding: 7px 20px;
+  }
+
+  .profile-name {
+    width: 37%;
+  }
+
+  button.btn-tckt.tckt-btn-sld.btn.btn-.rounded-pill {
+    font-size: 11px;
+  }
+
+  .tckt-right .qricon {
+    margin-bottom: 0px !important;
+  }
+}
+
+@media (max-width: 643px) {
+
+  .careyes-fasion-body-cnt .creyes-fsn-dgnsec .creyes-fsn-dgnsec-inner .careyes-degn-img {
+    height: 300px;
+}
+.careyes-fasion-body-cnt .creyes-fsn-dgnsec .creyes-fsn-dgnsec-inner .careyes-degn-cnt h4 {
+  font-size: 22px;
+}
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner2,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner3,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner4,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner6,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner7,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner9,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner10,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner12,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner13,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner15,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner16,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner18,
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner19 {
+    height: 320px;
+  }
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner5,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner8,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner11,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner14,
+  .careye-well-bdy .well-bdy-cnt-2 .img-inner17 {
+    height: 320px;
+  }
+
+  .careye-well-bdy {
+    margin: 100px 10px;
+}
+
+
+
+  .careyes-chekout-new .care-new-check .checkout-innr .checkot-lft .ck-mn-hd {
+    font-size: 30px;
+  }
+
+  #oxcariyasAllEventsSec .oxcariyasEventsSingle .alendr-img {
+    height: 280px;
+  }
+  .careyes-chekout-new .care-new-check .checkout-innr .checkot-lft .ck-mn-pr {
+    width: 100%;
+  }
+
+  .slider-bg .slider-heading {
+    top: calc(50% - -7px);
+  }
+  .slider-bg.careyes-hosing-assistent {
+    height: 400px !important;
+  }
+
+  .slider-bg.oxcareyeshousingSec {
+    height: 400px !important;
+  }
+
+  .care-log-link {
+    font-size: 24px !important;
+  }
+
+  #studio-work .image-viewer .cls-btn {
+    top: 32px;
+  }
+  .image-gallery-slide .image-gallery-image {
+    width: 90% !important;
+  }
+  .image-gallery-slide .image-gallery-description {
+    width: 80% !important;
+  }
+  .image-gallery-slide img:hover + .image-gallery-description {
+    width: 80% !important;
+  }
+
+  #btm-vst-sec h6 {
+    font-size: 20px;
+  }
+
+  #btm-vst-sec .vst-sec-item h4 {
+    font-size: 28px;
+  }
+
+  #Home-mn-cnt .univer-pera {
+    font-size: 26px;
+  }
+
+  #Home-mn-cnt .uni-para-sto {
+    font-size: 20px;
+  }
+
+  #new-home-mid .created-text .created-pera span {
+    font-size: 25px;
+  }
+  #new-home-mid .created-text .created-pera {
+    font-size: 20px;
+  }
+
+  .careyes-sec {
+    height: 350px;
+  }
+
+  #donatPg .donateCnt .donateAmount .yourDonationAmt ul li ul li {
+    font-size: 16px;
+  }
+
+  #donatPg .donateCnt p {
+    font-size: 16px;
+  }
+
+  #lineup-artist .lineup-hding h5 {
+    font-size: 25px;
+    margin: 15px;
+  }
+  #lineup-artist .lineup-hding p {
+    text-align: justify;
+    font-size: 18px;
+  }
+
+  #lineup-artist .lineup-art-imgs {
+    margin-bottom: 30px;
+  }
+
+  #membr-cummuni .membr-cummuni-img {
+    height: 350px;
+  }
+
+  #three-member .three-member-cnt h6 {
+    font-size: 22px;
+  }
+  #three-member .three-member-cnt p {
+    font-size: 18px;
+  }
+
+  #three-member {
+    padding: 20px;
+  }
+
+  #three-member .three-member-cnt {
+    margin: 70px 10px;
+  }
+  #three-member .three-member-bnnr {
+    border-radius: 15px;
+    height: 350px;
+  }
+  #membr-cummuni .membr-cummuni-text h5 {
+    font-size: 30px;
+  }
+
+  #membr-cummuni .membr-cummuni-text p {
+    font-size: 20px;
+  }
+  #membr-cummuni .membr-cummuni-text h6 {
+    font-size: 18px;
+  }
+
+  #linp-cnt {
+    margin-top: 60px;
+    margin-bottom: 60px;
+  }
+  .tranportestion-sec {
+    height: 350px;
+  }
+
+  .music-bg {
+    height: 350px;
+  }
+  .tranportestion-sec .slider-bnnr-hd {
+    font-size: 60px;
+  }
+
+  .hm-video-sec {
+    margin-bottom: 80px;
+  }
+
+  #hero-new .hero-inner {
+    height: 500px;
+  }
+
+  /* #hero-new .hero-text {
+        margin-top: 160px;
+    } */
+
+  #hero-new .hero-text .hero-heading {
+    font-size: 70px;
+  }
+
+  #hero-new .hero-text .hero-sheading {
+    font-size: 26px;
+  }
+
+  /* #hero-new .scroll-link {
+        margin-top: 120px;
+    } */
+
+  #hero-new {
+    padding: 12px;
+    margin-bottom: 0px;
+  }
+
+  .bottom-foot {
+    margin-top: 40px;
+  }
+
+  .foot-wrapper .mn-footer {
+    padding-top: 70px;
+  }
+
+  /* .left-links { display: flex; 
+    } */
+  .right-links {
+    text-align: right;
+    /* display: flex; */
+    justify-content: right;
+  }
+
+  .left-links .foot-link {
+    margin-right: 10px;
+  }
+
+  .right-links .foot-link {
+    margin-left: 10px;
+  }
+
+  .play-button-wrapper img {
+    width: 40px;
+  }
+
+  .inset-head {
+    font-size: 50px;
+  }
+
+  .e-date {
+    font-size: 24px;
+  }
+
+  #hero-inset .hero-inner-inset {
+    height: 400px !important;
+  }
+  /* 
+    #hero-inset {
+
+        margin-bottom: 50px;
+    } */
+
+  .in-head {
+    font-size: 26px;
+  }
+
+  /* .in-pera {
+        font-size: 26px;
+    } */
+
+  .com-inner {
+    height: 300px !important;
+  }
+
+  .com-pera {
+    font-size: 26px;
+  }
+
+  .com-content h3 {
+    font-size: 26px;
+  }
+
+  .mon-bg .slider-bnnr-hd {
+    font-size: 50px;
+  }
+
+  .mon-bg {
+    height: 400px;
+  }
+
+  .mon-bg .slider-bnnr-pra {
+    font-size: 20px;
+  }
+
+  .monte-quote .monte-acti {
+    height: 300px;
+  }
+
+  .slider-bg {
+    height: 400px;
+  }
+
+  .oxcareyes-cnt .inner-headingt {
+    font-size: 26px;
+  }
+
+  /* .oxcareyes-cnt .para1 {
+        font-size: 26px;
+    } */
+
+  /* #video-player iframe {
+        height: 290px;
+    } */
+
+  /* .oxcareyes-cnt .para2 {
+        font-size: 26px;
+    } */
+
+  .slider-bg {
+    height: 350px;
+  }
+
+  .accomm-sec {
+    height: 350px;
+  }
+
+  .accomm-sec .slider-bnnr-hd {
+    font-size: 50px;
+    /* margin-bottom: 50px; */
+  }
+
+  .service-sec {
+    margin-bottom: 80px;
+  }
+
+  .montenegro-sec {
+    height: 350px;
+  }
+
+  .porto-novi {
+    height: 350px;
+  }
+
+  .porto-monte {
+    height: 350px;
+  }
+
+  .staff-terms-sec {
+    height: 350px;
+  }
+
+  .yachts-sec {
+    height: 350px;
+  }
+
+  .yachts-cnt {
+    margin: 60px 0px;
+  }
+
+  .villas-cnt .main-para {
+    font-size: 24px;
+  }
+
+  .villas-sec {
+    height: 350px;
+  }
+
+  .villas-sec .slider-bnnr-hd {
+    font-size: 30px;
+    padding: 0px 25px;
+  }
+
+  .yachts-sec .slider-bnnr-hd {
+    font-size: 30px;
+    padding: 0px 25px;
+  }
+
+  .villas-cnt {
+    margin: 60px 0px;
+  }
+
+  .hotals-carousel {
+    width: 85%;
+  }
+
+  .hotels-cnt {
+    margin: 60px 0px 30px;
+  }
+
+  .hotels-cnt .main-para1 {
+    font-size: 24px;
+  }
+
+  .hotels-cnt .main-para1 span {
+    font-size: 20px;
+  }
+
+  .program-cnt h3.pro_heading {
+    font-size: 26px;
+  }
+
+  .program-cnt {
+    margin: 60px 0px 0px;
+    padding-bottom: 80px;
+  }
+
+  .program-cnt h3.pro_heading {
+    margin-top: 60px !important;
+    margin-bottom: 30px !important;
+  }
+
+  .program-cnt .pro_pera {
+    font-size: 18px;
+    text-align-last: center;
+  }
+
+  .program-info .day_info {
+    font-size: 20px;
+
+    text-align-last: center;
+  }
+
+  .program-cnt {
+    padding-bottom: 40px;
+  }
+
+  .program-info .day_info {
+    padding: 0px 0px;
+  }
+
+  /* .impact-cnt .para1 {
+        font-size: 24px;
+    } */
+
+  .impact-cnt .para2 {
+    font-size: 18px;
+  }
+
+  .impact-cnt .para2 span {
+    font-size: 15px;
+  }
+
+  /* .impact-cnt .para3 {
+        font-size: 24px;
+    } */
+
+  img.mx-auto.d-block.login-logoimg {
+    width: 200px;
+    margin-top: 80px;
+  }
+
+  .form-text {
+    font-size: 16px;
+
+    margin-top: 10px;
+  }
+
+  .update-btn {
+    margin-top: 10px;
+    margin-bottom: 50px;
+  }
+
+  .my-tickt-sec .tickt-heding h3 {
+    font-size: 26px;
+  }
+
+  .my-tickt-sec .tickt-heding p {
+    font-size: 18px;
+  }
+
+  .my-tickt-sec .tickt-heding p span {
+    font-size: 18px;
+  }
+
+  .profile-name h3 {
+    font-size: 20px;
+  }
+
+  .custom-file-upload {
+    padding: 7px 20px;
+  }
+
+  /* .about-cnt .para1 {
+        font-size: 24px;
+    } */
+
+  .about-cnt .py-5 {
+    padding-bottom: 3rem !important;
+  }
+
+  .team-sec img {
+    width: 80%;
+  }
+
+  /* .team-sec p {
+        font-size: 16px;
+
+    } */
+
+  .upcom {
+    padding: 40px 35px 30px;
+  }
+
+  .heading-all h2 {
+    font-size: 24px;
+  }
+
+  .past-card {
+    padding: 20px;
+  }
+
+  .policy-cnt {
+    margin-bottom: 25px;
+  }
+
+  .faq-accrd .faq-hding {
+    font-size: 24px;
+  }
+
+  .faq-accrd .accordion-button {
+    font-size: 18px !important;
+  }
+
+  .faq-accrd .accordion-body {
+    font-size: 16px;
+  }
+
+  .faq-accrd .accordion-body {
+    padding: 5px 0 20px;
+  }
+
+  /* .faq-accrd .faq-hding {
+    font-size: 22px;
+    margin-bottom: 20px;
+}
+.faq-accrd .accordion-button {
+   
+    padding: 15px 0;
+} */
+
+  .faq-accrd {
+    margin-bottom: 50px;
+  }
+
+  .imp_vdo {
+    padding: 44% 0 0 0;
+  }
+
+  /* .slider-heading {
+        height: 60%;
+    } */
+
+  /* .header-new .navbar-toggler {
+
+    top: 8px;
+    right: 5px;
+} */
+
+  .tean-cnt {
+    margin-top: 60px;
+  }
+}
+
+@media (max-width: 576px) {
+
+  .careyes-fasion-body-cnt .creyes-fsn-dgnsec {
+    margin: 0 3%;
+}
+.careyes-fasion-body-cnt .top-hd-cnt .toppara {
+  font-family: "Satoshi-medium";
+  margin: 30px 0;
+}
+.careyes-fasion-body-cnt .top-hd-cnt h2 {
+  font-size: 28px;
+}
+
+.careyes-fasion-body-cnt .top-hd-cnt p {
+  font-size: 22px;
+}
+
+
+.careyes-fasion-body-cnt .top-hd-cnt {
+  margin: 80px 0;
+}
+
+  .careyes-fasion-body-cnt .creyes-fsn-dgnsec .creyes-fsn-dgnsec-inner .careyes-degn-cnt p {
+    text-align: justify;
+    margin-bottom: 8px;
+}
+.careyes-fasion-body-cnt .top-hd-cnt p {
+  text-align: justify;
+}
+
+
+
+
+  .careye-well-bdy .well-bdy-cnt-1 .cnt-inner .well-sub-hed {
+    font-size: 24px;
+    line-height: 1.3;
+}
+
+.careye-well-bdy .well-bdy-cnt-1 .cnt-inner .well-inr-para, .careye-well-bdy .well-bdy-cnt-2 .cnt-inner .well-inr-para{
+  text-align: justify;
+}
+
+.careye-well-bdy .well-bdy-cnt-2 .cnt-inner .well-sub-hed{
+  line-height: 1.3;
+  font-size: 24px;
+}
+
+
+
+  .careye-well-bdy .well-bdy-cnt-1 .well-rgstr {
+    width: 100%;
+    margin-top: 25px;
+    font-size: 18px;
+    padding: 13px 30px;
+  }
+  /* .careye-well-bdy .well-bdy-cnt-2 {
+    margin: 60px 0;
+} */
+  .careye-well-bdy .well-bdy-cnt-2 .well-rgstr {
+    width: 100%;
+    margin: 25px 0 0 0;
+    font-size: 18px;
+     padding: 13px 30px;
+}
+
+
+
+  .careye-well-bdy {
+    margin: 80px 0px;
+}
+  .careyes-chekout-new
+    .care-new-check
+    .checkout-innr
+    .checkot-lft
+    .ck-event-dtl {
+    margin-top: 30px;
+  }
+  #oxcariyasAllEventsSec .oxcariyasEventsSingle .alendr-cnt p {
+    text-align: justify;
+  }
+
+  .hm-sb-dropdown-btn {
+    padding: 10px 0;
+  }
+  #oxcariyasAllEventsSec .oxcariyasEventsSingle p {
+    text-align: justify;
+  }
+
+  .oxcareyeshousingPgmnCnt p {
+    text-align: justify;
+  }
+
+  #oxcariyasAllEventsSec .oxcariyasEventsSingle .addOnDvTpMargin {
+    margin-top: 30px;
+  }
+
+  #oxcariyasAllEventsSec .oxcariyasEventsSingle .alendr-img {
+    height: 250px;
+  }
+
+  #oxcariyasAllEventsSec hgroup h2 {
+    font-size: 26px;
+    margin-bottom: 0;
+  }
+  .oxcareyes-cnt-aft-log.oxcareyeshousingPgmnCnt .mn-hd {
+    font-size: 26px;
+    margin-bottom: 22px;
+  }
+  .careyes-chekout-new
+    .care-new-check
+    .checkout-innr
+    .checkot-lft
+    .ck-event-dtl
+    .evnt-dtl-lft {
+    flex-wrap: wrap;
+  }
+  .careyes-chekout-new .care-new-check .checkout-innr .checkot-lft {
+    border-radius: 15px;
+    padding: 10px;
+  }
+  .my-tickt-sec .tckt-information {
+    height: 500px;
+  }
+
+  .my-tickt-sec .tckt-left {
+    min-height: 945px;
+  }
+
+  .oxcarysBtnUl li a {
+    width: 220px;
+  }
+
+  #oxcariyasAllEventsSec .oxcariyasEventsSingle {
+    margin: 40px 15px;
+    border-radius: 15px;
+  }
+
+  #oxcariyasAllEventsSec .oxcariyasEventsSingle .oxcariyasEventsSingleInr {
+    padding: 20px 20px 0px;
+  }
+
+  .assit-look-sec .look-lft {
+    width: 85%;
+  }
+  .careyes-assistent-cnt .careyes-assitent-sb-hd {
+    font-size: 22px;
+    margin: auto auto 25px;
+  }
+  .careyes-hosing-mid-img {
+    height: 350px;
+  }
+
+  .careyes-order-cnfm h4 {
+    font-size: 22px;
+  }
+
+  .careyes-order-cnfm .careyes-order-cnfm-inr .odr-lft h5 {
+    font-size: 20px;
+  }
+
+  .careyes-order-cnfm .careyes-order-cnfm-inr .odr-lft p {
+    font-size: 15px;
+  }
+  #hero-new .scroll-link {
+    bottom: 18px;
+  }
+  #new-home-mid .created-img {
+    height: 350px;
+  }
+  #hosing-vill-img .housing-innr {
+    height: 230px;
+    margin-bottom: 55px;
+  }
+  #hosing-vill {
+    margin: 60px 0;
+  }
+  #hero-inset .hero-inner-inset .scroll-link {
+    bottom: 18px;
+  }
+
+  .slider-bg .scrl-btn {
+    bottom: 18px;
+  }
+
+  #hosing-vill-img h4 {
+    font-size: 22px;
+  }
+
+  #hosing-vill p {
+    font-size: 20px;
+  }
+
+  #housing-vill-hotel {
+    margin: 50px 0 80px 0;
+  }
+  #housing-vill-hotel .vill-hotl-rgt label {
+    font-size: 18px;
+  }
+  #housing-vill-hotel .vill-hotl-rgt p {
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+  #housing-vill-hotel .vill-hotl-lft {
+    height: 280px;
+  }
+  #careye-housing h3 {
+    font-size: 22px;
+    margin: 40px 0 10px 0;
+  }
+  #careye-housing p {
+    font-size: 22px;
+  }
+  #careye-housing {
+    margin-top: 60px;
+  }
+  #careye-housing .housing-innr {
+    height: 250px;
+  }
+  .contct-contnt .contct-innr-cnt h5 {
+    font-size: 18px;
+  }
+  .contct-contnt .contct-innr-cnt p {
+    font-size: 16px;
+  }
+
+  .contct-contnt .contct-innr-cnt a {
+    font-size: 16px;
+  }
+
+  .oxcareyes-cnt-aft-log {
+    margin-top: 60px;
+  }
+  .oxcareyes-cnt-aft-log .inner-headingt {
+    font-size: 22px;
+  }
+
+  #new-home-mid {
+    margin-bottom: 80px;
+  }
+  .studios h5 {
+    font-size: 20px;
+  }
+
+  #studio-work .image-viewer .image-gallery-left-nav .image-gallery-svg,
+  .image-gallery-right-nav .image-gallery-svg {
+    display: none;
+  }
+  #studio-work .image-viewer .cls-btn {
+    width: calc(80% + 89px);
+    top: 41px;
+  }
+  #studio-work .image-viewer .view-img-titl {
+    top: 130px;
+  }
+
+  #studio-work
+    .image-viewer
+    .image-gallery-content
+    .image-gallery-slide
+    .image-gallery-image {
+    max-height: calc(100vh - 80px);
+    height: 80vh;
+    object-fit: cover;
+    margin-top: 2%;
+  }
+
+  #studio-work .studio-work-item img {
+    height: 100%;
+  }
+
+  #studio-ctn {
+    margin: 60px 0;
+  }
+  .studio-head {
+    font-size: 22px;
+    margin-bottom: 20px;
+  }
+  .studio-para {
+    /* font-size: 16px; */
+    text-align: justify;
+  }
+
+  /* .studios h5 {
+        font-size: 18px;
+    } */
+
+  #Home-mn-cnt {
+    margin: 60px 0;
+  }
+  /* #Home-mn-cnt .univer-pera {
+        font-size: 22px;
+    } */
+
+  /* #Home-mn-cnt .uni-para-sto {
+        font-size: 18px;
+    } */
+  #new-home-mid .created-text .created-pera span {
+    font-size: 22px;
+  }
+  /* #new-home-mid .created-text .created-pera {
+        font-size: 18px;
+    } */
+
+  /* #btm-vst-sec h6 {
+        font-size: 18px;
+    } */
+  #btm-vst-sec .vst-sec-item h4 {
+    font-size: 25px;
+  }
+
+  #accomo-casitas-cnt h5 {
+    font-size: 22px;
+  }
+
+  .care-trans-midimg h5 {
+    font-size: 20px;
+  }
+
+  #accomo-casitas-cnt p {
+    font-size: 16px;
+    text-align: justify;
+  }
+  .careyes-trans-cnt .main-para7 {
+    font-size: 18px;
+    text-align: justify;
+  }
+
+  .careyes-trans-cnt .inner-page-cnt {
+    font-size: 20px;
+  }
+
+  .service-box h4 {
+    font-size: 25px !important;
+  }
+
+  #whre-eat .whre-eat-innr {
+    width: 60%;
+  }
+  #care-tour-ex h5 {
+    margin-top: 80px !important;
+    font-size: 20px;
+    margin-top: 25px !important;
+    width: 100%;
+  }
+
+  #care-tour-ex .price-sec p {
+    font-size: 18px;
+  }
+
+  #care-tour-ex .price-sec {
+    margin-top: 30px;
+  }
+
+  #whre-eat h3 {
+    margin-top: 50px !important;
+    margin-bottom: 25px;
+  }
+
+  #whre-eat h5 {
+    font-size: 18px;
+    margin-top: 20px;
+  }
+
+  #whre-eat h6 {
+    font-size: 16px;
+    margin-top: 10px;
+  }
+
+  #careyes-cnt .hidden-gem .hidden-gem-lft {
+    width: 100%;
+    padding: 15px 15px 100px;
+  }
+
+  #careyes-cnt .hidden-gem .hidden-gem-lft .hidden-gem-lft-inn p {
+    text-align: justify;
+  }
+  #careyes-cnt .main-para7 {
+    font-size: 20px;
+    text-align: justify;
+  }
+  .careyes-sec .slider-bnnr-hd {
+    font-size: 40px;
+  }
+
+  .careyes-sec {
+    border-radius: 15px;
+  }
+  .slider-bg .slider-bnnr-pra {
+    font-size: 20px;
+  }
+
+  .additin-desti .additin-desti-inner .additin-desti-img {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .recomn-beach .recomn-beach-inner .recomn-beach-img {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .food-beverag .foodNbav-inner .foodsNbav-img {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .food-beverag .foodNbav-inner {
+    width: 64%;
+    margin: auto;
+  }
+  .additin-desti .kotor .kotor-rgt-img .kotor-rgt-img-inner {
+    height: 250px;
+  }
+
+  .montenegro-cnt .uniqueness-monten .uniqueness-monten-lft {
+    width: 100%;
+    padding: 20px 20px 80px 20px;
+  }
+  .additin-desti .kotor .kotor-inner h5 {
+    font-size: 20px;
+    text-align: left;
+    margin-bottom: 8px;
+  }
+  .additin-desti .kotor .kotor-inner p {
+    text-align: justify;
+  }
+  .additin-desti .kotor .kotor-inner {
+    padding: 30px 20px 60px;
+  }
+
+  .montenegro-cnt .main-para7 {
+    font-size: 20px;
+    text-align: justify;
+  }
+  .additin-desti h5 {
+    margin-bottom: 30px;
+  }
+  .monten-btm-bg {
+    height: 200px;
+  }
+
+  .recomn-beach .recomn-beach-inner {
+    width: 70%;
+    margin: auto;
+  }
+
+  .monten-mid-bg {
+    height: 200px;
+    margin-top: 150px;
+  }
+  .monte-tour-exp .tour-exp-inner h6 {
+    font-size: 20px;
+  }
+  .monte-tour-exp .tour-exp-inner p {
+    text-align: justify;
+  }
+
+  #donatPg .donateCnt .donateAmount .yourDonationAmt > ul {
+    flex-wrap: wrap;
+  }
+
+  /* #donatPg .donateCnt .donateAmount .yourDonationAmt > ul li{
+    width: 48%;
+    } */
+
+  #three-member .three-member-cnt a {
+    font-size: 14px;
+  }
+  #donatPg .donatPgImg {
+    height: 320px;
+  }
+
+  .staff-tct h3 {
+    font-size: 28px;
+  }
+
+  .staff-tct h3 .fnt-ddot {
+    font-size: 28px;
+  }
+
+  .memberShip-bg {
+    height: 400px;
+  }
+
+  #lineup-artist .lineup-art-imgs .artist-img {
+    width: 100%;
+    height: auto;
+  }
+  #lineup-artist .lineup-art-imgs .artist-img img {
+    width: 100%;
+  }
+
+  #lineup-artist .lineup-art-imgs {
+    margin-bottom: 0px;
+  }
+
+  #three-member .three-member-cnt p {
+    text-align: justify;
+  }
+
+  #three-member .three-member-bnnr .member-bnnr-cnt h2 {
+    font-size: 40px;
+  }
+
+  #three-member .three-member-cnt {
+    margin: 70px 0px;
+  }
+
+  .memberShip-bg .memb-slider-bnnr-hd {
+    font-size: 40px;
+  }
+  .memberShip-bg {
+    border-radius: 15px;
+  }
+  .memberShip-bg .mem-slider-bnnr-pra {
+    font-size: 30px;
+  }
+
+  /* .staff-terms h6{
+        font-size: 16px;
+        color: black;
+        font-family: "Satoshi-ragular";
+        margin-top: 30px;
+      } */
+
+  #aboutpagebg-1 .program-cnt .rent p {
+    font-size: 16px;
+  }
+  #linp-cnt .linp-cnt-pera22 {
+    font-size: 24px;
+  }
+  .music-bg .music-hding {
+    font-size: 40px;
+  }
+
+  .music-bg {
+    border-radius: 15px;
+  }
+  .tranportestion-sec {
+    border-radius: 15px;
+  }
+
+  .montenegro-cnt .main-para6 {
+    font-size: 16px;
+  }
+
+  .montenegro-cnt .main-para4 {
+    font-size: 17px;
+  }
+
+  #hero-inset .hero-inner-inset .hero-inset-text img {
+    width: 250px;
+    margin-bottom: 10px;
+  }
+
+  /* .otr-txt-inpt {
+        margin-top: -10px;
+    } */
+
+  #hero-new .hero-inner .link-font {
+    font-size: 14px;
+  }
+
+  .membr-btn-prt .memberbtn span {
+    top: -30px;
+    right: 27%;
+    font-size: 11px;
+  }
+
+  #hero-new .hero-text .hero-heading {
+    font-size: 80px;
+  }
+
+  #hero-new .hero-text .hero-heading {
+    font-size: 60px;
+  }
+
+  #hero-new .hero-text .hero-sheading {
+    font-size: 24px;
+  }
+
+  #hero-new .hero-inner {
+    height: 400px;
+  }
+
+  /* #hero-new .hero-text {
+        margin-top: 120px;
+    } */
+
+  /* #hero-new .scroll-link {
+        margin-top: 80px;
+    } */
+
+  /* .foot-wrapper .mn-footer .center-links {
+        margin-bottom: 41px;
+    } */
+  .in-pera .log-link {
+    font-size: 20px;
+  }
+
+  .odr-bnr-hrding {
+    font-size: 40px;
+  }
+
+  .bottom-foot img {
+    width: 50px;
+  }
+
+  #eco {
+    margin-bottom: 60px;
+  }
+
+  #created {
+    margin-bottom: 60px;
+  }
+
+  #created .created-img {
+    height: 440px;
+  }
+
+  #video-player {
+    margin-bottom: 80px;
+  }
+
+  .header-new.white {
+    padding-top: 8px !important;
+  }
+
+  /* .navbar {
+        padding: 0.3rem 0.5rem;
+    } */
+  .navbar-light .navbar-collapse {
+    top: 59px;
+  }
+
+  .modal-dialog.modal-sm.modal-dialog-centered {
+    padding-left: 10px;
+    padding-right: 10px;
+    margin: auto;
+  }
+
+  .login-text {
+    padding: 15px 10px;
+  }
+
+  .inset-head {
+    font-size: 40px;
+  }
+
+  .e-date {
+    font-size: 20px;
+  }
+
+  #hero-inset .hero-inner-inset {
+    height: 260px !important;
+  }
+
+  #hero-inset .align-items-center.h-100.row {
+    height: 80% !important;
+  }
+
+  /* #hero-inset .scroll-link {
+        margin-top: 31px;
+    } */
+
+  .scroll-btn img {
+    width: 20px;
+  }
+
+  #hero-inset {
+    margin-bottom: 60px;
+  }
+
+  .in-head {
+    font-size: 24px;
+  }
+
+  /* .in-pera {
+        font-size: 24px;
+    } */
+
+  #inset-content {
+    margin-bottom: 58px;
+  }
+
+  .com-pera {
+    font-size: 24px;
+  }
+
+  .com-content h3 {
+    font-size: 24px;
+  }
+
+  .com-inner .inset-head {
+    font-size: 60px;
+  }
+
+  .montenegro-cnt {
+    margin: 70px 0px;
+  }
+
+  .montenegro-cnt .inner-page-cnt {
+    font-size: 28px;
+  }
+
+  .montenegro-cnt .main-para {
+    font-size: 22px;
+  }
+
+  .montenegro-cnt .main-bnnr-pra {
+    font-size: 22px;
+  }
+
+  .mon-bg .slider-bnnr-hd {
+    font-size: 36px;
+  }
+
+  .mon-bg .slider-bnnr-pra {
+    font-size: 20px;
+  }
+
+  .slidersub-menu {
+    border-top: 1px solid white;
+    border-bottom: 1px solid #fff;
+    padding: 5px;
+  }
+
+  .in-pera .log-link {
+    font-size: 18px;
+  }
+
+  .navbar .dropdown-item {
+    padding: 5px 15px;
+    font-size: 12px;
+  }
+
+  .navbar a.border-top.web-drop.pt-4.border-2.dropdown-item {
+    padding-top: 16px !important;
+  }
+
+  .btn-tckt {
+    padding: 0.5rem 1rem !important;
+    font-size: 11px;
+  }
+
+  .header-new.white .logo-new {
+    width: 50px;
+  }
+
+  .header-new .logo-new {
+    width: 50px;
+  }
+
+  img.logo-new {
+    width: 50px;
+  }
+
+  .navbar-light .navbar-toggler-icon {
+    width: 36px;
+    height: 36px;
+    background-size: 36px;
+    top: -20px;
+    margin-left: -36px;
+  }
+
+  .hm-video-sec {
+    margin-bottom: 80px;
+  }
+
+  .scrl-btn img {
+    max-width: 25px;
+  }
+
+  .mon-bg .scrl-btn {
+    font-size: 14px !important;
+  }
+
+  .slider-bnnr-hd-cumm {
+    font-size: 40px;
+  }
+
+  .monte-quote .monte-acti {
+    height: 250px;
+  }
+
+  #com-content {
+    margin-bottom: 40px;
+  }
+
+  .oxcareyes-cnt {
+    margin: 60px 0px;
+  }
+
+  .oxcareyes-cnt .inner-headingt {
+    font-size: 24px;
+  }
+
+  /* .oxcareyes-cnt .para1 {
+        font-size: 24px;
+    } */
+
+  /* #video-player iframe {
+    height: 254px;
+} */
+  /* .oxcareyes-cnt .para2 {
+        font-size: 24px;
+    } */
+
+  .user-content {
+    padding: 0px 0px;
+  }
+
+  h1.inset-head.text-center.intrested {
+    font-size: 50px;
+  }
+
+  .pro-btn {
+    font-size: 12px;
+
+    padding: 8px 15px;
+  }
+
+  .new-mb-btn {
+    font-size: 13px;
+    display: flex;
+    padding: 5px 5px;
+  }
+
+  .accomm-sec .slider-bnnr-hd {
+    font-size: 40px;
+  }
+
+  .accomodation-cnt .main-para2 {
+    font-size: 24px;
+  }
+
+  .accomodation-cnt .main-para {
+    font-size: 24px;
+  }
+
+  .accomodation-cnt .main-para2.my-5 {
+    margin-top: 1rem !important;
+  }
+
+  .accomodation-cnt {
+    margin: 60px 0px 30px;
+  }
+
+  .service-sec {
+    margin-bottom: 60px;
+  }
+
+  .accomodation-cnt {
+    margin: 50px 0px 30px;
+  }
+
+  .montenegro-sec .slider-bnnr-hd {
+    font-size: 40px;
+  }
+
+  .staff-terms-sec .slider-bnnr-hd {
+    font-size: 40px;
+  }
+
+  .tranportestion-sec .slider-bnnr-hd {
+    font-size: 50px;
+  }
+
+  .montenegro-cnt .main-para1 {
+    font-size: 24px;
+  }
+
+  .yachts-cnt .main-para {
+    font-size: 24px;
+  }
+
+  .yachts-cnt .main-para2 {
+    font-size: 24px;
+  }
+
+  .info-para h3 {
+    font-size: 24px;
+  }
+
+  .info-para p {
+    font-size: 18px;
+  }
+
+  .info-para p a {
+    font-size: 17px;
+  }
+
+  .hm-video-sec {
+    margin-bottom: 60px;
+  }
+
+  .bottom-foot img {
+    width: 40px;
+  }
+
+  #about-footr .bottom-foot img {
+    width: 40px;
+  }
+
+  .villa-carousel {
+    margin: 50px 0px;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .slick-dots {
+    display: none !important;
+  }
+
+  .villas-cnt {
+    margin: 50px 0px;
+  }
+
+  .slick-prev::after {
+    width: 30px;
+    background-position: center;
+    height: 30px;
+    background-size: 25px;
+    margin-left: 12px;
+    top: -10px;
+  }
+
+  .slick-next::after {
+    width: 30px;
+    height: 30px;
+    top: -10px;
+    background-position: center;
+    background-size: 25px;
+    margin-left: -20px;
+  }
+
+  .slick-slide img {
+    border-radius: 10px;
+  }
+
+  .yachts-sec {
+    margin: 10px;
+    border-radius: 10px;
+  }
+
+  .hotels-cnt .inner-page-cnt span {
+    font-size: 24px;
+  }
+
+  .hotals-carousel {
+    width: 100%;
+  }
+
+  .hotels-cnt .inner-page-cnt span {
+    font-size: 24px;
+  }
+
+  .hotels-cnt {
+    margin: 60px 0px 20px;
+  }
+
+  .hotels-cnt {
+    margin: 60px 0px 20px;
+  }
+
+  .hotels-cnt .main-para1 {
+    width: 100%;
+  }
+
+  .hotels-cnt .main-para {
+    width: 100%;
+  }
+
+  .accom-htl-txt {
+    width: 100%;
+  }
+
+  .hotels-cnt .main-para2 {
+    font-size: 15px;
+
+    width: 100%;
+  }
+
+  .hotels-cnt p.main-para1.my-4 {
+    margin-top: -20px !important;
+  }
+
+  .hotels-cnt .inner-page-cnt span {
+    font-size: 24px;
+  }
+
+  .hotels-cnt .main-para1 {
+    font-size: 22px;
+  }
+
+  .hotels-cnt .main-para1 span {
+    font-size: 18px;
+  }
+
+  .hotels-cnt .info-para h3 {
+    font-size: 18px;
+    margin-top: 60px;
+  }
+
+  .hotels-cnt .info-para p {
+    margin-bottom: 0px;
+  }
+
+  .hotels-cnt .info-para h3 {
+    margin-bottom: 8px;
+  }
+
+  .hotels-cnt .info-para p a {
+    font-size: 16px;
+  }
+
+  .program-cnt h3.pro_heading {
+    margin-top: 50px !important;
+    margin-bottom: 25px !important;
+  }
+
+  .program-cnt h3.pro_heading {
+    font-size: 24px;
+  }
+
+  .impact-cnt .para1 {
+    font-size: 28px;
+  }
+
+  .impact-cnt {
+    margin: 50px auto;
+  }
+
+  .impact-cnt .para3 {
+    font-size: 28px;
+  }
+
+  /* .impact-cnt .para4 {
+
+        font-size: 22px;
+
+    } */
+
+  /* .impact-cnt .para5 {
+
+        font-size: 22px;
+
+    } */
+
+  .impact-cnt {
+    margin: 60px auto 40px;
+  }
+
+  .impct-crous {
+    margin: 40px 30px !important;
+  }
+  .impact-carousel {
+    margin: 20px auto;
+  }
+
+  .impact-carousel .slick-prev::after,
+  .impact-carousel .slick-next::after {
+    top: -24px;
+  }
+
+  .app-text {
+    font-size: 18px;
+  }
+
+  #my-profile .main-pro .app-text span {
+    font-size: 20px;
+  }
+  #my-profile .main-pro .app-text b {
+    font-size: 17px;
+  }
+
+  .input-row {
+    row-gap: 10px;
+  }
+
+  .input-row .form-control,
+  .form-select {
+    color: #898989 !important;
+    height: 40px;
+    background: #e6dfd5;
+    padding: 7px 10px;
+    border-radius: 5px;
+  }
+
+  #my-profile .PhoneInputInput {
+    border-radius: 5px;
+  }
+
+  .event-sec {
+    margin: 50px 0;
+  }
+
+  /* .tckt-information .col-sm-4 {
+        width: 50%;
+    }
+
+    .tckt-information .col-sm-12 {
+        width: 50%;
+    } */
+
+  .my-tickt-sec .tckt-right {
+    min-height: 780px;
+  }
+
+  .my-tickt-sec .tckt-right .tckt-information {
+    min-height: 300px;
+    height: 310px;
+  }
+
+  .my-tickt-sec {
+    margin: 50px 0 20px;
+  }
+
+  .my-tickt-sec .tickt-heding h3 {
+    font-size: 24px;
+  }
+
+  .my-tickt-sec .tickt-heding p {
+    font-size: 16px;
+  }
+
+  .my-tickt-sec .tickt-heding p span {
+    font-size: 16px;
+  }
+
+  .tckt-img-cnt h4 {
+    font-size: 25px;
+  }
+
+  .tckt-img-cnt h6 {
+    font-size: 18px;
+  }
+
+  .tckt-img-cnt {
+    margin-top: 18px;
+  }
+
+  .my-tickt-sec .tckt-left.mx-5,
+  .my-tickt-sec .tckt-right.mx-5 {
+    margin-left: 0px !important;
+    margin-right: 0px !important;
+  }
+
+  .profile-image {
+    width: 120px;
+    height: 120px;
+  }
+
+  /* .profile-name {
+  
+    width: calc(100% - 120px);
+
+} */
+  .title-row h4 {
+    font-size: 16px;
+
+    margin-top: 10px;
+    margin-bottom: 6px;
+  }
+
+  .policy-cnt h2 {
+    font-size: 20px;
+    font-family: "Satoshi-ragular";
+    color: #000;
+  }
+  /* .about-cnt .para1 {
+        font-size: 22px;
+    } */
+
+  .about-cnt .about-info {
+    margin: 70px 0px 70px;
+  }
+
+  .about-info .para3.pb-5 {
+    padding-bottom: 20px !important;
+  }
+
+  .about-cnt {
+    margin: 60px 0px 20px;
+  }
+
+  .team-sec .col-sm-4 {
+    width: 50%;
+  }
+
+  #hero-inset .ordr-confirmtion {
+    height: 200px;
+  }
+
+  .odr-bnr-hrding {
+    font-size: 26px;
+    margin-top: 70px;
+  }
+
+  .odr-sb-hrding {
+    font-size: 20px;
+  }
+
+  .odr-scces h3 {
+    font-size: 18px;
+  }
+
+  .odr-scces p {
+    font-size: 11px;
+  }
+
+  .odr-scces .col-sm-6 {
+    width: 50%;
+  }
+
+  .order-detaile.m-5 {
+    margin: 16px !important;
+  }
+
+  .order-detaile .col-sm-5 {
+    max-width: 41.66667%;
+  }
+
+  .order-detaile .col-sm-7 {
+    max-width: 58.33333%;
+  }
+
+  .ordr-cnfm-bdr h4 {
+    font-size: 14px !important;
+  }
+
+  .upcom {
+    padding: 40px 5px 30px;
+  }
+
+  .upcom .image-mon h1 {
+    font-size: 20px;
+  }
+
+  .faq-sec .slider-bnnr-hd {
+    font-size: 40px;
+  }
+
+  section.faq-sec {
+    height: 200px;
+  }
+
+  .policy-cnt .plicy-hding {
+    font-size: 18px;
+  }
+
+  .policy-cnt .plicy-para {
+    font-size: 17px;
+  }
+
+  .policyes table tr td {
+    font-size: 17px;
+  }
+
+  .policy-cnt ol li,
+  .policy-cnt a,
+  .policy-cnt ul li {
+    font-size: 16px;
+    text-align: justify;
+  }
+
+  .policy-cnt {
+    margin-bottom: 20px;
+  }
+
+  .gym-execis p {
+    font-size: 16px;
+  }
+
+  .faq-accrd .faq-hding {
+    font-size: 22px;
+    margin-bottom: 20px;
+  }
+
+  .faq-accrd .accordion-button {
+    padding: 15px 0;
+  }
+
+  .faq-accrd {
+    margin-bottom: 40px;
+  }
+
+  .tean-cnt h3 {
+    font-size: 24px;
+  }
+
+  #video-player .video-wrapper {
+    border-radius: 15px;
+  }
+
+  .vdo {
+    border-radius: 15px;
+  }
+
+  #hero-new .hero-inner {
+    border-radius: 15px;
+  }
+
+  #created .created-img {
+    border-radius: 15px;
+  }
+
+  .slider-bg {
+    border-radius: 15px;
+  }
+
+  .porto-novi {
+    border-radius: 15px;
+  }
+
+  .porto-monte {
+    border-radius: 15px;
+  }
+
+  .mon-bg {
+    border-radius: 15px;
+  }
+
+  .monte-quote .monte-acti {
+    border-radius: 15px;
+  }
+
+  .luchaireimage {
+    border-radius: 15px;
+  }
+
+  .montenegro-sec {
+    border-radius: 15px;
+  }
+
+  .staff-terms-sec {
+    border-radius: 15px;
+  }
+
+  .accomm-sec {
+    border-radius: 15px;
+  }
+
+  #hero-inset .hero-inner-inset {
+    border-radius: 15px;
+  }
+
+  /* .slider-heading {
+        height: 70%;
+    } */
+
+  #linp-cnt .linp-cnt-pera {
+    font-size: 24px;
+  }
+
+  button.btn-tckt.btn.btn-.rounded-pill {
+    margin-right: 8px;
+  }
+
+  .header-btn.d-flex {
+    width: auto;
+    margin-right: 34px;
+  }
+
+  .header-btn.d-flex {
+    align-items: center;
+  }
+
+  .btn-drop {
+    height: auto;
+
+    padding: 1px 4px;
+  }
+
+  button.btn-tckt.btn.btn-.rounded-pill {
+    margin-top: 0px;
+  }
+
+  .btn-drop {
+    margin-top: 0px;
+  }
+
+  .header-new .navbar-toggler {
+    top: -2px;
+  }
+
+  .main-dropdwn {
+    width: 170px;
+  }
+
+  .navbar-light .link-font {
+    padding: 10px 0px !important;
+  }
+
+  .profile-name h3 {
+    font-size: 18px;
+  }
+
+  .service-sec .col-sm-4 {
+    width: 33.33%;
+  }
+
+  .transport-monte .main-para7 a {
+    color: #060606;
+    font-size: 16px;
+    font-weight: 600;
+    word-wrap: break-word;
+  }
+}
+
+@media (max-width: 516px) {
+  #donatPg
+    .donateCnt
+    .donateAmount
+    .yourDonationAmt
+    .btm-dnt-frm
+    > li:first-child {
+    width: 24%;
+  }
+
+
+  .careyes-fasion-body-cnt .creyes-fsn-dgnsec .creyes-fsn-dgnsec-inner .careyes-degn-img {
+    height: 27  0px;
+}
+
+
+}
+
+@media (max-width: 511px) {
+  .care-trans-midimg .mid-inner {
+    height: 260px;
+  }
+
+  .slider-bg.careyes-wellness .slider-bnnr-pra {
+    font-size: 25px !important;
+}
+
+
+  #donatPg
+    .donateCnt
+    .donateAmount
+    .yourDonationAmt
+    .btm-dnt-frm
+    > li:first-child {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  #donatPg
+    .donateCnt
+    .donateAmount
+    .yourDonationAmt
+    .btm-dnt-frm
+    li:nth-child(2) {
+    margin-left: 0;
+  }
+
+  .dont-modl .modal-header h5 {
+    font-size: 20px;
+  }
+  .dont-modl .modal-body p {
+    font-size: 16px;
+  }
+
+  #donatPg .donateCnt .donateAmount .yourDonationAmt ul li :nth-child(3) {
+    display: block;
+    width: 100%;
+  }
+  #donatPg .donateCnt .donateAmount .yourDonationAmt ul input[type="submit"] {
+    margin-top: 30px;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .careyes-fasion-body-cnt .creyes-fsn-dgnsec .creyes-fsn-dgnsec-inner .careyes-degn-img {
+    height: 230px;
+    margin-bottom: 30px;
+}
+
+
+
+  #oxcariyasAllEventsSec .oxcariyasEventsSingle .alendr-img {
+    height: 200px;
+  }
+  .careyes-chekout-new
+    .care-new-check
+    .checkout-innr
+    .checkot-lft
+    .ck-event-dtl
+    h3 {
+    font-size: 18px;
+    margin-bottom: 15px;
+  }
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner2, .careye-well-bdy .well-bdy-cnt-1 .img-inner, .careye-well-bdy .well-bdy-cnt-1 .img-inner3, .careye-well-bdy .well-bdy-cnt-1 .img-inner4, .careye-well-bdy .well-bdy-cnt-1 .img-inner6, .careye-well-bdy .well-bdy-cnt-1 .img-inner7, .careye-well-bdy .well-bdy-cnt-1 .img-inner9, .careye-well-bdy .well-bdy-cnt-1 .img-inner10, .careye-well-bdy .well-bdy-cnt-1 .img-inner12, .careye-well-bdy .well-bdy-cnt-1 .img-inner13, .careye-well-bdy .well-bdy-cnt-1 .img-inner15, .careye-well-bdy .well-bdy-cnt-1 .img-inner16, .careye-well-bdy .well-bdy-cnt-1 .img-inner18, .careye-well-bdy .well-bdy-cnt-1 .img-inner19 {
+    height: 300px;
+}
+.careye-well-bdy .well-bdy-cnt-2 .img-inner, .careye-well-bdy .well-bdy-cnt-2 .img-inner5, .careye-well-bdy .well-bdy-cnt-2 .img-inner8, .careye-well-bdy .well-bdy-cnt-2 .img-inner11, .careye-well-bdy .well-bdy-cnt-2 .img-inner14, .careye-well-bdy .well-bdy-cnt-2 .img-inner17 {
+  height: 300px;
+}
+  .careyes-chekout-new .care-new-check .checkout-innr .men-innr-sec {
+    padding-left: 3px;
+    padding-right: 3px;
+  }
+
+  #studio-work .image-viewer .cls-btn {
+    width: calc(80% + 81px);
+    top: 30px;
+  }
+  .assit-look-sec .look-lft {
+    width: 100%;
+  }
+
+  #hosing-vill-img .housing-innr {
+    height: 180px;
+  }
+
+  .my-tickt-sec .tckt-right .tckt-information {
+    min-height: 300px;
+    height: 330px;
+  }
+
+  #housing-vill-hotel .vill-hotl-lft {
+    width: 100%;
+  }
+  #careye-housing .housing-innr {
+    height: 220px;
+  }
+  .care-log-link {
+    font-size: 20px !important;
+  }
+  #studio-work .image-viewer .view-img-titl {
+    top: 100px;
+  }
+
+  .image-gallery-slide .image-gallery-image {
+    width: 95% !important;
+  }
+
+  .care-trans-midimg .mid-inner {
+    height: 200px;
+  }
+  /* #studio-work .studio-work-item img {
+        height: 340px;
+    } */
+  #careyes-cnt .hidden-gem .hidden-gem-rgt {
+    height: 200px;
+    width: 90%;
+  }
+  #careyes-cnt h3.inner-page-cnt {
+    margin-top: 50px !important;
+  }
+
+  .careyes-sec {
+    height: 300px;
+  }
+
+  .food-beverag .foodNbav-inner {
+    width: 90%;
+  }
+
+  .food-beverag .foodNbav-inner .foodsNbav-img img {
+    width: 100%;
+  }
+
+  .recomn-beach .recomn-beach-inner {
+    width: 90%;
+  }
+
+  .recomn-beach .recomn-beach-inner .recomn-beach-img img {
+    width: 100%;
+  }
+  .montenegro-cnt .uniqueness-monten .uniqueness-monten-rgt {
+    width: 280px;
+    height: 180px;
+  }
+  #three-member .three-member-bnnr .member-bnnr-cnt h2 {
+    font-size: 30px;
+  }
+
+  #donatPg .donatPgImg {
+    height: 280px;
+  }
+  .memberShip-bg .memb-slider-bnnr-hd {
+    font-size: 30px;
+  }
+
+  #three-member .three-member-bnnr .member-bnnr-cnt h5 {
+    font-size: 18px;
+  }
+  #three-member .three-member-bnnr {
+    height: 300px;
+  }
+
+  #three-member {
+    padding: 15px;
+  }
+
+  #membr-cummuni .membr-cummuni-text h5 {
+    font-size: 28px;
+  }
+
+  #membr-cummuni .membr-cummuni-text p {
+    font-size: 18px;
+  }
+  #membr-cummuni .membr-cummuni-text h6 {
+    font-size: 16px;
+  }
+
+  #hero-new .hero-inner {
+    height: 379px;
+  }
+
+  .tranportestion-sec {
+    height: 300px;
+  }
+  .music-bg {
+    height: 300px;
+  }
+
+  #created .created-text h3 {
+    font-size: 23px;
+  }
+
+  #univer h3 {
+    font-size: 23px;
+  }
+  #aboutpagebg-1 .program-cnt .pro_heading-1 {
+    font-size: 30px;
+  }
+  #linp-cnt .linp-cnt-pera22 {
+    font-size: 22px;
+  }
+  .tranportestion-sec .slider-bnnr-hd {
+    font-size: 40px;
+  }
+
+  .profile-upbtn {
+    margin-top: 10px;
+  }
+
+  .profile-row {
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  .profile-name {
+    width: auto;
+  }
+
+  .profile-name h3 {
+    font-size: 16px;
+  }
+
+  .admn-mn-drp {
+    margin-top: 0px !important;
+  }
+
+  .navbar-light .navbar-toggler-icon {
+    width: 30px;
+    height: 33px;
+    background-size: 30px;
+    /*    
+        margin-left: -30px; */
+  }
+
+  .navbar-light .navbar-collapse {
+    top: 51px;
+  }
+
+  /* #hero-new .hero-inner .link-font {
+        
+        font-size: 11px;
+    } */
+  /* .navbar-light .link-font {
+      
+        font-size: 11px;
+    } */
+  .header-new .navbar-toggler {
+    top: -4px;
+  }
+
+  button.btn-tckt.btn.btn-.rounded-pill {
+    margin-right: 6px;
+  }
+
+  .header-btn.d-flex {
+    margin-right: 30px;
+  }
+
+  .odr-bnr-hrding {
+    font-size: 35px;
+  }
+
+  #hero-new .hero-text .hero-heading {
+    font-size: 50px;
+  }
+
+  #hero-new .hero-text .hero-sheading {
+    font-size: 22px;
+  }
+
+  /* #hero-new .hero-inner {
+        height: 450px;
+    } */
+  /* #hero-new .scroll-link {
+        margin-top: 80px;
+    } */
+
+  #univer {
+    margin-top: 40px;
+    margin-bottom: 60px;
+  }
+
+  #created .created-img {
+    height: 340px;
+  }
+
+  #univer .univer-pera {
+    font-size: 22px;
+  }
+
+  #created .created-text .created-pera span {
+    font-size: 22px;
+  }
+
+  #created .created-text .created-pera {
+    font-size: 20px;
+  }
+
+  .eco-text span {
+    font-size: 22px;
+  }
+
+  .eco-text {
+    font-size: 22px;
+  }
+
+  #created .created-text .created-pera {
+    padding: 40px 0px 0px;
+  }
+
+  .foot-link {
+    font-size: 12px;
+  }
+
+  #about-footr .foot-link {
+    font-size: 12px;
+  }
+
+  .bottom-foot {
+    margin-top: 50px;
+  }
+
+  .com-content h3 {
+    font-size: 22px;
+  }
+
+  .com-pera {
+    font-size: 22px;
+  }
+
+  .com-inner .inset-head {
+    font-size: 50px;
+  }
+
+  .com-inner {
+    height: 250px !important;
+  }
+
+  .mb-5 button.count-btn.btn {
+    margin-bottom: -4px !important;
+    /* margin-top: -35px; */
+  }
+
+  .mon-bg {
+    height: 350px;
+  }
+
+  .slidersub-menu a {
+    font-size: 10px;
+  }
+
+  .slidersub-menu .container {
+    padding-right: 10px !important;
+    padding-left: 10px !important;
+  }
+
+  .montenegro-cnt h3.inner-page-cnt {
+    margin-top: 50px !important;
+  }
+
+  #created {
+    margin-bottom: 40px;
+  }
+
+  .slider-bg .slider-bnnr-hd {
+    font-size: 50px;
+  }
+
+  .slider-bg {
+    height: 300px;
+  }
+
+  /* .oxcareyes-cnt .inner-headingt {
+        font-size: 22px;
+    } */
+
+  /* .oxcareyes-cnt .para1 {
+        font-size: 22px;
+    } */
+
+  /* #video-player iframe {
+        height: 208px;
+    } */
+  .oxcareyes-cnt p.para1.my-5 {
+    margin-top: 1.5rem !important;
+  }
+
+  .oxcareyes-cnt p.para1.my-3 {
+    margin-top: 1rem !important;
+  }
+
+  h1.inset-head.text-center.intrested {
+    font-size: 40px;
+  }
+
+  .mb-5,
+  .my-5 {
+    margin-bottom: 2rem !important;
+  }
+
+  .mt-5,
+  .my-5 {
+    margin-top: 2rem !important;
+  }
+
+  .accomm-sec {
+    height: 300px;
+  }
+
+  .service-sec {
+    margin-bottom: 50px;
+  }
+
+  .accomodation-cnt .main-para {
+    font-size: 20px;
+    text-align: justify;
+  }
+
+  .accomodation-cnt .main-para2 {
+    font-size: 22px;
+  }
+
+  .service-box h3 {
+    font-size: 22px !important;
+  }
+
+  .service-box {
+    text-align: center;
+  }
+
+  .montenegro-sec {
+    height: 300px;
+  }
+
+  .staff-terms-sec {
+    height: 300px;
+  }
+
+  .montenegro-cnt .main-para1 {
+    font-size: 22px;
+  }
+
+  .montenegro-cnt .main-para2 {
+    font-size: 20px;
+  }
+
+  .montenegro-cnt .info-para h3 {
+    font-size: 22px;
+  }
+
+  .montenegro-cnt .main-para3 {
+    font-size: 20px;
+  }
+
+  .montenegro-cnt .info-para p {
+    font-size: 20px;
+  }
+
+  .info-para.my-5.pb-5 {
+    padding-bottom: 0px !important;
+  }
+
+  .montenegro-cnt h4.inner-page-cnt {
+    margin-top: 50px !important;
+  }
+
+  .montenegro-cnt h4 {
+    font-size: 20px !important;
+  }
+
+  .montenegro-cnt h5 {
+    font-size: 20px !important;
+  }
+
+  .montenegro-cnt .main-para1 {
+    font-size: 22px;
+  }
+
+  .yachts-cnt .main-para {
+    font-size: 22px;
+  }
+
+  .yachts-cnt .main-para2 {
+    font-size: 22px;
+  }
+
+  .info-para h3 {
+    font-size: 22px;
+  }
+
+  .yachts-cnt {
+    margin: 50px 0px;
+  }
+
+  .yachts-sec {
+    height: 300px;
+  }
+
+  .foot-wrapper .mn-footer {
+    padding-top: 50px;
+  }
+
+  .social-link img {
+    width: 30px;
+  }
+
+  .foot-wrapper .mn-footer {
+    padding-top: 36px;
+  }
+
+  #about-footr .foot-wrapper .mn-footer {
+    padding-top: 50px;
+  }
+
+  #about-footr .social-link img {
+    width: 30px;
+  }
+
+  #about-footr .foot-wrapper .mn-footer {
+    padding-top: 36px;
+  }
+
+  #about-footr .bottom-foot {
+    margin-top: 30px;
+  }
+
+  .bottom-foot {
+    margin-top: 30px;
+  }
+
+  .villas-cnt .main-para {
+    font-size: 22px;
+  }
+
+  .villas-sec {
+    height: 300px;
+  }
+
+  .hotels-cnt .inner-page-cnt span {
+    font-size: 22px;
+  }
+
+  .hotels-cnt .inner-page-cnt span {
+    font-size: 22px;
+  }
+
+  .hotels-cnt .inner-page-cnt span {
+    font-size: 22px;
+  }
+
+  .hotels-cnt .main-para {
+    font-size: 18px;
+  }
+
+  .hotels-cnt .main-para2 {
+    font-size: 13px;
+  }
+
+  .hotels-cnt {
+    margin: 50px 0px 20px;
+  }
+
+  .hotels-cnt .info-para h3 {
+    font-size: 16px;
+    margin-top: 40px;
+  }
+
+  .hotels-cnt .info-para p a {
+    font-size: 15px;
+  }
+
+  .program-info .day_info {
+    font-size: 18px;
+  }
+
+  /* .program-cnt {
+
+        padding-bottom: 0px;
+    } */
+
+  img.mx-auto.d-block.login-logoimg {
+    width: 160px;
+  }
+
+  h5.fw-bold.text-center.fs-3.mt-5.mb-3 {
+    font-size: 20px !important;
+  }
+
+  .my-tickt-sec .tickt-heding h3 {
+    font-size: 22px;
+  }
+
+  .tckt-img-cnt h4 {
+    font-size: 20px;
+  }
+
+  .tckt-img-cnt h6 {
+    font-size: 16px;
+  }
+
+  .tckt-img-cnt {
+    margin-top: 22px;
+  }
+
+  .title-row h4 {
+    font-size: 16px;
+
+    margin-top: 10px;
+    margin-bottom: 8px;
+  }
+
+  #my-profile .input-row {
+    row-gap: 8px;
+  }
+
+  .team-sec .col-sm-4 {
+    width: 100%;
+  }
+
+  .team-sec img {
+    width: 75%;
+  }
+
+  .order-detaile .col-sm-5 {
+    max-width: 100%;
+  }
+
+  .order-detaile .col-sm-7 {
+    max-width: 100%;
+  }
+
+  .order-detaile.m-5 {
+    margin: 16px 0px 20px !important;
+  }
+
+  .order-detaile.pb-5 {
+    padding-bottom: 1rem !important;
+  }
+
+  .ordr-cnfm-bdr h4 {
+    font-size: 12px !important;
+  }
+
+  #hero-inset .odr-scces {
+    background-color: #313131;
+    padding: 20px 10px;
+    color: white;
+  }
+
+  .odr-scces p {
+    font-size: 11px;
+    text-align: left;
+  }
+
+  .odr-scces h3 {
+    font-size: 18px;
+    text-align: left;
+  }
+
+  .e-date {
+    font-size: 15px;
+  }
+
+  .heading-all h2 {
+    font-size: 22px;
+  }
+
+  .past-card h3 {
+    font-size: 25px;
+  }
+
+  .faq-sec .slider-bnnr-hd {
+    font-size: 30px;
+  }
+
+  .faq-accrd {
+    margin-bottom: 40px;
+  }
+
+  .faq-accrd .accordion-item:first-of-type .accordion-button {
+    border-radius: 0px;
+    padding: 15px 0;
+  }
+
+  .faq-accrd .accordion-button {
+    font-size: 16px !important;
+  }
+
+  .faq-accrd .accordion-body {
+    font-size: 15px;
+  }
+
+  #ticker_sec .ticket_h h3 {
+    font-size: 24px;
+  }
+
+  .evnt-dtl-lft {
+    border-radius: 10px !important;
+  }
+
+  .tickets--withoutaccordion {
+    /* border-bottom: 1px solid #eee; */
+    margin-bottom: 4px;
+    padding-bottom: 0px;
+  }
+
+  .bottom-p {
+    font-size: 10px;
+  }
+
+  #about-footr .bottom-p {
+    font-size: 10px;
+  }
+
+  /* .oxcareyes-cnt .para2 {
+        font-size: 23px;
+    } */
+
+  .tean-cnt {
+    padding-bottom: 20px;
+  }
+
+  .about-cnt {
+    margin: 60px 0px -15px;
+  }
+
+  #linp-cnt .linp-cnt-pera {
+    font-size: 22px;
+  }
+
+  #linp-cnt {
+    margin-top: 50px;
+    margin-bottom: 50px;
+  }
+
+  .bottom-p {
+    margin-top: 3px;
+  }
+
+  .header-new .logo-new {
+    width: 40px !important;
+  }
+
+  .btn-tckt {
+    padding: 0.3rem 0.5rem !important;
+    font-size: 10px;
+  }
+
+  .btn-circle {
+    width: 21px;
+    height: 21px;
+    margin-left: 7px;
+  }
+
+  .dropdown .btn {
+    font-size: 11px;
+  }
+
+  .bi-three-dots-vertical::before {
+    content: "\f5d3";
+    font-size: 9px;
+  }
+
+  /* .navbar-light .navbar-collapse {
+      
+        padding: 15px 15px 15px;
+    }
+    */
+
+  .navbar-light .navbar-collapse .navbar-nav {
+    margin: 15px !important;
+  }
+
+  /* #hero-new .hero-inner {
+       
+        background-attachment: local !important;
+       
+  
+    } */
+}
+
+@media (max-width: 400px) {
+
+  .careyes-fasion-body-cnt .creyes-fsn-dgnsec .creyes-fsn-dgnsec-inner .careyes-degn-img {
+    height: 200px;
+}
+.careyes-fasion-body-cnt .creyes-fsn-dgnsec .creyes-fsn-dgnsec-inner .careyes-degn-img img {
+  height: 210px;
+}
+
+  #oxcariyasAllEventsSec .oxcariyasEventsSingle .alendr-img {
+    height: 180px;
+  }
+
+  .slider-bg.careyes-wellness .slider-bnnr-pra {
+    font-size: 20px !important;
+}
+
+  .assit-look-sec .look-rgt {
+    padding-left: 0px;
+  }
+  #hosing-vill-img .housing-innr {
+    height: 160px;
+  }
+  #studio-work .image-viewer .cls-btn {
+    width: calc(80% + 66px);
+    top: 28px;
+  }
+
+  #studio-work .image-viewer .view-img-titl {
+    top: 70px;
+  }
+  .care-trans-midimg .mid-inner {
+    height: 180px;
+  }
+
+  .careyes-sec .slider-bnnr-hd {
+    font-size: 30px;
+  }
+
+  #whre-eat .whre-eat-innr {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  #donatPg
+    .donateCnt
+    .donateAmount
+    .yourDonationAmt
+    ul
+    input[type="text"]::placeholder {
+    font-size: 13px;
+  }
+
+  #donatPg .donateCnt .donateAmount .yourDonationAmt ul input[type="text"] {
+    width: 140px;
+  }
+  .food-beverag .foodNbav-inner {
+    width: 90%;
+  }
+
+  .service-box img {
+    width: 80%;
+    margin: auto;
+  }
+  .recomn-beach .recomn-beach-inner {
+    width: 100%;
+  }
+
+  .memberShip-bg .mem-slider-bnnr-pra {
+    font-size: 23px;
+    line-height: normal;
+  }
+
+  .music-bg .music-hding {
+    font-size: 30px;
+  }
+  .accomm-sec .slider-bnnr-hd {
+    font-size: 30px;
+  }
+
+  button.fgg.text-light.p-0.btn.btn- {
+    max-width: 60px;
+    overflow: hidden;
+  }
+
+  .input-box .input-text {
+    font-size: 12px;
+  }
+
+  .bottom-foot {
+    margin-top: 40px;
+  }
+
+  .inset-head {
+    font-size: 36px;
+  }
+
+  .e-date {
+    font-size: 17px;
+  }
+
+  #hero-inset .hero-inner-inset {
+    height: 250px;
+  }
+
+  /* #hero-inset .scroll-link {
+        margin-top: 23px;
+    } */
+
+  /* .in-head {
+        font-size: 22px;
+    } */
+
+  /* .in-pera {
+        font-size: 22px;
+    } */
+
+  .accomm-sec .slider-bnnr-hd {
+    font-size: 30px;
+  }
+
+  .service-sec .col-sm-4 {
+    width: 100%;
+  }
+
+  .montenegro-sec .slider-bnnr-hd {
+    font-size: 30px;
+  }
+  .staff-terms-sec .slider-bnnr-hd {
+    font-size: 30px;
+  }
+
+  .tranportestion-sec .slider-bnnr-hd {
+    font-size: 30px;
+  }
+
+  .montenegro-cnt .info-para p {
+    font-size: 18px;
+  }
+
+  .montenegro-cnt h4.inner-page-cnt {
+    margin-top: 40px !important;
+  }
+
+  /* .slider-heading {
+        height: 65%;
+    } */
+
+  .yachts-sec {
+    height: 260px;
+  }
+
+  .hotels-cnt .info-para {
+    width: 100%;
+    margin: auto;
+  }
+
+  .my-tickt-sec .tckt-information {
+    padding: 20px 10px 20px;
+  }
+
+  .my-tickt-sec .tckt-right .tckt-information {
+    padding: 20px 10px 20px;
+  }
+
+  .qricon {
+    width: 100px;
+  }
+
+  .tckt-information table {
+    margin-bottom: 120px;
+  }
+
+  .tckt-information p.tckt-pra {
+    margin-bottom: 120px;
+  }
+
+  .my-tickt-sec .tckt-btn {
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+
+  #hero-inset .ordr-confirmtion {
+    height: 170px;
+  }
+
+  .odr-bnr-hrding {
+    font-size: 27px;
+  }
+
+  .odr-sb-hrding {
+    font-size: 18px;
+  }
+
+  .odr-bnr-hrding {
+    margin-top: 64px;
+  }
+
+  .odr-scces p {
+    font-size: 10px;
+  }
+
+  .odr-scces h3 {
+    font-size: 16px;
+  }
+
+  .count-btn {
+    font-size: 11px !important;
+  }
+
+  .ordr-cnfm-bdr h4 {
+    font-size: 11px !important;
+  }
+
+  .upcom .image-mon {
+    height: 150px;
+    border-radius: 15px;
+  }
+
+  .past-card {
+    border-radius: 15px;
+  }
+
+  .heading-all h2 {
+    margin-bottom: 12px;
+  }
+
+  .past-card {
+    padding: 15px;
+  }
+
+  .past-card {
+    height: 150px;
+  }
+
+  #past {
+    margin-bottom: 40px;
+  }
+
+  .faq-accrd .faq-hding {
+    font-size: 20px;
+    margin-bottom: 15px;
+  }
+
+  #ticker_sec .ticket_h h3 {
+    font-size: 22px !important;
+  }
+
+  #ticker_sec p {
+    line-height: 22px !important;
+    font-size: 14px !important;
+  }
+
+  /* #video-player iframe {
+        height: 190px;
+    } */
+
+  .slidersub-menu {
+    overflow: auto;
+  }
+
+  .slidersub-menu ul li {
+    padding-right: 5px;
+  }
+}
+
+/* Mobile devices */
+
+@media (max-width: 391px) {
+  #careye-housing .housing-innr {
+    height: 200px;
+  }
+
+  .careye-well-bdy .well-bdy-cnt-1 .img-inner2, .careye-well-bdy .well-bdy-cnt-1 .img-inner, .careye-well-bdy .well-bdy-cnt-1 .img-inner3, .careye-well-bdy .well-bdy-cnt-1 .img-inner4, .careye-well-bdy .well-bdy-cnt-1 .img-inner6, .careye-well-bdy .well-bdy-cnt-1 .img-inner7, .careye-well-bdy .well-bdy-cnt-1 .img-inner9, .careye-well-bdy .well-bdy-cnt-1 .img-inner10, .careye-well-bdy .well-bdy-cnt-1 .img-inner12, .careye-well-bdy .well-bdy-cnt-1 .img-inner13, .careye-well-bdy .well-bdy-cnt-1 .img-inner15, .careye-well-bdy .well-bdy-cnt-1 .img-inner16, .careye-well-bdy .well-bdy-cnt-1 .img-inner18, .careye-well-bdy .well-bdy-cnt-1 .img-inner19 {
+    height: 280px;
+}
+.careye-well-bdy .well-bdy-cnt-2 .img-inner, .careye-well-bdy .well-bdy-cnt-2 .img-inner5, .careye-well-bdy .well-bdy-cnt-2 .img-inner8, .careye-well-bdy .well-bdy-cnt-2 .img-inner11, .careye-well-bdy .well-bdy-cnt-2 .img-inner14, .careye-well-bdy .well-bdy-cnt-2 .img-inner17 {
+  height: 280px;
+}
+
+
+  #hosing-vill-img .housing-innr {
+    height: 140px;
+  }
+  #careyes-cnt .hidden-gem .hidden-gem-rgt {
+    height: 180px;
+  }
+
+  .my-tickt-sec .tckt-field {
+    font-size: 11px;
+  }
+  .my-tickt-sec .table th,
+  .my-tickt-sec .table td {
+    padding: 10px 0;
+    font-size: 10px;
+  }
+}
+@media (max-width: 359px) {
+  .assit-look-sec .look-rgt label span {
+    font-size: 16px;
+  }
+  #studio-work .studio-work-item img {
+    height: 300px;
+  }
+  .care-trans-midimg .mid-inner {
+    height: 160px;
+  }
+  #donatPg
+    .donateCnt
+    .donateAmount
+    .yourDonationAmt
+    ul
+    input[type="text"]::placeholder {
+    font-size: 12px;
+  }
+  #careyes-cnt .hidden-gem .hidden-gem-rgt {
+    height: 160px;
+  }
+
+  .food-beverag .foodNbav-inner {
+    width: 100%;
+  }
+
+  .input-box .input-text {
+    font-size: 11px;
+  }
+  .memberShip-bg .memb-slider-bnnr-hd {
+    font-size: 35px;
+  }
+
+  .accomm-sec .slider-bnnr-hd {
+    font-size: 25px;
+  }
+
+  .tranportestion-sec .slider-bnnr-hd {
+    font-size: 25px;
+  }
+
+  .foot-wrapper.px-3 {
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+  }
+
+  #hero-new .hero-text .hero-heading {
+    font-size: 46px;
+  }
+
+  #hero-new .hero-text .hero-sheading {
+    font-size: 20px;
+  }
+
+  .odr-bnr-hrding {
+    font-size: 28px;
+  }
+
+  .hero-heading {
+    font-size: 44px;
+  }
+
+  .hero-heading {
+    font-size: 44px;
+  }
+
+  /* #hero-new .hero-inner {
+        height: 424px;
+    } */
+  .inset-head {
+    font-size: 32px;
+  }
+
+  .mon-bg .slider-bnnr-hd {
+    font-size: 30px;
+  }
+
+  #hero-new .hero-inner {
+    height: 350px;
+  }
+
+  .monte-quote .monte-acti {
+    height: 200px;
+  }
+
+  .slider-bg .slider-bnnr-hd {
+    font-size: 40px;
+  }
+
+  .slider-bg {
+    height: 280px;
+  }
+
+  /* #video-player iframe {
+        height: 200px;
+    } */
+  .accomm-sec .slider-bnnr-hd {
+    font-size: 29px;
+  }
+
+  .program-cnt .pro_pera {
+    font-size: 17px;
+  }
+  .music-bg .music-hding {
+    font-size: 25px;
+  }
+  .odr-scces .col-sm-6 {
+    width: 100%;
+  }
+
+  .odr-scces h3,
+  .odr-scces p {
+    text-align: center;
+  }
+
+  .faq-sec .slider-bnnr-hd {
+    font-size: 25px;
+  }
+
+  section.faq-sec {
+    height: 150px;
+  }
+
+  .foot-link {
+    font-size: 11px;
+  }
+
+  #about-footr .foot-link {
+    font-size: 11px;
+  }
+
+  .montenegro-sec .slider-bnnr-hd {
+    font-size: 25px;
+  }
+
+  .staff-terms-sec .slider-bnnr-hd {
+    font-size: 25px;
+  }
+
+  /* #video-player iframe {
+        height: 175px;
+    } */
+}
+
+@media (max-width: 346px) {
+  .yourDonationAmt button {
+    padding: 8px 16px !important;
+  }
+
+  #donatPg .donateCnt .donateAmount .yourDonationAmt ul input[type="text"] {
+    width: 130px;
+  }
+}
+
+@media print,
+  (-o-min-device-pixel-ratio: 5/4),
+  (-webkit-min-device-pixel-ratio: 1.25),
+  (min-resolution: 120dpi) {
+}
+
+@media print {
+}

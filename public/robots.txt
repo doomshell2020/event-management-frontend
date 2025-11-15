@@ -1,0 +1,11 @@
+# Allow everything to be crawled and indexed
+
+User-agent: *
+Disallow:
+
+# Allow Facebook and WhatsApp scrapers (not necessary but explicit)
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Facebot
+Allow: /
