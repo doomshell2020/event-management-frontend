@@ -22,7 +22,7 @@ export async function getServerSideProps({ params }) {
 
     return {
       props: {
-        event: data?.data?.events?.[0] || null, // ✅ pick the first matching event
+        event: data?.data?.events?.[0] || null,
         slug,
       },
     };
@@ -37,11 +37,19 @@ export async function getServerSideProps({ params }) {
   }
 }
 
-
-
-
 const EventDetailPage = ({ event, slug }) => {
-  if (!event || Object.keys(event).length == 0) {
+
+  // ⛳ All hooks MUST be at the top
+  const [backgroundImage, setIsMobile] = useState("/assets/front-images/about-slider_bg.jpg");
+
+  // Prepare dates safely
+  const startDate = event ? new Date(event.date_from?.local || event.date_from?.utc) : null;
+  const endDate = event ? new Date(event.date_to?.local || event.date_to?.utc) : null;
+  const saleStart = event ? new Date(event.sale_start?.local || event.sale_start?.utc) : null;
+  const saleEnd = event ? new Date(event.sale_end?.local || event.sale_end?.utc) : null;
+
+  // 🛑 Early return MUST come after hooks
+  if (!event || Object.keys(event).length === 0) {
     return (
       <>
         <FrontendHeader backgroundImage="/assets/front-images/about-slider_bg.jpg" />
@@ -63,14 +71,6 @@ const EventDetailPage = ({ event, slug }) => {
     );
   }
 
-  // ✅ Use "local" time from API safely
-  const startDate = new Date(event.date_from?.local || event.date_from?.utc);
-  const endDate = new Date(event.date_to?.local || event.date_to?.utc);
-  const saleStart = new Date(event.sale_start?.local || event.sale_start?.utc);
-  const saleEnd = new Date(event.sale_end?.local || event.sale_end?.utc);
-
-  const [backgroundImage, setIsMobile] = useState("/assets/front-images/about-slider_bg.jpg");
-
   return (
     <>
       <FrontendHeader backgroundImage={backgroundImage} />
@@ -78,7 +78,8 @@ const EventDetailPage = ({ event, slug }) => {
       <section id="event-detail-page">
         <div className="container">
           <div className="row">
-            {/* Left side — Image and share */}
+
+            {/* Left side image */}
             <div className="col-md-6">
               <div className="ticker_img fadeInLeft position-sticky top-0">
                 <div className="ticker_imgmn">
@@ -127,7 +128,7 @@ const EventDetailPage = ({ event, slug }) => {
               </div>
             </div>
 
-            {/* Right side — Details */}
+            {/* Right side details */}
             <div className="col-md-6">
               <div className="event-ticket-box">
                 <div className="section-heading">
@@ -140,13 +141,13 @@ const EventDetailPage = ({ event, slug }) => {
                     <li className="flex-fill">
                       <div>
                         <h6>Start Date</h6>
-                        <span>{format(startDate, "EEE, dd MMM yyyy | hh:mm a")}</span>
+                        <span>{startDate ? format(startDate, "EEE, dd MMM yyyy | hh:mm a") : ""}</span>
                       </div>
                     </li>
                     <li className="flex-fill">
                       <div>
                         <h6>End Date</h6>
-                        <span>{format(endDate, "EEE, dd MMM yyyy | hh:mm a")}</span>
+                        <span>{endDate ? format(endDate, "EEE, dd MMM yyyy | hh:mm a") : ""}</span>
                       </div>
                     </li>
                     <li className="flex-fill">
@@ -163,12 +164,12 @@ const EventDetailPage = ({ event, slug }) => {
                   The maximum number of tickets allowed per account is {event.ticket_limit || 50}.
                 </p>
 
-                {/* ✅ Tickets list */}
+                {/* TICKETS LIST */}
                 <div className="form-group ticket_all">
                   <ul className="ps-0">
                     {event?.tickets?.length > 0 ? (
                       event.tickets
-                        .filter((t) => t.status == "Y" || t.hidden == "N")
+                        .filter((t) => t.status === "Y" || t.hidden === "N")
                         .map((ticket) => (
                           <li key={ticket.id} className="list-item-none">
                             <div className="row align-items-center">
@@ -178,14 +179,14 @@ const EventDetailPage = ({ event, slug }) => {
                               <div className="col-sm-6 col-8 price-details">
                                 <div className="row align-items-center">
                                   <div className="col-6 d-flex align-items-center justify-content-end">
-                                    <span className="price">
-                                      ₹{ticket.price}
-                                    </span>
+                                    <span className="price">₹{ticket.price}</span>
                                   </div>
                                   <div className="col-6">
                                     <select className="form-select">
                                       {Array.from({ length: 11 }, (_, i) => (
-                                        <option key={i} value={i}>{i}</option>
+                                        <option key={i} value={i}>
+                                          {i}
+                                        </option>
                                       ))}
                                     </select>
                                   </div>
@@ -200,14 +201,14 @@ const EventDetailPage = ({ event, slug }) => {
                   </ul>
                 </div>
 
-                {/* ✅ Addons list */}
+                {/* ADDONS LIST */}
                 {event?.addons?.length > 0 && (
                   <>
                     <h5 className="event_Sub_h">Addons</h5>
                     <div className="form-group ticket_all">
                       <ul className="ps-0">
                         {event.addons
-                          .filter((a) => a.status == "Y" || a.hidden == "N")
+                          .filter((a) => a.status === "Y" || a.hidden === "N")
                           .map((addon) => (
                             <li key={addon.id} className="list-item-none">
                               <div className="row align-items-center">
@@ -222,7 +223,9 @@ const EventDetailPage = ({ event, slug }) => {
                                     <div className="col-6">
                                       <select className="form-select">
                                         {Array.from({ length: 11 }, (_, i) => (
-                                          <option key={i} value={i}>{i}</option>
+                                          <option key={i} value={i}>
+                                            {i}
+                                          </option>
                                         ))}
                                       </select>
                                     </div>
@@ -236,12 +239,18 @@ const EventDetailPage = ({ event, slug }) => {
                   </>
                 )}
 
-                {/* ✅ Description */}
+                {/* Description */}
                 <h5 className="event_Sub_h">Description</h5>
                 <div className="event_desp">
-                  <div dangerouslySetInnerHTML={{ __html: event.desp || "No description available." }} />
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html: event.desp || "No description available.",
+                    }}
+                  />
                   <p className="mb-0">
-                    <i><b>Note: An 8% transaction fee applies to each purchase.</b></i>
+                    <i>
+                      <b>Note: An 8% transaction fee applies to each purchase.</b>
+                    </i>
                   </p>
                 </div>
 

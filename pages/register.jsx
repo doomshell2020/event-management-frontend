@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import FrontendHeader from "@/shared/layout-components/frontelements/frontendheader";
 import FrontendFooter from "@/shared/layout-components/frontelements/frontendfooter";
 import styles from "@/styles/LoginPage.module.css";
-import api from "@/utils/api"; // ✅ axios instance
+import api from "@/utils/api";
 import Swal from "sweetalert2";
 import Link from "next/link";
 
@@ -27,7 +27,6 @@ const RegisterPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // 🧠 Basic validation
     if (!formData.gender) {
       Swal.fire("Error", "Please select your gender.", "error");
       return;
@@ -38,7 +37,12 @@ const RegisterPage = () => {
       const response = await api.post("/api/v1/auth/register", formData);
 
       if (response.data?.success) {
-        Swal.fire("Success", "Registration successful! Please check your email for verification.", "success");
+        Swal.fire(
+          "Success",
+          "Registration successful! Please check your email for verification.",
+          "success"
+        );
+
         setFormData({
           firstName: "",
           lastName: "",
@@ -51,7 +55,6 @@ const RegisterPage = () => {
         Swal.fire("Error", response.data?.message || "Something went wrong!", "error");
       }
     } catch (error) {
-
       const apiErrorMsg =
         error.response?.data?.error?.message ||
         error.response?.data?.message ||
@@ -192,7 +195,10 @@ const RegisterPage = () => {
                         </span>{" "}
                         and Accept Our{" "}
                         <span>
-                          <a target="_blank" href="https://eboxtickets.com/pages/terms-and-conditions">
+                          <a
+                            target="_blank"
+                            href="https://eboxtickets.com/pages/terms-and-conditions"
+                          >
                             Terms and Conditions
                           </a>
                         </span>
@@ -210,10 +216,12 @@ const RegisterPage = () => {
                   </form>
 
                   <hr style={{ borderColor: "currentColor" }} />
+
+                  {/* ✅ FIXED Link */}
                   <div className="reg_btn text-center">
                     <p className="text-14">
                       Already have an account?
-                      <a className="rg fw-bold" href="/login"> Log in</a>
+                      <Link href="/login" className="rg fw-bold"> Log in</Link>
                     </p>
                   </div>
                 </div>
