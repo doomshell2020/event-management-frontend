@@ -9,6 +9,9 @@ import FrontendFooter from "@/shared/layout-components/frontelements/frontendfoo
 import EventSidebar from "@/pages/components/Event/EventSidebar";
 import { Form, Button } from "react-bootstrap";
 import EventHeaderSection from "@/pages/components/Event/EventProgressBar";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+
 
 const ManageTicketPricing = () => {
     const router = useRouter();
@@ -19,6 +22,16 @@ const ManageTicketPricing = () => {
     const [slotsList, setSlotsList] = useState([]);
     const [pricingList, setPricingList] = useState([]);
     const [loading, setLoading] = useState(false);
+
+
+    const eventStart = eventDetails?.date_from?.local
+        ? new Date(eventDetails.date_from.local)
+        : null;
+
+    const eventEnd = eventDetails?.date_to?.local
+        ? new Date(eventDetails.date_to.local)
+        : null;
+
 
     /* ----------------------------------------------------
         FETCH TICKETS
@@ -106,25 +119,32 @@ const ManageTicketPricing = () => {
     const [selectedDate, setSelectedDate] = useState("");
     const [selectedSlot, setSelectedSlot] = useState("");
 
+    function toDateInputFormat(dateStr) {
+        if (!dateStr) return "";
+        const d = new Date(dateStr);
+        const year = d.getUTCFullYear();
+        const month = String(d.getUTCMonth() + 1).padStart(2, "0");
+        const day = String(d.getUTCDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+    }
+
+    const normalize = (d) => {
+        const dt = new Date(d);
+        return new Date(dt.getFullYear(), dt.getMonth(), dt.getDate());
+    };
+
     const handleFormSubmit = async (e) => {
         e.preventDefault();
         const form = e.currentTarget;
 
-        // --------------------------
-        // Bootstrap form validation
-        // --------------------------
-        if (form.checkValidity() === false) {
+        if (form.checkValidity() == false) {
             e.stopPropagation();
             setFormValidated(true);
             return;
         }
 
-        // Mark form as validated
         setFormValidated(true);
 
-        // --------------------------
-        // Ticket selection validation
-        // --------------------------
         if (!selectedTicket) {
             return Swal.fire("Required!", "Please select a ticket.", "warning");
         }
@@ -135,34 +155,33 @@ const ManageTicketPricing = () => {
             return Swal.fire("Required!", "Please enter a valid price.", "warning");
         }
 
-        const ticketType = selectedTicket.ticket_type?.toLowerCase();
-
-        // --------------------------
-        // Ticket-type specific validation
-        // --------------------------
-        if (ticketType === "day") {
+        const ticketType = selectedTicket.access_type?.toLowerCase();
+        if (ticketType == "day") {
             if (!selectedDate) {
                 return Swal.fire("Required!", "Please select a date for day-type ticket.", "warning");
             }
 
-            const chosenDate = new Date(selectedDate);
-            const eventStart = new Date(eventDetails.start_date);
-            const eventEnd = new Date(eventDetails.end_date);
+            // Normalize all dates to strip time
+            const normalize = (d) => {
+                const dt = new Date(d);
+                return new Date(dt.getFullYear(), dt.getMonth(), dt.getDate());
+            };
+
+            const chosenDate = normalize(selectedDate);
+            const eventStart = normalize(eventDetails.date_from.local);
+            const eventEnd = normalize(eventDetails.date_to.local);
 
             if (chosenDate < eventStart || chosenDate > eventEnd) {
                 return Swal.fire("Invalid Date!", "Date must be within the event duration.", "warning");
             }
         }
 
-        if (ticketType === "slot") {
+        if (ticketType == "slot") {
             if (!selectedSlot) {
                 return Swal.fire("Required!", "Please select a slot for slot-type ticket.", "warning");
             }
         }
 
-        // --------------------------
-        // Prepare payload
-        // --------------------------
         const payload = {
             event_id: Number(id),
             ticket_type_id: Number(selectedTicket.id),
@@ -172,9 +191,6 @@ const ManageTicketPricing = () => {
         if (selectedDate) payload.date = selectedDate;
         if (selectedSlot) payload.event_slot_id = Number(selectedSlot);
 
-        // --------------------------
-        // API call to save pricing
-        // --------------------------
         try {
             const res = await api.post(`/api/v2/tickets/ticket-pricing/set`, payload);
 
@@ -187,7 +203,6 @@ const ManageTicketPricing = () => {
                 setSelectedDate("");
                 setSelectedTicket(null);
                 setFormValidated(false);
-
                 // Refresh pricing list
                 fetchPricingList(id);
             } else {
@@ -264,12 +279,8 @@ const ManageTicketPricing = () => {
                                                     placeholder="Enter price"
                                                     value={price}
                                                     required
-                                                    min={0.01}
                                                     onChange={(e) => setPrice(e.target.value ? parseFloat(e.target.value) : "")}
                                                 />
-                                                <Form.Control.Feedback type="invalid">
-                                                    Please enter a valid price.
-                                                </Form.Control.Feedback>
                                             </div>
 
                                             {/* Date / Slot */}
@@ -283,10 +294,17 @@ const ManageTicketPricing = () => {
                                                             type="date"
                                                             value={selectedDate}
                                                             required
-                                                            min={eventDetails.start_date}
-                                                            max={eventDetails.end_date}
-                                                            onChange={(e) => setSelectedDate(e.target.value)}
+                                                            min={toDateInputFormat(eventDetails?.date_from?.local)}
+                                                            max={toDateInputFormat(eventDetails?.date_to?.local)}
+                                                            onChange={(e) => {
+                                                                const value = e.target.value; // YYYY-MM-DD
+                                                                setSelectedDate(value);
+                                                                const realDate = new Date(`${value}T00:00:00Z`);
+                                                                console.log("Converted Date:", realDate);
+                                                            }}
                                                         />
+
+
                                                         <Form.Control.Feedback type="invalid">
                                                             Please select a valid date within event duration.
                                                         </Form.Control.Feedback>

@@ -11,10 +11,10 @@ import EventHeaderSection from "@/pages/components/Event/EventProgressBar";
 
 import Calendar from "react-calendar";
 import DatePicker from "react-datepicker";
-// import Modal from "react-bootstrap/Modal";
-// import Button from "react-bootstrap/Button";
 import "react-calendar/dist/Calendar.css";
 import "react-datepicker/dist/react-datepicker.css";
+// import Modal from "react-bootstrap/Modal";
+// import Button from "react-bootstrap/Button";
 
 import { Form, Button, Modal } from "react-bootstrap";
 
