@@ -27,8 +27,10 @@ jest-output.log
 # ====================
 # ⚙️ Environment Files
 # ====================
+.env
 .env.development
 .env.production
+.env.local
 # .env.*  # Catch any other env variants
 
 # ====================
