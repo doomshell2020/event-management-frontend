@@ -18,10 +18,13 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
   const [username, setUsername] = useState("");
   const [isActiveNow, setIsActiveNow] = useState(false);
 
-  // 🚀 Do NOT check token on public pages (very important)
+  // 🚀 Define all routes that should NOT require login
   const publicRoutes = [
+    "/",
     "/login",
+    "/calender",
     "/register",
+    "/contact-us",
     "/forgot-password",
     "/verify-email"
   ];
@@ -30,26 +33,30 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
   //  ✅ TOKEN + LOGIN CHECK
   // --------------------------------------------------
   useEffect(() => {
+    const currentPath = router.pathname;
+
     // Skip validation on public routes
-    if (publicRoutes.includes(router.pathname)) return;
+    if (publicRoutes.includes(currentPath)) {
+      setIsLoggedIn(false); // optional: user is not logged in in public pages
+      return;
+    }
 
     const checkLoginStatus = () => {
       const token = Cookies.get("userAuthToken");
-      
       const storedUser =
         localStorage.getItem("user") || sessionStorage.getItem("user");
 
-      // ❌ If token missing OR expired → logout & redirect
+      // ❌ Token missing OR expired → logout & redirect
       if (!token || !isTokenValid(token)) {
         Cookies.remove("userAuthToken", { path: "/" });
         localStorage.clear();
         sessionStorage.clear();
         setIsLoggedIn(false);
-        router.replace("/login"); // no loop
+        router.replace("/login");
         return;
       }
 
-      // ✔️ Valid token – update state
+      // ✔️ Token exists → load user
       if (storedUser) {
         try {
           const userObj = JSON.parse(storedUser);
@@ -64,10 +71,12 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
 
     checkLoginStatus();
 
-    // Sync across tabs
+    // Sync across browser tabs
     window.addEventListener("storage", checkLoginStatus);
     return () => window.removeEventListener("storage", checkLoginStatus);
+
   }, [router.pathname]);
+
 
   // --------------------------------------------------
   //  Sticky Header
