@@ -29,7 +29,6 @@ api.interceptors.request.use(
           token = Cookies.get("userAuthToken");
         }
       }
-
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
