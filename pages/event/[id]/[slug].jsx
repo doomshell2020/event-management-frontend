@@ -135,7 +135,7 @@ const EventDetailPage = ({ event, slug }) => {
               <div className="event-ticket-box">
                 <div className="section-heading">
                   <h2 className="text-start">{event.name}</h2>
-                  <h6>Hosted By <a href="#">Organiser #{event.event_org_id}</a></h6>
+                  <h6>Hosted By <a href="#">Organizer #{event.event_org_id}</a></h6>
 
                   {/* 🚫 Inactive Event Warning */}
                   {event.status == "N" && (
