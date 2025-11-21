@@ -32,8 +32,8 @@ const MyTicket = () => {
                         </div>
 
                         <div className="col-md-7">
-                            <div class="ticket_h d-flex justify-content-between">
-                                <div class="flex-fill pe-2">
+                            <div className="ticket_h d-flex justify-content-between">
+                                <div className="flex-fill pe-2">
                                     <h3 className="fw-bold">IFRS UPDATE 2025</h3>
                                     <h6 className="text-14 fw-bold">Hosted By <a href="#">ACCA</a></h6>
                                 </div>

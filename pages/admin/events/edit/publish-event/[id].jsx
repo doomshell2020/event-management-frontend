@@ -698,7 +698,7 @@ const PublishEvent = () => {
                                     variant=""
                                     onClick={handleBookShow}
                                 >
-                                    <i class="bi bi-eye pe-2"></i>Preview Event
+                                    <i className="bi bi-eye pe-2"></i>Preview Event
                                 </Button>
 
                                 <Button
@@ -706,7 +706,7 @@ const PublishEvent = () => {
                                     variant=""
                                     onClick={() => PublishEvent()}
                                 >
-                                    <i class="far fa-arrow-alt-circle-up pe-2"></i>Publish Event
+                                    <i className="far fa-arrow-alt-circle-up pe-2"></i>Publish Event
                                 </Button>
 
                                 <Button

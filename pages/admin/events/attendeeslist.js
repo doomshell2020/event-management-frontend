@@ -228,7 +228,7 @@ const AttendeesList = () => {
             </div>
 
 
-            <div class="evnt-mngr-tbl">
+            <div className="evnt-mngr-tbl">
             <table {...getTableProps()} className="table table-hover mb-0">
                 <thead>
                     {headerGroups.map((headerGroup) => (

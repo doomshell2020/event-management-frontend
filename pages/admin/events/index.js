@@ -80,7 +80,7 @@ const EventView = () => {
                 color: "white",
               }}
             >
-              <i class="bi bi-pencil-fill"></i>
+              <i className="bi bi-pencil-fill"></i>
             </Link>
             <div className="evnt-invts-prfl me-4">
               {row.original.ImageURL ? (

@@ -2170,7 +2170,7 @@ const InvitationsTable = () => {
                   viewDemoClose("lgShow");
                 }}
               >
-                <i class="bi bi-x"></i>
+                <i className="bi bi-x"></i>
               </Button>
             </Modal.Header>
 
@@ -2910,7 +2910,7 @@ const InvitationsTable = () => {
               viewDemoClose("Basic");
             }}
           >
-            <i class="bi bi-x"></i>
+            <i className="bi bi-x"></i>
           </Button>
         </Modal.Header>
         <Modal.Body>

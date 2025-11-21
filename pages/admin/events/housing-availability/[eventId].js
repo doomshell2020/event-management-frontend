@@ -647,7 +647,7 @@ const HousingAvailability = () => {
                   title="Edit Property Info"
                   onClick={() => handleOpenModal(row)}
                 >
-                  <i class="bi bi-pencil-fill"></i>
+                  <i className="bi bi-pencil-fill"></i>
                 </button>
                 {internalNotes && (
                   <button
@@ -1941,7 +1941,7 @@ const HousingAvailability = () => {
               closedModal(false);
             }}
           >
-            <i class="bi bi-x"></i>
+            <i className="bi bi-x"></i>
           </Button>
         </Modal.Header>
         <Modal.Body>

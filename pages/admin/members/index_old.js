@@ -2008,7 +2008,7 @@ const MembersTable = () => {
               href={"/admin/members/add"}
               className=" btn-info  Member-top-mblbtn2 "
             >
-              <i class="bi bi-plus-lg"></i>
+              <i className="bi bi-plus-lg"></i>
             </Link>
 
             <Link
@@ -2750,7 +2750,7 @@ const MembersTable = () => {
                   viewDemoClose("lgShow");
                 }}
               >
-                <i class="bi bi-x"></i>
+                <i className="bi bi-x"></i>
               </Button>
             </Modal.Header>
 
@@ -3507,7 +3507,7 @@ const MembersTable = () => {
               viewDemoClose("Basic");
             }}
           >
-            <i class="bi bi-x"></i>
+            <i className="bi bi-x"></i>
           </Button>
         </Modal.Header>
         <Modal.Body>

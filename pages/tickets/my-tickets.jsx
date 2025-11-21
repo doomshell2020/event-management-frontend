@@ -88,10 +88,10 @@ const MyTicket = () => {
                         <div className="paginator col-sm-12">
                             <ul className="pagination justify-content-center">
                                 <li className="prev disabled">
-                                    <Link href="/"><i class="bi bi-chevron-left"></i> Previous</Link>
+                                    <Link href="/"><i className="bi bi-chevron-left"></i> Previous</Link>
                                 </li>
                                 <li className="next disabled">
-                                    <Link href="/">Next <i class="bi bi-chevron-right"></i></Link>
+                                    <Link href="/">Next <i className="bi bi-chevron-right"></i></Link>
                                 </li>
                             </ul>
                             <div className="text-center">

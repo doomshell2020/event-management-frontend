@@ -554,7 +554,7 @@ const Orders = () => {
                   RemainingAmountEmail(row.original.orderid);
                 }}
               >
-          <i class="bi bi-cash-stack"></i>
+          <i className="bi bi-cash-stack"></i>
               </a>
             )} */}
               </div>

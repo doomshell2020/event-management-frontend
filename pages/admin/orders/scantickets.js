@@ -1401,7 +1401,7 @@ const ScanTickets = () => {
               viewDemoClose("basic");
             }}
           >
-            <i class="bi bi-x"></i>
+            <i className="bi bi-x"></i>
           </Button>
         </Modal.Header>
         <Modal.Body>
