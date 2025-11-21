@@ -5,7 +5,6 @@ import Image from "next/image";
 import { format } from "date-fns";
 import React, { useMemo, useState, useRef, useEffect } from "react";
 
-// ✅ Correct SSR Function (with current date range)
 export async function getServerSideProps() {
   try {
     // Get current date in YYYY-MM-DD format

@@ -44,9 +44,12 @@ const VerifyEmailPage = () => {
     verify();
   }, [token]);
 
+    const [backgroundImage] = useState("/assets/front-images/about-slider_bg.jpg");
+  
+
   return (
     <>
-      <FrontendHeader />
+      <FrontendHeader backgroundImage={backgroundImage} />
 
       <div className="flex items-center justify-center py-5 px-4">
         <div className="max-w-md w-full bg-white shadow-md rounded-xl p-6 text-center">
