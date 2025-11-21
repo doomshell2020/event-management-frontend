@@ -3,251 +3,326 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import FrontendHeader from "@/shared/layout-components/frontelements/frontendheader";
 import FrontendFooter from "@/shared/layout-components/frontelements/frontendfooter";
+import api from "@/utils/api";
+import Cookies from "js-cookie";
+import Swal from "sweetalert2";
 
 const UpdateProfile = () => {
-  const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    gender: "",
-    dob: "",
-  });
+    const router = useRouter();
+    const [loading, setLoading] = useState(false);
+    const [formData, setFormData] = useState({
+        firstName: "",
+        lastName: "",
+        password: "",
+        gender: "",
+        dob: "",
+        emailNewsLetter: "N",
+        emailRelatedEvents: "N",
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+        oldPassword: "",
+        newPassword: "",
+    });
 
-
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!formData.gender) {
-      Swal.fire("Error", "Please select your gender.", "error");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const response = await api.post("/api/v1/auth/register", formData);
-
-      if (response.data?.success) {
-        Swal.fire(
-          "Success",
-          "Registration successful! Please check your email for verification.",
-          "success"
-        );
-
-        setFormData({
-          firstName: "",
-          lastName: "",
-          email: "",
-          password: "",
-          gender: "",
-          dob: "",
-        });
-      } else {
-        Swal.fire("Error", response.data?.message || "Something went wrong!", "error");
-      }
-    } catch (error) {
-      const apiErrorMsg =
-        error.response?.data?.error?.message ||
-        error.response?.data?.message ||
-        error.message ||
-        "Registration failed. Try again later.";
-
-      Swal.fire("Error", apiErrorMsg, "error");
-    } finally {
-      setLoading(false);
-    }
-  };
+    const [profileImage, setProfileImage] = useState("");
+    const [email, setEmail] = useState("");
+    const [phone, setPhone] = useState("");
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
+    };
 
 
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const token = Cookies.get("userAuthToken");
+                if (!token) {
+                    router.push("/login");
+                    return;
+                }
+                // ✅ Fetch user details from API
+                const res = await api.get("/api/v1/auth/me");
+                if (res.data?.success) {
+                    const user = res.data.data;
+                    setFormData({
+                        firstName: user.first_name || "",
+                        lastName: user.last_name || "",
+                        // email: user.email || "",
+                        gender: user.gender || "",
+                        dob: user.dob || "",
+                        emailNewsLetter: user.emailNewsLetter,
+                        emailRelatedEvents: user.emailRelatedEvents,
+                    });
+                    setEmail(user.email)
+                    setPhone(user.mobile)
+                    setProfileImage(user.profile_image); // if needed
+                } else {
+                    router.push("/login");
+                }
+            } catch (error) {
+                console.error("Error fetching user profile:", error);
+                router.push("/login");
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchUser();
+    }, [router]);
+    
+
+    const handleCheckbox = (e) => {
+        const { name, checked } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: checked ? "Y" : "N"
+        }));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+
+        try {
+            const payload = {
+                first_name: formData.firstName,
+                last_name: formData.lastName,
+                gender: formData.gender,
+                dob: formData.dob,
+                emailNewsLetter: formData.emailNewsLetter,
+                emailRelatedEvents: formData.emailRelatedEvents,
+            };
+
+            // ---------- PASSWORD UPDATE LOGIC ----------
+            // If user typed any password value
+            if (formData.oldPassword.trim() !== "" || formData.newPassword.trim() !== "") {
+
+                // Check both inputs must be filled
+                if (formData.oldPassword.trim() === "" || formData.newPassword.trim() === "") {
+                    Swal.fire("Error", "Both old and new password are required.", "error");
+                    setLoading(false);
+                    return;
+                }
+
+                // Backend expects only "password"
+                payload.password = formData.newPassword;
+            }
+            // --------------------------------------------
+            const response = await api.patch("/api/v1/auth/update-profile", payload);
+            if (response.data?.success) {
+                Swal.fire("Success", response.data.message, "success");
+                // Reset password fields
+                setFormData(prev => ({
+                    ...prev,
+                    oldPassword: "",
+                    newPassword: ""
+                }));
+            } else {
+                Swal.fire("Error", response.data?.message || "Something went wrong!", "error");
+            }
+
+        } catch (error) {
+            const apiErrorMsg =
+                error.response?.data?.error?.message ||
+                error.response?.data?.message ||
+                error.message ||
+                "Profile update failed. Try again later.";
+
+            Swal.fire("Error", apiErrorMsg, "error");
+        } finally {
+            setLoading(false);
+        }
+    };
 
 
 
-  return (
-    <>
-      <FrontendHeader />
-      {/* <section id="profile" style={{
-                margin: "35px 0px 50px",
-            }} >
-                <div className="container" style={
-                    {
-                        "max-width": "100%",
-                        "margin": "0 auto",
-                        "padding": "0 20px",
-                    }
-                }>
-                    <div className="heading">
-                        <h1>Profile</h1>
-                        <h2>Edit Profile</h2>
-                        <p className="mb-4">Your profile information is displayed below.</p>
+
+    return (
+        <>
+            <FrontendHeader />
+            <section id="edit-profile">
+                <div className="container">
+                    <div className="section-heading">
+                        <h1>Update profile</h1>
+                        <h2>Profile</h2>
+                        <p className="text-center body-text">
+                            Enter your information below to update your account
+                        </p>
+                    </div>
+
+                    <div className="row justify-content-center mt-4">
+                        {/* LEFT SIDE IMAGE */}
+                        <div className="col-md-3 text-center">
+                            <div className="profile-image-wrapper">
+                                <img
+                                    src={profileImage || "https://eboxtickets.com/images/Usersprofile/noimage.jpg"}
+                                    className="profile-img"
+                                    alt="Profile Image"
+                                />
+                                <h6 className="mt-2">{formData.firstName} {formData.lastName}</h6>
+                            </div>
+                        </div>
+
+                        {/* RIGHT SIDE FORM */}
+                        <div className="col-md-7">
+                            <div className="edit-box p-4 shadow-sm">
+
+                                {/* SECTION: EDIT YOUR PROFILE */}
+                                <div className="section-title">Edit Your Profile</div>
+                                <p>You can edit your profile below including updating your password.</p>
+
+                                <form onSubmit={handleSubmit}>
+
+                                    <div className="row">
+                                        <div className="col-md-6 mb-3">
+                                            <label>First Name</label>
+                                            <input
+                                                type="text"
+                                                name="firstName"
+                                                className="form-control"
+                                                value={formData.firstName}
+                                                onChange={handleChange}
+                                                required
+                                            />
+                                        </div>
+
+                                        <div className="col-md-6 mb-3">
+                                            <label>Last Name</label>
+                                            <input
+                                                type="text"
+                                                name="lastName"
+                                                className="form-control"
+                                                value={formData.lastName}
+                                                onChange={handleChange}
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="row">
+                                        <div className="col-md-6 mb-3">
+                                            <label>Email</label>
+                                            <input
+                                                type="email"
+                                                name="email"
+                                                className="form-control"
+                                                readOnly
+                                                value={email}
+                                                required
+                                            />
+                                        </div>
+
+                                        <div className="col-md-6 mb-3">
+                                            <label>Gender</label>
+                                            <select
+                                                className="form-control"
+                                                name="gender"
+                                                value={formData.gender}
+                                                onChange={handleChange}
+                                            >
+                                                <option value="">Choose Gender</option>
+                                                <option value="Male">Male</option>
+                                                <option value="Female">Female</option>
+                                                <option value="Other">Other</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div className="row">
+                                        <div className="col-md-6 mb-3">
+                                            <label>Date of Birth</label>
+                                            <input
+                                                type="date"
+                                                name="dob"
+                                                className="form-control"
+                                                value={formData.dob}
+                                                onChange={handleChange}
+                                                required
+                                            />
+                                        </div>
+
+                                        <div className="col-md-6 mb-3">
+                                            <label>Phone Number</label>
+                                            <input
+                                                type="text"
+                                                name="phone"
+                                                readOnly
+                                                className="form-control"
+                                                value={phone}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* SECTION: CHANGE PASSWORD */}
+                                    <div className="section-title mt-4">Change Password</div>
+                                    <p>Leave blank if you do not wish to change your password.</p>
+
+                                    <div className="row">
+                                        <div className="col-md-6 mb-3">
+                                            <label>Old Password</label>
+                                            <input
+                                                type="password"
+                                                name="oldPassword"
+                                                className="form-control"
+                                                value={formData.oldPassword}
+                                                onChange={handleChange}
+                                            />
+                                        </div>
+
+                                        <div className="col-md-6 mb-3">
+                                            <label>New Password</label>
+                                            <input
+                                                type="password"
+                                                name="newPassword"
+                                                className="form-control"
+                                                value={formData.newPassword}
+                                                onChange={handleChange}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* SECTION: EMAIL NOTIFICATION */}
+                                    <div className="section-title mt-4">Email Notifications</div>
+                                    <p>You can manage the notifications you receive via email.</p>
+
+                                    <div className="d-flex gap-4 mb-3">
+                                        <div>
+                                            <input
+                                                type="checkbox"
+                                                name="emailNewsLetter"
+                                                checked={formData.emailNewsLetter === "Y"}
+                                                onChange={handleCheckbox}
+                                            />{" "}
+                                            Email Newsletter
+                                        </div>
+
+                                        <div>
+                                            <input
+                                                type="checkbox"
+                                                name="emailRelatedEvents"
+                                                // checked={formData.relatedEvents}
+                                                checked={formData.emailRelatedEvents === "Y"}
+                                                onChange={handleCheckbox}
+                                            />{" "}
+                                            Email Related Events
+                                        </div>
+                                    </div>
+
+                                    <div className="text-end mt-4">
+                                        <button type="button" className="btn btn-secondary me-2" onClick={() => router.push("/users/view-profile")}>View Profile</button>
+                                        <button className="btn btn-primary">Save</button>
+                                    </div>
+
+                                </form>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </section> */}
-      <section id="sign-up">
-        <div className="container">
-          <div className="section-heading">
-            <h1>Create Account</h1>
-            <h2>Register</h2>
-            <p className="text-center body-text">
-              Enter your information below to create your account
-            </p>
-          </div>
+            </section>
 
-          <div className="form-content">
-            <div className="row">
-              <div className="col-md-6 col-sm-12 sig_img">
-                <div className="contact-form">
-                  <h1 className="fw-bold">Create Account</h1>
-                  <p className="body-text">Fill in the details below to register.</p>
+            <FrontendFooter />
 
-                  <form className="signup-pageform" onSubmit={handleSubmit}>
-                    <div>
-                      <input
-                        id="firstName"
-                        type="text"
-                        name="firstName"
-                        value={formData.firstName}
-                        onChange={handleChange}
-                        placeholder="First Name"
-                        className="form-control"
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <input
-                        id="lastName"
-                        type="text"
-                        name="lastName"
-                        value={formData.lastName}
-                        onChange={handleChange}
-                        placeholder="Last Name"
-                        className="form-control"
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <input
-                        id="email"
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        placeholder="Email"
-                        className="form-control"
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <input
-                        id="password"
-                        type="password"
-                        name="password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        placeholder="Password"
-                        className="form-control"
-                        required
-                      />
-                    </div>
-
-                    <div className="row align-items-center">
-                      <label className="col-sm-3 col-form-label">Gender</label>
-                      <div className="col-sm-9 d-flex">
-                        <input
-                          className="ms-1"
-                          type="radio"
-                          name="gender"
-                          value="Male"
-                          checked={formData.gender === "Male"}
-                          onChange={handleChange}
-                        />
-                        <label className="col-form-label ms-1">Male</label>
-
-                        <input
-                          className="ms-3"
-                          type="radio"
-                          name="gender"
-                          value="Female"
-                          checked={formData.gender === "Female"}
-                          onChange={handleChange}
-                        />
-                        <label className="col-form-label ms-1">Female</label>
-                      </div>
-                    </div>
-
-                    <div className="row align-items-center">
-                      <label className="col-sm-3 col-form-label">Date of Birth</label>
-                      <div className="col-sm-9">
-                        <input
-                          type="date"
-                          className="form-control"
-                          name="dob"
-                          value={formData.dob}
-                          onChange={handleChange}
-                          required
-                        />
-                      </div>
-                    </div>
-
-                    <div className="form_checkb gap-2 d-flex align-items-start">
-                      <input className="mt-1" type="checkbox" name="termscheck" required />
-                      <p className="chack_cont">
-                        By Creating An Account You Agree To Our{" "}
-                        <span>
-                          <a target="_blank" href="https://eboxtickets.com/pages/privacy-policy">
-                            Privacy Policy
-                          </a>
-                        </span>{" "}
-                        and Accept Our{" "}
-                        <span>
-                          <a
-                            target="_blank"
-                            href="https://eboxtickets.com/pages/terms-and-conditions"
-                          >
-                            Terms and Conditions
-                          </a>
-                        </span>
-                        .
-                      </p>
-                    </div>
-
-                    <button
-                      type="submit"
-                      className="primery-button w-100 text-14 mt-3"
-                      disabled={loading}
-                    >
-                      {loading ? "Registering..." : "Register"}
-                    </button>
-                  </form>
-
-                  <hr style={{ borderColor: "currentColor" }} />
-
-                  {/* ✅ FIXED Link */}
-                  <div className="reg_btn text-center">
-                    <p className="text-14">
-                      Already have an account?
-                      <Link href="/login" className="rg fw-bold"> Log in</Link>
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-      <FrontendFooter />
-
-    </>
-  )
+        </>
+    )
 }
 
 export default UpdateProfile
