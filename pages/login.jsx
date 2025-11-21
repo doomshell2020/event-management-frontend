@@ -13,15 +13,14 @@ import Swal from "sweetalert2";
 const LoginPage = () => {
   const router = useRouter();
   const [email, setEmail] = useState('rupam@doomshell.com');
-  const [password, setPassword] = useState('12345');
+  const [password, setPassword] = useState('123456');
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-
   useEffect(() => {
-    const rememberFlag = localStorage.getItem("rememberMe") === "true";
+    const rememberFlag = localStorage.getItem("rememberMe") == "true";
     setRememberMe(rememberFlag);
 
     if (rememberFlag) {
@@ -37,70 +36,73 @@ const LoginPage = () => {
     }
   }, [router]);
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    setSuccess("");
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
-  setError("");
-  setSuccess("");
+    const payload = { email, password };
 
-  const payload = { email, password };
+    try {
+      const res = await api.post("/api/v1/auth/login", payload);
 
-  try {
-    const res = await api.post("/api/v1/auth/login", payload);
+      if (!res.data?.success) {
+        const msg =
+          res.data?.error?.message ||
+          res.data?.message ||
+          "Invalid credentials, please try again.";
+        throw new Error(msg);
+      }
 
-    if (!res.data?.success) {
-      const msg =
-        res.data?.error?.message ||
-        res.data?.message ||
-        "Invalid credentials, please try again.";
-      throw new Error(msg);
+      const { token, user } = res.data.data;
+
+      // ✅ Always store user in localStorage (so all tabs can access)
+      localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("userAuthToken", token);
+
+      // ✅ Handle Remember Me for credentials only
+      if (rememberMe) {
+        localStorage.setItem("rememberMe", "true");
+        localStorage.setItem(
+          "loginCredentials",
+          JSON.stringify({ email, password })
+        );
+      } else {
+        localStorage.removeItem("rememberMe");
+        localStorage.removeItem("loginCredentials");
+      }
+
+      // Set cookie to expire in 1 minute
+      const oneMinuteFromNow = new Date(new Date().getTime() + 1 * 60 * 1000);
+
+      Cookies.set("userAuthToken", token, {
+        expires: oneMinuteFromNow,
+        expires: rememberMe ? 7 : 1, // days
+        secure: process.env.NODE_ENV == "production",
+        sameSite: "Strict",
+        path: "/",
+      });
+
+
+      toast.success("Login successful!");
+      setSuccess("Login successful!");
+      router.push("/");
+    } catch (err) {
+      console.error("Login error:", err);
+
+      const apiErrorMsg =
+        err.response?.data?.error?.message ||
+        err.response?.data?.message ||
+        err.message ||
+        "Something went wrong. Please try again.";
+
+      setError(apiErrorMsg);
+      Swal.fire("Error", apiErrorMsg, "error");
+    } finally {
+      setLoading(false);
     }
-
-    const { token, user } = res.data.data;
-
-    // ✅ Always store user in localStorage (so all tabs can access)
-    localStorage.setItem("user", JSON.stringify(user));
-
-    // ✅ Handle Remember Me for credentials only
-    if (rememberMe) {
-      localStorage.setItem("rememberMe", "true");
-      localStorage.setItem(
-        "loginCredentials",
-        JSON.stringify({ email, password })
-      );
-    } else {
-      localStorage.removeItem("rememberMe");
-      localStorage.removeItem("loginCredentials");
-    }
-
-    // ✅ Save auth token in cookie (short expiry if not remember me)
-    Cookies.set("userAuthToken", token, {
-      expires: rememberMe ? 7 : 1, // days
-      secure: process.env.NODE_ENV == "production",
-      sameSite: "Strict",
-      path: "/",
-    });
-
-    toast.success("Login successful!");
-    setSuccess("Login successful!");
-    router.push("/");
-  } catch (err) {
-    console.error("Login error:", err);
-
-    const apiErrorMsg =
-      err.response?.data?.error?.message ||
-      err.response?.data?.message ||
-      err.message ||
-      "Something went wrong. Please try again.";
-
-    setError(apiErrorMsg);
-    Swal.fire("Error", apiErrorMsg, "error");
-  } finally {
-    setLoading(false);
-  }
-};
-
+  };
 
   const [backgroundImage, setIsMobile] = useState('/assets/front-images/about-slider_bg.jpg');
   const [showPassword, setShowPassword] = useState(false);
@@ -189,6 +191,7 @@ const handleSubmit = async (e) => {
                             className="form-check-input"
                             id="rememberMe"
                             name="remember_me"
+                            onClick={() => setRememberMe(!rememberMe)}
                           />
                           <label className="form-check-label text-14" htmlFor="rememberMe">
                             Remember Me

@@ -4,8 +4,10 @@ import { useRouter } from "next/router";
 import CartModal from "@/pages/components/cart/index";
 import { handleLogout } from "@/utils/logout";
 import Cookies from "js-cookie";
+import { isTokenValid } from "@/utils/checkAuth";
 
 const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
+
   const [headerBackgroundImg, setHeaderBackgroundImg] = useState(
     backgroundImage ?? "/assets/front-images/slider_bg9.jpg"
   );
@@ -16,49 +18,68 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
   const [username, setUsername] = useState("");
   const [isActiveNow, setIsActiveNow] = useState(false);
 
-  // ✅ Open cart modal
-  const handleOpenCart = () => setIsActiveNow(false);
-  // ✅ Close cart modal
-  const handleCloseCart = () => setIsActiveNow(false);
+  // 🚀 Do NOT check token on public pages (very important)
+  const publicRoutes = [
+    "/login",
+    "/register",
+    "/forgot-password",
+    "/verify-email"
+  ];
 
-  // ✅ Check login status using cookie + storage
+  // --------------------------------------------------
+  //  ✅ TOKEN + LOGIN CHECK
+  // --------------------------------------------------
   useEffect(() => {
+    // Skip validation on public routes
+    if (publicRoutes.includes(router.pathname)) return;
+
     const checkLoginStatus = () => {
       const token = Cookies.get("userAuthToken");
+      console.log('>>>>>>>>>>>>>>>>',token);
+      
       const storedUser =
         localStorage.getItem("user") || sessionStorage.getItem("user");
 
-      if (token && storedUser) {
+      // ❌ If token missing OR expired → logout & redirect
+      if (!token || !isTokenValid(token)) {
+        Cookies.remove("userAuthToken", { path: "/" });
+        localStorage.clear();
+        sessionStorage.clear();
+
+        setIsLoggedIn(false);
+
+        router.replace("/login"); // no loop
+        return;
+      }
+
+      // ✔️ Valid token – update state
+      if (storedUser) {
         try {
           const userObj = JSON.parse(storedUser);
-          setIsLoggedIn(true);
           setUsername(userObj.firstName || "User");
+          setIsLoggedIn(true);
         } catch (err) {
-          console.error("Invalid user data in storage:", err);
+          console.error("Invalid user format:", err);
           setIsLoggedIn(false);
         }
-      } else {
-        setIsLoggedIn(false);
       }
     };
 
-    // Initial check
     checkLoginStatus();
 
-    // ✅ Sync login across browser tabs
+    // Sync across tabs
     window.addEventListener("storage", checkLoginStatus);
     return () => window.removeEventListener("storage", checkLoginStatus);
-  }, []);
+  }, [router.pathname]);
 
-  // ✅ Scroll effect for sticky header
+  // --------------------------------------------------
+  //  Sticky Header
+  // --------------------------------------------------
   useEffect(() => {
     const handleScroll = () => {
       const header = document.querySelector(".headernav");
-      if (window.scrollY > 0) {
-        header?.classList.add("scrolled");
-      } else {
-        header?.classList.remove("scrolled");
-      }
+      if (window.scrollY > 0) header?.classList.add("scrolled");
+      else header?.classList.remove("scrolled");
     };
 
     window.addEventListener("scroll", handleScroll);
