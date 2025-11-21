@@ -1,31 +1,37 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import { Button, Modal } from 'react-bootstrap';
 import FrontendHeader from "@/shared/layout-components/frontelements/frontendheader";
 import FrontendFooter from "@/shared/layout-components/frontelements/frontendfooter";
 import api from "@/utils/api";
 import Cookies from "js-cookie";
 import Swal from "sweetalert2";
+import { Bold } from "lucide-react";
 
 const UpdateProfile = () => {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+
     const [formData, setFormData] = useState({
         firstName: "",
         lastName: "",
         password: "",
         gender: "",
         dob: "",
+        phone: "",
         emailNewsLetter: "N",
         emailRelatedEvents: "N",
-
-        oldPassword: "",
-        newPassword: "",
+        old_password: "",
+        password: "",
     });
-
-    const [profileImage, setProfileImage] = useState("");
+    const [profileImage, setProfileImage] = useState(null);
+    const [selectedImage, setSelectedImage] = useState(null);
     const [email, setEmail] = useState("");
-    const [phone, setPhone] = useState("");
+    const [show, setShow] = useState(false);
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
@@ -47,14 +53,13 @@ const UpdateProfile = () => {
                     setFormData({
                         firstName: user.first_name || "",
                         lastName: user.last_name || "",
-                        // email: user.email || "",
                         gender: user.gender || "",
                         dob: user.dob || "",
+                        phone: user.mobile || "",
                         emailNewsLetter: user.emailNewsLetter,
                         emailRelatedEvents: user.emailRelatedEvents,
                     });
                     setEmail(user.email)
-                    setPhone(user.mobile)
                     setProfileImage(user.profile_image); // if needed
                 } else {
                     router.push("/login");
@@ -68,7 +73,7 @@ const UpdateProfile = () => {
         };
         fetchUser();
     }, [router]);
-    
+
 
     const handleCheckbox = (e) => {
         const { name, checked } = e.target;
@@ -78,11 +83,12 @@ const UpdateProfile = () => {
         }));
     };
 
+    // update user basic details and change password 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-
         try {
+            // ---------- BASE PAYLOAD ----------
             const payload = {
                 first_name: formData.firstName,
                 last_name: formData.lastName,
@@ -90,49 +96,93 @@ const UpdateProfile = () => {
                 dob: formData.dob,
                 emailNewsLetter: formData.emailNewsLetter,
                 emailRelatedEvents: formData.emailRelatedEvents,
+                mobile: formData.phone
             };
-
+            // Safely read password fields
+            const oldPass = formData.old_password || "";
+            const newPass = formData.password || "";
             // ---------- PASSWORD UPDATE LOGIC ----------
-            // If user typed any password value
-            if (formData.oldPassword.trim() !== "" || formData.newPassword.trim() !== "") {
-
-                // Check both inputs must be filled
-                if (formData.oldPassword.trim() === "" || formData.newPassword.trim() === "") {
+            // If either field is filled, user wants to update password
+            if (oldPass || newPass) {
+                // Both fields are required
+                if (!oldPass.trim() || !newPass.trim()) {
                     Swal.fire("Error", "Both old and new password are required.", "error");
                     setLoading(false);
                     return;
                 }
-
-                // Backend expects only "password"
-                payload.password = formData.newPassword;
+                // Add password fields to payload
+                payload.old_password = oldPass;
+                payload.password = newPass;
             }
-            // --------------------------------------------
+            // --------------------------------------------------
             const response = await api.patch("/api/v1/auth/update-profile", payload);
             if (response.data?.success) {
                 Swal.fire("Success", response.data.message, "success");
-                // Reset password fields
+                // Clear password fields
                 setFormData(prev => ({
                     ...prev,
-                    oldPassword: "",
-                    newPassword: ""
+                    old_password: "",
+                    password: ""
                 }));
             } else {
                 Swal.fire("Error", response.data?.message || "Something went wrong!", "error");
             }
-
         } catch (error) {
             const apiErrorMsg =
                 error.response?.data?.error?.message ||
                 error.response?.data?.message ||
                 error.message ||
                 "Profile update failed. Try again later.";
-
             Swal.fire("Error", apiErrorMsg, "error");
         } finally {
             setLoading(false);
         }
     };
 
+<<<<<<< HEAD
+=======
+
+    // ===== IMAGE CHANGE HANDLER =====
+    const handleImageUpload = (e) => {
+        const file = e.target.files[0];
+        setSelectedImage(file);
+    };
+
+    // ===== UPLOAD BUTTON HANDLER =====
+    const handleUploadSubmit = async (e) => {
+        e.preventDefault();
+         setIsLoading(true);
+        const body = new FormData();
+        body.append("profile_image", selectedImage);
+        try {
+            const res = await api.patch("/api/v1/auth/update-profile-image", body, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+            if (res.data.success) {
+                setIsLoading(true);
+                Swal.fire("Success", res.data.message, "success");
+                // show preview without refreshing
+                setProfileImage(URL.createObjectURL(selectedImage));
+                handleClose();
+            }
+        } catch (err) {
+            setIsLoading(false);
+            Swal.fire(
+                "Error",
+                err.response?.data?.message || "Upload failed!",
+                "error"
+            );
+        }
+    };
+
+
+
+
+
+
+>>>>>>> 926e7bdd8f262deea34c9e25ff81f4c791d8affc
     return (
         <>
             <FrontendHeader />
@@ -149,15 +199,46 @@ const UpdateProfile = () => {
                     <div className="row justify-content-center mt-4">
                         {/* LEFT SIDE IMAGE */}
                         <div className="col-md-3 text-center">
-                            <div className="profile-image-wrapper">
+                            <div
+                                className="profile-image-wrapper"
+                                style={{
+                                    position: "relative",
+                                    display: "inline-block"
+                                }}
+                            >
+                                {/* Pencil Icon */}
+                                <span
+                                    onClick={handleShow}
+                                    style={{
+                                        position: "absolute",
+                                        top: "-8px",
+                                        right: "-8px",
+                                        background: "#fff",
+                                        borderRadius: "50%",
+                                        padding: "6px",
+                                        cursor: "pointer",
+                                        boxShadow: "0 0 5px rgba(0,0,0,0.3)",
+                                        zIndex: 10
+                                    }}
+                                >
+                                    <i className="bi bi-pencil" style={{ fontSize: "16px", color: "#555" }}></i>
+                                </span>
+
                                 <img
                                     src={profileImage || "https://eboxtickets.com/images/Usersprofile/noimage.jpg"}
-                                    className="profile-img"
                                     alt="Profile Image"
+                                    style={{
+                                        width: "100%",
+                                        borderRadius: "10px"
+                                    }}
                                 />
-                                <h6 className="mt-2">{formData.firstName} {formData.lastName}</h6>
+
+                                <h6 className="mt-2">
+                                    <strong>{formData.firstName} {formData.lastName}</strong>
+                                </h6>
                             </div>
                         </div>
+
 
                         {/* RIGHT SIDE FORM */}
                         <div className="col-md-7">
@@ -240,11 +321,11 @@ const UpdateProfile = () => {
                                         <div className="col-md-6 mb-3">
                                             <label>Phone Number</label>
                                             <input
-                                                type="text"
+                                                type="number"
                                                 name="phone"
-                                                readOnly
                                                 className="form-control"
-                                                value={phone}
+                                                value={formData.phone}
+                                                onChange={handleChange}
                                             />
                                         </div>
                                     </div>
@@ -258,9 +339,9 @@ const UpdateProfile = () => {
                                             <label>Old Password</label>
                                             <input
                                                 type="password"
-                                                name="oldPassword"
+                                                name="old_password"
                                                 className="form-control"
-                                                value={formData.oldPassword}
+                                                value={formData.old_password}
                                                 onChange={handleChange}
                                             />
                                         </div>
@@ -269,9 +350,9 @@ const UpdateProfile = () => {
                                             <label>New Password</label>
                                             <input
                                                 type="password"
-                                                name="newPassword"
+                                                name="password"
                                                 className="form-control"
-                                                value={formData.newPassword}
+                                                value={formData.password}
                                                 onChange={handleChange}
                                             />
                                         </div>
@@ -306,7 +387,14 @@ const UpdateProfile = () => {
 
                                     <div className="text-end mt-4">
                                         <button type="button" className="btn btn-secondary me-2" onClick={() => router.push("/users/view-profile")}>View Profile</button>
-                                        <button className="btn btn-primary">Save</button>
+                                        {/* <button className="btn btn-primary">Save</button> */}
+                                        <button
+                                            type="submit"
+                                            className="btn btn-primary"
+                                            disabled={loading}
+                                        >
+                                            {loading ? "Updating..." : "Save"}
+                                        </button>
                                     </div>
 
                                 </form>
@@ -315,6 +403,67 @@ const UpdateProfile = () => {
                     </div>
                 </div>
             </section>
+            <Modal
+                show={show}
+                onHide={handleClose}
+                backdrop="static"
+                keyboard={false}
+            >
+                <form onSubmit={handleUploadSubmit}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Upload Picture</Modal.Title>
+                    </Modal.Header>
+
+                    <Modal.Body>
+
+                        <h6><strong>Picture Guidelines</strong></h6>
+
+                        <p>Please ensure that you have complied with the following Site Rules to avoid your profile from being deleted:</p>
+
+                        <ol>
+                            <li>Your face must be clearly visible.</li>
+                            <li>The photo uploaded MUST be YOU.</li>
+                            <li>The background of the photo must be clear with no other obscured objects.</li>
+                            <li>You can use only your picture for one account.</li>
+                        </ol>
+
+                        <p>
+                            We review your uploads manually and can reject submissions that don't match the aforementioned criteria.
+                        </p>
+
+                        {/* File Input */}
+                        <div className="mt-3">
+                            <input
+                                type="file"
+                                name="profile_image"
+                                required
+                                onChange={handleImageUpload}
+                                className="form-control"
+                            />
+                        </div>
+
+                    </Modal.Body>
+
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={handleClose}>
+                            Close
+                        </Button>
+
+                        <Button
+                            type="submit"
+                            variant="primary"
+                            disabled={isLoading}
+                        >
+                            {isLoading ? "Updating..." : "Upload"}
+                        </Button>
+
+                        {/* <Button variant="primary" type="submit">
+                            Upload
+                        </Button> */}
+                    </Modal.Footer>
+                </form>
+            </Modal>
+
 
             <FrontendFooter />
 

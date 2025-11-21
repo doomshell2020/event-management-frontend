@@ -35,8 +35,10 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
 
     const checkLoginStatus = () => {
       const token = Cookies.get("userAuthToken");
-      // console.log('>>>>>>>>>>>>>>>>',token);
-      const storedUser = localStorage.getItem("user") || sessionStorage.getItem("user");
+      
+      const storedUser =
+        localStorage.getItem("user") || sessionStorage.getItem("user");
+
       // ❌ If token missing OR expired → logout & redirect
       if (!token || !isTokenValid(token)) {
         Cookies.remove("userAuthToken", { path: "/" });
