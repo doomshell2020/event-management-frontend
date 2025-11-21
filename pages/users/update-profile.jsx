@@ -159,7 +159,7 @@ const UpdateProfile = () => {
                 },
             });
             if (res.data.success) {
-                setIsLoading(true);
+                setIsLoading(false);
                 Swal.fire("Success", res.data.message, "success");
                 // show preview without refreshing
                 setProfileImage(URL.createObjectURL(selectedImage));
@@ -433,6 +433,7 @@ const UpdateProfile = () => {
                             <input
                                 type="file"
                                 name="profile_image"
+                                accept="image/png, image/jpeg, image/jpg, image/webp"
                                 required
                                 onChange={handleImageUpload}
                                 className="form-control"
