@@ -128,7 +128,7 @@ const ProfilePage = () => {
                       <tr>
                         <td>Phone Number</td>
                         <td>
-                          {user.phone || "Not Added"}
+                          {user.mobile || "Not Added"}
                           {/* <button
                             type="button"
                             className="btn verified_btn p-0 ms-2"

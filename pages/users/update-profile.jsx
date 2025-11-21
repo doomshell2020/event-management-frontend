@@ -32,6 +32,7 @@ const UpdateProfile = () => {
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
+    const [backgroundImage] = useState("/assets/front-images/about-slider_bg.jpg");
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
@@ -149,7 +150,7 @@ const UpdateProfile = () => {
     // ===== UPLOAD BUTTON HANDLER =====
     const handleUploadSubmit = async (e) => {
         e.preventDefault();
-         setIsLoading(true);
+        setIsLoading(true);
         const body = new FormData();
         body.append("profile_image", selectedImage);
         try {
@@ -182,7 +183,7 @@ const UpdateProfile = () => {
 
     return (
         <>
-            <FrontendHeader />
+            <FrontendHeader   backgroundImage={backgroundImage}/>
             <section id="edit-profile">
                 <div className="container">
                     <div className="section-heading">
