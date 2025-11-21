@@ -35,7 +35,6 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
 
     const checkLoginStatus = () => {
       const token = Cookies.get("userAuthToken");
-      console.log('>>>>>>>>>>>>>>>>',token);
       
       const storedUser =
         localStorage.getItem("user") || sessionStorage.getItem("user");
