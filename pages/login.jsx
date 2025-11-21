@@ -77,7 +77,7 @@ const LoginPage = () => {
       const oneMinuteFromNow = new Date(new Date().getTime() + 1 * 60 * 1000);
 
       Cookies.set("userAuthToken", token, {
-        expires: oneMinuteFromNow,
+        // expires: oneMinuteFromNow,
         expires: rememberMe ? 7 : 1, // days
         secure: process.env.NODE_ENV == "production",
         sameSite: "Strict",
