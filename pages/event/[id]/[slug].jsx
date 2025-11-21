@@ -39,7 +39,7 @@ export async function getServerSideProps({ params }) {
 
 const EventDetailPage = ({ event, slug }) => {
 
-  // console.log("✅ Active Events:", event);
+  console.log("✅ Active Events:", event);
 
   // ⛳ All hooks MUST be at the top
   const [backgroundImage, setIsMobile] = useState("/assets/front-images/about-slider_bg.jpg");
@@ -136,7 +136,25 @@ const EventDetailPage = ({ event, slug }) => {
                 <div className="section-heading">
                   <h2 className="text-start">{event.name}</h2>
                   <h6>Hosted By <a href="#">Organiser #{event.event_org_id}</a></h6>
+
+                  {/* 🚫 Inactive Event Warning */}
+                  {event.status == "N" && (
+                    <div
+                      style={{
+                        background: "#ffdddd",
+                        border: "1px solid #ff6b6b",
+                        padding: "10px 15px",
+                        borderRadius: "6px",
+                        marginTop: "10px",
+                        color: "#b30000",
+                        fontWeight: "600"
+                      }}
+                    >
+                      ⚠️ This event is currently inactive and not available for booking.
+                    </div>
+                  )}
                 </div>
+
 
                 <div className="info">
                   <ul className="d-flex ps-0 mb-0">

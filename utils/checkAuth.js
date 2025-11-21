@@ -8,6 +8,8 @@ export const isTokenValid = (token) => {
     const exp = payload.exp * 1000; 
     return Date.now() < exp;
   } catch (e) {
+    // console.log('>>>>>>>>>>>>>>>>',e);
+    
     return false;
   }
 };

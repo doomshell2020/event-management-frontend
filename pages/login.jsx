@@ -20,15 +20,6 @@ const LoginPage = () => {
   const [success, setSuccess] = useState("");
 
   useEffect(() => {
-    const rememberFlag = localStorage.getItem("rememberMe") == "true";
-    setRememberMe(rememberFlag);
-
-    if (rememberFlag) {
-      const savedCredentials = JSON.parse(localStorage.getItem("loginCredentials") || "{}");
-      if (savedCredentials.email) setEmail(savedCredentials.email);
-      if (savedCredentials.password) setPassword(savedCredentials.password);
-    }
-
     const savedUser =
       localStorage.getItem("user") || sessionStorage.getItem("user");
     if (savedUser) {
@@ -60,22 +51,9 @@ const LoginPage = () => {
       // ✅ Always store user in localStorage (so all tabs can access)
       localStorage.setItem("user", JSON.stringify(user));
       localStorage.setItem("userAuthToken", token);
-
-      // ✅ Handle Remember Me for credentials only
-      if (rememberMe) {
-        localStorage.setItem("rememberMe", "true");
-        localStorage.setItem(
-          "loginCredentials",
-          JSON.stringify({ email, password })
-        );
-      } else {
-        localStorage.removeItem("rememberMe");
-        localStorage.removeItem("loginCredentials");
-      }
-
+      
       // Set cookie to expire in 1 minute
       const oneMinuteFromNow = new Date(new Date().getTime() + 1 * 60 * 1000);
-
       Cookies.set("userAuthToken", token, {
         // expires: oneMinuteFromNow,
         expires: rememberMe ? 7 : 1, // days
@@ -83,7 +61,6 @@ const LoginPage = () => {
         sameSite: "Strict",
         path: "/",
       });
-
 
       toast.success("Login successful!");
       setSuccess("Login successful!");
