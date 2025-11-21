@@ -68,6 +68,7 @@ const UpdateProfile = () => {
         };
         fetchUser();
     }, [router]);
+    
 
     const handleCheckbox = (e) => {
         const { name, checked } = e.target;
