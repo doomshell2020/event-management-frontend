@@ -139,8 +139,6 @@ const UpdateProfile = () => {
         }
     };
 
-<<<<<<< HEAD
-=======
 
     // ===== IMAGE CHANGE HANDLER =====
     const handleImageUpload = (e) => {
@@ -182,7 +180,6 @@ const UpdateProfile = () => {
 
 
 
->>>>>>> 926e7bdd8f262deea34c9e25ff81f4c791d8affc
     return (
         <>
             <FrontendHeader />
