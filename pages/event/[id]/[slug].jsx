@@ -39,7 +39,7 @@ export async function getServerSideProps({ params }) {
 
 const EventDetailPage = ({ event, slug }) => {
 
-  console.log("✅ Active Events:", event);
+  // console.log("✅ Active Events:", event);
 
   // ⛳ All hooks MUST be at the top
   const [backgroundImage, setIsMobile] = useState("/assets/front-images/about-slider_bg.jpg");

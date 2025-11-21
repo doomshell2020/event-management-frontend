@@ -18,38 +18,11 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
   const [username, setUsername] = useState("");
   const [isActiveNow, setIsActiveNow] = useState(false);
 
-  // 🚀 Public routes (static)
-  const publicRoutes = [
-    "/",
-    "/login",
-    "/calender",
-    "/register",
-    "/contact-us",
-    "/forgot-password",
-    "/verify-email"
-  ];
-
-  // 🚀 Dynamic public route patterns
-  const dynamicPublicPatterns = [
-    /^\/event\/\d+\/[^/]+$/   // matches /event/{id}/{slug}
-  ];
-
   useEffect(() => {
     const checkLoginStatus = () => {
       const token = Cookies.get("userAuthToken");
-
       const storedUser = localStorage.getItem("user") || sessionStorage.getItem("user");
-
-      if (!token || !isTokenValid(token)) {
-        Cookies.remove("userAuthToken", { path: "/" });
-        localStorage.clear();
-        sessionStorage.clear();
-        setIsLoggedIn(false);
-        // router.replace("/login");
-        return;
-      }
-
-      if (storedUser) {
+      if (storedUser && token) {
         try {
           const userObj = JSON.parse(storedUser);
           setUsername(userObj.firstName || "User");
@@ -60,13 +33,11 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
         }
       }
     };
-
     checkLoginStatus();
-
     window.addEventListener("storage", checkLoginStatus);
     return () => window.removeEventListener("storage", checkLoginStatus);
 
-  }, [router.pathname, router.asPath]);
+  }, [router]);
 
 
 
