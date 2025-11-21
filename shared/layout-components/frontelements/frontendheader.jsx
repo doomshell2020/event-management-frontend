@@ -18,7 +18,7 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
   const [username, setUsername] = useState("");
   const [isActiveNow, setIsActiveNow] = useState(false);
 
-  // 🚀 Define all routes that should NOT require login
+  // 🚀 Public routes (static)
   const publicRoutes = [
     "/",
     "/login",
@@ -29,34 +29,26 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
     "/verify-email"
   ];
 
-  // --------------------------------------------------
-  //  ✅ TOKEN + LOGIN CHECK
-  // --------------------------------------------------
+  // 🚀 Dynamic public route patterns
+  const dynamicPublicPatterns = [
+    /^\/event\/\d+\/[^/]+$/   // matches /event/{id}/{slug}
+  ];
+
   useEffect(() => {
-    const currentPath = router.pathname;
-
-    // Skip validation on public routes
-    if (publicRoutes.includes(currentPath)) {
-      setIsLoggedIn(false); // optional: user is not logged in in public pages
-      return;
-    }
-
     const checkLoginStatus = () => {
       const token = Cookies.get("userAuthToken");
-      const storedUser =
-        localStorage.getItem("user") || sessionStorage.getItem("user");
 
-      // ❌ Token missing OR expired → logout & redirect
+      const storedUser = localStorage.getItem("user") || sessionStorage.getItem("user");
+
       if (!token || !isTokenValid(token)) {
         Cookies.remove("userAuthToken", { path: "/" });
         localStorage.clear();
         sessionStorage.clear();
         setIsLoggedIn(false);
-        router.replace("/login");
+        // router.replace("/login");
         return;
       }
 
-      // ✔️ Token exists → load user
       if (storedUser) {
         try {
           const userObj = JSON.parse(storedUser);
@@ -71,11 +63,11 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
 
     checkLoginStatus();
 
-    // Sync across browser tabs
     window.addEventListener("storage", checkLoginStatus);
     return () => window.removeEventListener("storage", checkLoginStatus);
 
-  }, [router.pathname]);
+  }, [router.pathname, router.asPath]);
+
 
 
   // --------------------------------------------------
