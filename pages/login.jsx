@@ -20,9 +20,8 @@ const LoginPage = () => {
   const [success, setSuccess] = useState("");
 
   useEffect(() => {
-    const savedUser =
-      localStorage.getItem("user") || sessionStorage.getItem("user");
-    if (savedUser) {
+    const token = Cookies.get("userAuthToken");
+    if (token) {
       router.push("/");
     }
   }, [router]);
@@ -51,12 +50,12 @@ const LoginPage = () => {
       // ✅ Always store user in localStorage (so all tabs can access)
       localStorage.setItem("user", JSON.stringify(user));
       localStorage.setItem("userAuthToken", token);
-      
+
       // Set cookie to expire in 1 minute
       const oneMinuteFromNow = new Date(new Date().getTime() + 1 * 60 * 1000);
       Cookies.set("userAuthToken", token, {
         // expires: oneMinuteFromNow,
-        expires: rememberMe ? 7 : 1, // days
+        expires: process.env.TOKEN_EXPIRES_IN ? process.env.TOKEN_EXPIRES_IN : 1, // days
         secure: process.env.NODE_ENV == "production",
         sameSite: "Strict",
         path: "/",

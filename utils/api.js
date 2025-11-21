@@ -45,7 +45,6 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status == 401) {
       const url = error.config?.url || "";
-
       if (url.includes("/admin")) {
         Cookies.remove("adminAuthToken");
       } else {
