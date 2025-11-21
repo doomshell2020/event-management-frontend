@@ -198,7 +198,7 @@ const Home = ({ events }) => {
 
           {/* View All Button */}
           <div className="view-button d-flex justify-content-center">
-            <Link href="#" className="primery-button">
+            <Link href="/event/upcoming-events" className="primery-button">
               View All
             </Link>
           </div>
