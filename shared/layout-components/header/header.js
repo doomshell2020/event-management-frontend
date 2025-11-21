@@ -32,8 +32,8 @@ export default function Header() {
   // -------------------------
   const handleLogout = async () => {
     try {
-      localStorage.removeItem("accessToken_");
-      localStorage.removeItem("UserID_");
+      localStorage.removeItem("userAuthToken");
+      localStorage.removeItem("user");
       sessionStorage.clear();
 
       await fetch("/api/logout", {

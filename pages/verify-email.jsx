@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import FrontendHeader from "@/shared/layout-components/frontelements/frontendheader";
 import FrontendFooter from "@/shared/layout-components/frontelements/frontendfooter";
-import styles from "@/styles/LoginPage.module.css";
 import toast from "react-hot-toast";
+import api from "@/utils/api";
 
 const VerifyEmailPage = () => {
   const router = useRouter();
@@ -12,38 +12,28 @@ const VerifyEmailPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  
+
   const verify = async () => {
     setLoading(true);
     setError("");
     setSuccess("");
 
-    const verifyPromise = fetch(`/api/v1/front/auth/verify-email?token=${token}`)
-      .then(async (res) => {
-        const data = await res.json();
-        if (!res.ok) {
-          throw new Error(data.message || "Verification failed");
-        }
-        return data;
-      });
+    const verifyPromise = api
+      .get(`/api/v1/auth/verify-email?token=${token}`)
+      .then((res) => res.data);
 
     toast.promise(verifyPromise, {
       loading: "Verifying your email...",
-      success: (data) => data.message || "Email verified successfully!",
-      error: (err) => err.message || "Something went wrong!",
+      success: (data) => data.message || "Email verified!",
+      error: (err) => err.response?.data?.error?.message || "Something went wrong!",
     });
 
     try {
       const data = await verifyPromise;
       setSuccess(data.message);
-
-      // redirect to login after 3s
-      setTimeout(() => {
-        router.push("/login");
-      }, 3000);
-    } catch (err) {
-      console.error("Verification error:", err);
-      setError(err.message || "Invalid or expired link.");
+      setTimeout(() => router.push("/login"), 2500);
+    } catch (err) {      
+      setError(err.response?.data?.error?.message || "Invalid or expired link.");
     } finally {
       setLoading(false);
     }
@@ -52,36 +42,51 @@ const VerifyEmailPage = () => {
   useEffect(() => {
     if (!token) return;
     verify();
-  }, [token, router]);
+  }, [token]);
 
   return (
     <>
       <FrontendHeader />
 
-      <div className={styles.loginContainer}>
-        <div className={styles.loginBox}>
-          <div className={styles.leftSide}>
-            <img
-              src="https://eboxtickets.com/images/sigin.png"
-              alt="Verification Illustration"
-              className={styles.illustration}
-            />
-          </div>
+      <div className="flex items-center justify-center py-5 px-4">
+        <div className="max-w-md w-full bg-white shadow-md rounded-xl p-6 text-center">
 
-          <div className={styles.rightSide}>
-            <h1>Email Verification</h1>
-            <p>Please wait while we verify your email.</p>
+          {/* Smaller Image */}
+          <img
+            src="https://eboxtickets.com/images/sigin.png"
+            className="w-10 mx-auto mb-3"      // << Smaller image
+            alt="verify"
+          />
 
-            {loading && <h5 className={styles.info}>Verifying...</h5>}
-            {error && <h5 className={styles.error}>{error}</h5>}
-            {success && <h5 className={styles.success}>{success}</h5>}
+          <h1 className="text-lg font-bold mb-1">Email Verification</h1>
 
-            {success && (
-              <p className={styles.signupText}>
-                Redirecting you to <b>Login</b> page...
+          <p className="text-gray-600 text-sm mb-3">
+            Please wait while we verify your email.
+          </p>
+
+          {/* Loading */}
+          {loading && (
+            <p className="text-blue-600 font-semibold text-sm">Verifying...</p>
+          )}
+
+          {/* Error */}
+          {error && (
+            <p className="text-red-600 font-semibold text-sm">
+              {error}
+            </p>
+          )}
+
+          {/* Success */}
+          {success && (
+            <>
+              <p className="text-green-600 font-semibold text-sm">
+                {success}
               </p>
-            )}
-          </div>
+              <p className="text-gray-500 text-xs mt-2">
+                Redirecting to login...
+              </p>
+            </>
+          )}
         </div>
       </div>
 
