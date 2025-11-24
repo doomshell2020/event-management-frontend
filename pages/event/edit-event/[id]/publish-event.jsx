@@ -37,9 +37,8 @@ const PublishEvent = () => {
 
     const toggleEventStatus = async () => {
         if (!eventDetails) return;
-
-        const newStatus = eventDetails.is_active ? 0 : 1;
-
+        const newStatus = eventDetails.status=='N' ? 'Y' : 'N';
+        console.log('newStatus :', newStatus);
         const confirmResult = await Swal.fire({
             title: "Are you sure?",
             text: `You want to ${newStatus ? "activate" : "deactivate"} this event?`,
@@ -63,9 +62,13 @@ const PublishEvent = () => {
                         "Content-Type": "multipart/form-data",
                     },
                 });
+                // console.log('res :', res);
+
+                // console.log('>>>>>>>>>>>>',res.data.data.event);
+                
 
                 if (res.data.success) {
-                    setEventDetails((prev) => ({ ...prev, is_active: newStatus }));
+                    setEventDetails(res.data.data.event);
                     Swal.fire({
                         icon: "success",
                         title: `Event ${newStatus ? "activated" : "deactivated"} successfully!`,
@@ -116,19 +119,19 @@ const PublishEvent = () => {
                                     <hr className="custom-hr" />
                                     <div className="d-flex align-items-center justify-content-between">
                                         <div className="d-flex align-items-center">
-                                            {eventDetails && eventDetails.is_active ? (
+                                            {eventDetails && eventDetails.status == 'Y' ? (
                                                 <Eye className="me-2" />
                                             ) : (
                                                 <EyeOff className="me-2" />
                                             )}
                                             <div>
                                                 <p className="text-16 mb-1">
-                                                    {eventDetails && eventDetails.is_active
+                                                    {eventDetails && eventDetails.status == 'Y'
                                                         ? "Event is Active"
                                                         : "Event is Inactive"}
                                                 </p>
                                                 <p className="text-14 text-dark mb-0">
-                                                    {eventDetails && eventDetails.is_active
+                                                    {eventDetails && eventDetails.status == 'Y'
                                                         ? "Your event is live and visible to attendees."
                                                         : "Your event is not visible to attendees."}
                                                 </p>
@@ -137,13 +140,13 @@ const PublishEvent = () => {
                                         <div>
                                             {eventDetails && (
                                                 <button
-                                                    className={`btn ${eventDetails.is_active ? "btn-danger" : "btn-success"}`}
+                                                    className={`btn ${eventDetails.status == 'Y' ? "btn-danger" : "btn-success"}`}
                                                     onClick={toggleEventStatus}
                                                     disabled={statusLoading}
                                                 >
                                                     {statusLoading
                                                         ? "Processing..."
-                                                        : eventDetails.is_active
+                                                        : eventDetails.status == 'Y'
                                                             ? "Deactivate Event"
                                                             : "Activate Event"}
                                                 </button>

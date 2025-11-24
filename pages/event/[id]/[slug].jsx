@@ -3,6 +3,7 @@ import FrontendHeader from "@/shared/layout-components/frontelements/frontendhea
 import FrontendFooter from "@/shared/layout-components/frontelements/frontendfooter";
 import Link from "next/link";
 import { format } from "date-fns";
+import CartModal from "@/pages/components/cart_new/CartModal";
 
 export async function getServerSideProps({ params }) {
   const { id, slug } = params;
@@ -49,7 +50,7 @@ const EventDetailPage = ({ event, slug }) => {
   const endDate = event ? new Date(event.date_to?.local || event.date_to?.utc) : null;
   const saleStart = event ? new Date(event.sale_start?.local || event.sale_start?.utc) : null;
   const saleEnd = event ? new Date(event.sale_end?.local || event.sale_end?.utc) : null;
-
+  const eventId = event ? event.id : null;
   // 🛑 Early return MUST come after hooks
   if (!event || Object.keys(event).length == 0) {
     return (
@@ -72,6 +73,16 @@ const EventDetailPage = ({ event, slug }) => {
       </>
     );
   }
+
+
+  const [showCart, setShowCart] = useState(false);
+  const [selectedEventId, setSelectedEventId] = useState(eventId);
+
+  const handleOpenCart = () => {
+    setSelectedEventId(selectedEventId);
+    setShowCart(true);
+  };
+
 
   return (
     <>
@@ -153,6 +164,13 @@ const EventDetailPage = ({ event, slug }) => {
                       ⚠️ This event is currently inactive and not available for booking.
                     </div>
                   )}
+
+                  <button onClick={(e) => {
+                    e.preventDefault();
+                    handleOpenCart();
+                  }}>
+                    Check availability
+                  </button >
                 </div>
 
 
@@ -280,6 +298,19 @@ const EventDetailPage = ({ event, slug }) => {
           </div>
         </div>
       </section>
+
+      {/* ✅ Cart Modal */}
+
+      {
+        showCart && (
+          <CartModal
+            show={showCart}
+            handleClose={() => setShowCart(false)}
+            eventId={selectedEventId}
+          />
+
+        )
+      }
 
       <FrontendFooter />
     </>

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import CartModal from "@/pages/components/cart/index";
 import { handleLogout } from "@/utils/logout";
 import Cookies from "js-cookie";
 import { isTokenValid } from "@/utils/checkAuth";
+import CartModal from "@/pages/components/cart_new/CartModal";
 
 const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
 
@@ -16,7 +16,14 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [username, setUsername] = useState("");
-  const [isActiveNow, setIsActiveNow] = useState(false);
+  const [showCart, setShowCart] = useState(false);
+  const [selectedEventId, setSelectedEventId] = useState(300);
+
+  const handleOpenCart = () => {
+    setSelectedEventId(selectedEventId);
+    setShowCart(true);
+  };
+
 
   useEffect(() => {
     const checkLoginStatus = () => {
@@ -213,9 +220,17 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
       </div>
 
       {/* ✅ Cart Modal */}
-      {isActiveNow && (
-        <CartModal isActiveNow={isActiveNow} makeModalOff={handleCloseCart} />
-      )}
+      {
+        showCart && (
+          <CartModal
+            show={showCart}
+            handleClose={() => setShowCart(false)}
+            eventId={selectedEventId}
+          />
+        )
+      }
+
+
     </>
   );
 };

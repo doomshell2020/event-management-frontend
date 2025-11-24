@@ -172,7 +172,6 @@ const MyEventsPage = () => {
         return null;
     };
 
-
     const handleFileChange = (e) => {
         setImage(e.target.files[0]);
     };
@@ -428,7 +427,7 @@ const MyEventsPage = () => {
                                                         >
                                                             <option value="">Select Timezone</option>
                                                             {timezones.map((tz) => (
-                                                                <option key={tz.id} value={tz.id}>
+                                                                <option key={tz.name} value={tz.name}>
                                                                     {tz.name}
                                                                 </option>
                                                             ))}
