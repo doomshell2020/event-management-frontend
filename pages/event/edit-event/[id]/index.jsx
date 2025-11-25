@@ -60,6 +60,8 @@ const MyEventsPage = () => {
         approve_timer: "",
         event_timezone: "",
         desp: "",
+        is_free: "",
+        allow_register: "",
     });
 
     const [image, setImage] = useState(null);
@@ -211,10 +213,14 @@ const MyEventsPage = () => {
             if (image) fd.append("feat_image", image);
             fd.append("desp", content.trim());
 
-            const response = await api.put(`/api/v2/events/update/${id}`, fd, {
+            const endpoint =
+                formData.is_free == "Y"
+                    ? `/api/v1/events/update/${id}`
+                    : `/api/v2/events/update/${id}`;
+
+            const response = await api.put(endpoint, fd, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
-
             const resData = response.data;
 
             if (resData?.success) {
@@ -310,58 +316,6 @@ const MyEventsPage = () => {
                                 </div>
                             ) : (
                                 <section id="post-eventpg edit-event-page">
-
-                                    {/* <div className="event_names d-flex justify-content-between align-items-center p-2 px-3 mb-3">
-                                        <div className="dropdown">
-                                            <button
-                                                className="btn rounded-md text-sm text-white dropdown-toggle"
-                                                role="button"
-                                                id="dropdownMenuLink2"
-                                                data-bs-toggle="dropdown"
-                                                aria-expanded="false"
-                                                style={{ backgroundColor: "#e62d56" }}
-                                                onClick={() => setIsOpenWiggins(!isOpenWiggins)}
-                                            >
-                                                {eventDetails?.name || ''}
-                                            </button>
-
-                                            {isOpenWiggins && (
-                                                <ul className="dropdown-menu" aria-labelledby="dropdownMenuLink2">
-                                                    <li>
-                                                        <a className="dropdown-item" href="https://eboxtickets.com/event/settings/287">
-                                                            Jescie Wiggins
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a className="dropdown-item" href="https://eboxtickets.com/event/settings/283">
-                                                            Raksha Bandhan
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a className="dropdown-item browseall_event" href="https://eboxtickets.com/event/myevent">
-                                                            Browse All Event
-                                                        </a>
-                                                    </li>
-                                                </ul>
-                                            )}
-                                        </div>
-
-                                        <div className="text-center">
-                                            <h6 className="event_Heading mb-0 fs-5 fw-bold">{eventDetails?.name || ''}</h6>
-                                        </div>
-
-                                        <div className="text-right mt-1">
-                                            <Link
-                                                href={`/event/${eventDetails.id}/${eventDetails.slug}`}
-                                                className="btn rounded-md text-sm text-white"
-                                                rel="noopener noreferrer"
-                                                style={{ backgroundColor: "#00b56a" }}
-                                                target="_blank"
-                                            >
-                                                <i className="bi bi-eye-fill"></i> View Event
-                                            </Link>
-                                        </div>
-                                    </div> */}
 
                                     <EventHeaderSection eventDetails={eventDetails} />
 
