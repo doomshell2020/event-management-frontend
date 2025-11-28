@@ -1,31 +1,18 @@
 import React, { useMemo, useState, useRef, useEffect } from "react";
 import FrontendHeader from "@/shared/layout-components/frontelements/frontendheader";
 import FrontendFooter from "@/shared/layout-components/frontelements/frontendfooter";
-import FrontLeftSideBar from "@/shared/layout-components/frontelements/front-left-side-bar";
 import Link from "next/link";
-import {
-    CForm,
-    CCol,
-    CFormLabel,
-    CFormFeedback,
-    CFormInput,
-    CInputGroupText,
-    CButton,
-    CFormCheck,
-    CFormTextarea,
-} from "@coreui/react";
-import { Breadcrumb, Card, Col, Form, InputGroup, Row } from "react-bootstrap";
-import moment from "moment-timezone";
 import Swal from "sweetalert2";
-import { useTable, usePagination, useGlobalFilter } from "react-table";
 import { format } from "date-fns"; // helps format dates
 import api from "@/utils/api";
-import EventSidebar from "../components/Event/EventSidebar";
+import EventSidebar from "../../components/Event/EventSidebar";
+import axios from "axios";
+import { useRouter } from 'next/router';
 
-export default function OrganizerEvents({ userId }) {
-    const [eventData, setEventData] = useState([]);
-    const [isOpen, setIsOpen] = useState(false);
-    const [isLeftRight, setIsLeftRight] = useState(false);
+export default function Appointments({}) {
+    const router = useRouter();
+    const [appointmentData, setAppointmentsData] = useState([]);
+    const [eventId, setEventId] = useState(router.query.eventId);
     const [backgroundImage, setIsMobile] = useState('/assets/front-images/about-slider_bg.jpg');
     const [loading, setLoading] = useState(true); // ✅ Added loading state
 
@@ -33,15 +20,16 @@ export default function OrganizerEvents({ userId }) {
     const fetchEvents = async () => {
         setLoading(true); // start loading
         try {
-            const res = await api.post(`/api/v1/events/event-list`);
+            // const res = await api.get(`/api/v1/wellness/wellness-list`);
+            const res = await axios.get(`http://localhost:5000/api/v1/wellness/wellness-list/${eventId}`);
             if (res.data.success) {
-                setEventData(res.data.data.events || []);
+                setAppointmentsData(res.data.data.wellness || []);
             } else {
-                setEventData([]);
+                setAppointmentsData([]);
             }
         } catch (error) {
             console.error("Error fetching events:", error);
-            setEventData([]);
+            setAppointmentsData([]);
         } finally {
             setLoading(false); // stop loading after API call
         }
@@ -49,24 +37,22 @@ export default function OrganizerEvents({ userId }) {
 
     useEffect(() => {
         fetchEvents();
-    }, [userId]);
+    }, [eventId]);
 
-    const handleStatusChange = async (eventId, newStatus) => {
+    const handleStatusChange = async (appointmentId, newStatus) => {
+        // console.log("--->->",appointmentId)
         const status = newStatus;
         const actionText = newStatus == "Y" ? "enable" : "disable";
-
         const result = await Swal.fire({
             title: "Are you sure?",
-            text: `Do you want to ${actionText} this event?`,
+            text: `Do you want to ${actionText} this Appointment?`,
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
             confirmButtonText: `Yes, ${actionText} it!`,
         });
-
         if (!result.isConfirmed) return;
-
         try {
             Swal.fire({
                 title: "Processing...",
@@ -76,35 +62,30 @@ export default function OrganizerEvents({ userId }) {
                     Swal.showLoading();
                 },
             });
-
             // 🔥 Create FormData instead of JSON
-            const formData = new FormData();
-            formData.append("status", status);
-
+            const body = {
+                status:status
+            }
             // 🔥 Send FormData
-            const response = await api.put(
-                `/api/v1/events/update/${eventId}`,
-                formData,
-                {
-                    headers: {
-                        "Content-Type": "multipart/form-data",
-                    },
-                }
-            );
-
+            // const response = await api.put(`/api/v1/update/update/${appointmentId}`,
+            //     formData,
+            //     {
+            //         headers: {
+            //             "Content-Type": "multipart/form-data",
+            //         },
+            //     }
+            // );
+            const response = await axios.put(`http://localhost:5000/api/v1/wellness/update/${appointmentId}`, body);
             const resData = response.data;
-
             Swal.close();
-
             if (resData?.success) {
                 Swal.fire({
                     icon: "success",
                     title: "Updated!",
-                    text: `Event has been ${actionText}d successfully.`,
+                    text: `Appointment has been ${actionText}d successfully.`,
                     timer: 1500,
                     showConfirmButton: false,
                 });
-
                 fetchEvents();
             } else {
                 Swal.fire({
@@ -124,10 +105,11 @@ export default function OrganizerEvents({ userId }) {
         }
     };
 
-    const handleDelete = async (eventId) => {
+
+    const handleDelete = async (appointmentId) => {
         const result = await Swal.fire({
             title: "Are you sure?",
-            text: "This action will permanently delete the event.",
+            text: "This action will permanently delete the appointment.",
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
@@ -147,14 +129,15 @@ export default function OrganizerEvents({ userId }) {
                 },
             });
 
-            const response = await api.delete(`/api/v1/events/delete/${eventId}`);
+            // const response = await api.delete(`/api/v1/events/wellness/delete/${appointmentId}`);
+            const response = await api.delete(`http://localhost:5000/api/v1/wellness/delete/${appointmentId}`);
             const resData = response.data;
 
             if (resData?.success) {
                 Swal.fire({
                     icon: "success",
                     title: "Deleted!",
-                    text: "The event has been deleted successfully.",
+                    text: "The appointment has been deleted successfully.",
                     timer: 1500,
                     showConfirmButton: false,
                 });
@@ -165,7 +148,7 @@ export default function OrganizerEvents({ userId }) {
                 Swal.fire({
                     icon: "error",
                     title: "Error",
-                    text: resData?.message || "Failed to delete the event.",
+                    text: resData?.message || "Failed to delete the appointment.",
                 });
             }
         } catch (error) {
@@ -191,20 +174,27 @@ export default function OrganizerEvents({ userId }) {
                     <EventSidebar />
 
                     <div className="event-righcontent">
-                        <h4>My Events</h4>
+                        <h4>My Appointments</h4>
+                        <button
+                            className="primery-button fw-normal px-2 text-white"
+                            style={{ backgroundColor: "#00ad00" }}
+                            onClick={() => router.push(`/appointments/${eventId}/create`)}
+                        >
+                            <i className="bi bi-plus"></i> Create Appointments
+                        </button>
                         <hr
                             style={{
                                 borderColor: "currentColor",
                             }}
                         />
 
-                        <div className="search_sec">
+                        {/* <div className="search_sec">
                             <form className="d-flex align-items-center">
                                 <input
                                     className="form-control me-2 text-14"
                                     style={{ height: "34px" }}
                                     type="text"
-                                    placeholder="Search My Events"
+                                    placeholder="Search My Appointments"
                                     aria-label="Search"
                                 />
                                 <svg
@@ -219,7 +209,7 @@ export default function OrganizerEvents({ userId }) {
                                     </g>
                                 </svg>
                             </form>
-                        </div>
+                        </div> */}
 
                         <div className="desbord-content">
                             <div className="my-ticket-box">
@@ -229,11 +219,12 @@ export default function OrganizerEvents({ userId }) {
                                             <thead className="table-dark table_bg">
                                                 <tr>
                                                     <th style={{ width: "2%" }} scope="col">#</th>
-                                                    <th style={{ width: "14%" }} scope="col">Name</th>
-                                                    {/* <th style={{ width: "17%" }} scope="col">Date and Time</th> */}
-                                                    <th style={{ width: "8%" }} scope="col">Venue</th>
-                                                    <th style={{ width: "18%" }} scope="col">Ticket Sale</th>
-                                                    <th style={{ width: "16%" }} scope="col">Ticket Types</th>
+                                                    <th style={{ width: "14%" }} scope="col">Image</th>
+                                                    <th style={{ width: "14%" }} scope="col">Appointment Name</th>
+                                                    <th style={{ width: "8%" }} scope="col">Event Name</th>
+                                                    <th style={{ width: "17%" }} scope="col">Created</th>
+                                                    {/* <th style={{ width: "18%" }} scope="col">Ticket Sale</th> */}
+                                                    {/* <th style={{ width: "16%" }} scope="col">Ticket Types</th> */}
                                                     <th style={{ width: "15%" }} scope="col">Action</th>
                                                 </tr>
                                             </thead>
@@ -245,24 +236,24 @@ export default function OrganizerEvents({ userId }) {
                                                             <div className="spinner-border text-primary" role="status">
                                                                 <span className="visually-hidden">Loading...</span>
                                                             </div>
-                                                            <div className="mt-2">Loading events...</div>
+                                                            <div className="mt-2">Loading appointments...</div>
                                                         </td>
                                                     </tr>
-                                                ) : eventData && eventData.length > 0 ? (
-                                                    eventData.map((event, index) => {
-                                                        const startDate = event?.date_from?.local
-                                                            ? new Date(event.date_from.local.replace(" ", "T"))
-                                                            : new Date(event?.date_from?.utc);
+                                                ) : appointmentData && appointmentData.length > 0 ? (
+                                                    appointmentData.map((event, index) => {
+                                                        const createdDate = event?.createdAt
+                                                            ? new Date(event.createdAt.replace(" ", "T"))
+                                                            : new Date(event?.createdAt?.utc);
 
-                                                        const endDate = event?.date_to?.local
-                                                            ? new Date(event.date_to.local.replace(" ", "T"))
-                                                            : new Date(event?.date_to?.utc);
+                                                        // const endDate = event?.date_to?.local
+                                                        //     ? new Date(event.date_to.local.replace(" ", "T"))
+                                                        //     : new Date(event?.date_to?.utc);
 
-                                                        const ticketTypes = Array.isArray(event?.EventTicketTypes)
-                                                            ? event.EventTicketTypes
-                                                            : [];
-                                                        const currencySymbol = event?.Currency?.Currency_symbol || "";
-                                                        const imgUrl = event?.feat_image || "";
+                                                        // const ticketTypes = Array.isArray(event?.EventTicketTypes)
+                                                        //     ? event.EventTicketTypes
+                                                        //     : [];
+                                                        // const currencySymbol = event?.Currency?.Currency_symbol || "";
+                                                        const imgUrl = event?.Image || "";
 
                                                         return (
                                                             <tr key={event.id}>
@@ -282,14 +273,11 @@ export default function OrganizerEvents({ userId }) {
                                                                         />
                                                                     </div>
                                                                 </td>
-
-                                                                {/* ✅ Venue + Location combined */}
                                                                 <td>
                                                                     {event ? (
                                                                         <>
                                                                             <Link
-                                                                                href={`/event/${event.id}/${event.slug}`}
-                                                                                target="_blank"
+                                                                                href='#'
                                                                                 rel="noopener noreferrer"
                                                                                 style={{
                                                                                     fontSize: "1.1rem",
@@ -300,9 +288,21 @@ export default function OrganizerEvents({ userId }) {
                                                                             >
                                                                                 {event.name || "Untitled Event"}
                                                                             </Link>
-                                                                            <br />
+                                                                            {/* <br />
                                                                             <span className="text-muted">
                                                                                 {event.location || "Location not added"}
+                                                                            </span> */}
+                                                                        </>
+                                                                    ) : (
+                                                                        "N/A"
+                                                                    )}
+                                                                </td>
+                                                                {/* ✅ Venue + Location combined */}
+                                                                <td>
+                                                                    {event.eventList ? (
+                                                                        <>
+                                                                            <span className="text-muted"><b>
+                                                                                {event.eventList.name || "Location not added"}</b>
                                                                             </span>
                                                                         </>
                                                                     ) : (
@@ -312,15 +312,15 @@ export default function OrganizerEvents({ userId }) {
 
                                                                 {/* ✅ Dates */}
                                                                 <td>
-                                                                    <b>From:</b>{" "}
-                                                                    {startDate ? format(startDate, "EEE, dd MMM yyyy") : "N/A"}
-                                                                    <br />
-                                                                    <b>To:</b>{" "}
-                                                                    {endDate ? format(endDate, "EEE, dd MMM yyyy") : "N/A"}
+                                                                    {/* <b>From:</b>{" "} */}
+                                                                    {createdDate ? format(createdDate, "EEE, dd MMM yyyy") : "N/A"}
+                                                                    {/* <br /> */}
+                                                                    {/* <b>To:</b>{" "}
+                                                                    {endDate ? format(endDate, "EEE, dd MMM yyyy") : "N/A"} */}
                                                                 </td>
 
                                                                 {/* ✅ Ticket Types */}
-                                                                <td className="ticket_types">
+                                                                {/* <td className="ticket_types">
                                                                     {ticketTypes.length > 0 ? (
                                                                         ticketTypes.map((ticketType) => (
                                                                             <div
@@ -362,25 +362,52 @@ export default function OrganizerEvents({ userId }) {
                                                                     ) : (
                                                                         <p>Tickets not created</p>
                                                                     )}
-                                                                </td>
+                                                                </td> */}
 
                                                                 {/* ✅ Action Buttons */}
                                                                 <td className="Con_center">
                                                                     <div className="editIcos">
-                                                                        <Link
+                                                                        {/* <Link
                                                                             className="edit viewIcos"
                                                                             href={`/event/${event.id}/${event.slug}`}
                                                                             target="_blank"
                                                                         >
                                                                             <i className="bi bi-eye-fill"></i> View
-                                                                        </Link>
+                                                                        </Link> */}
 
                                                                         <Link
-                                                                            href={`/event/edit-event/${event.id}`}
+                                                                            href={`/appointments/${event.id}/edit`}
                                                                             className="edit viewIcos"
                                                                         >
                                                                             <i className="fas fa-edit"></i> Edit
                                                                         </Link>
+
+                                                                        <Link
+                                                                            href="#"
+                                                                            className={`action_btn edit ${event.status == "Y" ? "disable_btn" : "enable_btn"
+                                                                                }`}
+                                                                            onClick={(e) => {
+                                                                                e.preventDefault();
+                                                                                handleStatusChange(
+                                                                                    event.id,
+                                                                                    event.status == "Y" ? "N" : "Y"
+                                                                                );
+                                                                            }}
+                                                                            title={
+                                                                                event.status == "Y"
+                                                                                    ? "Disable Appointment"
+                                                                                    : "Enable Appointment"
+                                                                            }
+                                                                        >
+                                                                            {event.status == "Y" ? (
+                                                                                <i className="bi bi-x-circle-fill text-danger"></i>
+                                                                            ) : (
+                                                                                <i className="bi bi-check-circle-fill text-success"></i>
+                                                                            )}
+                                                                        </Link>
+
+
+
 
                                                                         <Link
                                                                             href="#"
@@ -410,7 +437,7 @@ export default function OrganizerEvents({ userId }) {
                                                                         </Link>
                                                                     </div>
 
-                                                                    <div className="d-flex">
+                                                                    {/* <div className="d-flex">
                                                                         <Link
                                                                             href="#"
                                                                             className={`action_btn edit ${event.status == "Y" ? "disable_btn" : "enable_btn"
@@ -435,15 +462,15 @@ export default function OrganizerEvents({ userId }) {
                                                                             )}
                                                                         </Link>
 
-                                                                        <Link className="action_btn excel_btn edit" href={`/appointments/${event.id}`} title="My Appointment">
+                                                                       <Link className="action_btn excel_btn edit" href="/">
                                                                             <img
                                                                                 className="del-icon"
                                                                                 style={{ width: "16px" }}
                                                                                 src="/assets/front-images/export-icon.png"
                                                                                 alt=""
                                                                             />
-                                                                        </Link>
-                                                                    </div>
+                                                                        </Link> 
+                                                                    </div> */}
                                                                 </td>
                                                             </tr>
                                                         );
@@ -477,7 +504,7 @@ export default function OrganizerEvents({ userId }) {
                                         </ul>
                                         <div className="text-center">
                                             <p className="paginate_p text-14">
-                                                Page 1 of 1, showing {eventData?.length || 0} record(s)
+                                                Page 1 of 1, showing {appointmentData?.length || 0} record(s)
                                             </p>
                                         </div> */}
                                     </div>
