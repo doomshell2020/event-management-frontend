@@ -9,13 +9,11 @@ import { format } from "date-fns"; // helps format dates
 export default function MyOrders({ userId }) {
     const [backgroundImage, setIsMobile] = useState('/assets/front-images/about-slider_bg.jpg');
     const [orderData, setOrderData] = useState([]);
-    console.log("--------orderData", orderData)
     const [loading, setLoading] = useState(true); // ✅ Added loading state
     const fetchOrders = async () => {
         setLoading(true); // start loading
         try {
             const res = await api.get(`/api/v1/orders`);
-            console.log("-------res", res)
             if (res.data.success) {
                 setOrderData(res.data.data || []);
             } else {
@@ -68,18 +66,12 @@ export default function MyOrders({ userId }) {
                                         (sum, item) => sum + (item.count || 0),
                                         0
                                     );
-
-                                    // Checking slot or appointment
-                                    const firstItem = order?.orderItems?.[0];
-                                    const slotName = firstItem?.slot?.slot_name;
-                                    const appointmentName = firstItem?.appointment?.wellnessList?.name;
                                     return (
                                         <div key={order.id} className="col-lg-6 col-md-12">
                                             <div className="up_events position-relative">
-                                                <Link href="/tickets/ticket-detail">
+                                                <Link  href={`/orders/${order.id}`}>
                                                     <div className="inner_box">
                                                         <div className="row d-flex align-items-center justify-content-center g-0">
-
                                                             <div className="col-sm-5">
                                                                 <div className="image_br d-flex align-items-center w-100 overflow-hidden" style={{ height: "220px" }}>
                                                                     <img
