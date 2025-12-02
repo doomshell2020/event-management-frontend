@@ -180,12 +180,12 @@ const EventDetailPage = ({ event, slug }) => {
                     Check availability
                   </button >
 
-                  <button onClick={(e) => {
+                  {/* <button onClick={(e) => {
                     e.preventDefault();
                     handleOpenAppointmentCart();
                   }}>
                     Book Appointment
-                  </button >
+                  </button > */}
 
 
 

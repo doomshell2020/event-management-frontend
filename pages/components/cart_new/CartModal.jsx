@@ -36,17 +36,15 @@ const LoadingComponent = ({ isActive }) => {
 };
 
 export default function CartModal({ show, handleClose, eventId }) {
+
     const [isLoading, setIsLoading] = useState(true);
-    const [eventDetails, setEventDetails] = useState(null);
+    const [cartLoading, setCartLoading] = useState(false);
+    const [loadingId, setLoadingId] = useState(null); // track which pricing ID is loading
+
     const [cart, setCart] = useState([]);
     const [adminFees, setAdminFees] = useState(8);
-
-    {
-        eventDetails.slots.map((slot) => {
-            console.log('>>>>>>>>',slot);
-            
-        })
-    }
+    const [eventDetails, setEventDetails] = useState(null);
+    // console.log('eventDetails :', eventDetails);
 
     // CART API FUNCTIONS
     const fetchCart = async (eventId) => {
@@ -54,15 +52,15 @@ export default function CartModal({ show, handleClose, eventId }) {
     };
 
     const increaseCart = async (cartId) => {
-        return await api.post(`/api/v1/cart/increase/${cartId}`);
+        return await api.put(`/api/v1/cart/increase/${cartId}`);
     };
 
     const decreaseCart = async (cartId) => {
-        return await api.post(`/api/v1/cart/decrease/${cartId}`);
+        return await api.put(`/api/v1/cart/decrease/${cartId}`);
     };
 
     const deleteCart = async (cartId) => {
-        return await api.delete(`/api/v1/cart/delete/${cartId}`);
+        return await api.delete(`/api/v1/cart/remove/${cartId}`);
     };
 
     const addToCart = async (params) => {
@@ -77,42 +75,103 @@ export default function CartModal({ show, handleClose, eventId }) {
         ticket_price_id: null,  // not needed for slot
         package_id: null,       // not needed for slot
     });
-    const [slotCart, setSlotCart] = useState({});
+
+    const [slotCart, setSlotCart] = useState([]);
 
     // Fetch Event + Cart Details
     useEffect(() => {
         if (!show) return;
-        setIsLoading(true);
+        setCartLoading(true);
         const fetchDetails = async () => {
             try {
                 const res = await api.get(`/api/v2/events/public-event-detail/${eventId}`);
                 setEventDetails(res.data.data.event);
-                setAdminFees(res.data.fees || 8);
-
-
-                // Load cart
-                const cartRes = await fetchCart(eventId);
-                const list = cartRes?.data?.data || [];
+                await refreshSlotCart();
                 setCart(list);
-                let map = {};
-                list.forEach((c) => {
-                    if (c.item_type == "ticket_price") {
-                        map[c.id] = {
-                            cartId: c.id,
-                            count: c.count
-                        };
-                    }
-                });
-                setSlotCart(map);
 
             } catch (error) {
                 console.error("Error loading cart/event:", error);
             }
+            setCartLoading(false);
             setIsLoading(false);
         };
 
         fetchDetails();
     }, [show, eventId]);
+
+    const increaseSlot = async (slot) => {
+        const pricingId = slot.pricings[0]?.id;
+
+        try {
+            setLoadingId(pricingId);
+
+            const existing = slotCart.find(item => item.uniqueId == pricingId);
+
+            if (existing) {
+                await increaseCart(existing.cartId);
+            } else {
+                await addToCart({
+                    event_id: eventId,
+                    item_type: "ticket_price",
+                    ticket_price_id: pricingId,
+                    count: 1
+                });
+            }
+
+            await refreshSlotCart();
+
+        } catch (err) {
+            console.log("Increase slot error:", err);
+        }
+
+        setLoadingId(null);
+    };
+
+    const decreaseSlot = async (slot) => {
+        const pricingId = slot.pricings[0]?.id;
+
+        try {
+            setLoadingId(pricingId);
+
+            const existing = slotCart.find(item => item.uniqueId == pricingId);
+            if (!existing) return;
+
+            if (existing.count > 1) {
+                await decreaseCart(existing.cartId);
+            } else {
+                await deleteCart(existing.cartId);
+            }
+
+            await refreshSlotCart();
+
+        } catch (err) {
+            console.log("Decrease slot error:", err);
+        }
+
+        setLoadingId(null);
+    };
+
+    const refreshSlotCart = async () => {
+        try {
+            const cartRes = await fetchCart(eventId);
+
+            const list = cartRes?.data?.data || [];
+            setCart(list);
+            const slotCartList = list
+                .filter((c) => c.item_type == "ticket_price")
+                .map((c) => ({
+                    cartId: c.id,
+                    uniqueId: c.uniqueId,
+                    count: c.count
+                }));
+
+            setSlotCart(slotCartList);
+
+        } catch (err) {
+            // If API fails → Reset slotCart to empty
+            setSlotCart([]);
+        }
+    };
 
     // Calculate Totals
     const totalTickets = cart.reduce((n, item) => n + item.count, 0);
@@ -141,6 +200,30 @@ export default function CartModal({ show, handleClose, eventId }) {
     };
 
     const [showFullDesc, setShowFullDesc] = useState(false);
+    const [payLoading, setPayLoading] = useState(false);
+    const handlePayNow = async () => {
+        if (payLoading) return; // prevent double click
+        setPayLoading(true);
+
+        try {
+            const response = await api.post("/api/v1/orders/create", {
+                event_id: eventId,               // dynamic event
+                total_amount: finalTotal,        // your calculated total
+                payment_method: "Online"         // Cash , UPI , AT_DOOR
+                // coupon_code: "WELCOME10"
+            });
+
+            console.log("Order Created:", response.data);
+
+            // TODO: redirect to payment gateway page if required
+            // navigate('/payment');
+
+        } catch (error) {
+            console.error("Order Create Error:", error);
+        } finally {
+            setPayLoading(false);
+        }
+    };
 
     const formatReadableDate = (dateStr) => {
         if (!dateStr) return "";
@@ -150,86 +233,6 @@ export default function CartModal({ show, handleClose, eventId }) {
             month: "short",
             year: "numeric",
         });
-    };
-
-    const increaseSlot = async (slot) => {
-        try {
-
-            setIsLoading(true);
-
-            // Check existing slot cart
-            const existing = slotCart[slot.id];
-
-            if (existing) {
-                // Already in cart → increase
-                await increaseCart(existing.cartId);
-            } else {
-                // First time add
-                await addToCart({
-                    event_id: eventId,
-                    item_type: "ticket_price",
-                    ticket_price_id: slot.id,
-                    count: 1
-                });
-            }
-
-            // Fetch updated cart
-            const cartRes = await fetchCart(eventId);
-            const list = cartRes.data.data || [];
-            setCart(list);
-
-            // Build slot cart map
-            let map = {};
-            list.forEach((c) => {
-                if (c.item_type === "ticket_price") {
-                    map[c.slot_id] = {
-                        cartId: c.id,
-                        count: c.no_tickets
-                    };
-                }
-            });
-
-            setSlotCart(map);
-
-        } catch (e) {
-            console.log("Increase slot error:", e);
-        }
-
-        setIsLoading(false);
-    };
-
-    const decreaseSlot = async (slot) => {
-        try {
-            const existing = slotCart[slot.id];
-            if (!existing) return;
-
-            setIsLoading(true);
-
-            await decreaseCart(existing.cartId);
-
-            // Fetch updated cart
-            const cartRes = await fetchCart(eventId);
-            const list = cartRes.data.data || [];
-            setCart(list);
-
-            // Build slot cart map again
-            let map = {};
-            list.forEach((c) => {
-                if (c.item_type == "slot") {
-                    map[c.slot_id] = {
-                        cartId: c.id,
-                        count: c.no_tickets
-                    };
-                }
-            });
-
-            setSlotCart(map);
-
-        } catch (e) {
-            console.log("Decrease slot error:", e);
-        }
-
-        setIsLoading(false);
     };
 
     return (
@@ -336,7 +339,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                                     {eventDetails.tickets?.length > 0 && (
                                         <div className="ticket-section mt-4">
                                             <h5 className="mb-3">Available Tickets</h5>
-                                            
+
                                             {eventDetails.tickets.map((ticket, i) => (
                                                 <div key={i} className="ticket-box mb-3 p-2 border rounded">
                                                     <strong>{ticket.title}</strong>
@@ -358,13 +361,19 @@ export default function CartModal({ show, handleClose, eventId }) {
                                     )}
 
                                     {/* AVAILABLE SLOTS */}
-                                    {
-                                        eventDetails.slots?.length > 0 && (
-                                            <div className="slot-section mt-4">
-                                                <h5 className="mb-3">Event Slots</h5>
+                                    {eventDetails.slots?.length > 0 && (
+                                        <div className="slot-section mt-4">
+                                            <h5 className="mb-3">Event Slots</h5>
 
-                                                {eventDetails.slots.map((slot) => (
+                                            {eventDetails.slots.map((slot) => {
+                                                const pricingId = slot.pricings?.[0]?.id;
 
+                                                // Find matching slot count from cart
+                                                const cartItem = slotCart.find(item => item.uniqueId === pricingId);
+
+                                                const isLoading = loadingId === pricingId;
+
+                                                return (
                                                     <div key={slot.id} className="slot-box p-3 border rounded mb-3 shadow-sm">
 
                                                         <div className="d-flex justify-content-between align-items-center">
@@ -372,34 +381,55 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                 {slot.slot_name}
                                                             </strong>
 
-                                                            {/* Counter Buttons */}
-                                                            <div className="d-flex align-items-center">
-                                                                <button
-                                                                    className="btn btn-sm btn-outline-secondary"
-                                                                    onClick={() => decreaseSlot(slot)}
-                                                                >
-                                                                    –
-                                                                </button>
+                                                            {/* Counter */}
+                                                            {isLoading ? <Spinner size="sm" /> :
+                                                                <div className="d-flex align-items-center">
 
-                                                                <span className="mx-2" style={{ fontSize: "16px", width: "25px", textAlign: "center" }}>
-                                                                    {slotCart[slot.id]?.count || 0}
-                                                                </span>
+                                                                    {/* Decrease */}
+                                                                    <button
+                                                                        className="btn btn-sm btn-outline-secondary"
+                                                                        onClick={() => decreaseSlot(slot)}
+                                                                        disabled={isLoading}
+                                                                    >
+                                                                        –
+                                                                    </button>
 
-                                                                <button
-                                                                    className="btn btn-sm btn-outline-primary"
-                                                                    onClick={() => increaseSlot(slot)}
-                                                                >
-                                                                    +
-                                                                </button>
-                                                            </div>
+                                                                    {/* Count / Loading */}
+                                                                    <span
+                                                                        className="mx-2"
+                                                                        style={{
+                                                                            fontSize: "16px",
+                                                                            width: "25px",
+                                                                            textAlign: "center",
+                                                                            display: "flex",
+                                                                            justifyContent: "center"
+                                                                        }}
+                                                                    >
+                                                                        {cartItem?.count || 0}
+                                                                    </span>
+
+                                                                    {/* Increase */}
+                                                                    <button
+                                                                        className="btn btn-sm btn-outline-primary"
+                                                                        onClick={() => increaseSlot(slot)}
+                                                                        disabled={isLoading}
+                                                                    >
+                                                                        +
+                                                                    </button>
+
+                                                                </div>
+                                                            }
+
                                                         </div>
 
+                                                        {/* Slot Time */}
                                                         <p className="mt-2">
                                                             {formatReadableDate(slot.slot_date)} — {slot.start_time} to {slot.end_time}
                                                         </p>
 
                                                         <p className="text-muted">{slot.description}</p>
 
+                                                        {/* Pricing List */}
                                                         {slot.pricings?.length > 0 && (
                                                             <div className="pricing-tier">
                                                                 {slot.pricings.map((p, idx) => (
@@ -411,10 +441,12 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                             </div>
                                                         )}
                                                     </div>
-                                                ))}
-                                            </div>
-                                        )
-                                    }
+                                                );
+                                            })}
+
+                                        </div>
+                                    )}
+
 
                                 </div>
                             </Col>
@@ -425,25 +457,33 @@ export default function CartModal({ show, handleClose, eventId }) {
                                 <div className="checkot-rgt">
                                     <h2>Checkout</h2>
 
-                                    {cart.length > 0 ? (
+                                    {cart?.length > 0 ? (
                                         <div className="monte25-tct-purcs">
                                             <h6>YOUR TICKETS</h6>
 
-                                            {cart.map((item, i) => (
-                                                <div key={i} className="ticket-item mb-2">
-                                                    <strong>
-                                                        {item.display_name}
-                                                        {item.item_type && ` (${item.item_type})`}
-                                                    </strong>
-                                                    <p>
-                                                        {item.count} × ${item.ticket_price}
-                                                    </p>
-                                                </div>
-                                            ))}
+                                            {cart.map((item) => {
+                                                const itemPrice = Number(item.ticket_price || 0);
+                                                const itemTotal = item.count * itemPrice;
 
-                                            <h6 className="mt-5">
-                                                TOTAL {totalTickets} ITEM
-                                                {totalTickets > 1 ? "S" : ""}
+                                                return (
+                                                    <div key={item.id} className="ticket-item mb-3">
+                                                        <strong>{item.display_name}</strong>
+
+                                                        <div className="d-flex justify-content-between">
+                                                            <p className="mb-0">
+                                                                {item.count} × ${itemPrice.toFixed(2)}
+                                                            </p>
+
+                                                            <p className="mb-0">
+                                                                ${itemTotal.toFixed(2)}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+
+                                            <h6 className="mt-4">
+                                                TOTAL {totalTickets} ITEM{totalTickets > 1 ? "S" : ""}
                                             </h6>
 
                                             <div className="apply-cd my-3">
@@ -472,12 +512,27 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                     <p>${finalTotal.toFixed(2)}</p>
                                                 </div>
                                             </div>
+
+                                            {/* PAY NOW BUTTON */}
+                                            <Button
+                                                variant="primary"
+                                                className="w-100 py-2"
+                                                style={{ fontSize: "18px", fontWeight: "600" }}
+                                                onClick={handlePayNow}
+                                                disabled={payLoading}
+                                            >
+                                                {payLoading ? "Processing..." : "PAY NOW"}
+                                            </Button>
+
+
                                         </div>
                                     ) : (
                                         <h3 className="text-center mt-5">Cart is Empty</h3>
                                     )}
                                 </div>
                             </Col>
+
+
                         </Row>
                     </div>
                 )}
