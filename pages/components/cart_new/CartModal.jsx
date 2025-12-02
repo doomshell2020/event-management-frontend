@@ -206,15 +206,14 @@ export default function CartModal({ show, handleClose, eventId }) {
 
     const handlePayNow = async () => {
         if (payLoading) return; // Prevent double click
-
         setPayLoading(true);
-
         try {
             const res = await api.post("/api/v1/orders/create", {
                 event_id: eventId,
                 total_amount: finalTotal,
                 payment_method: "Online"
             });
+            handleClose(false)
 
             // SUCCESS POPUP
             Swal.fire({
@@ -231,6 +230,7 @@ export default function CartModal({ show, handleClose, eventId }) {
             // OPTIONAL: redirect to payment page
             // navigate("/payment");
         } catch (error) {
+            handleClose(false)
 
             // ERROR POPUP
             Swal.fire({
@@ -246,9 +246,10 @@ export default function CartModal({ show, handleClose, eventId }) {
 
         } finally {
             setPayLoading(false);
+            handleClose(false)
+
         }
     };
-
 
     const formatReadableDate = (dateStr) => {
         if (!dateStr) return "";

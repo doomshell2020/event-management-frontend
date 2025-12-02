@@ -154,10 +154,12 @@ const EventDetailPage = ({ event, slug }) => {
               <div className="event-ticket-box">
                 <div className="section-heading">
                   <h2 className="text-start">{event.name}</h2>
-                  <h6>Hosted By <a href="#">Organizer #{event.event_org_id}</a></h6>
+                  <h6>
+                    Hosted By <a href="#">Organizer #{event.event_org_id}</a>
+                  </h6>
 
                   {/* 🚫 Inactive Event Warning */}
-                  {event.status == "N" && (
+                  {event.status === "N" && (
                     <div
                       style={{
                         background: "#ffdddd",
@@ -166,30 +168,27 @@ const EventDetailPage = ({ event, slug }) => {
                         borderRadius: "6px",
                         marginTop: "10px",
                         color: "#b30000",
-                        fontWeight: "600"
+                        fontWeight: "600",
                       }}
                     >
                       ⚠️ This event is currently inactive and not available for booking.
                     </div>
                   )}
 
-                  <button onClick={(e) => {
-                    e.preventDefault();
-                    handleOpenCart();
-                  }}>
-                    Check availability
-                  </button >
-
-                  {/* <button onClick={(e) => {
-                    e.preventDefault();
-                    handleOpenAppointmentCart();
-                  }}>
-                    Book Appointment
-                  </button > */}
-
-
-
+                  {/* ✅ Show button only for active events */}
+                  {event.status === "Y" && (
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleOpenCart();
+                      }}
+                      className="check-btn"
+                    >
+                      Check Availability
+                    </button>
+                  )}
                 </div>
+
 
 
                 <div className="info">
@@ -215,13 +214,13 @@ const EventDetailPage = ({ event, slug }) => {
                   </ul>
                 </div>
 
-                <h5 className="event_Sub_h">Tickets</h5>
+                {/* <h5 className="event_Sub_h">Tickets</h5>
                 <p className="event_pra">
                   The maximum number of tickets allowed per account is {event.ticket_limit || 50}.
-                </p>
+                </p> */}
 
                 {/* TICKETS LIST */}
-                <div className="form-group ticket_all">
+                {/* <div className="form-group ticket_all">
                   <ul className="ps-0">
                     {event?.tickets?.length > 0 ? (
                       event.tickets
@@ -255,10 +254,10 @@ const EventDetailPage = ({ event, slug }) => {
                       <li>No active tickets available.</li>
                     )}
                   </ul>
-                </div>
+                </div> */}
 
                 {/* ADDONS LIST */}
-                {event?.addons?.length > 0 && (
+                {/* {event?.addons?.length > 0 && (
                   <>
                     <h5 className="event_Sub_h">Addons</h5>
                     <div className="form-group ticket_all">
@@ -293,7 +292,7 @@ const EventDetailPage = ({ event, slug }) => {
                       </ul>
                     </div>
                   </>
-                )}
+                )} */}
 
                 {/* Description */}
                 <h5 className="event_Sub_h">Description</h5>

@@ -1,20 +1,48 @@
 // utils/formatDate.js
-export const formatDateTime = (dateString, timezone = null, locale = "en-GB") => {
+// export const formatDateTime = (dateString, timezone = null, locale = "en-GB") => {
+//     if (!dateString) return "";
+
+//     try {
+//         const date = new Date(dateString);
+
+//         // Use Intl.DateTimeFormat for timezone-safe conversion
+//         const formatter = new Intl.DateTimeFormat(locale, {
+//             day: "2-digit",
+//             month: "2-digit",
+//             year: "numeric",
+//             hour: "2-digit",
+//             minute: "2-digit",
+//             second: "2-digit",
+//             hour12: true,
+//             timeZone: timezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
+//         });
+
+//         return formatter.format(date);
+//     } catch (error) {
+//         console.error("Invalid date format:", dateString, error);
+//         return "";
+//     }
+// };
+
+export const formatDateTime = (
+    dateString,
+    timezone = null,
+    locale = "en-GB"
+) => {
     if (!dateString) return "";
 
     try {
         const date = new Date(dateString);
 
-        // Use Intl.DateTimeFormat for timezone-safe conversion
         const formatter = new Intl.DateTimeFormat(locale, {
             day: "2-digit",
             month: "2-digit",
             year: "numeric",
             hour: "2-digit",
             minute: "2-digit",
-            second: "2-digit",
-            hour12: true,
-            timeZone: timezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
+            hour12: true, // AM/PM enabled
+            timeZone:
+                timezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
         });
 
         return formatter.format(date);
@@ -23,6 +51,7 @@ export const formatDateTime = (dateString, timezone = null, locale = "en-GB") =>
         return "";
     }
 };
+
 
 
 export const formatDateTimeShort = (dateString) => {
