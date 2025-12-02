@@ -7,9 +7,6 @@ import Swal from "sweetalert2";
 import moment from "moment-timezone"; // ✅ Import moment-timezone
 import HtmlEditor, { getHtmlEditorContent } from "@/pages/components/HtmlEditor/HtmlEditor";
 import { useRouter } from 'next/router';
-import axios from "axios";
-
-
 
 const CreateAppointmentPage = () => {
     const [backgroundImage, setIsMobile] = useState('/assets/front-images/about-slider_bg.jpg');
@@ -124,11 +121,7 @@ const CreateAppointmentPage = () => {
             if (image) {
                 body.append("wellnessImage", image);
             }
-            // ✅ API Call
-            //  const response = await api.post("/api/v1/events/create", body, {
-            //         headers: { "Content-Type": "multipart/form-data" },
-            //     });
-            const response = await axios.post("http://localhost:5000/api/v1/wellness/create-slots", body, {
+            const response = await api.post("/api/v1/wellness/create-slots", body, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
             const resData = response.data;

@@ -20,8 +20,8 @@ export default function Appointments({}) {
     const fetchEvents = async () => {
         setLoading(true); // start loading
         try {
-            // const res = await api.get(`/api/v1/wellness/wellness-list`);
-            const res = await axios.get(`http://localhost:5000/api/v1/wellness/wellness-list/${eventId}`);
+            const res = await api.get(`/api/v1/wellness/wellness-list/${eventId}`);
+            // const res = await axios.get(`http://localhost:5000/api/v1/wellness/wellness-list/${eventId}`);
             if (res.data.success) {
                 setAppointmentsData(res.data.data.wellness || []);
             } else {
@@ -62,20 +62,10 @@ export default function Appointments({}) {
                     Swal.showLoading();
                 },
             });
-            // 🔥 Create FormData instead of JSON
             const body = {
                 status:status
             }
-            // 🔥 Send FormData
-            // const response = await api.put(`/api/v1/update/update/${appointmentId}`,
-            //     formData,
-            //     {
-            //         headers: {
-            //             "Content-Type": "multipart/form-data",
-            //         },
-            //     }
-            // );
-            const response = await axios.put(`http://localhost:5000/api/v1/wellness/update/${appointmentId}`, body);
+            const response = await api.put(`/api/v1/wellness/update/${appointmentId}`, body);
             const resData = response.data;
             Swal.close();
             if (resData?.success) {
@@ -128,11 +118,8 @@ export default function Appointments({}) {
                     Swal.showLoading();
                 },
             });
-
-            // const response = await api.delete(`/api/v1/events/wellness/delete/${appointmentId}`);
-            const response = await api.delete(`http://localhost:5000/api/v1/wellness/delete/${appointmentId}`);
+            const response = await api.delete(`/api/v1/wellness/delete/${appointmentId}`);
             const resData = response.data;
-
             if (resData?.success) {
                 Swal.fire({
                     icon: "success",

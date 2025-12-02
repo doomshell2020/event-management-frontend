@@ -4,6 +4,7 @@ import FrontendFooter from "@/shared/layout-components/frontelements/frontendfoo
 import Link from "next/link";
 import { format } from "date-fns";
 import CartModal from "@/pages/components/cart_new/CartModal";
+import AppointmentModal from "@/pages/components/appointment_cart/CartModal";
 
 export async function getServerSideProps({ params }) {
   const { id, slug } = params;
@@ -76,11 +77,18 @@ const EventDetailPage = ({ event, slug }) => {
 
 
   const [showCart, setShowCart] = useState(false);
+  const [showAppointmentCart, setShowAppointmentCart] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState(eventId);
 
   const handleOpenCart = () => {
     setSelectedEventId(selectedEventId);
     setShowCart(true);
+  };
+
+  // appointment cart...
+  const handleOpenAppointmentCart = () => {
+    setSelectedEventId(selectedEventId);
+    setShowAppointmentCart(true);
   };
 
 
@@ -171,6 +179,16 @@ const EventDetailPage = ({ event, slug }) => {
                   }}>
                     Check availability
                   </button >
+
+                  <button onClick={(e) => {
+                    e.preventDefault();
+                    handleOpenAppointmentCart();
+                  }}>
+                    Book Appointment
+                  </button >
+
+
+
                 </div>
 
 
@@ -300,7 +318,6 @@ const EventDetailPage = ({ event, slug }) => {
       </section>
 
       {/* ✅ Cart Modal */}
-
       {
         showCart && (
           <CartModal
@@ -308,9 +325,23 @@ const EventDetailPage = ({ event, slug }) => {
             handleClose={() => setShowCart(false)}
             eventId={selectedEventId}
           />
-
         )
       }
+
+      {/* ✅Appointment Cart Modal */}
+      {
+        showAppointmentCart && (
+          <AppointmentModal
+            show={showAppointmentCart}
+            handleClose={() => setShowAppointmentCart(false)}
+            eventId={selectedEventId}
+          />
+        )
+      }
+
+
+
+
 
       <FrontendFooter />
     </>

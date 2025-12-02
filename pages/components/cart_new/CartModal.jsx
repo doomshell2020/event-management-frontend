@@ -41,6 +41,13 @@ export default function CartModal({ show, handleClose, eventId }) {
     const [cart, setCart] = useState([]);
     const [adminFees, setAdminFees] = useState(8);
 
+    {
+        eventDetails.slots.map((slot) => {
+            console.log('>>>>>>>>',slot);
+            
+        })
+    }
+
     // CART API FUNCTIONS
     const fetchCart = async (eventId) => {
         return await api.get(`/api/v1/cart/list?event_id=${eventId}`);
@@ -72,59 +79,35 @@ export default function CartModal({ show, handleClose, eventId }) {
     });
     const [slotCart, setSlotCart] = useState({});
 
-
-    // CART ACTIONS
-    const handleIncrease = async (cartId) => {
-        try {
-            setIsLoading(true);
-            await increaseCart(cartId);
-            const cartRes = await fetchCart(eventId);
-            setCart(cartRes.data.data || []);
-        } catch (e) {
-            console.log("Increase error:", e);
-        }
-        setIsLoading(false);
-    };
-
-    const handleDecrease = async (cartId) => {
-        try {
-            setIsLoading(true);
-            await decreaseCart(cartId);
-            const cartRes = await fetchCart(eventId);
-            setCart(cartRes.data.data || []);
-        } catch (e) {
-            console.log("Decrease error:", e);
-        }
-        setIsLoading(false);
-    };
-
-    const handleDelete = async (cartId) => {
-        try {
-            setIsLoading(true);
-            await deleteCart(cartId);
-            const cartRes = await fetchCart(eventId);
-            setCart(cartRes.data.data || []);
-        } catch (e) {
-            console.log("Delete error:", e);
-        }
-        setIsLoading(false);
-    };
-
     // Fetch Event + Cart Details
     useEffect(() => {
         if (!show) return;
         setIsLoading(true);
-
         const fetchDetails = async () => {
             try {
                 const res = await api.get(`/api/v2/events/public-event-detail/${eventId}`);
-
                 setEventDetails(res.data.data.event);
                 setAdminFees(res.data.fees || 8);
+
+
+                // Load cart
+                const cartRes = await fetchCart(eventId);
+                const list = cartRes?.data?.data || [];
+                setCart(list);
+                let map = {};
+                list.forEach((c) => {
+                    if (c.item_type == "ticket_price") {
+                        map[c.id] = {
+                            cartId: c.id,
+                            count: c.count
+                        };
+                    }
+                });
+                setSlotCart(map);
+
             } catch (error) {
                 console.error("Error loading cart/event:", error);
             }
-
             setIsLoading(false);
         };
 
@@ -132,9 +115,9 @@ export default function CartModal({ show, handleClose, eventId }) {
     }, [show, eventId]);
 
     // Calculate Totals
-    const totalTickets = cart.reduce((n, item) => n + item.no_tickets, 0);
+    const totalTickets = cart.reduce((n, item) => n + item.count, 0);
     const priceTotal = cart.reduce(
-        (n, item) => n + item.no_tickets * item.price,
+        (n, item) => n + item.count * item.ticket_price,
         0
     );
     const feeTotal = (priceTotal * adminFees) / 100;
@@ -198,7 +181,7 @@ export default function CartModal({ show, handleClose, eventId }) {
             // Build slot cart map
             let map = {};
             list.forEach((c) => {
-                if (c.item_type == "ticket_price") {
+                if (c.item_type === "ticket_price") {
                     map[c.slot_id] = {
                         cartId: c.id,
                         count: c.no_tickets
@@ -353,7 +336,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                                     {eventDetails.tickets?.length > 0 && (
                                         <div className="ticket-section mt-4">
                                             <h5 className="mb-3">Available Tickets</h5>
-
+                                            
                                             {eventDetails.tickets.map((ticket, i) => (
                                                 <div key={i} className="ticket-box mb-3 p-2 border rounded">
                                                     <strong>{ticket.title}</strong>
@@ -430,7 +413,8 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                     </div>
                                                 ))}
                                             </div>
-                                        )}
+                                        )
+                                    }
 
                                 </div>
                             </Col>
@@ -448,11 +432,11 @@ export default function CartModal({ show, handleClose, eventId }) {
                                             {cart.map((item, i) => (
                                                 <div key={i} className="ticket-item mb-2">
                                                     <strong>
-                                                        {item.ticketName}
-                                                        {item.tickettype && ` (${item.tickettype})`}
+                                                        {item.display_name}
+                                                        {item.item_type && ` (${item.item_type})`}
                                                     </strong>
                                                     <p>
-                                                        {item.no_tickets} × ${item.price}
+                                                        {item.count} × ${item.ticket_price}
                                                     </p>
                                                 </div>
                                             ))}

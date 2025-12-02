@@ -7,7 +7,6 @@ import Swal from "sweetalert2";
 import moment from "moment-timezone"; // ✅ Import moment-timezone
 import HtmlEditor, { getHtmlEditorContent } from "@/pages/components/HtmlEditor/HtmlEditor";
 import { useRouter } from 'next/router';
-import axios from "axios";
 
 
 
@@ -51,14 +50,12 @@ const EditAppointmentPage = () => {
 
         const fetchWellness = async () => {
             try {
-                // const response = api.get(`${apiUrl}/v1/wellness/wellness/${id}`);
-                const { data } = await axios.get(`http://localhost:5000/api/v1/wellness/wellness/${AppointmentId}`);
+                const { data } = await api.get(`/api/v1/wellness/wellness/${AppointmentId}`);
                 const wellness = data?.data?.wellness;
                 if (!data?.success || !wellness) {
                     console.error("Invalid API response:", data);
                     return;
                 }
-                // console.log("-----------wellness",wellness.event_id)
                 setName(wellness.name ?? "");
                 setLocation(wellness.location ?? "");
                 setPaymentCurrency(wellness.currency ?? "");
@@ -130,10 +127,7 @@ const EditAppointmentPage = () => {
                 body.append("wellnessImage", image);
             }
             // ✅ API Call
-            //  const response = await api.post("/api/v1/events/create", body, {
-            //         headers: { "Content-Type": "multipart/form-data" },
-            //     });
-            const response = await axios.put(`http://localhost:5000/api/v1/wellness/update-wellness/${AppointmentId}`, body, {
+            const response = await api.put(`/api/v1/wellness/update-wellness/${AppointmentId}`, body, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
             const resData = response.data;
