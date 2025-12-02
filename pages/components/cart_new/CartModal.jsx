@@ -79,6 +79,8 @@ export default function CartModal({ show, handleClose, eventId }) {
     });
 
     const [slotCart, setSlotCart] = useState([]);
+    const [normalCart, setNormalCart] = useState([]);
+    // console.log('normalCart :', normalCart);
 
     // Fetch Event + Cart Details
     useEffect(() => {
@@ -89,7 +91,6 @@ export default function CartModal({ show, handleClose, eventId }) {
                 const res = await api.get(`/api/v2/events/public-event-detail/${eventId}`);
                 setEventDetails(res.data.data.event);
                 await refreshSlotCart();
-                setCart(list);
 
             } catch (error) {
                 console.error("Error loading cart/event:", error);
@@ -169,11 +170,31 @@ export default function CartModal({ show, handleClose, eventId }) {
 
             setSlotCart(slotCartList);
 
+            const normalCartList = list
+                .filter((c) => c.item_type == "ticket")
+                .map((c) => ({
+                    cartId: c.id,
+                    uniqueId: c.uniqueId,
+                    count: c.count
+                }));
+
+            setNormalCart(normalCartList);
+
         } catch (err) {
             // If API fails → Reset slotCart to empty
             setSlotCart([]);
+            setNormalCart([]);
         }
     };
+
+    const increaseTicket = (ticket) => {
+        increaseCart({ uniqueId: ticket.uniqueId, type: "ticket" });
+    };
+
+    const decreaseTicket = (ticket) => {
+        decreaseCart({ uniqueId: ticket.uniqueId, type: "ticket" });
+    };
+
 
     // Calculate Totals
     const totalTickets = cart.reduce((n, item) => n + item.count, 0);
@@ -223,7 +244,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                 confirmButtonText: "OK",
             });
 
-            console.log("Order created:", res.data);
+            // console.log("Order created:", res.data);
 
             await refreshSlotCart();
 
@@ -366,25 +387,78 @@ export default function CartModal({ show, handleClose, eventId }) {
                                         <div className="ticket-section mt-4">
                                             <h5 className="mb-3">Available Tickets</h5>
 
-                                            {eventDetails.tickets.map((ticket, i) => (
-                                                <div key={i} className="ticket-box mb-3 p-2 border rounded">
-                                                    <strong>{ticket.title}</strong>
-                                                    <p>Base Price: ₹{ticket.price}</p>
+                                            {eventDetails.tickets.map((ticket, i) => {
+                                                const pricingId = ticket?.id;
+                                                const cartItem = normalCart.find(item => item.uniqueId == pricingId);
+                                                const isLoading = loadingId == pricingId;
+                                                return (
+                                                    <div key={i} className="ticket-box mb-3 p-3 border rounded shadow-sm">
 
-                                                    {ticket.pricings?.length > 0 && (
-                                                        <div className="pricing-tier mt-2">
-                                                            {ticket.pricings.map((p, idx) => (
-                                                                <div key={idx} className="d-flex justify-content-between">
-                                                                    <span>{p.date}</span>
-                                                                    <span>₹{p.price}</span>
+                                                        <div className="d-flex justify-content-between align-items-center">
+                                                            <strong style={{ fontSize: "17px" }}>{ticket.title}</strong>
+
+                                                            {/* Counter */}
+                                                            {isLoading ? (
+                                                                <Spinner size="sm" />
+                                                            ) : (
+                                                                <div className="d-flex align-items-center">
+
+                                                                    {/* Decrease */}
+                                                                    <button
+                                                                        className="btn btn-sm btn-outline-secondary"
+                                                                        onClick={() => decreaseTicket(ticket)}
+                                                                        disabled={isLoading}
+                                                                    >
+                                                                        –
+                                                                    </button>
+
+                                                                    {/* Count */}
+                                                                    <span
+                                                                        className="mx-2"
+                                                                        style={{
+                                                                            fontSize: "16px",
+                                                                            width: "25px",
+                                                                            textAlign: "center",
+                                                                            display: "flex",
+                                                                            justifyContent: "center"
+                                                                        }}
+                                                                    >
+                                                                        {cartItem?.count || 0}
+                                                                    </span>
+
+                                                                    {/* Increase */}
+                                                                    <button
+                                                                        className="btn btn-sm btn-outline-primary"
+                                                                        onClick={() => increaseTicket(ticket)}
+                                                                        disabled={isLoading}
+                                                                    >
+                                                                        +
+                                                                    </button>
+
                                                                 </div>
-                                                            ))}
+                                                            )}
                                                         </div>
-                                                    )}
-                                                </div>
-                                            ))}
+
+                                                        {/* Pricing Display */}
+                                                        <p className="mt-2">Base Price: ₹{ticket.price}</p>
+
+                                                        {ticket.pricings?.length > 0 && (
+                                                            <div className="pricing-tier mt-2">
+                                                                {ticket.pricings.map((p, idx) => (
+                                                                    <div key={idx} className="d-flex justify-content-between">
+                                                                        <span>{p.date}</span>
+                                                                        <span>₹{p.price}</span>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        )}
+
+                                                    </div>
+                                                );
+                                            })}
                                         </div>
                                     )}
+
 
                                     {/* AVAILABLE SLOTS */}
                                     {eventDetails.slots?.length > 0 && (
@@ -395,9 +469,9 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                 const pricingId = slot.pricings?.[0]?.id;
 
                                                 // Find matching slot count from cart
-                                                const cartItem = slotCart.find(item => item.uniqueId === pricingId);
+                                                const cartItem = slotCart.find(item => item.uniqueId == pricingId);
 
-                                                const isLoading = loadingId === pricingId;
+                                                const isLoading = loadingId == pricingId;
 
                                                 return (
                                                     <div key={slot.id} className="slot-box p-3 border rounded mb-3 shadow-sm">
