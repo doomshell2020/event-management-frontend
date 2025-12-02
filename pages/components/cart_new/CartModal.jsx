@@ -9,6 +9,8 @@ import {
 } from "react-bootstrap";
 import Image from "next/image";
 import api from "@/utils/api";
+import Swal from "sweetalert2";
+
 
 // Loader Component
 const LoadingComponent = ({ isActive }) => {
@@ -201,29 +203,52 @@ export default function CartModal({ show, handleClose, eventId }) {
 
     const [showFullDesc, setShowFullDesc] = useState(false);
     const [payLoading, setPayLoading] = useState(false);
+
     const handlePayNow = async () => {
-        if (payLoading) return; // prevent double click
+        if (payLoading) return; // Prevent double click
+
         setPayLoading(true);
 
         try {
-            const response = await api.post("/api/v1/orders/create", {
-                event_id: eventId,               // dynamic event
-                total_amount: finalTotal,        // your calculated total
-                payment_method: "Online"         // Cash , UPI , AT_DOOR
-                // coupon_code: "WELCOME10"
+            const res = await api.post("/api/v1/orders/create", {
+                event_id: eventId,
+                total_amount: finalTotal,
+                payment_method: "Online"
             });
 
-            console.log("Order Created:", response.data);
+            // SUCCESS POPUP
+            Swal.fire({
+                icon: "success",
+                title: "Order Created!",
+                text: res?.data?.message || "Your order has been created successfully.",
+                confirmButtonText: "OK",
+            });
 
-            // TODO: redirect to payment gateway page if required
-            // navigate('/payment');
+            console.log("Order created:", res.data);
 
+            await refreshSlotCart();
+
+            // OPTIONAL: redirect to payment page
+            // navigate("/payment");
         } catch (error) {
-            console.error("Order Create Error:", error);
+
+            // ERROR POPUP
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text:
+                    error?.response?.data?.message ||
+                    "Something went wrong while creating the order.",
+                confirmButtonText: "Close",
+            });
+
+            console.error("Order create error:", error);
+
         } finally {
             setPayLoading(false);
         }
     };
+
 
     const formatReadableDate = (dateStr) => {
         if (!dateStr) return "";
@@ -523,6 +548,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                                             >
                                                 {payLoading ? "Processing..." : "PAY NOW"}
                                             </Button>
+
 
 
                                         </div>
