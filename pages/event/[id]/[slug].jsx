@@ -159,7 +159,7 @@ const EventDetailPage = ({ event, slug }) => {
                   </h6>
 
                   {/* 🚫 Inactive Event Warning */}
-                  {event.status === "N" && (
+                  {event.status == "N" && (
                     <div
                       style={{
                         background: "#ffdddd",
@@ -175,18 +175,30 @@ const EventDetailPage = ({ event, slug }) => {
                     </div>
                   )}
 
-                  {/* ✅ Show button only for active events */}
-                  {event.status === "Y" && (
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleOpenCart();
-                      }}
-                      className="check-btn"
-                    >
-                      Check Availability
-                    </button>
+                  {event.status == "Y" && (
+                    <div className="mt-3 d-flex gap-2">
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleOpenCart();
+                        }}
+                        className="btn btn-primary"
+                      >
+                        Check Availability
+                      </button>
+
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleOpenAppointmentCart();
+                        }}
+                        className="btn btn-outline-primary"
+                      >
+                        Check Appointment
+                      </button>
+                    </div>
                   )}
+
                 </div>
 
 
