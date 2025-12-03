@@ -11,7 +11,7 @@ export default function MyOrdersDetails({ userId }) {
     const router = useRouter();
     const { orderId } = router.query;
     const [orderData, setOrderData] = useState({});
-    console.log("----------orderData", orderData)
+    // console.log("----------orderData", orderData)
     const [loading, setLoading] = useState(true); // ✅ Added loading state
     const fetchOrders = async () => {
         setLoading(true); // start loading

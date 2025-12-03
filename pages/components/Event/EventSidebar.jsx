@@ -1,10 +1,21 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 
 const EventSidebar = ({ eventId }) => {
+    // console.log('eventId :', eventId);
     const [isLeftRight, setIsLeftRight] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
+    const pathname = usePathname();
+    const normalizePath = (p = "") => p.replace(/\/+$/, "");
+
+    const isActive = (href) => {
+        const np = normalizePath(pathname || "");
+        const nh = normalizePath(href || "");
+        return np == nh;
+    };
+
 
     return (
         <div className={`event-sidebar ${isLeftRight ? "sideBarRightLeftClosed" : ""}`}>
@@ -47,28 +58,26 @@ const EventSidebar = ({ eventId }) => {
             {eventId ? (
                 <ul className="listunstyl components">
                     {[
-                        { href: "/event/my-event", icon: "bi bi-speedometer2", label: "Dashboard" },
-                        { href: "/event/my-event", icon: "bi bi-sliders", label: "Settings" },
-                        { href: "/event/payment", icon: "bi bi-credit-card", label: "Payments" },
-                        { href: "/event/my-event", icon: "bi bi-bar-chart", label: "Analytics" },
-                        { href: "/event/my-event", icon: "bi bi-wallet2", label: "Payouts" },
-                        { href: "/event/my-event", icon: "bi bi-wallet2", label: "Export Tickets" },
-                        { href: "/event/my-event", icon: "bi bi-people", label: "Committee" },
-                        { href: "/event/my-event", icon: "fas fa-ticket-alt", label: "Tickets" },
-                        { href: "/event/my-event", icon: "fas fa-chart-bar", label: "Ticket Reports" },
+                        { href: `/event/dashboard/${eventId}`, icon: "bi bi-speedometer2", label: "Dashboard" },
+                        { href: `/event/edit-event/${eventId}`, icon: "bi bi-sliders", label: "Settings" },
+                        { href: `/event/payments/${eventId}`, icon: "bi bi-credit-card", label: "Payments" },
+                        { href: `/event/analytics/${eventId}`, icon: "bi bi-bar-chart", label: "Analytics" },
+                        { href: `/event/payouts/${eventId}`, icon: "bi bi-wallet2", label: "Payouts" },
+                        { href: `/event/export-tickets/${eventId}`, icon: "bi bi-wallet2", label: "Export Tickets" },
+                        { href: `/event/committee/${eventId}`, icon: "bi bi-people", label: "Committee" },
+                        { href: `/event/tickets/${eventId}`, icon: "fas fa-ticket-alt", label: "Tickets" },
+                        { href: `/event/ticket-reports/${eventId}`, icon: "fas fa-chart-bar", label: "Ticket Reports" },
                     ].map((item, idx) => (
-                        <li key={idx}>
+                        <li key={idx} className={isActive(item.href) ? "active" : ""}>
                             <Link href={item.href}>
                                 <i className={item.icon}></i>
                                 <span> {item.label} </span>
                             </Link>
                         </li>
                     ))}
-
-                    <li className="menu_line"></li>
                 </ul>
             ) : (
-                <hr /> // A small separator when main menu is hidden
+                <hr />
             )}
 
             {/* ACCOUNT MENU - Always Visible */}
