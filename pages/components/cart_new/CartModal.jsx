@@ -46,7 +46,7 @@ export default function CartModal({ show, handleClose, eventId }) {
     const [cart, setCart] = useState([]);
     const [adminFees, setAdminFees] = useState(8);
     const [eventDetails, setEventDetails] = useState(null);
-    console.log('eventDetails :', eventDetails);
+    // console.log('eventDetails :', eventDetails);
 
     // CART API FUNCTIONS
     const fetchCart = async (eventId) => {
@@ -90,7 +90,7 @@ export default function CartModal({ show, handleClose, eventId }) {
             try {
                 const res = await api.get(`/api/v2/events/public-event-detail/${eventId}`);
                 setEventDetails(res.data.data.event);
-                await refreshSlotCart();
+                await refreshCartItems();
 
             } catch (error) {
                 console.error("Error loading cart/event:", error);
@@ -121,7 +121,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                 });
             }
 
-            await refreshSlotCart();
+            await refreshCartItems();
 
         } catch (err) {
             console.log("Increase slot error:", err);
@@ -145,7 +145,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                 await deleteCart(existing.cartId);
             }
 
-            await refreshSlotCart();
+            await refreshCartItems();
 
         } catch (err) {
             console.log("Decrease slot error:", err);
@@ -154,7 +154,7 @@ export default function CartModal({ show, handleClose, eventId }) {
         setLoadingId(null);
     };
 
-    const refreshSlotCart = async () => {
+    const refreshCartItems = async () => {
         try {
             const cartRes = await fetchCart(eventId);
             const list = cartRes?.data?.data || [];
@@ -188,17 +188,46 @@ export default function CartModal({ show, handleClose, eventId }) {
         }
     };
 
-    const increaseTicket = (ticket) => {
-        console.log('ticket :', ticket);
-        return
-
-        increaseCart({ uniqueId: ticket.uniqueId, type: "ticket" });
+    const increaseTicket = async (ticket) => {
+        const cartId = ticket?.id;
+        try {
+            setLoadingId(cartId);
+            const existing = normalCart.find(item => item.uniqueId == cartId);
+            if (existing) {
+                await increaseCart(existing.cartId);
+            } else {
+                await addToCart({
+                    event_id: eventId,
+                    item_type: "ticket",
+                    ticket_id: cartId,
+                    count: 1
+                });
+            }
+            await refreshCartItems();
+        } catch (err) {
+            console.log("Increase slot error:", err);
+        }
+        setLoadingId(null);
     };
 
-    const decreaseTicket = (ticket) => {
-        decreaseCart({ uniqueId: ticket.uniqueId, type: "ticket" });
-    };
+    const decreaseTicket = async (ticket) => {
+        const cartId = ticket?.id;
 
+        try {
+            setLoadingId(cartId);
+            const existing = normalCart.find(item => item.uniqueId == cartId);
+            if (!existing) return;
+            if (existing.count > 1) {
+                await decreaseCart(existing.cartId);
+            } else {
+                await deleteCart(existing.cartId);
+            }
+            await refreshCartItems();
+        } catch (err) {
+            console.log("Decrease slot error:", err);
+        }
+        setLoadingId(null);
+    };
 
     // Calculate Totals
     const totalTickets = cart.reduce((n, item) => n + item.count, 0);
@@ -250,7 +279,7 @@ export default function CartModal({ show, handleClose, eventId }) {
 
             // console.log("Order created:", res.data);
 
-            await refreshSlotCart();
+            await refreshCartItems();
 
             // OPTIONAL: redirect to payment page
             // navigate("/payment");
@@ -285,6 +314,13 @@ export default function CartModal({ show, handleClose, eventId }) {
             year: "numeric",
         });
     };
+
+    const handleDeleteItem = async(id) => {
+        // console.log("Deleting item:", id);
+        await deleteCart(id); // your API function
+        await refreshCartItems()
+    };
+
 
     return (
         <Modal
@@ -571,20 +607,28 @@ export default function CartModal({ show, handleClose, eventId }) {
 
                                                 return (
                                                     <div key={item.id} className="ticket-item mb-3">
-                                                        <strong>{item.display_name}</strong>
+                                                        <div className="d-flex justify-content-between align-items-center">
+                                                            <strong>{item.display_name}</strong>
+
+                                                            <button
+                                                                className="btn btn-sm btn-outline-danger"
+                                                                onClick={() => handleDeleteItem(item.id)}
+                                                            >
+                                                                <i className="bi bi-trash"></i>
+                                                            </button>
+                                                        </div>
 
                                                         <div className="d-flex justify-content-between">
                                                             <p className="mb-0">
                                                                 {item.count} × ${itemPrice.toFixed(2)}
                                                             </p>
 
-                                                            <p className="mb-0">
-                                                                ${itemTotal.toFixed(2)}
-                                                            </p>
+                                                            <p className="mb-0">${itemTotal.toFixed(2)}</p>
                                                         </div>
                                                     </div>
                                                 );
                                             })}
+
 
                                             <h6 className="mt-4">
                                                 TOTAL {totalTickets} ITEM{totalTickets > 1 ? "S" : ""}
