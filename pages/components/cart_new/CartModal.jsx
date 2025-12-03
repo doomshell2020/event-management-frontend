@@ -46,7 +46,7 @@ export default function CartModal({ show, handleClose, eventId }) {
     const [cart, setCart] = useState([]);
     const [adminFees, setAdminFees] = useState(8);
     const [eventDetails, setEventDetails] = useState(null);
-    // console.log('eventDetails :', eventDetails);
+    console.log('eventDetails :', eventDetails);
 
     // CART API FUNCTIONS
     const fetchCart = async (eventId) => {
@@ -91,7 +91,6 @@ export default function CartModal({ show, handleClose, eventId }) {
                 const res = await api.get(`/api/v2/events/public-event-detail/${eventId}`);
                 setEventDetails(res.data.data.event);
                 await refreshSlotCart();
-
             } catch (error) {
                 console.error("Error loading cart/event:", error);
             }
@@ -157,10 +156,12 @@ export default function CartModal({ show, handleClose, eventId }) {
     const refreshSlotCart = async () => {
         try {
             const cartRes = await fetchCart(eventId);
+            const cartList = cartRes?.data?.data || [];
+            // console.log('list :', cartList);
 
-            const list = cartRes?.data?.data || [];
-            setCart(list);
-            const slotCartList = list
+            setCart(cartList);
+
+            const slotCartList = cartList
                 .filter((c) => c.item_type == "ticket_price")
                 .map((c) => ({
                     cartId: c.id,
@@ -170,7 +171,7 @@ export default function CartModal({ show, handleClose, eventId }) {
 
             setSlotCart(slotCartList);
 
-            const normalCartList = list
+            const normalCartList = cartList
                 .filter((c) => c.item_type == "ticket")
                 .map((c) => ({
                     cartId: c.id,
