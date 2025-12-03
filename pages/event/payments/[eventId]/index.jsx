@@ -1,0 +1,214 @@
+import Link from "next/link";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/router";
+import Swal from "sweetalert2";
+import api from "@/utils/api";
+
+import FrontendHeader from "@/shared/layout-components/frontelements/frontendheader";
+import FrontendFooter from "@/shared/layout-components/frontelements/frontendfooter";
+import EventHeaderSection from "@/pages/components/Event/EventProgressBar";
+import EventSidebar from "@/pages/components/Event/EventSidebar";
+
+const ManagePayments = () => {
+    const router = useRouter();
+    const { eventId } = router.query;
+
+    const [eventDetails, setEventDetails] = useState(null);
+    const [orderData, setOrderData] = useState([]);
+    const [totalPages, setTotalPages] = useState(1);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalRecords, setTotalRecords] = useState(0);
+    const [limit] = useState(5);
+    const [loading, setLoading] = useState(true);
+    const [backgroundImage] = useState("/assets/front-images/about-slider_bg.jpg");
+
+    // Fetch Event Details
+    const fetchEventDetails = async (eventId) => {
+        setLoading(true);
+        try {
+            const res = await api.post(`/api/v1/events/event-list`, { id: eventId });
+            if (res.data.success && res.data.data.events.length > 0) {
+                setEventDetails(res.data.data.events[0]);
+            }
+            setLoading(false);
+
+        } catch (error) {
+            console.error("Error fetching event:", error);
+            setLoading(false);
+        }
+    };
+
+    // Fetch Orders with Pagination
+    const fetchOrders = async (eventId, page) => {
+        try {
+            const res = await api.get(
+                `/api/v1/orders/organizer?eventId=${eventId}&page=${page}&limit=${limit}`
+            );
+            if (res.data.success) {
+                const { records, totalPages, currentPage, totalRecords } = res.data.data;
+                setOrderData(records);
+                setTotalPages(totalPages);
+                setCurrentPage(currentPage);
+                setTotalRecords(totalRecords);
+            } else {
+                setOrderData([]);
+            }
+        } catch (error) {
+            console.error("Error fetching orders:", error);
+            setOrderData([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (eventId) {
+            fetchEventDetails(eventId);
+            fetchOrders(eventId, currentPage);
+        }
+    }, [eventId, currentPage]);
+
+    // Pagination Button Handler
+    const goToPage = (page) => {
+        if (page >= 1 && page <= totalPages) {
+            setCurrentPage(page);
+        }
+    };
+
+    return (
+        <>
+            <FrontendHeader backgroundImage={backgroundImage} />
+
+            <section id="myevent-deshbord">
+                <div className="d-flex">
+
+                    {/* Sidebar */}
+                    <EventSidebar eventId={eventId} />
+
+                    <div className="event-righcontent">
+                        <div className="dsa_contant">
+
+                            <section id="post-eventpg edit-event-page">
+                                <EventHeaderSection eventDetails={eventDetails} isProgressBarShow={false} />
+
+                                <h4 className="text-24">Payments</h4>
+                                <hr className="custom-hr" />
+
+                                {/* LOADING */}
+                                {loading ? (
+                                    <div className="text-center py-5">
+                                        <div className="spinner-border text-primary" role="status">
+                                            <span className="visually-hidden">Loading...</span>
+                                        </div>
+                                        <p className="mt-3">Loading Payments...</p>
+                                    </div>
+                                ) : (
+                                    <>
+                                        {/* TABLE */}
+                                        <div className="stripe-table mt-4">
+                                            <div className="d-flex justify-content-between align-items-center mt-3">
+                                                <h6 className="fw-bold">Total Records: {totalRecords}</h6>
+                                            </div>
+                                            <table className="table align-middle">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Sr No.</th>
+                                                        <th>Customer</th>
+                                                        <th>Tickets</th>
+                                                        <th>Total Amount</th>
+                                                        <th>Payment Type</th>
+                                                        <th>Date</th>
+                                                    </tr>
+                                                </thead>
+
+                                                <tbody>
+                                                    {orderData && orderData.length == 0 ? (
+                                                        <tr>
+                                                            <td colSpan="6" className="text-center py-4 text-muted">
+                                                                No payment records found.
+                                                            </td>
+                                                        </tr>
+                                                    ) : (
+                                                        orderData.map((item, index) => {
+                                                            const srNo = (index + 1) + (currentPage - 1) * limit;
+
+                                                            return (
+                                                                <tr key={index} style={{ borderBottom: "1px solid #eaeaea" }}>
+
+                                                                    {/* SR NO */}
+                                                                    <td className="fw-bold">{srNo}</td>
+
+                                                                    {/* Customer */}
+                                                                    <td>
+                                                                        <div className="fw-bold">
+                                                                            {item.user.first_name} {item.user.last_name}
+                                                                        </div>
+                                                                        <div className="fw-bold">{item.user.mobile}</div>
+                                                                        <div className="text-muted">Order : {item.order_uid}</div>
+                                                                    </td>
+
+                                                                    {/* Tickets */}
+                                                                    <td className="fw-bold">{item.orderItems.length}</td>
+
+                                                                    {/* Amount */}
+                                                                    <td className="fw-bold">${item.total_amount}</td>
+
+                                                                    {/* Paid/Unpaid */}
+                                                                    <td>{item.status == "Y" ? "Paid" : "Unpaid"}</td>
+
+                                                                    {/* Date */}
+                                                                    <td>
+                                                                        {new Date(item.createdAt).toLocaleDateString("en-GB", {
+                                                                            day: "2-digit",
+                                                                            month: "short",
+                                                                            year: "numeric",
+                                                                        })}
+                                                                    </td>
+                                                                </tr>
+                                                            );
+                                                        })
+                                                    )}
+                                                </tbody>
+
+                                            </table>
+                                        </div>
+
+                                        {/* PAGINATION */}
+                                        {totalPages > 1 && (
+                                            <div className="d-flex justify-content-between align-items-center mt-3">
+                                                <button
+                                                    className="btn btn-outline-primary"
+                                                    disabled={currentPage == 1}
+                                                    onClick={() => goToPage(currentPage - 1)}
+                                                >
+                                                    ⬅ Previous
+                                                </button>
+
+                                                <div className="fw-bold">
+                                                    Page {currentPage} / {totalPages}
+                                                </div>
+
+                                                <button
+                                                    className="btn btn-outline-primary"
+                                                    disabled={currentPage === totalPages}
+                                                    onClick={() => goToPage(currentPage + 1)}
+                                                >
+                                                    Next ➜
+                                                </button>
+                                            </div>
+                                        )}
+                                    </>
+                                )}
+                            </section>
+
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <FrontendFooter />
+        </>
+    );
+};
+
+export default ManagePayments;

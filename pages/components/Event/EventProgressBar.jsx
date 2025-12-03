@@ -4,11 +4,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import api from "@/utils/api";
 
-const EventHeaderSection = ({ eventDetails }) => {
+const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
     const pathname = usePathname();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [eventData, setEventData] = useState([]);
     const [loading, setLoading] = useState(false);
+    const showProgress = isProgressBarShow !== false;
 
     // console.log('//////////',eventDetails);
 
@@ -196,25 +197,28 @@ const EventHeaderSection = ({ eventDetails }) => {
             </div>
 
             {/* ===== Progress Bar ===== */}
-            <div className="prosection">
-                <div className="table-responsive">
-                    <div className="scroll_tab w-auto px-2">
-                        <ul id="progressbar">
-                            {steps.map((step, index) => {
-                                const isActive = checkActiveStep(step);
-                                return (
-                                    <li key={index} className={isActive ? "active" : ""}>
-                                        <Link className="fw-semibold" href={step.path}>
-                                            {step.label}
-                                        </Link>
-                                    </li>
-                                );
-                            })}
-                        </ul>
-
+            {/* ===== Progress Bar ===== */}
+            {showProgress && (
+                <div className="prosection">
+                    <div className="table-responsive">
+                        <div className="scroll_tab w-auto px-2">
+                            <ul id="progressbar">
+                                {steps.map((step, index) => {
+                                    const isActive = checkActiveStep(step);
+                                    return (
+                                        <li key={index} className={isActive ? "active" : ""}>
+                                            <Link className="fw-semibold" href={step.path}>
+                                                {step.label}
+                                            </Link>
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
+
         </>
     );
 };
