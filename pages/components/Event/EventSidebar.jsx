@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useState } from "react";
 
-const EventSidebar = () => {
+const EventSidebar = ({ eventId }) => {
     const [isLeftRight, setIsLeftRight] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
 
@@ -27,42 +27,52 @@ const EventSidebar = () => {
                         <span className="fw-bold"> Create Event </span>
                     </Link>
                 </li>
-                <li className="mb-3">
-                    <Link
-                        className="text-white fw-bold"
-                        href="/event/my-event"
-                        style={{ backgroundColor: "#00ad00" }}
-                    >
-                        <i className="bi bi-eye-fill"></i>
-                        <span className="fw-bold"> View Event </span>
-                    </Link>
-                </li>
-            </ul>
 
-            {/* Main Menu */}
-            <ul className="listunstyl components">
-                {[
-                    { href: "/event/my-event", icon: "bi bi-speedometer2", label: "Dashboard" },
-                    { href: "/event/my-event", icon: "bi bi-sliders", label: "Settings" },
-                    { href: "/event/my-event", icon: "bi bi-credit-card", label: "Payments" },
-                    { href: "/event/my-event", icon: "bi bi-bar-chart", label: "Analytics" },
-                    { href: "/event/my-event", icon: "bi bi-wallet2", label: "Payouts" },
-                    { href: "/event/my-event", icon: "bi bi-wallet2", label: "Export Tickets" },
-                    { href: "/event/my-event", icon: "bi bi-people", label: "Committee" },
-                    { href: "/event/my-event", icon: "fas fa-ticket-alt", label: "Tickets" },
-                    { href: "/event/my-event", icon: "fas fa-chart-bar", label: "Ticket Reports" },
-                ].map((item, idx) => (
-                    <li key={idx}>
-                        <Link href={item.href}>
-                            <i className={item.icon}></i>
-                            <span> {item.label} </span>
+                {/* View Event only if eventId exists */}
+                {eventId && (
+                    <li className="mb-3">
+                        <Link
+                            className="text-white fw-bold"
+                            href="/event/my-event"
+                            style={{ backgroundColor: "#00ad00" }}
+                        >
+                            <i className="bi bi-eye-fill"></i>
+                            <span className="fw-bold"> View Event </span>
                         </Link>
                     </li>
-                ))}
+                )}
+            </ul>
 
-                <li className="menu_line"></li>
+            {/* MAIN MENU — show only if eventId exists */}
+            {eventId ? (
+                <ul className="listunstyl components">
+                    {[
+                        { href: "/event/my-event", icon: "bi bi-speedometer2", label: "Dashboard" },
+                        { href: "/event/my-event", icon: "bi bi-sliders", label: "Settings" },
+                        { href: "/event/payment", icon: "bi bi-credit-card", label: "Payments" },
+                        { href: "/event/my-event", icon: "bi bi-bar-chart", label: "Analytics" },
+                        { href: "/event/my-event", icon: "bi bi-wallet2", label: "Payouts" },
+                        { href: "/event/my-event", icon: "bi bi-wallet2", label: "Export Tickets" },
+                        { href: "/event/my-event", icon: "bi bi-people", label: "Committee" },
+                        { href: "/event/my-event", icon: "fas fa-ticket-alt", label: "Tickets" },
+                        { href: "/event/my-event", icon: "fas fa-chart-bar", label: "Ticket Reports" },
+                    ].map((item, idx) => (
+                        <li key={idx}>
+                            <Link href={item.href}>
+                                <i className={item.icon}></i>
+                                <span> {item.label} </span>
+                            </Link>
+                        </li>
+                    ))}
 
-                {/* Account Dropdown */}
+                    <li className="menu_line"></li>
+                </ul>
+            ) : (
+                <hr /> // A small separator when main menu is hidden
+            )}
+
+            {/* ACCOUNT MENU - Always Visible */}
+            <ul className="listunstyl components">
                 <li>
                     <ul className="dropdown-box ps-0">
                         <li className="dropdown">

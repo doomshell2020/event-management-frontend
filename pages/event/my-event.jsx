@@ -233,7 +233,7 @@ export default function OrganizerEvents({ userId }) {
                                                     {/* <th style={{ width: "17%" }} scope="col">Date and Time</th> */}
                                                     <th style={{ width: "8%" }} scope="col">Venue</th>
                                                     <th style={{ width: "18%" }} scope="col">Ticket Sale</th>
-                                                    <th style={{ width: "16%" }} scope="col">Ticket Types</th>
+                                                    {/* <th style={{ width: "16%" }} scope="col">Ticket Types</th> */}
                                                     <th style={{ width: "15%" }} scope="col">Action</th>
                                                 </tr>
                                             </thead>
@@ -320,7 +320,7 @@ export default function OrganizerEvents({ userId }) {
                                                                 </td>
 
                                                                 {/* ✅ Ticket Types */}
-                                                                <td className="ticket_types">
+                                                                {/* <td className="ticket_types">
                                                                     {ticketTypes.length > 0 ? (
                                                                         ticketTypes.map((ticketType) => (
                                                                             <div
@@ -362,7 +362,7 @@ export default function OrganizerEvents({ userId }) {
                                                                     ) : (
                                                                         <p>Tickets not created</p>
                                                                     )}
-                                                                </td>
+                                                                </td> */}
 
                                                                 {/* ✅ Action Buttons */}
                                                                 <td className="Con_center">

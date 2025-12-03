@@ -104,7 +104,7 @@ const PublishEvent = () => {
 
             <section id="myevent-deshbord">
                 <div className="d-flex">
-                    <EventSidebar />
+                    <EventSidebar eventId={id} />
                     <div className="event-righcontent">
                         <div className="dsa_contant">
                             <section id="post-eventpg edit-event-page">

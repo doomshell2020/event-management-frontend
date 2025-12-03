@@ -173,7 +173,7 @@ const ManageTickets = () => {
             <section id="myevent-deshbord">
                 <div className="d-flex">
                     {/* Sidebar */}
-                    <EventSidebar />
+                    <EventSidebar eventId={id} />
 
                     <div className="event-righcontent">
                         <div className="dsa_contant">
