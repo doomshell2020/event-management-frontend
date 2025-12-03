@@ -8,89 +8,72 @@ import FrontendHeader from "@/shared/layout-components/frontelements/frontendhea
 import FrontendFooter from "@/shared/layout-components/frontelements/frontendfooter";
 import EventHeaderSection from "@/pages/components/Event/EventProgressBar";
 import EventSidebar from "@/pages/components/Event/EventSidebar";
-import { Eye, EyeOff, Lock, Settings, CheckCircle, XCircle, Ticket } from "lucide-react";
-import { Form, Button, Modal } from "react-bootstrap";
 
 const ManagePayments = () => {
     const router = useRouter();
     const { eventId } = router.query;
-    const [eventDetails, setEventDetails] = useState(null);
-    const [isOpenWiggins, setIsOpenWiggins] = useState(false);
-    const [show, setShow] = useState(false);
-    const [openDropdown, setOpenDropdown] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [orderData, setOrderData] = useState([]);
-    // console.log('orderData :', orderData);
 
+    const [eventDetails, setEventDetails] = useState(null);
+    const [orderData, setOrderData] = useState([]);
+    const [totalPages, setTotalPages] = useState(1);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalRecords, setTotalRecords] = useState(0);
+    const [limit] = useState(5);
+    const [loading, setLoading] = useState(true);
+    const [backgroundImage] = useState("/assets/front-images/about-slider_bg.jpg");
+
+    // Fetch Event Details
     const fetchEventDetails = async (eventId) => {
+        setLoading(true);
         try {
             const res = await api.post(`/api/v1/events/event-list`, { id: eventId });
-
             if (res.data.success && res.data.data.events.length > 0) {
-                const event = res.data.data.events[0];
-                setEventDetails(event);
+                setEventDetails(res.data.data.events[0]);
             }
+            setLoading(false);
+
         } catch (error) {
             console.error("Error fetching event:", error);
+            setLoading(false);
+        }
+    };
+
+    // Fetch Orders with Pagination
+    const fetchOrders = async (eventId, page) => {
+        try {
+            const res = await api.get(
+                `/api/v1/orders/organizer?eventId=${eventId}&page=${page}&limit=${limit}`
+            );
+            if (res.data.success) {
+                const { records, totalPages, currentPage, totalRecords } = res.data.data;
+                setOrderData(records);
+                setTotalPages(totalPages);
+                setCurrentPage(currentPage);
+                setTotalRecords(totalRecords);
+            } else {
+                setOrderData([]);
+            }
+        } catch (error) {
+            console.error("Error fetching orders:", error);
+            setOrderData([]);
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        if (eventId) fetchEventDetails(eventId);
-        if (eventId) fetchOrders(eventId);
-    }, [eventId]);
+        if (eventId) {
+            fetchEventDetails(eventId);
+            fetchOrders(eventId, currentPage);
+        }
+    }, [eventId, currentPage]);
 
-    const fetchOrders = async (eventId) => {
-        setLoading(true); // start loading
-        try {
-            const res = await api.get(`/api/v1/orders?eventId=${eventId}`);
-            if (res.data.success) {
-                setOrderData(res.data.data || []);
-            } else {
-                setOrderData([]);
-            }
-        } catch (error) {
-            console.error("Error fetching events:", error);
-            setOrderData([]);
-        } finally {
-            setLoading(false); // stop loading after API call
+    // Pagination Button Handler
+    const goToPage = (page) => {
+        if (page >= 1 && page <= totalPages) {
+            setCurrentPage(page);
         }
     };
-
-    const [backgroundImage] = useState("/assets/front-images/about-slider_bg.jpg");
-
-    {/* Dummy Payment Data */ }
-    const paymentData = [
-        {
-            customerName: "Rohit",
-            orderNo: 4344,
-            tickets: 1,
-            amount: "10.00",
-            currency: "TTD",
-            paymentMethod: "Cash",
-            date: "13 Nov 2024"
-        },
-        {
-            customerName: "Aarav",
-            orderNo: 5521,
-            tickets: 2,
-            amount: "25.00",
-            currency: "TTD",
-            paymentMethod: "Card",
-            date: "16 Nov 2024"
-        },
-        {
-            customerName: "Sophia",
-            orderNo: 5522,
-            tickets: 3,
-            amount: "50.00",
-            currency: "USD",
-            paymentMethod: "Online",
-            date: "20 Nov 2024"
-        }
-    ];
 
     return (
         <>
@@ -98,62 +81,131 @@ const ManagePayments = () => {
 
             <section id="myevent-deshbord">
                 <div className="d-flex">
+
                     {/* Sidebar */}
                     <EventSidebar eventId={eventId} />
+
                     <div className="event-righcontent">
                         <div className="dsa_contant">
+
                             <section id="post-eventpg edit-event-page">
                                 <EventHeaderSection eventDetails={eventDetails} isProgressBarShow={false} />
+
                                 <h4 className="text-24">Payments</h4>
                                 <hr className="custom-hr" />
-                                <div className="stripe-table mt-4">
-                                    <table className="table align-middle">
-                                        <thead>
-                                            <tr>
-                                                <th>Customer</th>
-                                                <th>Tickets</th>
-                                                <th>Total Amount</th>
-                                                <th>Payment Type</th>
-                                                <th>Date</th>
-                                            </tr>
-                                        </thead>
 
-                                        <tbody>
-                                            {orderData.map((item, index) => (
-                                                <tr key={index} style={{ borderBottom: "1px solid #eaeaea" }}>
+                                {/* LOADING */}
+                                {loading ? (
+                                    <div className="text-center py-5">
+                                        <div className="spinner-border text-primary" role="status">
+                                            <span className="visually-hidden">Loading...</span>
+                                        </div>
+                                        <p className="mt-3">Loading Payments...</p>
+                                    </div>
+                                ) : (
+                                    <>
+                                        {/* TABLE */}
+                                        <div className="stripe-table mt-4">
+                                            <div className="d-flex justify-content-between align-items-center mt-3">
+                                                <h6 className="fw-bold">Total Records: {totalRecords}</h6>
+                                            </div>
+                                            <table className="table align-middle">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Sr No.</th>
+                                                        <th>Customer</th>
+                                                        <th>Tickets</th>
+                                                        <th>Total Amount</th>
+                                                        <th>Payment Type</th>
+                                                        <th>Date</th>
+                                                    </tr>
+                                                </thead>
 
-                                                    {/* Customer + Order */}
-                                                    <td>
-                                                        <div className="fw-bold">{item.customerName}</div>
-                                                        <small className="text-muted">Order : {item.order_uid}</small>
-                                                    </td>
+                                                <tbody>
+                                                    {orderData && orderData.length == 0 ? (
+                                                        <tr>
+                                                            <td colSpan="6" className="text-center py-4 text-muted">
+                                                                No payment records found.
+                                                            </td>
+                                                        </tr>
+                                                    ) : (
+                                                        orderData.map((item, index) => {
+                                                            const srNo = (index + 1) + (currentPage - 1) * limit;
 
-                                                    {/* Tickets */}
-                                                    <td className="fw-bold">{item.orderItems.length}</td>
+                                                            return (
+                                                                <tr key={index} style={{ borderBottom: "1px solid #eaeaea" }}>
 
-                                                    {/* Amount */}
-                                                    <td className="fw-bold">
-                                                        {item.total_amount}
-                                                    </td>
+                                                                    {/* SR NO */}
+                                                                    <td className="fw-bold">{srNo}</td>
 
-                                                    {/* Payment Method */}
-                                                    <td>{item.paymentMethod}</td>
+                                                                    {/* Customer */}
+                                                                    <td>
+                                                                        <div className="fw-bold">
+                                                                            {item.user.first_name} {item.user.last_name}
+                                                                        </div>
+                                                                        <div className="fw-bold">{item.user.mobile}</div>
+                                                                        <div className="text-muted">Order : {item.order_uid}</div>
+                                                                    </td>
 
-                                                    {/* Date */}
-                                                    <td>{item.createdAt}</td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
+                                                                    {/* Tickets */}
+                                                                    <td className="fw-bold">{item.orderItems.length}</td>
 
+                                                                    {/* Amount */}
+                                                                    <td className="fw-bold">${item.total_amount}</td>
 
+                                                                    {/* Paid/Unpaid */}
+                                                                    <td>{item.status == "Y" ? "Paid" : "Unpaid"}</td>
 
+                                                                    {/* Date */}
+                                                                    <td>
+                                                                        {new Date(item.createdAt).toLocaleDateString("en-GB", {
+                                                                            day: "2-digit",
+                                                                            month: "short",
+                                                                            year: "numeric",
+                                                                        })}
+                                                                    </td>
+                                                                </tr>
+                                                            );
+                                                        })
+                                                    )}
+                                                </tbody>
+
+                                            </table>
+                                        </div>
+
+                                        {/* PAGINATION */}
+                                        {totalPages > 1 && (
+                                            <div className="d-flex justify-content-between align-items-center mt-3">
+                                                <button
+                                                    className="btn btn-outline-primary"
+                                                    disabled={currentPage == 1}
+                                                    onClick={() => goToPage(currentPage - 1)}
+                                                >
+                                                    ⬅ Previous
+                                                </button>
+
+                                                <div className="fw-bold">
+                                                    Page {currentPage} / {totalPages}
+                                                </div>
+
+                                                <button
+                                                    className="btn btn-outline-primary"
+                                                    disabled={currentPage === totalPages}
+                                                    onClick={() => goToPage(currentPage + 1)}
+                                                >
+                                                    Next ➜
+                                                </button>
+                                            </div>
+                                        )}
+                                    </>
+                                )}
                             </section>
+
                         </div>
                     </div>
                 </div>
             </section>
+
             <FrontendFooter />
         </>
     );
