@@ -56,20 +56,36 @@ export default function MyOrders({ userId }) {
                                     const purchaseDate = order?.createdAt
                                         ? format(new Date(order.createdAt), "dd MMM yyyy, hh:mm a")
                                         : "N/A";
-
-                                    const eventImage =
-                                        order?.event?.feat_image ||
-                                        "/assets/front-images/my-tacket-section.jpg";
-
                                     // Total Tickets Count
                                     const totalTickets = order?.orderItems?.reduce(
                                         (sum, item) => sum + (item.count || 0),
                                         0
                                     );
+
+
                                     return (
                                         <div key={order.id} className="col-lg-6 col-md-12">
                                             <div className="up_events position-relative">
-                                                <Link  href={`/orders/${order.id}`}>
+                                                {order?.orderItems[0]?.type === "appointment" && (
+                                                    <span
+                                                        className="position-absolute badge"
+                                                        style={{
+                                                            top: "10px",
+                                                            right: "10px",
+                                                            padding: "6px 10px",
+                                                            fontSize: "12px",
+                                                            borderRadius: "6px",
+                                                            zIndex: 10,
+                                                            background:"rgb(61, 109, 181)"
+                                                        }}
+                                                    >
+                                                        Appointment
+                                                    </span>
+                                                )}
+
+
+
+                                                <Link href={`/orders/${order.id}`}>
                                                     <div className="inner_box">
                                                         <div className="row d-flex align-items-center justify-content-center g-0">
                                                             <div className="col-sm-5">
