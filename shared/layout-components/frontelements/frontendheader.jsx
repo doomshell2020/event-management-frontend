@@ -5,6 +5,8 @@ import { handleLogout } from "@/utils/logout";
 import Cookies from "js-cookie";
 import { isTokenValid } from "@/utils/checkAuth";
 import CartModal from "@/pages/components/cart_new/CartModal";
+import { useCart } from "@/shared/layout-components/layout/CartContext";
+
 
 const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
 
@@ -12,17 +14,21 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
     backgroundImage ?? "/assets/front-images/slider_bg9.jpg"
   );
 
+  const { cartCount } = useCart();
+  // console.log('cartCount :', cartCount);
+
+
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [username, setUsername] = useState("");
   const [showCart, setShowCart] = useState(false);
-  const [selectedEventId, setSelectedEventId] = useState(300);
 
   const handleOpenCart = () => {
-    setSelectedEventId(selectedEventId);
+    if (cartCount == 0) return;  // stop if cart is empty
     setShowCart(true);
   };
+
 
 
   useEffect(() => {
@@ -46,11 +52,7 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
 
   }, [router]);
 
-
-
-  // --------------------------------------------------
   //  Sticky Header
-  // --------------------------------------------------
   useEffect(() => {
     const handleScroll = () => {
       const header = document.querySelector(".headernav");
@@ -100,11 +102,14 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
                       }}
                     >
                       Cart
-                      {/* <span className="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-danger">
-                        2
-                        <span className="visually-hidden">unread messages</span>
-                      </span> */}
+
+                      {cartCount > 0 && (
+                        <span className="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-danger">
+                          {cartCount}
+                        </span>
+                      )}
                     </a>
+
                   </>
                 )}
 
@@ -230,7 +235,6 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
           <CartModal
             show={showCart}
             handleClose={() => setShowCart(false)}
-            eventId={selectedEventId}
           />
         )
       }

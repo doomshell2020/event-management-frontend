@@ -10,6 +10,7 @@ import {
 import Image from "next/image";
 import api from "@/utils/api";
 import Swal from "sweetalert2";
+import { useCart } from "@/shared/layout-components/layout/CartContext";
 
 
 // Loader Component
@@ -39,19 +40,32 @@ const LoadingComponent = ({ isActive }) => {
 
 export default function CartModal({ show, handleClose, eventId }) {
 
+    const { cart, refreshCart, eventData, normalCart, slotCart, loadingCart, setEventId } = useCart();
     const [isLoading, setIsLoading] = useState(true);
     const [cartLoading, setCartLoading] = useState(false);
     const [loadingId, setLoadingId] = useState(null); // track which pricing ID is loading
-
-    const [cart, setCart] = useState([]);
     const [adminFees, setAdminFees] = useState(8);
     const [eventDetails, setEventDetails] = useState(null);
-    // console.log('eventDetails :', eventDetails);
 
-    // CART API FUNCTIONS
-    const fetchCart = async (eventId) => {
-        return await api.get(`/api/v1/cart/list?event_id=${eventId}`);
-    };
+    useEffect(() => {
+        setIsLoading(loadingCart);
+    }, [loadingCart]);
+
+    useEffect(() => {
+        if (eventId) {
+            setEventId(eventId);   // store eventId globally
+            refreshCart(eventId);  // load cart for that event
+        }
+    }, []);
+
+    const [addCartParams, setAddCartParams] = useState({
+        event_id: eventId,
+        count: 1,               // default count
+        item_type: "",          // "slot"
+        ticket_id: null,        // not needed for slot
+        ticket_price_id: null,  // not needed for slot
+        package_id: null,       // not needed for slot
+    });
 
     const increaseCart = async (cartId) => {
         return await api.put(`/api/v1/cart/increase/${cartId}`);
@@ -68,39 +82,6 @@ export default function CartModal({ show, handleClose, eventId }) {
     const addToCart = async (params) => {
         return await api.post(`/api/v1/cart/add`, params)
     }
-
-    const [addCartParams, setAddCartParams] = useState({
-        event_id: eventId,
-        count: 1,               // default count
-        item_type: "",          // "slot"
-        ticket_id: null,        // not needed for slot
-        ticket_price_id: null,  // not needed for slot
-        package_id: null,       // not needed for slot
-    });
-
-    const [slotCart, setSlotCart] = useState([]);
-    const [normalCart, setNormalCart] = useState([]);
-    // console.log('normalCart :', normalCart);
-
-    // Fetch Event + Cart Details
-    useEffect(() => {
-        if (!show) return;
-        setCartLoading(true);
-        const fetchDetails = async () => {
-            try {
-                const res = await api.get(`/api/v2/events/public-event-detail/${eventId}`);
-                setEventDetails(res.data.data.event);
-                await refreshCartItems();
-
-            } catch (error) {
-                console.error("Error loading cart/event:", error);
-            }
-            setCartLoading(false);
-            setIsLoading(false);
-        };
-
-        fetchDetails();
-    }, [show, eventId]);
 
     const increaseSlot = async (slot) => {
         const pricingId = slot.pricings[0]?.id;
@@ -121,7 +102,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                 });
             }
 
-            await refreshCartItems();
+            await refreshCart(eventId || undefined);
 
         } catch (err) {
             console.log("Increase slot error:", err);
@@ -145,47 +126,13 @@ export default function CartModal({ show, handleClose, eventId }) {
                 await deleteCart(existing.cartId);
             }
 
-            await refreshCartItems();
+            await refreshCart(eventId || undefined);
 
         } catch (err) {
             console.log("Decrease slot error:", err);
         }
 
         setLoadingId(null);
-    };
-
-    const refreshCartItems = async () => {
-        try {
-            const cartRes = await fetchCart(eventId);
-            const list = cartRes?.data?.data || [];
-
-            setCart(list);
-
-            const slotCartList = list
-                .filter((c) => c.item_type == "ticket_price")
-                .map((c) => ({
-                    cartId: c.id,
-                    uniqueId: c.uniqueId,
-                    count: c.count
-                }));
-
-            setSlotCart(slotCartList);
-
-            const normalCartList = list
-                .filter((c) => c.item_type == "ticket")
-                .map((c) => ({
-                    cartId: c.id,
-                    uniqueId: c.uniqueId,
-                    count: c.count
-                }));
-
-            setNormalCart(normalCartList);
-
-        } catch (err) {
-            // If API fails → Reset slotCart to empty
-            setSlotCart([]);
-            setNormalCart([]);
-        }
     };
 
     const increaseTicket = async (ticket) => {
@@ -203,7 +150,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                     count: 1
                 });
             }
-            await refreshCartItems();
+            await refreshCart(eventId || undefined);
         } catch (err) {
             console.log("Increase slot error:", err);
         }
@@ -222,7 +169,7 @@ export default function CartModal({ show, handleClose, eventId }) {
             } else {
                 await deleteCart(existing.cartId);
             }
-            await refreshCartItems();
+            await refreshCart(eventId || undefined);
         } catch (err) {
             console.log("Decrease slot error:", err);
         }
@@ -279,7 +226,7 @@ export default function CartModal({ show, handleClose, eventId }) {
 
             // console.log("Order created:", res.data);
 
-            await refreshCartItems();
+            await refreshCart(eventId || undefined);
 
             // OPTIONAL: redirect to payment page
             // navigate("/payment");
@@ -315,10 +262,9 @@ export default function CartModal({ show, handleClose, eventId }) {
         });
     };
 
-    const handleDeleteItem = async(id) => {
-        // console.log("Deleting item:", id);
+    const handleDeleteItem = async (id) => {
         await deleteCart(id); // your API function
-        await refreshCartItems()
+        await refreshCart(eventId || undefined);
     };
 
 
@@ -340,13 +286,13 @@ export default function CartModal({ show, handleClose, eventId }) {
             <Modal.Body className="px-3 care-new-check">
                 <LoadingComponent isActive={isLoading} />
 
-                {!isLoading && eventDetails && (
+                {!isLoading && eventData && (
                     <div className="checkout-innr">
                         <Row className="gy-4">
                             {/* LEFT SIDE */}
                             <Col lg={8}>
                                 <div className="checkot-lft">
-                                    <h2 className="ck-mn-hd">{eventDetails.name}</h2>
+                                    <h2 className="ck-mn-hd">{eventData.name}</h2>
 
                                     <div className="ck-event-dtl">
                                         <div className="eventsBxSec">
@@ -356,8 +302,8 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                 <Col md={5}>
                                                     <div className="evt-innr-dtl" style={{ textAlign: "center" }}>
                                                         <Image
-                                                            src={eventDetails.feat_image}
-                                                            alt={eventDetails.name}
+                                                            src={eventData.feat_image}
+                                                            alt={eventData.name}
                                                             width={380}
                                                             height={380}
                                                             className="firstDayEvent"
@@ -371,13 +317,13 @@ export default function CartModal({ show, handleClose, eventId }) {
 
                                                         <div className="monte-evntcnts mt-3">
                                                             <strong style={{ fontSize: "18px" }}>
-                                                                {eventDetails.location}
+                                                                {eventData.location}
                                                             </strong>
 
                                                             <p style={{ marginTop: "6px", fontSize: "15px", color: "#555" }}>
                                                                 {formatEventDateRange(
-                                                                    eventDetails.date_from?.local,
-                                                                    eventDetails.date_to?.local
+                                                                    eventData.date_from?.local,
+                                                                    eventData.date_to?.local
                                                                 )}
                                                             </p>
                                                         </div>
@@ -396,7 +342,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                 lineHeight: "22px"
                                                             }}
                                                             dangerouslySetInnerHTML={{
-                                                                __html: eventDetails.desp,
+                                                                __html: eventData.desp,
                                                             }}
                                                         />
 
@@ -423,11 +369,11 @@ export default function CartModal({ show, handleClose, eventId }) {
                                     </div>
 
                                     {/* AVAILABLE TICKETS */}
-                                    {eventDetails.tickets?.length > 0 && (
+                                    {eventData.tickets?.length > 0 && (
                                         <div className="ticket-section mt-4">
                                             <h5 className="mb-3">Available Tickets</h5>
 
-                                            {eventDetails.tickets.map((ticket, i) => {
+                                            {eventData.tickets.map((ticket, i) => {
                                                 const pricingId = ticket?.id;
                                                 const cartItem = normalCart.find(item => item.uniqueId == pricingId);
                                                 const isLoading = loadingId == pricingId;
@@ -501,11 +447,11 @@ export default function CartModal({ show, handleClose, eventId }) {
 
 
                                     {/* AVAILABLE SLOTS */}
-                                    {eventDetails.slots?.length > 0 && (
+                                    {eventData.slots?.length > 0 && (
                                         <div className="slot-section mt-4">
                                             <h5 className="mb-3">Event Slots</h5>
 
-                                            {eventDetails.slots.map((slot) => {
+                                            {eventData.slots.map((slot) => {
                                                 const pricingId = slot.pricings?.[0]?.id;
 
                                                 // Find matching slot count from cart

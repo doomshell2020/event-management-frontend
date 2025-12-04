@@ -109,8 +109,8 @@ const ManagePayments = () => {
                                             <div className="d-flex justify-content-between align-items-center mt-3">
                                                 <h6 className="fw-bold">Total Records: {totalRecords}</h6>
                                             </div>
-                                            <table className="table align-middle">
-                                                <thead>
+                                            <table className="table table-striped">
+                                                <thead className="thead-dark">
                                                     <tr>
                                                         <th>Sr No.</th>
                                                         <th>Customer</th>
