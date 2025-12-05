@@ -155,7 +155,7 @@ const EventDetailPage = ({ event, slug }) => {
                 <div className="section-heading">
                   <h2 className="text-start">{event.name}</h2>
                   <h6>
-                    Hosted By <a href="#">Organizer #{event.event_org_id}</a>
+                    Hosted By <a href="#"> #{event.companyInfo?.name || 'Company'}</a>
                   </h6>
 
                   {/* 🚫 Inactive Event Warning */}
@@ -349,9 +349,6 @@ const EventDetailPage = ({ event, slug }) => {
           />
         )
       }
-
-
-
 
 
       <FrontendFooter />
