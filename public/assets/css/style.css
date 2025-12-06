@@ -74,6 +74,28 @@ tr {
   border-style: solid;
 }
 
+/* SWAL ALWAYS ON TOP */
+.swal2-container,
+.swal2-popup {
+  z-index: 999999999 !important;
+}
+
+/* KEEP BOOTSTRAP BELOW */
+.modal-backdrop {
+  z-index: 1040 !important;
+}
+
+.modal {
+  z-index: 1050 !important;
+}
+
+/* YOUR CUSTOM MODAL CLASSES (lower them) */
+.cart-modal-size,
+.oxmonten2025EvntSec {
+  z-index: 1050 !important;
+}
+
+
 p.des_h {
   margin-right: 0px;
   font-size: 18px;

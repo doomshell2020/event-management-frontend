@@ -43,18 +43,25 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status == 401) {
+    if (error.response?.status === 401) {
       const url = error.config?.url || "";
       if (url.includes("/admin")) {
         Cookies.remove("adminAuthToken");
+        localStorage.removeItem("admin");
+        localStorage.removeItem("adminAuthToken");
       } else {
         Cookies.remove("userAuthToken");
+        localStorage.removeItem("user");
+        localStorage.removeItem("userAuthToken");
       }
-
       console.warn("⚠️ Unauthorized: Token expired or invalid");
+      // Optionally redirect if needed:
+      window.location.href = "/login";
     }
+
     return Promise.reject(error);
   }
 );
+
 
 export default api;

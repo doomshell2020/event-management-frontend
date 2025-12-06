@@ -5,6 +5,10 @@ import Link from "next/link";
 import { format } from "date-fns";
 import CartModal from "@/pages/components/cart_new/CartModal";
 import AppointmentModal from "@/pages/components/appointment_cart/CartModal";
+import { useAuth } from "@/shared/layout-components/layout/AuthContext";
+import Swal from "sweetalert2";
+import { useRouter } from "next/router";
+
 
 export async function getServerSideProps({ params }) {
   const { id, slug } = params;
@@ -40,7 +44,9 @@ export async function getServerSideProps({ params }) {
 }
 
 const EventDetailPage = ({ event, slug }) => {
-
+  const { token } = useAuth();
+  // console.log('token :', token);
+  const router = useRouter();
   // console.log("✅ Active Events:", event);
 
   // ⛳ All hooks MUST be at the top
@@ -81,9 +87,22 @@ const EventDetailPage = ({ event, slug }) => {
   const [selectedEventId, setSelectedEventId] = useState(eventId);
 
   const handleOpenCart = () => {
+    if (!token) {
+      Swal.fire({
+        icon: "warning",
+        title: "Login Required",
+        text: "Please log in to view your cart.",
+        confirmButtonText: "Login Now"
+      }).then(() => {
+        router.push("/login");
+      });
+      return;
+    }
+
     setSelectedEventId(selectedEventId);
     setShowCart(true);
   };
+
 
   // appointment cart...
   const handleOpenAppointmentCart = () => {

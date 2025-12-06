@@ -33,6 +33,7 @@ export const CartProvider = ({ children }) => {
 
             const event = data.event || null;
             const cartItems = data.cart || [];
+            // console.log('cartItems :', cartItems);
 
             // Save event + items
             setEventData(event);
@@ -42,7 +43,7 @@ export const CartProvider = ({ children }) => {
             // Slot Tickets
             setSlotCart(
                 cartItems
-                    .filter(c => c.item_type === "ticket_price")
+                    .filter(c => c.item_type == "ticket_price")
                     .map(c => ({
                         cartId: c.id,
                         uniqueId: c.uniqueId,
@@ -53,7 +54,7 @@ export const CartProvider = ({ children }) => {
             // Normal Tickets
             setNormalCart(
                 cartItems
-                    .filter(c => c.item_type === "ticket")
+                    .filter(c => c.item_type == "ticket")
                     .map(c => ({
                         cartId: c.id,
                         uniqueId: c.uniqueId,
