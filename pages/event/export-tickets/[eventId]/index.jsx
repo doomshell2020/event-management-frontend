@@ -9,12 +9,13 @@ import FrontendFooter from "@/shared/layout-components/frontelements/frontendfoo
 import EventHeaderSection from "@/pages/components/Event/EventProgressBar";
 import EventSidebar from "@/pages/components/Event/EventSidebar";
 
-const ManagePayments = () => {
+const ExportTickets = () => {
     const router = useRouter();
     const { eventId } = router.query;
 
+    const [qrBasePath, setQrBasePath] = useState(null);
     const [eventDetails, setEventDetails] = useState(null);
-    const [orderData, setOrderData] = useState([]);
+    const [ticketData, setTicketData] = useState([]);
     const [totalPages, setTotalPages] = useState(1);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalRecords, setTotalRecords] = useState(0);
@@ -22,57 +23,62 @@ const ManagePayments = () => {
     const [loading, setLoading] = useState(true);
     const [backgroundImage] = useState("/assets/front-images/about-slider_bg.jpg");
 
-    // Fetch Event Details Only Once
+    // Fetch Event Details
     const fetchEventDetails = async (eventId) => {
+        setLoading(true);
         try {
             const res = await api.post(`/api/v1/events/event-list`, { id: eventId });
             if (res.data.success && res.data.data.events.length > 0) {
                 setEventDetails(res.data.data.events[0]);
             }
+            setLoading(false);
+
         } catch (error) {
             console.error("Error fetching event:", error);
+            setLoading(false);
         }
     };
 
     // Fetch Orders with Pagination
-    const fetchOrders = async (eventId, page) => {
+    const fetchTickets = async (eventId, page) => {
         setLoading(true);
         try {
             const res = await api.get(
-                `/api/v1/orders/organizer?eventId=${eventId}&page=${page}&limit=${limit}`
+                `/api/v1/orders/organizer/ticket-exports?eventId=${eventId}&page=${page}&limit=${limit}`
             );
 
             if (res.data.success) {
-                const { records, totalPages, currentPage, totalRecords } = res.data.data;
+                const { records, totalPages, currentPage, totalRecords, qr_base_path } = res.data.data;
 
-                setOrderData(records);
+                setTicketData(records);
                 setTotalPages(totalPages);
                 setCurrentPage(currentPage);
                 setTotalRecords(totalRecords);
-            } else {
-                setOrderData([]);
+                setQrBasePath(qr_base_path);
             }
-        } catch (error) {
-            console.error("Error fetching orders:", error);
-            setOrderData([]);
+        } catch (err) {
+            console.error(err);
+            setTicketData([]);
         } finally {
             setLoading(false);
         }
     };
 
+
+    // ✅ Fetch Event Details ONLY once when eventId becomes available
     useEffect(() => {
-        if (eventId) {
-            fetchEventDetails(eventId); // only once
-        }
+        if (!eventId) return;
+        fetchEventDetails(eventId);   // ✔ ONLY ONE TIME
     }, [eventId]);
 
+    // ✅ Fetch Tickets ONLY when page changes
     useEffect(() => {
-        if (eventId) {
-            fetchOrders(eventId, currentPage); // only orders refresh
-        }
-    }, [eventId, currentPage]);
+        if (!eventId) return;
+        fetchTickets(eventId, currentPage);  // ✔ runs every time page changes
+    }, [currentPage]);  // ❗ remove eventId to avoid re-calling event details
 
-    // Pagination
+
+    // Pagination Button Handler
     const goToPage = (page) => {
         if (page >= 1 && page <= totalPages) {
             setCurrentPage(page);
@@ -93,6 +99,7 @@ const ManagePayments = () => {
                         <div className="dsa_contant">
 
                             <section id="post-eventpg edit-event-page">
+
                                 <EventHeaderSection eventDetails={eventDetails} isProgressBarShow={false} />
 
                                 <h4 className="text-24">Payments</h4>
@@ -104,71 +111,89 @@ const ManagePayments = () => {
                                         <h6 className="fw-bold">Total Records: {totalRecords}</h6>
                                     </div>
 
-                                    {/* TABLE */}
                                     <div className="table-responsive">
-                                        <table className="table table-hover align-middle">
+                                        <table className="table table-hover align-middle shadow-sm rounded">
                                             <thead className="bg-dark text-white">
                                                 <tr>
-                                                    <th>Sr No.</th>
-                                                    <th>Customer</th>
-                                                    <th>Tickets</th>
-                                                    <th>Total Amount</th>
-                                                    <th>Payment Type</th>
-                                                    <th>Date</th>
+                                                    <th style={{ width: "80px" }}>Sr No.</th>
+                                                    <th style={{ width: "150px" }}>QR Code</th>
+                                                    <th>Email</th>
+                                                    <th>Name</th>
+                                                    <th>Amount</th>
+                                                    <th>Type</th>
+                                                    <th>Purchased Date</th>
                                                 </tr>
                                             </thead>
 
                                             <tbody>
-
-                                                {/* Loader ONLY inside tbody */}
+                                                {/* LOADING */}
                                                 {loading ? (
                                                     <tr>
-                                                        <td colSpan="6" className="text-center py-5">
+                                                        <td colSpan="7" className="text-center py-5">
                                                             <div className="spinner-border text-primary" role="status"></div>
-                                                            <p className="mt-3 text-muted">Loading Payments...</p>
+                                                            <p className="mt-3 fw-semibold text-muted">Loading Payments...</p>
                                                         </td>
                                                     </tr>
-                                                ) : orderData.length === 0 ? (
+                                                ) : ticketData && ticketData.length === 0 ? (
                                                     <tr>
-                                                        <td colSpan="6" className="text-center py-4 text-muted">
-                                                            No payment records found.
+                                                        <td colSpan="7" className="text-center py-4 text-muted">
+                                                            <i className="bi bi-ticket-perforated fs-3 d-block"></i>
+                                                            No Ticket Records Found
                                                         </td>
                                                     </tr>
                                                 ) : (
-                                                    orderData.map((item, index) => {
+                                                    ticketData.map((item, index) => {
                                                         const srNo = index + 1 + (currentPage - 1) * limit;
 
                                                         return (
                                                             <tr key={index}>
-                                                                {/* SR NO */}
-                                                                <td className="fw-bold">{srNo}</td>
+                                                                <td className="fw-semibold">{srNo}</td>
 
-                                                                {/* Customer */}
+                                                                {/* QR Code – Larger */}
                                                                 <td>
-                                                                    <div className="fw-bold">
-                                                                        {item.user.first_name} {item.user.last_name}
-                                                                    </div>
-                                                                    <div className="fw-bold">{item.user.mobile}</div>
-                                                                    <div className="text-muted">Order : {item.order_uid}</div>
+                                                                    <img
+                                                                        src={`${qrBasePath}${item.qr_image}`}
+                                                                        alt="QR Code"
+                                                                        style={{
+                                                                            width: "80px",
+                                                                            height: "80px",
+                                                                            objectFit: "contain",
+                                                                            borderRadius: "8px",
+                                                                            border: "1px solid #ddd",
+                                                                            padding: "5px",
+                                                                            background: "#fff"
+                                                                        }}
+                                                                    />
                                                                 </td>
 
-                                                                {/* Tickets */}
-                                                                <td className="fw-bold">{item.orderItems.length}</td>
+                                                                {/* Email */}
+                                                                <td className="fw-semibold">{item?.order?.user?.email || 'No Email'}</td>
+
+                                                                {/* Name */}
+                                                                <td className="fw-semibold">
+                                                                    {item?.order?.user?.first_name} {item?.order?.user?.last_name || 'No Name'}
+                                                                </td>
 
                                                                 {/* Amount */}
-                                                                <td className="fw-bold">${item.total_amount}</td>
+                                                                <td className="fw-bold text-success">
+                                                                    ${item?.order?.total_amount}
+                                                                </td>
 
                                                                 {/* Paid/Unpaid */}
                                                                 <td>
-                                                                    {item.status === "Y" ? (
-                                                                        <span className="badge bg-success">Paid</span>
-                                                                    ) : (
-                                                                        <span className="badge bg-secondary">Unpaid</span>
-                                                                    )}
+                                                                    <span
+                                                                        className={`badge px-3 py-2 ${item.type == "paid"
+                                                                            ? "bg-success"
+                                                                            : "bg-secondary"
+                                                                            }`}
+                                                                        style={{ fontSize: "0.85rem" }}
+                                                                    >
+                                                                        {item.type?.toUpperCase()}
+                                                                    </span>
                                                                 </td>
 
-                                                                {/* Date */}
-                                                                <td>
+                                                                {/* Purchased Date */}
+                                                                <td className="text-muted">
                                                                     {new Date(item.createdAt).toLocaleDateString("en-GB", {
                                                                         day: "2-digit",
                                                                         month: "short",
@@ -179,7 +204,6 @@ const ManagePayments = () => {
                                                         );
                                                     })
                                                 )}
-
                                             </tbody>
                                         </table>
                                     </div>
@@ -189,19 +213,22 @@ const ManagePayments = () => {
                                 {/* PAGINATION */}
                                 {totalPages > 1 && (
                                     <div className="d-flex justify-content-between align-items-center mt-3">
+
                                         <button
                                             className="btn btn-outline-primary"
-                                            disabled={currentPage === 1}
+                                            disabled={currentPage == 1}
                                             onClick={() => goToPage(currentPage - 1)}
                                         >
                                             ⬅ Previous
                                         </button>
 
-                                        <div className="fw-bold">Page {currentPage} / {totalPages}</div>
+                                        <div className="fw-bold">
+                                            Page {currentPage} / {totalPages}
+                                        </div>
 
                                         <button
                                             className="btn btn-outline-primary"
-                                            disabled={currentPage === totalPages}
+                                            disabled={currentPage == totalPages}
                                             onClick={() => goToPage(currentPage + 1)}
                                         >
                                             Next ➜
@@ -210,6 +237,7 @@ const ManagePayments = () => {
                                 )}
 
                             </section>
+
 
                         </div>
                     </div>
@@ -221,4 +249,4 @@ const ManagePayments = () => {
     );
 };
 
-export default ManagePayments;
+export default ExportTickets;
