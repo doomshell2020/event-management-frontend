@@ -72,6 +72,13 @@ export default function CartModal({ show, handleClose, eventId }) {
         return await api.post(`/api/v1/cart/add`, params)
     }
 
+    const clearCart = async () => {
+        return await api.delete(`/api/v1/cart/clear`);
+    };
+
+
+
+
     const [slotCart, setSlotCart] = useState({});
 
     // Fetch Event + Cart Details
@@ -231,8 +238,91 @@ export default function CartModal({ show, handleClose, eventId }) {
             });
             setSlotCart(map);
 
-        } catch (e) {
-            console.log("Increase slot error:", e);
+        } catch (err) {
+            if (err?.response?.status == 409) {
+                const result = await Swal.fire({
+                    title: "Appointment Conflict!",
+                    text: err?.response?.data?.message ||
+                        "You have already selected appointments from another event. Do you want to clear them and continue?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, Clear Cart",
+                    cancelButtonText: "No",
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    reverseButtons: true
+                });
+
+                if (!result.isConfirmed) {
+                    setIncreaseLoadingId(null);
+                    return;
+                }
+
+                // ➋ SHOW LOADER
+                Swal.fire({
+                    title: "Clearing Cart...",
+                    text: "Please wait",
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    didOpen: () => Swal.showLoading()
+                });
+
+                // ➌ CLEAR CART
+                await clearCart();
+                // await refreshCart();
+
+                Swal.fire({
+                    title: "Cart Cleared",
+                    text: "You can add items now.",
+                    icon: "success",
+                    timer: 1200,
+                    showConfirmButton: false
+                });
+                // ➍ RETRY ADDING ITEM AUTOMATICALLY
+                try {
+                    await addToCart({
+                        event_id: eventId,
+                        item_type: "appointment",
+                        appointment_id: slot.id,
+                        count: 1
+                    });
+
+                    // Fetch updated cart
+                    const cartRes = await fetchCart(eventId);
+                    const list = cartRes.data.data || [];
+                    setCart(list);
+                    // Build slot cart map
+                    let map = {};
+                    list.forEach((c) => {
+                        if (c.item_type === "appointment") {
+                            map[c.raw?.appointment_id] = {
+                                cartId: c.id,
+                                count: c.count
+                            };
+                        }
+                    });
+                    setSlotCart(map);
+
+                    Swal.fire({
+                        icon: "success",
+                        title: "Added Successfully",
+                        timer: 1200,
+                        showConfirmButton: false
+                    });
+
+                } catch (retryError) {
+                    console.log("Retry error:", retryError);
+                    Swal.fire({
+                        icon: "error",
+                        title: "Failed",
+                        text: "Could not add the ticket after clearing cart."
+                    });
+                }
+
+                setIncreaseLoadingId(null);
+                return;
+            }
+            console.log("Increase slot error:", err);
         }
 
         setIncreaseLoadingId(null);

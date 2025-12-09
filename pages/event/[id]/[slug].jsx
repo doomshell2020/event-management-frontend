@@ -8,7 +8,6 @@ import AppointmentModal from "@/pages/components/appointment_cart/CartModal";
 import { useAuth } from "@/shared/layout-components/layout/AuthContext";
 import Swal from "sweetalert2";
 import { useRouter } from "next/router";
-
 import api from "@/utils/api";
 
 export async function getServerSideProps({ params }) {
@@ -51,6 +50,33 @@ const EventDetailPage = ({ event, slug }) => {
   const [backgroundImage, setIsMobile] = useState("/assets/front-images/about-slider_bg.jpg");
   const [isLoading, setIsLoading] = useState(true);
   const [appointmentData, setAppointmentData] = useState([]);
+
+  const formatTime = (timeString) => {
+    if (!timeString) return "";
+
+    let [hours, minutes] = timeString.split(":");
+
+    hours = parseInt(hours);
+    const suffix = hours >= 12 ? "PM" : "AM";
+
+    hours = hours % 12 || 12; // Convert 0 -> 12, 13 -> 1
+
+    return `${hours}:${minutes} ${suffix}`;
+  };
+
+
+  const formatReadableDate = (dateStr) => {
+    if (!dateStr) return "";
+    const date = new Date(dateStr);
+    return date.toLocaleDateString("en-US", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
+
+
   // Prepare dates safely
   const startDate = event ? new Date(event.date_from?.local || event.date_from?.utc) : null;
   const endDate = event ? new Date(event.date_to?.local || event.date_to?.utc) : null;
