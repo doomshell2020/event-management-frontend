@@ -147,28 +147,6 @@ const EventDetailPage = ({ event, slug }) => {
     fetchDetails();
   }, [eventId]);
 
-  const formatTime = (timeString) => {
-    if (!timeString) return "";
-
-    let [hours, minutes] = timeString.split(":");
-
-    hours = parseInt(hours);
-    const suffix = hours >= 12 ? "PM" : "AM";
-
-    hours = hours % 12 || 12; // Convert 0 -> 12, 13 -> 1
-
-    return `${hours}:${minutes} ${suffix}`;
-  };
-
-  const formatReadableDate = (dateStr) => {
-    if (!dateStr) return "";
-    const date = new Date(dateStr);
-    return date.toLocaleDateString("en-US", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
-  };
 
   return (
     <>
