@@ -12,6 +12,7 @@ import 'nprogress/nprogress.css';
 
 // ✅ Import Global Cart Provider
 import { CartProvider } from '@/shared/layout-components/layout/CartContext';
+import { AuthProvider } from '@/shared/layout-components/layout/AuthContext';
 
 const layouts = {
   Contentlayout: Contentlayout
@@ -54,23 +55,25 @@ function MyApp({ Component, pageProps }) {
 
       {/* 🔥 Redux + Cart Provider Wrapped Together */}
       <Provider store={store}>
-        <CartProvider>
-          <NextNProgress
-            color="#e62d56"
-            startPosition={0.3}
-            stopDelayMs={200}
-            height={3}
-            showOnShallow={true}
-            options={{ showSpinner: false }}
-          />
+        <AuthProvider>
+          <CartProvider>
+            <NextNProgress
+              color="#e62d56"
+              startPosition={0.3}
+              stopDelayMs={200}
+              height={3}
+              showOnShallow={true}
+              options={{ showSpinner: false }}
+            />
 
-          {/* 🔥 Your entire app now has global Cart access */}
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
+            {/* 🔥 Your entire app now has global Cart access */}
+            <Layout>
+              <Component {...pageProps} />
+            </Layout>
 
-          <Toaster position="bottom-right" />
-        </CartProvider>
+            <Toaster position="bottom-right" />
+          </CartProvider>
+        </AuthProvider>
       </Provider>
     </>
   );

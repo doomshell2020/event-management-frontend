@@ -41,6 +41,7 @@ const LoadingComponent = ({ isActive }) => {
 export default function CartModal({ show, handleClose, eventId }) {
 
     const { cart, refreshCart, eventData, normalCart, slotCart, loadingCart, setEventId } = useCart();
+
     const [isLoading, setIsLoading] = useState(true);
     const [cartLoading, setCartLoading] = useState(false);
     const [loadingId, setLoadingId] = useState(null); // track which pricing ID is loading
@@ -105,10 +106,83 @@ export default function CartModal({ show, handleClose, eventId }) {
             await refreshCart(eventId || undefined);
 
         } catch (err) {
-            console.log("Increase slot error:", err);
-        }
 
-        setLoadingId(null);
+            if (err?.response?.status == 409) {
+
+                const result = await Swal.fire({
+                    title: "Items from another event found!",
+                    text: err?.response?.data?.message ||
+                        "Your cart has products from another event. Clear it?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, Clear Cart",
+                    cancelButtonText: "No",
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    reverseButtons: true
+                });
+
+                if (!result.isConfirmed) {
+                    setLoadingId(null);
+                    return;
+                }
+
+                // ➋ SHOW LOADER
+                Swal.fire({
+                    title: "Clearing Cart...",
+                    text: "Please wait",
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    didOpen: () => Swal.showLoading()
+                });
+
+                // ➌ CLEAR CART
+                await clearCart();
+
+                Swal.fire({
+                    title: "Cart Cleared",
+                    text: "You can add items now.",
+                    icon: "success",
+                    timer: 1200,
+                    showConfirmButton: false
+                });
+
+                // ➍ RETRY ADDING ITEM AUTOMATICALLY
+                try {
+                    await addToCart({
+                        event_id: eventId,
+                        item_type: "ticket_price",
+                        ticket_price_id: pricingId,
+                        count: 1
+                    });
+
+                    await refreshCart(eventId || undefined);
+
+                    Swal.fire({
+                        icon: "success",
+                        title: "Added Successfully",
+                        timer: 1200,
+                        showConfirmButton: false
+                    });
+
+                } catch (retryError) {
+                    console.log("Retry error:", retryError);
+                    Swal.fire({
+                        icon: "error",
+                        title: "Failed",
+                        text: "Could not add the ticket after clearing cart."
+                    });
+                }
+
+                setLoadingId(null);
+                return;
+            }
+
+            console.log("Increase ticket error:", err);
+
+        } finally {
+            setLoadingId(null); // ensures loader is removed ALWAYS
+        }
     };
 
     const decreaseSlot = async (slot) => {
@@ -129,51 +203,231 @@ export default function CartModal({ show, handleClose, eventId }) {
             await refreshCart(eventId || undefined);
 
         } catch (err) {
-            console.log("Decrease slot error:", err);
-        }
+            if (err?.response?.status == 409) {
 
-        setLoadingId(null);
+                const result = await Swal.fire({
+                    title: "Items from another event found!",
+                    text: err.response.data?.message ||
+                        "Your cart belongs to another event. Clear it?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, Clear Cart",
+                    cancelButtonText: "No",
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    reverseButtons: true
+                });
+
+                if (!result.isConfirmed) {
+                    setLoadingId(null);
+                    return;
+                }
+
+                // Loader
+                Swal.fire({
+                    title: "Clearing...",
+                    text: "Please wait...",
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    didOpen: () => Swal.showLoading()
+                });
+
+                // Clear cart
+                await clearCart();
+
+                Swal.close();
+
+                Swal.fire({
+                    title: "Cart Cleared",
+                    text: "You can continue now.",
+                    icon: "success",
+                    timer: 1200,
+                    showConfirmButton: false
+                });
+                await decreaseCart(existing.cartId);
+            }
+            console.log("Decrease error:", err);
+        } finally {
+            setLoadingId(null);
+        }
+    };
+
+    const clearCart = async () => {
+        return await api.delete(`/api/v1/cart/clear`);
     };
 
     const increaseTicket = async (ticket) => {
-        const cartId = ticket?.id;
+        const ticketId = ticket?.id;
+
         try {
-            setLoadingId(cartId);
-            const existing = normalCart.find(item => item.uniqueId == cartId);
+            setLoadingId(ticketId);
+
+            const existing = normalCart.find(item => item.uniqueId == ticketId);
+            // console.log('normalCart :', normalCart);
+            // console.log('existing :', existing);
+            // return false
+
             if (existing) {
                 await increaseCart(existing.cartId);
             } else {
                 await addToCart({
                     event_id: eventId,
                     item_type: "ticket",
-                    ticket_id: cartId,
+                    ticket_id: ticketId,
                     count: 1
                 });
             }
-            await refreshCart(eventId || undefined);
+
+            await refreshCart(eventId);
+
         } catch (err) {
-            console.log("Increase slot error:", err);
+
+            if (err?.response?.status == 409) {
+
+                const result = await Swal.fire({
+                    title: "Items from another event found!",
+                    text: err?.response?.data?.message ||
+                        "Your cart has products from another event. Clear it?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, Clear Cart",
+                    cancelButtonText: "No",
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    reverseButtons: true
+                });
+
+                if (!result.isConfirmed) {
+                    setLoadingId(null);
+                    return;
+                }
+
+                // ➋ SHOW LOADER
+                Swal.fire({
+                    title: "Clearing Cart...",
+                    text: "Please wait",
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    didOpen: () => Swal.showLoading()
+                });
+
+                // ➌ CLEAR CART
+                await clearCart();
+                // await refreshCart();
+
+                Swal.fire({
+                    title: "Cart Cleared",
+                    text: "You can add items now.",
+                    icon: "success",
+                    timer: 1200,
+                    showConfirmButton: false
+                });
+
+                // ➍ RETRY ADDING ITEM AUTOMATICALLY
+                try {
+                    await addToCart({
+                        event_id: eventId,
+                        item_type: "ticket",
+                        ticket_id: ticketId,
+                        count: 1
+                    });
+
+                    await refreshCart(eventId);
+
+                    Swal.fire({
+                        icon: "success",
+                        title: "Added Successfully",
+                        timer: 1200,
+                        showConfirmButton: false
+                    });
+
+                } catch (retryError) {
+                    console.log("Retry error:", retryError);
+                    Swal.fire({
+                        icon: "error",
+                        title: "Failed",
+                        text: "Could not add the ticket after clearing cart."
+                    });
+                }
+
+                setLoadingId(null);
+                return;
+            }
+
+            console.log("Increase ticket error:", err);
+
+        } finally {
+            setLoadingId(null); // ensures loader is removed ALWAYS
         }
-        setLoadingId(null);
     };
 
     const decreaseTicket = async (ticket) => {
-        const cartId = ticket?.id;
+        const ticketId = ticket?.id;
 
         try {
-            setLoadingId(cartId);
-            const existing = normalCart.find(item => item.uniqueId == cartId);
+            setLoadingId(ticketId);
+
+            const existing = normalCart.find(item => item.uniqueId == ticketId);
             if (!existing) return;
             if (existing.count > 1) {
                 await decreaseCart(existing.cartId);
-            } else {
+            }
+            else {
                 await deleteCart(existing.cartId);
             }
-            await refreshCart(eventId || undefined);
+            await refreshCart(eventId);
         } catch (err) {
-            console.log("Decrease slot error:", err);
+            if (err?.response?.status == 409) {
+
+                const result = await Swal.fire({
+                    title: "Items from another event found!",
+                    text: err.response.data?.message ||
+                        "Your cart belongs to another event. Clear it?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, Clear Cart",
+                    cancelButtonText: "No",
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    reverseButtons: true
+                });
+
+                if (!result.isConfirmed) {
+                    setLoadingId(null);
+                    return;
+                }
+
+                // Loader
+                Swal.fire({
+                    title: "Clearing...",
+                    text: "Please wait...",
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    didOpen: () => Swal.showLoading()
+                });
+
+                // Clear cart
+                await clearCart();
+
+                Swal.close();
+
+                Swal.fire({
+                    title: "Cart Cleared",
+                    text: "You can continue now.",
+                    icon: "success",
+                    timer: 1200,
+                    showConfirmButton: false
+                });
+                await decreaseCart(existing.cartId);
+                // No retry for decrease (because item doesn't exist anymore)
+                // await refreshCart(eventId);
+            }
+
+            console.log("Decrease error:", err);
+
+        } finally {
+            setLoadingId(null);
         }
-        setLoadingId(null);
     };
 
     // Calculate Totals
@@ -263,10 +517,28 @@ export default function CartModal({ show, handleClose, eventId }) {
     };
 
     const handleDeleteItem = async (id) => {
-        await deleteCart(id); // your API function
-        await refreshCart(eventId || undefined);
-    };
+        Swal.fire({
+            title: "Are you sure?",
+            text: "This item will be removed from your cart.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, remove it",
+            cancelButtonText: "Cancel"
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                await deleteCart(id); // your API function
+                await refreshCart(eventId || undefined);
 
+                Swal.fire({
+                    icon: "success",
+                    title: "Removed!",
+                    text: "The item has been deleted from your cart."
+                });
+            }
+        });
+    };
 
     return (
         <Modal

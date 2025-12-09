@@ -6,7 +6,7 @@ import Cookies from "js-cookie";
 import { isTokenValid } from "@/utils/checkAuth";
 import CartModal from "@/pages/components/cart_new/CartModal";
 import { useCart } from "@/shared/layout-components/layout/CartContext";
-
+import { useAuth } from "../layout/AuthContext";
 
 const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
 
@@ -15,6 +15,7 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
   );
 
   const { cartCount } = useCart();
+  const { loadingAuth,user } = useAuth();
   // console.log('cartCount :', cartCount);
 
 

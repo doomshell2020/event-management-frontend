@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import api from "@/utils/api";
 import Cookies from "js-cookie"; // 👈 add this import at the top
 import Swal from "sweetalert2";
+import { useAuth, login } from "@/shared/layout-components/layout/AuthContext";
 
 
 const LoginPage = () => {
@@ -25,6 +26,8 @@ const LoginPage = () => {
       router.push("/");
     }
   }, [router]);
+
+  const { login: loginUser } = useAuth();  // 👈 Get login function from context
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -46,24 +49,18 @@ const LoginPage = () => {
       }
 
       const { token, user } = res.data.data;
-
-      // ✅ Always store user in localStorage (so all tabs can access)
-      localStorage.setItem("user", JSON.stringify(user));
-      localStorage.setItem("userAuthToken", token);
-
-      // Set cookie to expire in 1 minute
-      const oneMinuteFromNow = new Date(new Date().getTime() + 1 * 60 * 1000);
-      Cookies.set("userAuthToken", token, {
-        // expires: oneMinuteFromNow,
-        expires: process.env.TOKEN_EXPIRES_IN ? process.env.TOKEN_EXPIRES_IN : 1, // days
-        secure: process.env.NODE_ENV == "production",
-        sameSite: "Strict",
-        path: "/",
+      loginUser(user, token);
+      toast.success("Login successful!");
+      Swal.fire({
+        icon: "success",
+        title: "Welcome!",
+        text: "Login successful!",
+        timer: 1500,
+        showConfirmButton: false,
       });
 
-      toast.success("Login successful!");
-      setSuccess("Login successful!");
       router.push("/");
+
     } catch (err) {
       console.error("Login error:", err);
 
@@ -74,11 +71,18 @@ const LoginPage = () => {
         "Something went wrong. Please try again.";
 
       setError(apiErrorMsg);
-      Swal.fire("Error", apiErrorMsg, "error");
+
+      Swal.fire({
+        icon: "error",
+        title: "Login Failed",
+        text: apiErrorMsg,
+      });
+
     } finally {
       setLoading(false);
     }
   };
+
 
   const [backgroundImage, setIsMobile] = useState('/assets/front-images/about-slider_bg.jpg');
   const [showPassword, setShowPassword] = useState(false);

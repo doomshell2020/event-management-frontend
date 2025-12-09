@@ -5,6 +5,9 @@ import Link from "next/link";
 import { format } from "date-fns";
 import CartModal from "@/pages/components/cart_new/CartModal";
 import AppointmentModal from "@/pages/components/appointment_cart/CartModal";
+import { useAuth } from "@/shared/layout-components/layout/AuthContext";
+import Swal from "sweetalert2";
+import { useRouter } from "next/router";
 import api from "@/utils/api";
 
 export async function getServerSideProps({ params }) {
@@ -41,16 +44,67 @@ export async function getServerSideProps({ params }) {
 }
 
 const EventDetailPage = ({ event, slug }) => {
+  const { token } = useAuth();
+  // console.log('token :', token);
+  const router = useRouter();
   // ⛳ All hooks MUST be at the top
   const [backgroundImage, setIsMobile] = useState("/assets/front-images/about-slider_bg.jpg");
   const [isLoading, setIsLoading] = useState(true);
   const [appointmentData, setAppointmentData] = useState([]);
+
+  const formatTime = (timeString) => {
+    if (!timeString) return "";
+
+    let [hours, minutes] = timeString.split(":");
+
+    hours = parseInt(hours);
+    const suffix = hours >= 12 ? "PM" : "AM";
+
+    hours = hours % 12 || 12; // Convert 0 -> 12, 13 -> 1
+
+    return `${hours}:${minutes} ${suffix}`;
+  };
+
+
+  const formatReadableDate = (dateStr) => {
+    if (!dateStr) return "";
+    const date = new Date(dateStr);
+    return date.toLocaleDateString("en-US", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
+
+
   // Prepare dates safely
   const startDate = event ? new Date(event.date_from?.local || event.date_from?.utc) : null;
   const endDate = event ? new Date(event.date_to?.local || event.date_to?.utc) : null;
   const saleStart = event ? new Date(event.sale_start?.local || event.sale_start?.utc) : null;
   const saleEnd = event ? new Date(event.sale_end?.local || event.sale_end?.utc) : null;
-  const eventId = event ? event.id : null;
+  const eventId = event?.id || null;
+
+  const fetchDetails = async () => {
+    try {
+      setIsLoading(true);  // Start loader here
+
+      const res = await api.get(`/api/v2/events/${eventId}/appointments`);
+      setAppointmentData(res.data?.data?.wellness || []);
+    } catch (error) {
+      console.error("Error loading cart/event:", error);
+    } finally {
+      setIsLoading(false); // Ensure loader stops even if error occurs
+    }
+  };
+
+  useEffect(() => {
+    if (eventId) {
+      fetchDetails();
+    }
+  }, [eventId]);
+
+
   // 🛑 Early return MUST come after hooks
   if (!event || Object.keys(event).length == 0) {
     return (
@@ -80,9 +134,22 @@ const EventDetailPage = ({ event, slug }) => {
   const [selectedEventId, setSelectedEventId] = useState(eventId);
 
   const handleOpenCart = () => {
+    if (!token) {
+      Swal.fire({
+        icon: "warning",
+        title: "Login Required",
+        text: "Please log in to view your cart.",
+        confirmButtonText: "Login Now"
+      }).then(() => {
+        router.push("/login");
+      });
+      return;
+    }
+
     setSelectedEventId(selectedEventId);
     setShowCart(true);
   };
+
 
   // appointment cart...
   const handleOpenAppointmentCart = () => {
@@ -104,31 +171,6 @@ const EventDetailPage = ({ event, slug }) => {
 
     fetchDetails();
   }, [eventId]);
-
-  const formatTime = (timeString) => {
-    if (!timeString) return "";
-
-    let [hours, minutes] = timeString.split(":");
-
-    hours = parseInt(hours);
-    const suffix = hours >= 12 ? "PM" : "AM";
-
-    hours = hours % 12 || 12; // Convert 0 -> 12, 13 -> 1
-
-    return `${hours}:${minutes} ${suffix}`;
-  };
-
-
-  const formatReadableDate = (dateStr) => {
-    if (!dateStr) return "";
-    const date = new Date(dateStr);
-    return date.toLocaleDateString("en-US", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
-  };
-
 
   return (
     <>
