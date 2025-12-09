@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import FrontendHeader from "@/shared/layout-components/frontelements/frontendheader";
 import FrontendFooter from "@/shared/layout-components/frontelements/frontendfooter";
 import Link from "next/link";
 import { format } from "date-fns";
 import CartModal from "@/pages/components/cart_new/CartModal";
 import AppointmentModal from "@/pages/components/appointment_cart/CartModal";
+import api from "@/utils/api";
 
 export async function getServerSideProps({ params }) {
   const { id, slug } = params;
@@ -40,12 +41,10 @@ export async function getServerSideProps({ params }) {
 }
 
 const EventDetailPage = ({ event, slug }) => {
-
-  // console.log("✅ Active Events:", event);
-
   // ⛳ All hooks MUST be at the top
   const [backgroundImage, setIsMobile] = useState("/assets/front-images/about-slider_bg.jpg");
-
+  const [isLoading, setIsLoading] = useState(true);
+  const [appointmentData, setAppointmentData] = useState([]);
   // Prepare dates safely
   const startDate = event ? new Date(event.date_from?.local || event.date_from?.utc) : null;
   const endDate = event ? new Date(event.date_to?.local || event.date_to?.utc) : null;
@@ -89,6 +88,45 @@ const EventDetailPage = ({ event, slug }) => {
   const handleOpenAppointmentCart = () => {
     setSelectedEventId(selectedEventId);
     setShowAppointmentCart(true);
+  };
+
+  // ......
+  useEffect(() => {
+    const fetchDetails = async () => {
+      try {
+        const res = await api.get(`api/v2/events/${eventId}/appointments`);
+        setAppointmentData(res.data.data.wellness);
+      } catch (error) {
+        console.error("Error loading cart/event:", error);
+      }
+      setIsLoading(false);
+    };
+
+    fetchDetails();
+  }, [eventId]);
+
+  const formatTime = (timeString) => {
+    if (!timeString) return "";
+
+    let [hours, minutes] = timeString.split(":");
+
+    hours = parseInt(hours);
+    const suffix = hours >= 12 ? "PM" : "AM";
+
+    hours = hours % 12 || 12; // Convert 0 -> 12, 13 -> 1
+
+    return `${hours}:${minutes} ${suffix}`;
+  };
+
+
+  const formatReadableDate = (dateStr) => {
+    if (!dateStr) return "";
+    const date = new Date(dateStr);
+    return date.toLocaleDateString("en-US", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
   };
 
 
@@ -187,7 +225,7 @@ const EventDetailPage = ({ event, slug }) => {
                         Check Availability
                       </button>
 
-                      <button
+                      {/* <button
                         onClick={(e) => {
                           e.preventDefault();
                           handleOpenAppointmentCart();
@@ -195,7 +233,7 @@ const EventDetailPage = ({ event, slug }) => {
                         className="btn btn-outline-primary"
                       >
                         Check Appointment
-                      </button>
+                      </button> */}
                     </div>
                   )}
 
@@ -327,6 +365,100 @@ const EventDetailPage = ({ event, slug }) => {
           </div>
         </div>
       </section>
+
+      {event.status == "Y" && (
+        <section className="py-4">
+          <div className="container">
+
+            {appointmentData?.length > 0 && (
+              <>
+                <h5 className="mb-3">Available Appointments</h5>
+
+                <div className="row g-4">
+
+                  {appointmentData.map((w) => (
+                    <div className="col-md-6" key={w.id}>   {/* <-- 2 Cards Per Row */}
+
+                      <div className="card shadow-sm border-0 h-100">
+
+                        {/* Image */}
+                        <img
+                          src={w.Image}
+                          className="card-img-top"
+                          style={{ height: "130px", objectFit: "cover" }}
+                          alt={w.name}
+                        />
+
+                        <div className="card-body py-3">
+
+                          {/* Title */}
+                          <h6 className="fw-bold mb-1 text-uppercase" style={{ fontSize: "15px" }}>
+                            {w.name}
+                          </h6>
+
+                          {/* Location */}
+                          <p className="text-muted mb-2" style={{ fontSize: "13px" }}>
+                            <i className="bi bi-geo-alt-fill me-1"></i> {w.location}
+                          </p>
+
+                          {/* Description */}
+                          <div
+                            className="text-muted mb-3"
+                            style={{ fontSize: "13px", height: "40px", overflow: "hidden" }}
+                            dangerouslySetInnerHTML={{ __html: w.description }}
+                          />
+
+                          {/* Slots */}
+                          {w.wellnessSlots?.length > 0 &&
+                            w.wellnessSlots.map((slot) => (
+                              <div
+                                className="d-flex justify-content-between align-items-center border rounded p-3 mb-2"
+                                key={slot.id}
+                                style={{ background: "#f9f9f9" }}
+                              >
+                                {/* Left Details */}
+                                <div style={{ fontSize: "13px" }}>
+                                  <p className="mb-1"><strong>Date:</strong> {formatReadableDate(slot.date)}</p>
+                                  <p className="mb-1">
+                                    <strong>Time:</strong> {formatTime(slot.slot_start_time)} - {formatTime(slot.slot_end_time)}
+                                  </p>
+                                  <p className="mb-1"><strong>Location:</strong> {slot.slot_location}</p>
+                                  <p className="mb-0"><strong>Price:</strong> {slot.price}</p>
+                                </div>
+
+                                {/* Button */}
+                                <button
+                                  className="btn px-3"
+                                  style={{ fontSize: "15px", whiteSpace: "nowrap", background: "#fca3bb", borderRadius: "50px", color: "#fff" }}
+                                  // onClick={() => handleBookAppointment(w, slot)}
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    handleOpenAppointmentCart();
+                                  }}
+                                >
+                                  Book  Appointment
+                                </button>
+                              </div>
+                            ))}
+
+                        </div>
+                      </div>
+
+                    </div>
+                  ))}
+
+                </div>
+              </>
+            )}
+
+          </div>
+        </section>
+      )}
+
+
+
+
+
 
       {/* ✅ Cart Modal */}
       {

@@ -6,7 +6,9 @@ import {
     Row,
     Spinner,
     InputGroup,
+    Form,
 } from "react-bootstrap";
+
 import Image from "next/image";
 import api from "@/utils/api";
 import Swal from "sweetalert2"; // Import SweetAlert
@@ -38,10 +40,16 @@ const LoadingComponent = ({ isActive }) => {
 
 export default function CartModal({ show, handleClose, eventId }) {
     const [isLoading, setIsLoading] = useState(true);
+
     const [eventDetails, setEventDetails] = useState({});
     const [cart, setCart] = useState([]);
+    const [couponDetails, setCouponDetails] = useState("");
+    const [coupon, setCoupon] = useState("");
     const [adminFees, setAdminFees] = useState(8);
 
+
+    const [increaseLoadingId, setIncreaseLoadingId] = useState(null);
+    const [decreaseLoadingId, setDecreaseLoadingId] = useState(null);
     // console.log("--------eventId",eventId)
     // CART API FUNCTIONS
     const fetchCart = async (eventId) => {
@@ -120,9 +128,64 @@ export default function CartModal({ show, handleClose, eventId }) {
         });
     };
 
+
+
+    // const handleDeleteCartItem = async (slot) => {
+    //     console.log("-----------slot",slot)
+    //     try {
+    //         // const existing = slotCart[slot.id];
+    //         // if (!existing) return;
+    //         const result = await Swal.fire({
+    //             title: "Are you sure?",
+    //             text: "You won't be able to revert this!",
+    //             icon: "warning",
+    //             showCancelButton: true,
+    //             confirmButtonColor: "#3085d6",
+    //             cancelButtonColor: "#d33",
+    //             confirmButtonText: "Yes, delete it!",
+    //             customClass: {
+    //                 popup: "add-tckt-dtlpop",
+    //             }
+    //         });
+
+    //         if (result.isConfirmed) {
+    //             setIsLoading(true);
+    //             await decreaseCart(existing.cartId);
+    //             const cartRes = await fetchCart(eventId);
+    //             const list = cartRes.data.data || [];
+    //             setCart(list);
+    //             // Build slot cart map again
+    //             let map = {};
+    //             list.forEach((c) => {
+    //                 if (c.item_type === "appointment") {
+    //                     map[c.raw?.appointment_id] = {
+    //                         cartId: c.id,
+    //                         count: c.count
+    //                     };
+    //                 }
+    //             });
+    //             setSlotCart(map);
+    //             setIsLoading(false);
+    //         }
+    //     } catch (error) {
+    //         console.error("Error calling API:", error);
+    //         setErrorMessage(error.message);
+    //         setSuccessMessage(""); // Clear success message if any
+    //         Swal.fire({
+    //             icon: "error",
+    //             title: "Error",
+    //             text: error.message,
+    //         });
+    //         await fetchCartDetails();
+    //         setIsLoading(false);
+    //     }
+    // };
+
+
+
     const increaseSlot = async (slot) => {
         try {
-            setIsLoading(true);
+            setIncreaseLoadingId(slot.id);
             // Check existing slot cart
             const existing = slotCart[slot.id];
             if (existing) {
@@ -172,14 +235,14 @@ export default function CartModal({ show, handleClose, eventId }) {
             console.log("Increase slot error:", e);
         }
 
-        setIsLoading(false);
+        setIncreaseLoadingId(null);
     };
 
     const decreaseSlot = async (slot) => {
         try {
             const existing = slotCart[slot.id];
             if (!existing) return;
-            setIsLoading(true);
+            setDecreaseLoadingId(slot.id);
             await decreaseCart(existing.cartId);
             // Fetch updated cart
             const cartRes = await fetchCart(eventId);
@@ -199,7 +262,7 @@ export default function CartModal({ show, handleClose, eventId }) {
         } catch (e) {
             console.log("Decrease slot error:", e);
         }
-        setIsLoading(false);
+        setDecreaseLoadingId(null);
     };
 
 
@@ -215,9 +278,6 @@ export default function CartModal({ show, handleClose, eventId }) {
 
         return `${hours}:${minutes} ${suffix}`;
     };
-
-
-
 
     const handleFreeTicket = async () => {
         try {
@@ -304,8 +364,8 @@ export default function CartModal({ show, handleClose, eventId }) {
             };
             handleClose();
             Swal.fire({
-                title: "Processing...",
-                text: "Please wait while we create your ticket.",
+                title: "Booking Appointment...",
+                text: "Please wait while we confirm your appointment.",
                 icon: "info",
                 allowOutsideClick: false,
                 allowEscapeKey: false,
@@ -314,8 +374,8 @@ export default function CartModal({ show, handleClose, eventId }) {
             const response = await api.post(`/api/v1/orders/create-appointment`, data);
             if (response.data.success) {
                 Swal.fire({
-                    title: "Success!",
-                    text: "Your ticket has been created successfully!",
+                    title: "Appointment Confirmed!",
+                    text: "Your appointment has been successfully booked.",
                     icon: "success",
                     confirmButtonText: "Okay",
                 }).then(() => {
@@ -327,13 +387,12 @@ export default function CartModal({ show, handleClose, eventId }) {
                 setIsBtnLoading(false);
                 Swal.fire({
                     title: "Error!",
-                    text: response.data.message || "Failed to create ticket!",
+                    text: response.data.message || "Unable to book your appointment.",
                     icon: "error"
                 });
             }
         } catch (error) {
             setIsBtnLoading(false); // 🔥 STOP LOADER
-
             Swal.fire({
                 title: "Error!",
                 text: error.message || "An unexpected error occurred!",
@@ -371,15 +430,22 @@ export default function CartModal({ show, handleClose, eventId }) {
                     <div className="checkout-innr">
                         <Row className="gy-4">
                             {/* LEFT SIDE */}
-                            <Col lg={8}>
+                            <Col lg={8} className="men-innr-sec">
                                 <div className="checkot-lft">
                                     {/* EVENT NAME */}
                                     <h2 className="ck-mn-hd">{eventDetails.name}</h2>
+
+                                    <span
+                                        className="check-25-lft-pra"
+                                        dangerouslySetInnerHTML={{
+                                            __html: eventDetails.desp,
+                                        }}
+                                    />
                                     {/* EVENT IMAGE + DETAILS */}
                                     <div className="ck-event-dtl">
                                         <div className="eventsBxSec">
-                                            <Row className="gy-3 align-items-start">
-                                                {/* EVENT IMAGE */}
+                                            {/* <Row className="gy-3 align-items-start">
+                                               
                                                 <Col md={5}>
                                                     <div className="evt-innr-dtl" style={{ textAlign: "center" }}>
                                                         <Image
@@ -402,8 +468,6 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                         </div>
                                                     </div>
                                                 </Col>
-
-                                                {/* DESCRIPTION */}
                                                 <Col md={7}>
                                                     <div className="event-description mt-2">
                                                         <div
@@ -432,137 +496,241 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                     </div>
                                                 </Col>
 
+                                            </Row> */}
+
+                                            <Row className="align-items-center gy-3 marginTpMinus4">
+                                                {eventDetails.wellness?.length > 0 && (
+                                                    <div className="ticket-section mt-4">
+                                                        <h5 className="mb-3">Available Appointments</h5>
+                                                        {eventDetails.wellness.map((w) => (
+                                                            <div
+                                                                key={w.id}
+                                                                className="ticket-box mb-4 p-3 border rounded shadow-sm"
+                                                            >
+
+                                                                {/* Appointment Name */}
+                                                                <strong style={{ fontSize: "17px" }}>{w.name}</strong>
+
+                                                                {/* Appointment Image (only if exists) */}
+                                                                {w.Image && (
+                                                                    <div className="w-50 my-3">
+                                                                        <Image
+                                                                            src={w.Image}
+                                                                            alt={w.name}
+                                                                            width={500}
+                                                                            height={300}
+                                                                            style={{
+                                                                                borderRadius: "10px",
+                                                                                width: "50%",
+                                                                                height: "auto",
+                                                                                objectFit: "cover",
+                                                                            }}
+                                                                        />
+                                                                    </div>
+                                                                )}
+
+                                                                {/* Appointment Description */}
+                                                                <div
+                                                                    className="mt-2"
+                                                                    dangerouslySetInnerHTML={{ __html: w.description }}
+                                                                />
+
+                                                                {/* Slots */}
+                                                                {w.wellnessSlots?.length > 0 ? (
+                                                                    w.wellnessSlots.map((slot) => (
+                                                                        <div
+                                                                            key={slot.id}
+                                                                            className="slot-box p-3 border rounded mb-3 shadow-sm"
+                                                                        >
+                                                                            <div className="d-flex justify-content-between align-items-center">
+                                                                                <strong style={{ fontSize: "17px" }}>
+                                                                                    {formatReadableDate(slot.date)}
+                                                                                </strong>
+                                                                                <Col sm={3} xs={6} className="mt-0">
+                                                                                    <div className="evnt-dtl-rgt monte-ticy-butn">
+
+                                                                                        {/* Decrease Button */}
+                                                                                        <Button
+                                                                                            variant=""
+                                                                                            onClick={() => decreaseSlot(slot)}
+                                                                                            disabled={decreaseLoadingId === slot.id}
+                                                                                        >
+                                                                                            {decreaseLoadingId === slot.id ? (
+                                                                                                <span className="spinner-border spinner-border-sm"></span>
+                                                                                            ) : (
+                                                                                                "-"
+                                                                                            )}
+                                                                                        </Button>
+
+                                                                                        <span>{slotCart[slot.id]?.count || 0}</span>
+
+                                                                                        {/* Increase Button */}
+                                                                                        <Button
+                                                                                            variant=""
+                                                                                            onClick={() => increaseSlot(slot)}
+                                                                                            disabled={increaseLoadingId === slot.id}
+                                                                                        >
+                                                                                            {increaseLoadingId === slot.id ? (
+                                                                                                <span className="spinner-border spinner-border-sm"></span>
+                                                                                            ) : (
+                                                                                                "+"
+                                                                                            )}
+                                                                                        </Button>
+
+                                                                                    </div>
+                                                                                </Col>
+
+                                                                                {/* <div className="d-flex align-items-center">
+                                                                                    <button
+                                                                                        className="btn btn-sm btn-outline-secondary"
+                                                                                        onClick={() => decreaseSlot(slot)}
+                                                                                    >
+                                                                                        –
+                                                                                    </button>
+
+                                                                                    <span
+                                                                                        className="mx-2"
+                                                                                        style={{
+                                                                                            fontSize: "16px",
+                                                                                            width: "25px",
+                                                                                            textAlign: "center",
+                                                                                        }}
+                                                                                    >
+                                                                                        {slotCart[slot.id]?.count || 0}
+                                                                                    </span>
+
+                                                                                    <button
+                                                                                        className="btn btn-sm btn-outline-primary"
+                                                                                        onClick={() => increaseSlot(slot)}
+                                                                                    >
+                                                                                        +
+                                                                                    </button>
+                                                                                </div> */}
+                                                                            </div>
+
+                                                                            <p className="mt-2">
+                                                                                {formatTime(slot.slot_start_time)} to {formatTime(slot.slot_end_time)}
+                                                                            </p>
+
+                                                                            <p><strong>Location: {slot.slot_location}</strong></p>
+
+                                                                            <p><strong>Price: ₹{slot.price}</strong></p>
+                                                                        </div>
+                                                                    ))
+                                                                ) : (
+                                                                    <p className="text-muted">No slots available</p>
+                                                                )}
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
                                             </Row>
                                         </div>
                                     </div>
 
                                     {/* --------------------------------------------WELLNESS APPOINTMENTS + SLOTS (Grouped)----------------------------------------------- */}
-                                    {eventDetails.wellness?.length > 0 && (
-                                        <div className="ticket-section mt-4">
-                                            <h5 className="mb-3">Available Appointments</h5>
-
-                                            {eventDetails.wellness.map((w) => (
-                                                <div
-                                                    key={w.id}
-                                                    className="ticket-box mb-4 p-3 border rounded shadow-sm"
-                                                >
-
-                                                    {/* Appointment Name */}
-                                                    <strong style={{ fontSize: "17px" }}>{w.name}</strong>
-
-                                                    {/* Appointment Image (only if exists) */}
-                                                    {w.Image && (
-                                                        <div className="w-50 my-3">
-                                                            <Image
-                                                                src={w.Image}
-                                                                alt={w.name}
-                                                                width={500}
-                                                                height={300}
-                                                                style={{
-                                                                    borderRadius: "10px",
-                                                                    width: "50%",
-                                                                    height: "auto",
-                                                                    objectFit: "cover",
-                                                                }}
-                                                            />
-                                                        </div>
-                                                    )}
-
-                                                    {/* Appointment Description */}
-                                                    <div
-                                                        className="mt-2"
-                                                        dangerouslySetInnerHTML={{ __html: w.description }}
-                                                    />
-
-                                                    {/* Slots */}
-                                                    {w.wellnessSlots?.length > 0 ? (
-                                                        w.wellnessSlots.map((slot) => (
-                                                            <div
-                                                                key={slot.id}
-                                                                className="slot-box p-3 border rounded mb-3 shadow-sm"
-                                                            >
-                                                                <div className="d-flex justify-content-between align-items-center">
-                                                                    <strong style={{ fontSize: "17px" }}>
-                                                                        {formatReadableDate(slot.date)}
-                                                                    </strong>
-
-                                                                    <div className="d-flex align-items-center">
-                                                                        <button
-                                                                            className="btn btn-sm btn-outline-secondary"
-                                                                            onClick={() => decreaseSlot(slot)}
-                                                                        >
-                                                                            –
-                                                                        </button>
-
-                                                                        <span
-                                                                            className="mx-2"
-                                                                            style={{
-                                                                                fontSize: "16px",
-                                                                                width: "25px",
-                                                                                textAlign: "center",
-                                                                            }}
-                                                                        >
-                                                                            {slotCart[slot.id]?.count || 0}
-                                                                        </span>
-
-                                                                        <button
-                                                                            className="btn btn-sm btn-outline-primary"
-                                                                            onClick={() => increaseSlot(slot)}
-                                                                        >
-                                                                            +
-                                                                        </button>
-                                                                    </div>
-                                                                </div>
-
-                                                                <p className="mt-2">
-                                                                    {formatTime(slot.slot_start_time)} to {formatTime(slot.slot_end_time)}
-                                                                </p>
-
-                                                                <p><strong>Location: {slot.slot_location}</strong></p>
-
-                                                                <p><strong>Price: ₹{slot.price}</strong></p>
-                                                            </div>
-                                                        ))
-                                                    ) : (
-                                                        <p className="text-muted">No slots available</p>
-                                                    )}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-
-
 
                                 </div>
                             </Col>
 
                             {/* RIGHT SIDE (CART SUMMARY) */}
-                            <Col lg={4}>
+                            <Col lg={4} className="crys-accomo-rgt men-innr-sec monten25-rgt-pnl">
                                 <div className="checkot-rgt">
-                                    <h2>Checkout</h2>
-
+                                    {/* <h2>Checkout</h2> */}
+                                    <div
+                                        className="checkot-rgt-bnr mont25rgt-bnt "
+                                        style={{
+                                            backgroundImage: `url(${eventDetails.feat_image
+                                                ? `${eventDetails.feat_image}`
+                                                : `https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/1024px-No_image_available.svg.png`
+                                                })`,
+                                        }}
+                                    > <img
+                                            src={`https://eboxtickets.com/images/eboxticket_dark_logo.png`}
+                                            alt="Logo"
+                                        />
+                                    </div>
                                     {cart.length > 0 ? (
-                                        <div className="monte25-tct-purcs">
+                                        <div className="checkot-tct-purcs monte25-tct-purcs">
                                             <h6>YOUR APPOINTMENTS</h6>
 
-                                            {cart.map((item, i) => (
-                                                <div key={i} className="ticket-item mb-2">
-                                                    <strong>
-                                                        {item.display_name}
-                                                        {item.item_type && ` (${item.item_type})`}
-                                                    </strong>
-                                                    <p>
-                                                        {item.count} × ${item.ticket_price}
+                                            {cart.map((item, index) => (
+                                                <div key={index + Math.random(100)} className="yr-tct-dtl">
+                                                    <p className="yr-tct-dtl-para">
+                                                        {item.count}x{" "}
+                                                        <span>
+                                                            {item.item_type == "appointment" &&
+                                                                item.display_name
+                                                                ? item.display_name
+                                                                : "Unknown"}
+                                                        </span>
+                                                    </p>
+                                                    <p
+                                                        style={{ cursor: "pointer" }}
+                                                        title="Delete Item"
+                                                    >
+                                                        {/* {currencySymbol} */}
+                                                        $
+                                                        {item.item_type == "appointment" &&
+                                                            item.display_name
+                                                            ? (
+                                                                item?.ticket_price *
+                                                                item.count
+                                                            ).toLocaleString()
+                                                            : 0}
+                                                        {/* <img
+                                                            src={`/assets/img/caryes-ticket-dlt.png`}
+                                                            alt="delete-icon"
+                                                            onClick={() =>
+                                                                handleDeleteCartItem(item.id)
+                                                            } // Assuming you implement this function
+                                                        /> */}
                                                     </p>
                                                 </div>
                                             ))}
 
-                                            <h6 className="mt-5">
+
+                                            <div className="apply-cd mt-5">
+                                                <InputGroup className="input-group">
+                                                    <Form.Control
+                                                        className="form-control"
+                                                        placeholder="ENTER STAFF ID"
+                                                        type="text"
+                                                        value={coupon}
+                                                        onChange={(e) =>
+                                                            setCoupon(e.target.value.toUpperCase())
+                                                        }
+                                                    />
+                                                    {/* Conditional rendering of the button */}
+                                                    {couponDetails ? (
+                                                        <Button
+                                                            variant=""
+                                                            className="btn"
+                                                            type="button"
+                                                        // onClick={handleRemoveCoupon} // Function to remove the coupon
+                                                        >
+                                                            REMOVE
+                                                        </Button>
+                                                    ) : (
+                                                        <Button
+                                                            variant=""
+                                                            className="btn"
+                                                            type="button"
+                                                        // onClick={handleApplyCoupon} // Function to apply the coupon
+                                                        >
+                                                            APPLY
+                                                        </Button>
+                                                    )}
+                                                </InputGroup>
+                                            </div>
+
+
+                                            {/* <h6 className="mt-5">
                                                 TOTAL {totalTickets} ITEM
                                                 {totalTickets > 1 ? "S" : ""}
-                                            </h6>
+                                            </h6> */}
 
-                                            <div className="apply-cd my-3">
+                                            {/* <div className="apply-cd my-3">
                                                 <InputGroup>
                                                     <input
                                                         type="text"
@@ -570,9 +738,52 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                         className="form-control"
                                                     />
                                                 </InputGroup>
-                                            </div>
+                                            </div> */}
 
                                             <div className="tickt-ttl-prs">
+                                                <div className="tct-ttl-innr">
+                                                    <p>SUBTOTAL</p>
+                                                    <span>
+                                                        {/* {currencySymbol} */}$
+                                                        {priceTotal.toFixed(2)} {" "}
+                                                    </span>
+                                                </div>
+
+                                                {couponDetails && (
+                                                    <div className="tct-ttl-innr">
+                                                        <p>STAFF ID</p>
+                                                        <span>
+                                                            {couponDetails.discount_type === "percentage" ? (
+                                                                <>- {Math.floor(couponDetails.discount_value)}% ({currencySymbol}{formatSmartPrice(discountAmount)})</>
+                                                            ) : (
+                                                                <>
+                                                                    -{" "}
+                                                                    {currencySymbol || ""}
+                                                                    {formatSmartPrice(discountAmount)}
+                                                                </>
+                                                            )}
+                                                        </span>
+                                                    </div>
+                                                )}
+
+                                                <div className="tct-ttl-innr">
+                                                    <p>TICKETS FEES & TAXES</p>
+                                                    <span>
+                                                        $
+                                                        {feeTotal.toFixed(2)}
+                                                    </span>
+                                                </div>
+
+                                                <div className="tct-ttl-innr">
+                                                    <p>TOTAL</p>
+                                                    <p>
+                                                        $
+                                                        {finalTotal.toFixed(2)}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            {/* <div className="tickt-ttl-prs">
                                                 <div className="d-flex justify-content-between">
                                                     <p>PRICE</p>
                                                     <span>${priceTotal.toFixed(2)}</span>
@@ -587,49 +798,82 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                     <p>TOTAL</p>
                                                     <p>${finalTotal.toFixed(2)}</p>
                                                 </div>
-                                            </div>
+                                            </div> */}
                                         </div>
                                     ) : (
                                         <h3 className="text-center mt-5">Cart is Empty</h3>
                                     )}
                                 </div>
                                 {cart.length > 0 && (
-                                    <Button
-                                        type="submit"
-                                        disabled={isBtnLoading}   // 🔥 Prevent double click
-                                        style={{
-                                            backgroundColor: "#ff4da6",
-                                            color: "white",
-                                            borderRadius: "8px",
-                                            padding: "10px 16px",
-                                            fontWeight: "600",
-                                            border: "none",
-                                            width: "100%",
-                                            opacity: isBtnLoading ? 0.7 : 1, // loader look
-                                            cursor: isBtnLoading ? "not-allowed" : "pointer"
-                                        }}
-                                        onClick={() => {
-                                            if (finalTotal == 0) {
-                                                handleFreeTicket();
-                                            } else {
-                                                handlePurchase();
-                                            }
-                                        }}
-                                    >
-                                        {isBtnLoading ? (
-                                            <span
-                                                className="spinner-border spinner-border-sm"
-                                                role="status"
-                                                style={{ marginRight: "8px" }}
-                                            ></span>
-                                        ) : null}
+                                    <div className="by-nw-btn accomofl-ck-bt">
+                                        <Button
+                                            variant=""
+                                            className="btn"
+                                            type="submit"
+                                            style={{
+                                                backgroundColor: "#fca3bb",
+                                                color: "white",
+                                                borderRadius: "30px",
+                                                padding: "10px 24px",
+                                                fontWeight: "600",
+                                                border: "none",
+                                                width: "50%",          // full width hat gaya
+                                                display: "block",
+                                                margin: "20px auto 0",      // button center me aa jayega
+                                                opacity: isBtnLoading ? 0.7 : 1,
+                                                cursor: isBtnLoading ? "not-allowed" : "pointer"
+                                            }}
+                                            onClick={() => {
+                                                if (finalTotal == 0) {
+                                                    handleFreeTicket();
+                                                } else {
+                                                    handlePurchase();
+                                                }
+                                            }}
+                                        >
+                                            {finalTotal == 0 ? "FREE TICKET" : "PURCHASE"}
+                                        </Button>
 
-                                        {isBtnLoading
-                                            ? "Processing..."
-                                            : finalTotal == 0
-                                                ? "FREE TICKET"
-                                                : "PURCHASE"}
-                                    </Button>
+                                    </div>
+
+
+
+                                    // <Button
+                                    //     type="submit"
+                                    //     disabled={isBtnLoading}   // 🔥 Prevent double click
+                                    // style={{
+                                    //     backgroundColor: "#ff4da6",
+                                    //     color: "white",
+                                    //     borderRadius: "8px",
+                                    //     padding: "10px 16px",
+                                    //     fontWeight: "600",
+                                    //     border: "none",
+                                    //     width: "100%",
+                                    //     opacity: isBtnLoading ? 0.7 : 1, // loader look
+                                    //     cursor: isBtnLoading ? "not-allowed" : "pointer"
+                                    // }}
+                                    //     onClick={() => {
+                                    //         if (finalTotal == 0) {
+                                    //             handleFreeTicket();
+                                    //         } else {
+                                    //             handlePurchase();
+                                    //         }
+                                    //     }}
+                                    // >
+                                    //     {isBtnLoading ? (
+                                    //         <span
+                                    //             className="spinner-border spinner-border-sm"
+                                    //             role="status"
+                                    //             style={{ marginRight: "8px" }}
+                                    //         ></span>
+                                    //     ) : null}
+
+                                    //     {isBtnLoading
+                                    //         ? "Processing..."
+                                    //         : finalTotal == 0
+                                    //             ? "FREE TICKET"
+                                    //             : "PURCHASE"}
+                                    // </Button>
 
                                 )}
 

@@ -87,6 +87,23 @@ export default function MyOrdersDetails({ userId }) {
         }
     };
 
+    // date format AM-PM
+    function formatTime(timeString) {
+        if (!timeString) return "";
+        const [hour, minute] = timeString.split(":");
+        const date = new Date();
+        date.setHours(hour, minute);
+
+        return date.toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true
+        });
+    }
+
+
+
+
     return (
         <>
             <FrontendHeader backgroundImage={backgroundImage} />
@@ -125,8 +142,7 @@ export default function MyOrdersDetails({ userId }) {
                                 {/* RIGHT DETAILS SECTION */}
                                 <div className="col-lg-8 col-md-7">
                                     <h2 className="fw-bold m-0">{orderData?.event?.name}</h2>
-                                    <div className="text-muted mb-3">Hosted By {orderData?.event?.event_org_id}</div>
-
+                                    <div className="text-muted mb-3">Hosted By <a href="#"> #{orderData?.event?.companyInfo?.name || 'Company'}</a></div>
                                     {/* BLUE TOP BAR */}
                                     <div className="row text-white p-3 rounded mb-4" style={{ background: "#3d6db5" }}>
                                         <div className="col-md-4 border-end">
@@ -170,7 +186,6 @@ export default function MyOrdersDetails({ userId }) {
                                     </div>
 
                                     {orderData?.orderItems?.map((item, index) => {
-                                        // console.log("-------item", item.type)
                                         // Detect Type
                                         const isTicket = item.type === "ticket_price";
                                         const isAppointment = item.type === "appointment";
@@ -194,8 +209,9 @@ export default function MyOrdersDetails({ userId }) {
 
                                         // Date & Time
                                         const dateInfo = isTicket
-                                            ? `${item.slot?.slot_date} | ${item.slot?.start_time} - ${item.slot?.end_time}`
-                                            : `${item.appointment?.date} | ${item.appointment?.slot_start_time} - ${item.appointment?.slot_end_time}`;
+                                            ? `${item.slot?.slot_date} | ${formatTime(item.slot?.start_time)} - ${formatTime(item.slot?.end_time)}`
+                                            : `${item.appointment?.date} | ${formatTime(item.appointment?.slot_start_time)} - ${formatTime(item.appointment?.slot_end_time)}`;
+
 
                                         return (
                                             <div key={item.id} className="border rounded p-3 bg-light mb-4">

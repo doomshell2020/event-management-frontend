@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 import moment from "moment-timezone"; // ✅ Import moment-timezone
 import HtmlEditor, { getHtmlEditorContent } from "@/pages/components/HtmlEditor/HtmlEditor";
 import { useRouter } from 'next/router';
+import DatePicker from "react-datepicker";
 
 
 
@@ -315,7 +316,7 @@ const EditAppointmentPage = () => {
                                                         <label className="form-label">
                                                             Date <span className="text-danger">*</span>
                                                         </label>
-                                                        <input
+                                                        {/* <input
                                                             type="date"
                                                             className="form-control rounded-0"
                                                             name="slot_date"
@@ -323,33 +324,92 @@ const EditAppointmentPage = () => {
                                                             min={today}
                                                             value={slot.date}
                                                             onChange={(e) => handleChange(index, "date", e.target.value)}
+                                                        /> */}
+                                                        <DatePicker
+                                                            selected={slot.date ? new Date(slot.date) : null}
+                                                            onChange={(date) =>
+                                                                handleChange(index, "date", date.toISOString().split("T")[0])
+                                                            }
+                                                            className="form-control rounded-0"
+                                                            minDate={new Date()}
+                                                            dateFormat="yyyy-MM-dd"
+                                                            placeholderText="Select Date"
                                                         />
                                                     </div>
 
                                                     {/* Start Time */}
                                                     <div className="col-lg-2 col-md-6 mb-3">
                                                         <label className="form-label">Start Time <span className="text-danger">*</span></label>
-                                                        <input
+                                                        {/* <input
                                                             type="time"
                                                             className="form-control rounded-0"
                                                             name="slot_start"
                                                             value={slot.slot_start_time}
                                                             onChange={(e) => handleChange(index, "slot_start_time", e.target.value)}
-                                                        />
+                                                        /> */}
 
+                                                        <DatePicker
+                                                            selected={
+                                                                slot.slot_start_time
+                                                                    ? new Date(`2000-01-01T${slot.slot_start_time}`)
+                                                                    : null
+                                                            }
+                                                            onChange={(date) => {
+                                                                // 24-hour format for DB
+                                                                const dbTime = date.toLocaleTimeString("en-GB", {
+                                                                    hour: "2-digit",
+                                                                    minute: "2-digit",
+                                                                    hour12: false,
+                                                                });
+                                                                handleChange(index, "slot_start_time", dbTime);
+                                                            }}
+                                                            showTimeSelect
+                                                            showTimeSelectOnly
+                                                            timeIntervals={5}
+                                                            timeCaption="Start Time"
+                                                            dateFormat="h:mm aa" // only UI format (12 hr)
+                                                            className="form-control rounded-0"
+                                                            placeholderText="Start Time"
+                                                        />
                                                     </div>
 
                                                     {/* End Time */}
                                                     <div className="col-lg-2 col-md-6 mb-3">
                                                         <label className="form-label">End Time <span className="text-danger">*</span></label>
-                                                        <input
+                                                        {/* <input
                                                             type="time"
                                                             className="form-control rounded-0"
                                                             name="slot_end"
                                                             required
                                                             value={slot.slot_end_time}
                                                             onChange={(e) => handleChange(index, "slot_end_time", e.target.value)}
+                                                        /> */}
+
+                                                        <DatePicker
+                                                            selected={
+                                                                slot.slot_end_time
+                                                                    ? new Date(`2000-01-01T${slot.slot_end_time}`)
+                                                                    : null
+                                                            }
+                                                            onChange={(date) => {
+                                                                // 24-hour format for DB
+                                                                const dbTime = date.toLocaleTimeString("en-GB", {
+                                                                    hour: "2-digit",
+                                                                    minute: "2-digit",
+                                                                    hour12: false,
+                                                                });
+
+                                                                handleChange(index, "slot_end_time", dbTime);
+                                                            }}
+                                                            showTimeSelect
+                                                            showTimeSelectOnly
+                                                            timeIntervals={5}
+                                                            timeCaption="End Time"
+                                                            dateFormat="h:mm aa" // only UI format
+                                                            className="form-control rounded-0"
+                                                            placeholderText="End Time"
                                                         />
+
                                                     </div>
 
                                                     {/* Price */}

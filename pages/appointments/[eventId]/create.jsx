@@ -7,7 +7,7 @@ import Swal from "sweetalert2";
 import moment from "moment-timezone"; // ✅ Import moment-timezone
 import HtmlEditor, { getHtmlEditorContent } from "@/pages/components/HtmlEditor/HtmlEditor";
 import { useRouter } from 'next/router';
-
+import DatePicker from "react-datepicker";
 const CreateAppointmentPage = () => {
     const [backgroundImage, setIsMobile] = useState('/assets/front-images/about-slider_bg.jpg');
     const router = useRouter();
@@ -32,41 +32,14 @@ const CreateAppointmentPage = () => {
         if (start && end && start >= end) {
             // alert("End time must be greater than Start time");
             Swal.fire({
-                    icon: "error",
-                    title: "Oops!",
-                    text: 'End time must be greater than Start time',
-                });
+                icon: "error",
+                title: "Oops!",
+                text: 'End time must be greater than Start time',
+            });
             updatedSlots[index].slot_end_time = "";
         }
         setSlots(updatedSlots);
     };
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                // Fetch countries
-                const countryRes = await api.get("/api/v1/common/list?key=country");
-                if (countryRes.data?.success && Array.isArray(countryRes.data.data?.data)) {
-                    setCountries(countryRes.data.data.data);
-                }
-
-                // Fetch companies
-                const companyRes = await api.get("/api/v1/events/company-list");
-                if (companyRes.data?.success && Array.isArray(companyRes.data.data?.companies)) {
-                    setCompanies(companyRes.data.data.companies);
-                }
-
-                // ✅ Use moment-timezone to get timezone list
-                const tzList = moment.tz.names();
-                setTimezones(tzList.map((tz) => ({ id: tz, name: tz })));
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            }
-        };
-        fetchData();
-    }, []);
-
-
 
     const handleFileChange = (e) => {
         setImage(e.target.files[0]);
@@ -113,7 +86,7 @@ const CreateAppointmentPage = () => {
             const body = new FormData();
             body.append("name", name.trim());
             body.append("currency", paymentCurrency);
-            body.append("event_id",EventId );
+            body.append("event_id", EventId);
             body.append("location", location || "");
             body.append("description", content.trim());
             body.append("slots", slotsJSON);
@@ -305,7 +278,7 @@ const CreateAppointmentPage = () => {
                                                 <div className="row g-3" key={index}>
 
                                                     {/* Date */}
-                                                    <div className="col-lg-2 col-md-6 mb-3">
+                                                    {/* <div className="col-lg-2 col-md-6 mb-3">
                                                         <label className="form-label">
                                                             Date <span className="text-danger">*</span>
                                                         </label>
@@ -318,10 +291,93 @@ const CreateAppointmentPage = () => {
                                                             value={slot.date}
                                                             onChange={(e) => handleChange(index, "date", e.target.value)}
                                                         />
+                                                    </div> */}
+                                                    <div className="col-lg-2 col-md-6 mb-3">
+                                                        <label className="form-label">
+                                                            Date <span className="text-danger">*</span>
+                                                        </label>
+
+                                                        <DatePicker
+                                                            selected={slot.date ? new Date(slot.date) : null}
+                                                            onChange={(date) =>
+                                                                handleChange(index, "date", date.toISOString().split("T")[0])
+                                                            }
+                                                            className="form-control rounded-0"
+                                                            minDate={new Date()}
+                                                            dateFormat="yyyy-MM-dd"
+                                                            placeholderText="Select Date"
+                                                        />
                                                     </div>
 
                                                     {/* Start Time */}
                                                     <div className="col-lg-2 col-md-6 mb-3">
+                                                        <label className="form-label">
+                                                            Start Time <span className="text-danger">*</span>
+                                                        </label>
+
+                                                        <DatePicker
+                                                            selected={
+                                                                slot.slot_start_time
+                                                                    ? new Date(`2000-01-01T${slot.slot_start_time}`)
+                                                                    : null
+                                                            }
+                                                            onChange={(date) => {
+                                                                // 24-hour format for DB
+                                                                const dbTime = date.toLocaleTimeString("en-GB", {
+                                                                    hour: "2-digit",
+                                                                    minute: "2-digit",
+                                                                    hour12: false,
+                                                                });
+
+                                                                handleChange(index, "slot_start_time", dbTime);
+                                                            }}
+                                                            showTimeSelect
+                                                            showTimeSelectOnly
+                                                            timeIntervals={5}
+                                                            timeCaption="Start Time"
+                                                            dateFormat="h:mm aa" // only UI format (12 hr)
+                                                            className="form-control rounded-0"
+                                                            placeholderText="Start Time"
+                                                        />
+                                                    </div>
+
+                                                    {/* Start Time */}
+
+                                                    <div className="col-lg-2 col-md-6 mb-3">
+                                                        <label className="form-label">
+                                                            End Time <span className="text-danger">*</span>
+                                                        </label>
+
+
+                                                        <DatePicker
+                                                            selected={
+                                                                slot.slot_end_time
+                                                                    ? new Date(`2000-01-01T${slot.slot_end_time}`)
+                                                                    : null
+                                                            }
+                                                            onChange={(date) => {
+                                                                // 24-hour format for DB
+                                                                const dbTime = date.toLocaleTimeString("en-GB", {
+                                                                    hour: "2-digit",
+                                                                    minute: "2-digit",
+                                                                    hour12: false,
+                                                                });
+
+                                                                handleChange(index, "slot_end_time", dbTime);
+                                                            }}
+                                                            showTimeSelect
+                                                            showTimeSelectOnly
+                                                            timeIntervals={5}
+                                                            timeCaption="End Time"
+                                                            dateFormat="h:mm aa" // only UI format
+                                                            className="form-control rounded-0"
+                                                            placeholderText="End Time"
+                                                        />
+                                                    </div>
+
+
+
+                                                    {/* <div className="col-lg-2 col-md-6 mb-3">
                                                         <label className="form-label">Start Time <span className="text-danger">*</span></label>
                                                         <input
                                                             type="time"
@@ -330,11 +386,10 @@ const CreateAppointmentPage = () => {
                                                             value={slot.slot_start_time}
                                                             onChange={(e) => handleChange(index, "slot_start_time", e.target.value)}
                                                         />
-
-                                                    </div>
+                                                    </div> */}
 
                                                     {/* End Time */}
-                                                    <div className="col-lg-2 col-md-6 mb-3">
+                                                    {/* <div className="col-lg-2 col-md-6 mb-3">
                                                         <label className="form-label">End Time <span className="text-danger">*</span></label>
                                                         <input
                                                             type="time"
@@ -344,7 +399,7 @@ const CreateAppointmentPage = () => {
                                                             value={slot.slot_end_time}
                                                             onChange={(e) => handleChange(index, "slot_end_time", e.target.value)}
                                                         />
-                                                    </div>
+                                                    </div> */}
 
                                                     {/* Price */}
                                                     <div className="col-lg-2 col-md-6 mb-3">
