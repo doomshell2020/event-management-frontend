@@ -314,27 +314,27 @@ export default function MyOrdersDetails({ userId }) {
 
                                                     <div className="row mb-1">
                                                         <div className="col-4 fw-bold">Total Amount :</div>
-                                                        <div className="col-8">{currencyName}{' '}{orderData.subtotal || orderData.total_amount}</div>
+                                                        <div className="col-8">{currencyName}{' '}{orderData.sub_total || 0}</div>
                                                     </div>
                                                     <div className="row mb-1">
                                                         <div className="col-4 fw-bold">Discount :</div>
-                                                        <div className="col-8">{currencyName}{' '}{orderData.tax || 0}</div>
+                                                        <div className="col-8">{currencyName}{' '}{orderData.discount_amount || 0}</div>
                                                     </div>
                                                     <div className="row mb-1">
                                                         <div className="col-4 fw-bold">Tax :</div>
-                                                        <div className="col-8">{currencyName}{' '}{orderData.tax || 0}</div>
+                                                        <div className="col-8">{currencyName}{' '}{orderData.tax_total || 0}</div>
                                                     </div>
 
-                                                    {orderData.discount > 0 && (
+                                                    {orderData.discount_amount > 0 && (
                                                         <div className="row mb-1">
                                                             <div className="col-4 fw-bold">Discount :</div>
-                                                            <div className="col-8">-{currencyName}{' '}{orderData.discount}</div>
+                                                            <div className="col-8">-{currencyName}{' '}{orderData.discount_amount}</div>
                                                         </div>
                                                     )}
 
                                                     <div className="row fw-bold text-success mt-2">
                                                         <div className="col-4">Total Paid :</div>
-                                                        <div className="col-8">{currencyName}{' '}{orderData.total_amount}</div>
+                                                        <div className="col-8">{currencyName}{' '}{orderData.grand_total || 0}</div>
                                                     </div>
                                                 </div>
                                             </div>

@@ -58,13 +58,13 @@ const EventSidebar = ({ eventId }) => {
             {eventId ? (
                 <ul className="listunstyl components">
                     {[
-                        { href: `/event/dashboard/${eventId}`, icon: "bi bi-speedometer2", label: "Dashboard" },
+                        { href: `/event/my-event/`, icon: "bi bi-speedometer2", label: "Dashboard" },
                         { href: `/event/edit-event/${eventId}`, icon: "bi bi-sliders", label: "Settings" },
                         { href: `/event/payments/${eventId}`, icon: "bi bi-credit-card", label: "Payments" },
                         { href: `/event/export-tickets/${eventId}`, icon: "bi bi-wallet2", label: "Export Tickets" },
                         { href: `/event/analytics/${eventId}`, icon: "bi bi-bar-chart", label: "Analytics" },
                         { href: `/event/payouts/${eventId}`, icon: "bi bi-wallet2", label: "Payouts" },
-                        { href: `/event/committee/${eventId}`, icon: "bi bi-people", label: "Committee" },
+                        { href: `/event/edit-event/${eventId}/manage-committee`, icon: "bi bi-people", label: "Committee" },
                         { href: `/event/tickets/${eventId}`, icon: "fas fa-ticket-alt", label: "Tickets" },
                         { href: `/event/ticket-reports/${eventId}`, icon: "fas fa-chart-bar", label: "Ticket Reports" },
                     ].map((item, idx) => (

@@ -1,7 +1,7 @@
 import { loadStripe } from "@stripe/stripe-js";
 import Link from "next/link";
 import { Button, Col, Row, Modal, Form } from "react-bootstrap";
-import { useEffect, useState, useCallback ,useRef} from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import axios from "axios";
 import CheckoutForm from "./CheckoutForm";
 import api from "@/utils/api";
@@ -26,12 +26,12 @@ export default function CheckOutComponents({
     let stripePromise;
 
     stripePromise = loadStripe(
-        process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY
+        process.env.STRIPE_SECRET_KEY
     );
     const [isLoading, setIsLoading] = useState(true);
     const [clientSecret, setClientSecret] = useState("");
     const [cart, setCart] = useState([]);
-    console.log("----cart", cart)
+    // console.log("----cart", cart)
     const [currencySymbol, setCurrencySymbol] = useState("");
     const [currencyName, setCurrencyName] = useState("");
     const [ticketingFeeDetails, setTicketingFeeDetails] = useState();
@@ -123,107 +123,6 @@ export default function CheckOutComponents({
         const decimal = amount - floor;
         return decimal >= threshold ? Math.ceil(amount) : floor;
     };
-
-    // const calculateTotalsV1 = ({
-    //     cart = [],
-    //     discountAmount = 0,
-    //     ticketingFeeDetails = {}
-    // }) => {
-    //     const round2 = (num) => Math.round(num * 100) / 100;
-    //     let totalAppointmentPrice = 0;
-    //     // Separate ticket and addon totals
-    //     cart.forEach(item => {
-    //         const price = item.item_type == "appointment"
-    //             ? item.ticket_price || 0
-    //             : 0
-    //         if (item.item_type == "appointment") {
-    //             totalAppointmentPrice += price * item.count;
-    //         }
-    //     });
-    //     const totalTicketAndAddonPrice = totalAppointmentPrice;
-    //     // Apply discount only to tickets
-    //     const discountedTicketTotal = round2(Math.max(totalAppointmentPrice - discountAmount, 0));
-    //     // const discountedTotalTicAdd = discountedTicketTotal + discountedAddonTotal;
-    //     const discountedTotalTicAdd = discountedTicketTotal;
-    //     // For backward compatibility
-    //     const discountedTicketAndAddon = discountedTotalTicAdd;
-
-    //     // Destructure fees with defaults
-    //     const {
-    //         ticket_platform_fee_percentage = 0,
-    //         ticket_stripe_fee_percentage = 0,
-    //         ticket_bank_fee_percentage = 0,
-    //         ticket_processing_fee_percentage = 0
-    //     } = ticketingFeeDetails;
-
-    //     const adminFeePercent =
-    //         ticket_platform_fee_percentage +
-    //         ticket_bank_fee_percentage +
-    //         ticket_processing_fee_percentage;
-    //     const adminFeeDecimal = adminFeePercent / 100;
-    //     const stripeFeeDecimal = ticket_stripe_fee_percentage / 100;
-
-    //     // Admin fees for tickets
-    //     const ticPlatformFee = round2(discountedTicketTotal * (ticket_platform_fee_percentage / 100));
-    //     const ticBankFee = round2(discountedTicketTotal * (ticket_bank_fee_percentage / 100));
-    //     const ticProcessingFee = round2(discountedTicketTotal * (ticket_processing_fee_percentage / 100));
-    //     const ticketAdminTotal = ticPlatformFee + ticBankFee + ticProcessingFee;
-
-    //     // Combine admin fees
-    //     const ticketPlatformFee = round2(ticPlatformFee);
-    //     const ticketBankFee = round2(ticBankFee);
-    //     const ticketProcessingFee = round2(ticProcessingFee);
-
-    //     // Stripe fee calculation
-    //     const totalBeforeStripe = round2(discountedTotalTicAdd + ticketAdminTotal);
-    //     const customerPays = roundWithThreshold(totalBeforeStripe / (1 - stripeFeeDecimal));
-
-    //     const ticketPortion = discountedTicketTotal + ticketAdminTotal;
-    //     // const addonPortion = discountedAddonTotal + addonAdminTotal;
-    //     const totalPortion = ticketPortion || 1; // avoid division by 0
-
-    //     const ticStripeFee = round2((ticketPortion / totalPortion) * (customerPays * stripeFeeDecimal));
-    //     // const addonStripeFee = round2((addonPortion / totalPortion) * (customerPays * stripeFeeDecimal));
-    //     const ticketStripeFee = round2(ticStripeFee);
-
-    //     // Tax breakdowns
-    //     const ticketTax = round2((discountedTicketTotal * adminFeeDecimal) + ticStripeFee);
-    //     // const addonTax = round2((discountedAddonTotal * adminFeeDecimal) + addonStripeFee);
-    //     const totalTax = roundWithThreshold(ticketTax);
-
-    //     const exactFinalAmount = roundWithThreshold(
-    //         discountedTicketAndAddon + ticketAdminTotal + ticStripeFee
-    //     );
-    //     const finalTotalAmount = roundWithThreshold(exactFinalAmount);
-
-    //     console.log("finalTotalAmount", finalTotalAmount)
-
-
-    //     return {
-    //         breakdown: {
-    //             ticketTotal: totalAppointmentPrice || 0,
-    //             // addonTotal: totalAddonPrice || 0,
-    //             totalTicketAndAddonPrice,
-    //             discountAmount,
-    //             totalAfterDiscount: discountedTicketAndAddon,
-    //             ticketTax,
-    //             // addonTax,
-    //             totalTax,
-    //             finalTotalAmount,
-    //             payableAmount: customerPays,
-    //             exactFinalAmount,
-    //             ticketTaxBreakdown: {
-    //                 totalTax,
-    //                 ticketPlatformFee,
-    //                 ticketStripeFee,
-    //                 ticketBankFee,
-    //                 ticketProcessingFee
-    //             }
-    //         }
-    //     };
-    // };
-
-
     const calculateTotalsV1 = ({
         cart = [],
         discountAmount = 0
@@ -275,7 +174,7 @@ export default function CheckOutComponents({
         ticketingFeeDetails
     });
 
-    const { ticketTotal, addonTotal, totalTicketAndAddonPrice, discountAmount, totalAfterDiscount, totalTax, finalTotalAmount, payableAmount,appointmentTotal } = breakdown;
+    const { ticketTotal,appointmentTotal, addonTotal, totalTicketAndAddonPrice, discountAmount, totalAfterDiscount, totalTax, finalTotalAmount, payableAmount } = breakdown;
     // return
     /////////////////////////////////Cart calculation End///////////////////////////////////
 
@@ -309,51 +208,6 @@ export default function CheckOutComponents({
     useEffect(() => {
         fetchCartDetails();
     }, [fetchCartDetails]);
-
-    // Fetch Client Secret
-    // useEffect(() => {
-    //     // Only proceed if cart has items and finalTotalAmount > 0
-    //     if (cart.length > 0 && finalTotalAmount > 0 && !clientSecret) {
-    //         const fetchClientSecret = async () => {
-    //             setIsLoading(true);
-    //             try {
-    //                 const user = await fetchMemberProfile();
-    //                 if (!user) return;
-    //                 const { data } = await api.post("/api/v1/payment/create-payment-intent", {
-    //                     user_id: userId,
-    //                     event_id: eventId,
-    //                     total_amount: finalTotalAmount,
-    //                     tax: totalTax,
-    //                     currency: currencyName || "usd",
-    //                     discount: couponDetails,
-    //                     cartData: [
-    //                         {
-    //                             "ticketId": 32,
-    //                             "ticketType": "appointment",
-    //                             "quantity": 1,
-    //                             "price": 100
-    //                         }
-    //                     ],
-    //                     // finalPrice: finalTotalAmount,
-    //                     // name: `${user.FirstName} ${user.LastName}`,
-    //                     // email: user.Email,
-    //                     // adminFees,
-    //                     // cart,
-    //                     // breakdown,
-    //                 });
-    //                 console.log("-data",data.data.clientSecret)
-    //             //    setClientSecret(data.clientSecret);
-    //                setClientSecret(data.data.clientSecret);
-    //             } catch (error) {
-    //                 console.error("❌ Error creating payment intent:", error);
-    //             } finally {
-    //                 setIsLoading(false);
-    //             }
-    //         };
-
-    //         fetchClientSecret();
-    //     }
-    // }, [cart, finalTotalAmount, currencySymbol]);
     const intentCreatedRef = useRef(false);
     useEffect(() => {
         if (
@@ -377,11 +231,11 @@ export default function CheckOutComponents({
                     {
                         user_id: user.id,
                         event_id: eventId,
-                        sub_total:appointmentTotal,
-                        tax_total : totalTax,
+                        sub_total: appointmentTotal,
+                        tax_total: totalTax,
                         grand_total: finalTotalAmount,
                         currency: currencyName || "usd",
-                        discount_amount : couponDetails,
+                        discount_amount: 0,
                         cartData: cart.map(item => ({
                             ticketId: item.raw.appointments.id,
                             ticketType: item.item_type,
