@@ -1,7 +1,7 @@
 import { loadStripe } from "@stripe/stripe-js";
 import Link from "next/link";
 import { Button, Col, Row, Modal, Form } from "react-bootstrap";
-import { useEffect, useState, useCallback ,useRef} from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import axios from "axios";
 import CheckoutForm from "./CheckoutForm";
 import api from "@/utils/api";
@@ -26,12 +26,12 @@ export default function CheckOutComponents({
     let stripePromise;
 
     stripePromise = loadStripe(
-        process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY
+        process.env.STRIPE_SECRET_KEY
     );
     const [isLoading, setIsLoading] = useState(true);
     const [clientSecret, setClientSecret] = useState("");
     const [cart, setCart] = useState([]);
-    console.log("----cart", cart)
+    // console.log("----cart", cart)
     const [currencySymbol, setCurrencySymbol] = useState("");
     const [currencyName, setCurrencyName] = useState("");
     const [ticketingFeeDetails, setTicketingFeeDetails] = useState();
@@ -275,7 +275,7 @@ export default function CheckOutComponents({
         ticketingFeeDetails
     });
 
-    const { ticketTotal, addonTotal, totalTicketAndAddonPrice, discountAmount, totalAfterDiscount, totalTax, finalTotalAmount, payableAmount } = breakdown;
+    const { ticketTotal,appointmentTotal, addonTotal, totalTicketAndAddonPrice, discountAmount, totalAfterDiscount, totalTax, finalTotalAmount, payableAmount } = breakdown;
     // return
     /////////////////////////////////Cart calculation End///////////////////////////////////
 
@@ -377,10 +377,11 @@ export default function CheckOutComponents({
                     {
                         user_id: user.id,
                         event_id: eventId,
-                        total_amount: finalTotalAmount,
-                        tax: totalTax,
+                        sub_total: appointmentTotal,
+                        tax_total: totalTax,
+                        grand_total: finalTotalAmount,
                         currency: currencyName || "usd",
-                        discount: couponDetails,
+                        discount_amount: 0,
                         cartData: cart.map(item => ({
                             ticketId: item.raw.appointments.id,
                             ticketType: item.item_type,
