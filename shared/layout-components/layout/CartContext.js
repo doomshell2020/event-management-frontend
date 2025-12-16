@@ -30,7 +30,6 @@ export const CartProvider = ({ children }) => {
 
             const res = await api.get(`/api/v1/cart/list${query}`);
             const data = res?.data?.data || {};
-
             const event = data.event || null;
             const cartItems = data.cart || [];
             // console.log('cartItems :', cartItems);

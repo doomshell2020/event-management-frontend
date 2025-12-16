@@ -9,6 +9,7 @@ import { format } from "date-fns"; // helps format dates
 export default function MyOrders({ userId }) {
     const [backgroundImage, setIsMobile] = useState('/assets/front-images/about-slider_bg.jpg');
     const [orderData, setOrderData] = useState([]);
+    console.log("---orderData", orderData)
     const [loading, setLoading] = useState(true); // ✅ Added loading state
     const fetchOrders = async () => {
         setLoading(true); // start loading
@@ -62,25 +63,31 @@ export default function MyOrders({ userId }) {
                                         0
                                     );
 
+                                    const currencySymbol = order?.orderItems?.[0]?.appointment?.wellnessList?.currencyName?.Currency_symbol || "";
+                                    // console.log("--------currencySymbol",currencySymbol)
 
                                     return (
                                         <div key={order.id} className="col-lg-6 col-md-12">
                                             <div className="up_events position-relative">
                                                 {order?.orderItems[0]?.type === "appointment" && (
                                                     <span
-                                                        className="position-absolute badge"
+                                                        className="position-absolute d-flex align-items-center gap-1"
                                                         style={{
                                                             top: "10px",
                                                             right: "10px",
-                                                            padding: "6px 10px",
+                                                            padding: "6px 12px",
                                                             fontSize: "12px",
-                                                            borderRadius: "6px",
+                                                            borderRadius: "8px",
                                                             zIndex: 10,
-                                                            background:"rgb(61, 109, 181)"
+                                                            background: "#1e40af",
+                                                            color: "#fff",
+                                                            fontWeight: 500
                                                         }}
                                                     >
+                                                        <i className="fa-solid fa-calendar-check"></i>
                                                         Appointment
                                                     </span>
+
                                                 )}
 
 
@@ -122,7 +129,9 @@ export default function MyOrders({ userId }) {
                                                                     <div className="d-flex justify-content-start align-items-center mb-1">
 
                                                                         <p className="time m-0 p-0 me-4">
-                                                                            <strong style={{ width: "100px", display: "inline-block" }}>Total Tickets</strong>
+                                                                            <strong style={{ width: "100px", display: "inline-block" }}> {order?.orderItems?.[0]?.type === "appointment"
+                                                                                ? "Appointments"
+                                                                                : "Total Tickets"}</strong>
                                                                             <span style={{ width: "10px", display: "inline-block", fontWeight: "bold" }}>:</span>
                                                                             {totalTickets}
                                                                         </p>
@@ -130,7 +139,7 @@ export default function MyOrders({ userId }) {
                                                                         <p className="time m-0 p-0">
                                                                             <strong style={{ width: "70px", display: "inline-block" }}> Amount</strong>
                                                                             <span style={{ width: "10px", display: "inline-block", fontWeight: "bold" }}>:</span>
-                                                                            {order.total_amount}
+                                                                            {currencySymbol}{" "}{order.total_amount}
                                                                         </p>
 
                                                                     </div>

@@ -189,13 +189,14 @@ export default function MyOrdersDetails({ userId }) {
                                         // Detect Type
                                         const isTicket = item.type === "ticket_price";
                                         const isAppointment = item.type === "appointment";
+                                        const currencyName = item.appointment?.wellnessList?.currencyName?.Currency_symbol;
+                                        // Dynamic Label
+                                        const typeLabel = isAppointment ? "Appointment Name" : "Ticket Type";
 
-                                        // Ticket Type Text
+                                        // Ticket / Appointment Title
                                         const ticketType = isTicket
                                             ? item.slot?.slot_name || "Ticket"
-                                            : isAppointment
-                                                ? item.appointment?.wellnessList?.name || "Appointment"
-                                                : "N/A";
+                                            : item.appointment?.wellnessList?.name || "Appointment";
 
                                         // Purchase Date
                                         const purchaseDate = orderData?.createdAt
@@ -210,19 +211,20 @@ export default function MyOrdersDetails({ userId }) {
                                         // Date & Time
                                         const dateInfo = isTicket
                                             ? `${item.slot?.slot_date} | ${formatTime(item.slot?.start_time)} - ${formatTime(item.slot?.end_time)}`
-                                            : `${item.appointment?.date} | ${formatTime(item.appointment?.slot_start_time)} - ${formatTime(item.appointment?.slot_end_time)}`;
-
+                                            : `${format(new Date(item.appointment?.date), "EEE, dd MMM yyyy")} | ${formatTime(item.appointment?.slot_start_time)} - ${formatTime(item.appointment?.slot_end_time)}`;
 
                                         return (
                                             <div key={item.id} className="border rounded p-3 bg-light mb-4">
 
-                                                {/* Ticket Type */}
+                                                {/* ORDER ID */}
                                                 <div className="row mb-2">
                                                     <div className="col-4 fw-bold">Order ID :</div>
                                                     <div className="col-8">{orderData.order_uid}</div>
                                                 </div>
+
+                                                {/* Ticket Type / Appointment Name */}
                                                 <div className="row mb-2">
-                                                    <div className="col-4 fw-bold">Ticket Type :</div>
+                                                    <div className="col-4 fw-bold">{typeLabel} :</div>
                                                     <div className="col-8">{ticketType}</div>
                                                 </div>
 
@@ -232,7 +234,7 @@ export default function MyOrdersDetails({ userId }) {
                                                     <div className="col-8">{purchaseDate}</div>
                                                 </div>
 
-                                                {/* Slot / Appointment Date */}
+                                                {/* Date & Time */}
                                                 <div className="row mb-2">
                                                     <div className="col-4 fw-bold">Date & Time :</div>
                                                     <div className="col-8">{dateInfo}</div>
@@ -244,7 +246,7 @@ export default function MyOrdersDetails({ userId }) {
                                                     <div className="col-8">{location}</div>
                                                 </div>
 
-                                                {/* QR Image */}
+                                                {/* QR Code */}
                                                 {item.qr_image_url && (
                                                     <div className="row mb-3">
                                                         <div className="col-4 fw-bold">QR Code :</div>
@@ -258,27 +260,37 @@ export default function MyOrdersDetails({ userId }) {
                                                     </div>
                                                 )}
 
-                                                {/* Ticket Holder Name */}
-                                                <div className="row mb-3">
-                                                    <div className="col-4 fw-bold">Ticket Holder Name :</div>
-                                                    <div className="col-8">
-                                                        <input
-                                                            type="text"
-                                                            className="form-control"
-                                                            defaultValue={item.holder_name || ""}
-                                                            placeholder="Enter Ticket Holder Name"
-                                                        />
+                                                {/* Ticket Holder Name → ONLY for Tickets */}
+                                                {!isAppointment && (
+                                                    <div className="row mb-3">
+                                                        <div className="col-4 fw-bold">Ticket Holder Name :</div>
+                                                        <div className="col-8">
+                                                            <input
+                                                                type="text"
+                                                                className="form-control"
+                                                                defaultValue={item.holder_name || ""}
+                                                                placeholder="Enter Ticket Holder Name"
+                                                            />
+                                                        </div>
                                                     </div>
-                                                </div>
+                                                )}
 
-                                                {/* Buttons */}
+                                                {/* BUTTONS */}
                                                 <div className="d-flex justify-content-end gap-2">
-                                                    <button className="btn btn-success" disabled>Print Ticket</button>
-                                                    <button className="btn btn-primary" disabled>Save Name</button>
-                                                    {item?.type === "appointment" && (
+
+                                                    {/* Ticket Buttons */}
+                                                    {!isAppointment && (
+                                                        <>
+                                                            <button className="btn btn-success" disabled>Print Ticket</button>
+                                                            <button className="btn btn-primary" disabled>Save Name</button>
+                                                        </>
+                                                    )}
+
+                                                    {/* Appointment Button */}
+                                                    {isAppointment && (
                                                         <button
                                                             className="btn btn-danger"
-                                                            disabled={item.cancel_status === "cancel"} // If already cancelled → disable
+                                                            disabled={item.cancel_status === "cancel"}
                                                             onClick={(e) => {
                                                                 e.preventDefault();
                                                                 if (item.cancel_status !== "cancel") {
@@ -293,9 +305,42 @@ export default function MyOrdersDetails({ userId }) {
                                                     )}
 
                                                 </div>
+
+                                                {/* AMOUNT SUMMARY (required by testing team) */}
+                                                <hr />
+
+                                                <div className="mt-3">
+                                                    <h5 className="fw-bold">Payment Summary</h5>
+
+                                                    <div className="row mb-1">
+                                                        <div className="col-4 fw-bold">Total Amount :</div>
+                                                        <div className="col-8">{currencyName}{' '}{orderData.subtotal || orderData.total_amount}</div>
+                                                    </div>
+                                                    <div className="row mb-1">
+                                                        <div className="col-4 fw-bold">Discount :</div>
+                                                        <div className="col-8">{currencyName}{' '}{orderData.tax || 0}</div>
+                                                    </div>
+                                                    <div className="row mb-1">
+                                                        <div className="col-4 fw-bold">Tax :</div>
+                                                        <div className="col-8">{currencyName}{' '}{orderData.tax || 0}</div>
+                                                    </div>
+
+                                                    {orderData.discount > 0 && (
+                                                        <div className="row mb-1">
+                                                            <div className="col-4 fw-bold">Discount :</div>
+                                                            <div className="col-8">-{currencyName}{' '}{orderData.discount}</div>
+                                                        </div>
+                                                    )}
+
+                                                    <div className="row fw-bold text-success mt-2">
+                                                        <div className="col-4">Total Paid :</div>
+                                                        <div className="col-8">{currencyName}{' '}{orderData.total_amount}</div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         );
                                     })}
+
                                 </div>
                             </div>
                         </div>
