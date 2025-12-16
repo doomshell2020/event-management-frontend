@@ -139,9 +139,9 @@ const CheckoutForm = ({ showNextStep, clientSecret }) => {
                     below) ticket and/or participant and/or attendee of the Event
                     (“you&quot; or “Participant” or “Attendee”), on the one hand, and
                     Experiencias de la Costa SA de CV, a Mexican limited liability
-                    company, and Ondalinda Productions, LLC, a Delaware limited liability company, on the other hand (collectively “we” or
-                    “ONDALINDA X CAREYES” or “ONDALINDA”). Participant and
-                    ONDALINDA X CAREYES may collectively be referred
+                    company, and eboxtickets Productions, LLC, a Delaware limited liability company, on the other hand (collectively “we” or
+                    “eboxtickets” or “eboxtickets”). Participant and
+                    eboxtickets may collectively be referred
                     hereinafter as the &quot;Parties.&quot;
                 </p>
 
@@ -158,7 +158,7 @@ const CheckoutForm = ({ showNextStep, clientSecret }) => {
                 <p style={{ textIndent: "0" }}>
                     WHEREAS the Participant enters into this Agreement as
                     medically, physically, and mentally able to participate in the
-                    Event with respect to the services provided by ONDALINDA X
+                    Event with respect to the services provided by eboxtickets X
                     CAREYES, upon the terms and conditions hereinafter set forth;
                     and
                 </p>
@@ -172,7 +172,7 @@ const CheckoutForm = ({ showNextStep, clientSecret }) => {
                     By purchasing and/or using an Event ticket, you agree to be
                     bound by this Agreement, and to the Terms of Service which are
                     available at <Link href="https://eboxtickets.com/terms/" target="_blank">https://eboxtickets.com/terms/</Link>. The “Event” means the
-                    ONDALINDA x CAREYES 2025, a music, art and wellness
+                    eboxtickets 2025, a music, art and wellness
                     festival that will be held in Costa Careyes in Jalisco, Mexico, on
                     November 6, 2025 through November 9, 2025.
                 </p>
@@ -194,8 +194,8 @@ const CheckoutForm = ({ showNextStep, clientSecret }) => {
                 <h6 style={{ fontWeight: "400" }}>LIMITATION OF LIABILITY</h6>
                 <ol type="1">
                     <li>
-                        ONDALINDA disclaims liability arising out of
-                        attendance at the Event, or any ONDALINDA affiliated
+                        eboxtickets disclaims liability arising out of
+                        attendance at the Event, or any eboxtickets affiliated
                         activity in connection with the Event. In no event will
                         we or our members, managers, officers, employees,
                         directors, parents, subsidiaries, affiliates, agents or

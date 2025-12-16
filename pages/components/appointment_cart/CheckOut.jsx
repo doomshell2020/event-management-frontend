@@ -275,7 +275,7 @@ export default function CheckOutComponents({
         ticketingFeeDetails
     });
 
-    const { ticketTotal, addonTotal, totalTicketAndAddonPrice, discountAmount, totalAfterDiscount, totalTax, finalTotalAmount, payableAmount } = breakdown;
+    const { ticketTotal, addonTotal, totalTicketAndAddonPrice, discountAmount, totalAfterDiscount, totalTax, finalTotalAmount, payableAmount,appointmentTotal } = breakdown;
     // return
     /////////////////////////////////Cart calculation End///////////////////////////////////
 
@@ -377,10 +377,11 @@ export default function CheckOutComponents({
                     {
                         user_id: user.id,
                         event_id: eventId,
-                        total_amount: finalTotalAmount,
-                        tax: totalTax,
+                        sub_total:appointmentTotal,
+                        tax_total : totalTax,
+                        grand_total: finalTotalAmount,
                         currency: currencyName || "usd",
-                        discount: couponDetails,
+                        discount_amount : couponDetails,
                         cartData: cart.map(item => ({
                             ticketId: item.raw.appointments.id,
                             ticketType: item.item_type,
