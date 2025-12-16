@@ -129,7 +129,7 @@ export default function MyOrders({ userId }) {
                                                                     <div className="d-flex justify-content-start align-items-center mb-1">
 
                                                                         <p className="time m-0 p-0 me-4">
-                                                                            <strong style={{ width: "100px", display: "inline-block" }}> {order?.orderItems?.[0]?.type === "appointment"
+                                                                            <strong style={{ width: "100px", display: "inline-block" }}> {order?.orderItems?.[0]?.type == "appointment"
                                                                                 ? "Appointments"
                                                                                 : "Total Tickets"}</strong>
                                                                             <span style={{ width: "10px", display: "inline-block", fontWeight: "bold" }}>:</span>
@@ -139,7 +139,7 @@ export default function MyOrders({ userId }) {
                                                                         <p className="time m-0 p-0">
                                                                             <strong style={{ width: "70px", display: "inline-block" }}> Amount</strong>
                                                                             <span style={{ width: "10px", display: "inline-block", fontWeight: "bold" }}>:</span>
-                                                                            {currencySymbol}{" "}{order.total_amount}
+                                                                            {currencySymbol}{" "}{order.grand_total}
                                                                         </p>
 
                                                                     </div>
