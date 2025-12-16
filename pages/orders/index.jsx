@@ -9,7 +9,6 @@ import { format } from "date-fns"; // helps format dates
 export default function MyOrders({ userId }) {
     const [backgroundImage, setIsMobile] = useState('/assets/front-images/about-slider_bg.jpg');
     const [orderData, setOrderData] = useState([]);
-    console.log("---orderData", orderData)
     const [loading, setLoading] = useState(true); // ✅ Added loading state
     const fetchOrders = async () => {
         setLoading(true); // start loading
