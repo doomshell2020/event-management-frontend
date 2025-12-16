@@ -16,6 +16,7 @@ const CreateAppointmentPage = () => {
     const [name, setName] = useState("");
     const [location, setLocation] = useState("");
     const [paymentCurrency, setPaymentCurrency] = useState("");
+    const [isTaxApplied, setIsTaxApplied] = useState("Y");
     const [image, setImage] = useState(null);
     const noteRef = useRef(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -51,7 +52,7 @@ const CreateAppointmentPage = () => {
             slot_start_time: "",
             slot_end_time: "",
             price: "",
-            slot_location: "",
+            // slot_location: "",
             count: "",
         }
     ]);
@@ -65,7 +66,7 @@ const CreateAppointmentPage = () => {
                 slot_start_time: "",
                 slot_end_time: "",
                 price: "",
-                slot_location: "",
+                // slot_location: "",
                 count: "",
             }
         ]);
@@ -89,6 +90,7 @@ const CreateAppointmentPage = () => {
             body.append("event_id", EventId);
             body.append("location", location || "");
             body.append("description", content.trim());
+            body.append("tax_applied", isTaxApplied);
             body.append("slots", slotsJSON);
             // ✅ Append image only if user selected
             if (image) {
@@ -168,7 +170,8 @@ const CreateAppointmentPage = () => {
                                             <div className="row g-3">
 
                                                 {/* Appointment Name */}
-                                                <div className="col-lg-4 col-md-6 mb-3">
+                                                {/* <div className="col-lg-4 col-md-6 mb-3"> */}
+                                                <div className="col-lg-2 col-md-6 mb-3">
                                                     <label className="form-label">
                                                         Appointment Name <span className="text-danger">*</span>
                                                     </label>
@@ -187,7 +190,7 @@ const CreateAppointmentPage = () => {
                                                 </div>
 
                                                 {/* Location */}
-                                                <div className="col-lg-4 col-md-6 mb-3">
+                                                <div className="col-lg-2 col-md-6 mb-3">
                                                     <label className="form-label">
                                                         Location <span className="text-danger">*</span>
                                                     </label>
@@ -202,7 +205,7 @@ const CreateAppointmentPage = () => {
                                                 </div>
 
                                                 {/* Currency */}
-                                                <div className="col-lg-4 col-md-6 mb-3">
+                                                <div className="col-lg-2 col-md-6 mb-3">
                                                     <label className="form-label">Currency</label>
                                                     <select
                                                         className="form-select rounded-0"
@@ -213,6 +216,25 @@ const CreateAppointmentPage = () => {
                                                         <option value="">Payment Type</option>
                                                         <option value="1">INR</option>
                                                         <option value="2">USD</option>
+                                                    </select>
+                                                </div>
+
+
+                                                {/* NEW – Include Tax Option */}
+                                                <div className="col-lg-2 col-md-6 mb-3">
+                                                    <label className="form-label">
+                                                        Include Tax<span className="text-danger">*</span>
+                                                    </label>
+
+                                                    <select
+                                                        className="form-select rounded-0"
+                                                        name="is_tax_applied"
+                                                        value={isTaxApplied}
+                                                        onChange={(e) => setIsTaxApplied(e.target.value)}
+                                                    >
+                                                        <option value="">Select Option</option>
+                                                        <option value="Y">Yes, Include Tax</option>
+                                                        <option value="N">No, Exclude Tax</option>
                                                     </select>
                                                 </div>
 
@@ -271,210 +293,212 @@ const CreateAppointmentPage = () => {
                                     <h2 className="text-16 text-white text-uppercase position-relative text-start fw-bold mt-3">
                                         <i className="far fa-calendar-plus"></i> Add Appointment Slots
                                     </h2>
-
                                     <div className="inner-formdeta p-4 text-start fs-6 fw-normal">
                                         <div className="resistor-content">
-                                            {slots.map((slot, index) => (
-                                                <div className="row g-3" key={index}>
 
-                                                    {/* Date */}
-                                                    {/* <div className="col-lg-2 col-md-6 mb-3">
-                                                        <label className="form-label">
-                                                            Date <span className="text-danger">*</span>
-                                                        </label>
-                                                        <input
-                                                            type="date"
-                                                            className="form-control rounded-0"
-                                                            name="slot_date"
-                                                            required
-                                                            min={today}
-                                                            value={slot.date}
-                                                            onChange={(e) => handleChange(index, "date", e.target.value)}
-                                                        />
-                                                    </div> */}
-                                                    <div className="col-lg-2 col-md-6 mb-3">
-                                                        <label className="form-label">
-                                                            Date <span className="text-danger">*</span>
-                                                        </label>
+                                            {slots.map((slot, index) => {
 
-                                                        <DatePicker
-                                                            selected={slot.date ? new Date(slot.date) : null}
-                                                            onChange={(date) =>
-                                                                handleChange(index, "date", date.toISOString().split("T")[0])
-                                                            }
-                                                            className="form-control rounded-0"
-                                                            minDate={new Date()}
-                                                            dateFormat="yyyy-MM-dd"
-                                                            placeholderText="Select Date"
-                                                        />
+                                                // Inline Styles
+                                                const formControlStyle = {
+                                                    height: "38px",
+                                                    borderRadius: "4px"
+                                                };
+
+                                                const labelStyle = {
+                                                    fontWeight: 500
+                                                };
+
+                                                const slotRowDefault = {
+                                                    transition: "0.3s",
+                                                    borderBottom: "1px solid #f1f1f1",
+                                                    paddingBottom: "20px",
+                                                    marginBottom: "20px"
+                                                };
+
+                                                const slotRowHover = {
+                                                    background: "#fafafa",
+                                                    borderRadius: "6px"
+                                                };
+
+                                                return (
+                                                    <div
+                                                        key={index}
+                                                        className="row gy-3 align-items-end"
+                                                        style={slotRowDefault}
+                                                        onMouseEnter={(e) => Object.assign(e.currentTarget.style, slotRowHover)}
+                                                        onMouseLeave={(e) => Object.assign(e.currentTarget.style, slotRowDefault)}
+                                                    >
+
+                                                        {/* Date */}
+                                                        <div className="col-lg-2 col-md-6">
+                                                            <label className="form-label" style={labelStyle}>
+                                                                Date <span className="text-danger">*</span>
+                                                            </label>
+                                                            <DatePicker
+                                                                selected={slot.date ? new Date(slot.date) : null}
+                                                                onChange={(date) =>
+                                                                    handleChange(index, "date", date.toISOString().split("T")[0])
+                                                                }
+                                                                className="form-control"
+                                                                style={formControlStyle}
+                                                                minDate={new Date()}
+                                                                dateFormat="yyyy-MM-dd"
+                                                                placeholderText="Select Date"
+                                                            />
+                                                        </div>
+
+                                                        {/* Start Time */}
+                                                        <div className="col-lg-2 col-md-6">
+                                                            <label className="form-label" style={labelStyle}>
+                                                                Start Time <span className="text-danger">*</span>
+                                                            </label>
+
+                                                            <DatePicker
+                                                                selected={
+                                                                    slot.slot_start_time
+                                                                        ? new Date(`2000-01-01T${slot.slot_start_time}`)
+                                                                        : null
+                                                                }
+                                                                onChange={(date) => {
+                                                                    const dbTime = date.toLocaleTimeString("en-GB", {
+                                                                        hour: "2-digit",
+                                                                        minute: "2-digit",
+                                                                        hour12: false
+                                                                    });
+                                                                    handleChange(index, "slot_start_time", dbTime);
+                                                                }}
+                                                                showTimeSelect
+                                                                showTimeSelectOnly
+                                                                timeIntervals={5}
+                                                                timeCaption="Start Time"
+                                                                dateFormat="h:mm aa"
+                                                                className="form-control"
+                                                                style={formControlStyle}
+                                                                placeholderText="Start Time"
+                                                            />
+                                                        </div>
+
+                                                        {/* End Time */}
+                                                        <div className="col-lg-2 col-md-6">
+                                                            <label className="form-label" style={labelStyle}>
+                                                                End Time <span className="text-danger">*</span>
+                                                            </label>
+
+                                                            <DatePicker
+                                                                selected={
+                                                                    slot.slot_end_time
+                                                                        ? new Date(`2000-01-01T${slot.slot_end_time}`)
+                                                                        : null
+                                                                }
+                                                                onChange={(date) => {
+                                                                    const dbTime = date.toLocaleTimeString("en-GB", {
+                                                                        hour: "2-digit",
+                                                                        minute: "2-digit",
+                                                                        hour12: false
+                                                                    });
+                                                                    handleChange(index, "slot_end_time", dbTime);
+                                                                }}
+                                                                showTimeSelect
+                                                                showTimeSelectOnly
+                                                                timeIntervals={5}
+                                                                timeCaption="End Time"
+                                                                dateFormat="h:mm aa"
+                                                                className="form-control"
+                                                                style={formControlStyle}
+                                                                placeholderText="End Time"
+                                                            />
+                                                        </div>
+
+                                                        {/* Price */}
+                                                        <div className="col-lg-2 col-md-6">
+                                                            <label className="form-label" style={labelStyle}>
+                                                                Price <span className="text-danger">*</span>
+                                                            </label>
+
+                                                            <input
+                                                                type="text"
+                                                                required
+                                                                className="form-control"
+                                                                style={formControlStyle}
+                                                                value={slot.price}
+                                                                onChange={(e) => handleChange(index, "price", e.target.value)}
+                                                            />
+                                                        </div>
+
+                                                        {/* Count */}
+                                                        <div className="col-lg-2 col-md-6">
+                                                            <label className="form-label" style={labelStyle}>
+                                                                Count <span className="text-danger">*</span>
+                                                            </label>
+
+                                                            <input
+                                                                type="number"
+                                                                required
+                                                                className="form-control"
+                                                                style={formControlStyle}
+                                                                value={slot.count}
+                                                                onChange={(e) => handleChange(index, "count", e.target.value)}
+                                                            />
+                                                        </div>
+
+                                                        {/* Buttons */}
+                                                        <div className="col-lg-2 col-md-6 d-flex flex-column align-items-end gap-2">
+
+                                                            {/* Remove button */}
+                                                            {index !== 0 && (
+                                                                <button
+                                                                    type="button"
+                                                                    className="btn btn-sm"
+                                                                    style={{
+                                                                        backgroundColor: "#ff6b6b",
+                                                                        color: "#fff",
+                                                                        minWidth: "110px",
+                                                                        borderRadius: "4px"
+                                                                    }}
+                                                                    onClick={() => handleRemove(index)}
+                                                                >
+                                                                    Remove
+                                                                </button>
+                                                            )}
+
+                                                            {/* Add More button */}
+                                                            {index === slots.length - 1 && (
+                                                                <button
+                                                                    type="button"
+                                                                    className="btn btn-sm"
+                                                                    style={{
+                                                                        backgroundColor: "#16a34a",
+                                                                        color: "#fff",
+                                                                        minWidth: "110px",
+                                                                        borderRadius: "4px"
+                                                                    }}
+                                                                    onClick={handleAddMore}
+                                                                >
+                                                                    <i className="bi bi-plus-lg me-1"></i> Add More
+                                                                </button>
+                                                            )}
+
+                                                        </div>
+
                                                     </div>
+                                                );
+                                            })}
 
-                                                    {/* Start Time */}
-                                                    <div className="col-lg-2 col-md-6 mb-3">
-                                                        <label className="form-label">
-                                                            Start Time <span className="text-danger">*</span>
-                                                        </label>
-
-                                                        <DatePicker
-                                                            selected={
-                                                                slot.slot_start_time
-                                                                    ? new Date(`2000-01-01T${slot.slot_start_time}`)
-                                                                    : null
-                                                            }
-                                                            onChange={(date) => {
-                                                                // 24-hour format for DB
-                                                                const dbTime = date.toLocaleTimeString("en-GB", {
-                                                                    hour: "2-digit",
-                                                                    minute: "2-digit",
-                                                                    hour12: false,
-                                                                });
-
-                                                                handleChange(index, "slot_start_time", dbTime);
-                                                            }}
-                                                            showTimeSelect
-                                                            showTimeSelectOnly
-                                                            timeIntervals={5}
-                                                            timeCaption="Start Time"
-                                                            dateFormat="h:mm aa" // only UI format (12 hr)
-                                                            className="form-control rounded-0"
-                                                            placeholderText="Start Time"
-                                                        />
-                                                    </div>
-
-                                                    {/* Start Time */}
-
-                                                    <div className="col-lg-2 col-md-6 mb-3">
-                                                        <label className="form-label">
-                                                            End Time <span className="text-danger">*</span>
-                                                        </label>
-
-
-                                                        <DatePicker
-                                                            selected={
-                                                                slot.slot_end_time
-                                                                    ? new Date(`2000-01-01T${slot.slot_end_time}`)
-                                                                    : null
-                                                            }
-                                                            onChange={(date) => {
-                                                                // 24-hour format for DB
-                                                                const dbTime = date.toLocaleTimeString("en-GB", {
-                                                                    hour: "2-digit",
-                                                                    minute: "2-digit",
-                                                                    hour12: false,
-                                                                });
-
-                                                                handleChange(index, "slot_end_time", dbTime);
-                                                            }}
-                                                            showTimeSelect
-                                                            showTimeSelectOnly
-                                                            timeIntervals={5}
-                                                            timeCaption="End Time"
-                                                            dateFormat="h:mm aa" // only UI format
-                                                            className="form-control rounded-0"
-                                                            placeholderText="End Time"
-                                                        />
-                                                    </div>
-
-
-
-                                                    {/* <div className="col-lg-2 col-md-6 mb-3">
-                                                        <label className="form-label">Start Time <span className="text-danger">*</span></label>
-                                                        <input
-                                                            type="time"
-                                                            className="form-control rounded-0"
-                                                            name="slot_start"
-                                                            value={slot.slot_start_time}
-                                                            onChange={(e) => handleChange(index, "slot_start_time", e.target.value)}
-                                                        />
-                                                    </div> */}
-
-                                                    {/* End Time */}
-                                                    {/* <div className="col-lg-2 col-md-6 mb-3">
-                                                        <label className="form-label">End Time <span className="text-danger">*</span></label>
-                                                        <input
-                                                            type="time"
-                                                            className="form-control rounded-0"
-                                                            name="slot_end"
-                                                            required
-                                                            value={slot.slot_end_time}
-                                                            onChange={(e) => handleChange(index, "slot_end_time", e.target.value)}
-                                                        />
-                                                    </div> */}
-
-                                                    {/* Price */}
-                                                    <div className="col-lg-2 col-md-6 mb-3">
-                                                        <label className="form-label">Price <span className="text-danger">*</span></label>
-                                                        <input
-                                                            type="text"
-                                                            className="form-control rounded-0"
-                                                            name="slot_price"
-                                                            required
-                                                            value={slot.price}
-                                                            onChange={(e) => handleChange(index, "price", e.target.value)}
-                                                        />
-                                                    </div>
-
-                                                    {/* Slot Location */}
-                                                    <div className="col-lg-2 col-md-6 mb-3">
-                                                        <label className="form-label">Slot Location</label>
-                                                        <input
-                                                            type="text"
-                                                            className="form-control rounded-0"
-                                                            name="slot_location"
-                                                            value={slot.slot_location}
-                                                            onChange={(e) => handleChange(index, "slot_location", e.target.value)}
-                                                        />
-                                                    </div>
-
-                                                    {/* Count */}
-                                                    <div className="col-lg-2 col-md-6 mb-3">
-                                                        <label className="form-label">Count <span className="text-danger">*</span></label>
-                                                        <input
-                                                            type="number"
-                                                            className="form-control rounded-0"
-                                                            name="slot_count"
-                                                            required
-                                                            value={slot.count}
-                                                            onChange={(e) => handleChange(index, "count", e.target.value)}
-                                                        />
-                                                    </div>
-
-                                                    {/* REMOVE BUTTON (RIGHT SIDE) */}
-                                                    <div className="col-lg-12 d-flex justify-content-end mt-3">
-                                                        {index !== 0 && (<button type="button" className="primery-button"
-                                                            onClick={() => handleRemove(index)}
-                                                        >
-                                                            Remove
-                                                        </button>
-                                                        )}
-                                                    </div>
-
-                                                </div>
-
-                                            ))}
-
-
-                                            <div className="col-lg-12 d-flex justify-content-end mt-1">
-
-                                                <button
-                                                    type="button"
-                                                    className="primery-button fw-normal px-2 text-white"
-                                                    style={{ backgroundColor: "#00ad00" }}
-                                                    onClick={handleAddMore}
-                                                >
-                                                    <i className="bi bi-plus"></i> Add More
-                                                </button>
-                                            </div>
-
-
-                                            {/* ---------------- SUBMIT BUTTON ---------------- */}
+                                            {/* Submit Button */}
                                             <div className="text-center mt-4">
-                                                <button type="submit" className="primery-button px-4" disabled={isLoading}>
+                                                <button
+                                                    type="submit"
+                                                    className="primery-button px-4"
+                                                    disabled={isLoading}
+                                                >
                                                     {isLoading ? "Creating..." : "Create Appointment"}
                                                 </button>
                                             </div>
                                         </div>
                                     </div>
+
+
+
 
                                 </form>
                                 {/* ---------------- SINGLE FORM END ---------------- */}
