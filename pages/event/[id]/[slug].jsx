@@ -177,6 +177,11 @@ const EventDetailPage = ({ event, slug }) => {
     });
   };
 
+
+
+
+
+
   return (
     <>
       <FrontendHeader backgroundImage={backgroundImage} />
@@ -590,7 +595,7 @@ const EventDetailPage = ({ event, slug }) => {
       }
 
       {/* ✅Appointment Cart Modal */}
-      {/* {
+      {
         showAppointmentCart && (
           <AppointmentModal
             show={showAppointmentCart}
@@ -599,7 +604,7 @@ const EventDetailPage = ({ event, slug }) => {
             slotIds={slotIds}
           />
         )
-      } */}
+      }
 
 
       <FrontendFooter />
