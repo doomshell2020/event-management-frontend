@@ -178,11 +178,6 @@ const EventDetailPage = ({ event, slug }) => {
     });
   };
 
-
-
-
-
-
   return (
     <>
       <FrontendHeader backgroundImage={backgroundImage} />
@@ -419,9 +414,6 @@ const EventDetailPage = ({ event, slug }) => {
         </div>
       </section>
 
-
-
-
       <section className="py-4">
         <div className="container">
           {appointmentData?.length > 0 && (
@@ -597,7 +589,7 @@ const EventDetailPage = ({ event, slug }) => {
       }
 
       {/* ✅Appointment Cart Modal */}
-      {
+      {/* {
         showAppointmentCart && (
           <AppointmentModal
             show={showAppointmentCart}
@@ -606,7 +598,7 @@ const EventDetailPage = ({ event, slug }) => {
             slotIds={slotIds}
           />
         )
-      }
+      } */}
 
 
       <FrontendFooter />

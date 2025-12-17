@@ -79,10 +79,8 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
         return await api.delete(`/api/v1/cart/clear`);
     };
 
-
-
-
     const [slotCart, setSlotCart] = useState({});
+    
     useEffect(() => {
         if (!show) return;
 
