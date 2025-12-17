@@ -12,6 +12,7 @@ export default function MyOrdersDetails({ userId }) {
     const router = useRouter();
     const { orderId } = router.query;
     const [orderData, setOrderData] = useState({});
+    console.log("----orderData", orderData)
     const [loading, setLoading] = useState(true); // ✅ Added loading state
     const fetchOrders = async () => {
         setLoading(true); // start loading
@@ -138,11 +139,220 @@ export default function MyOrdersDetails({ userId }) {
                                     </div>
                                 </div>
 
+
                                 {/* RIGHT DETAILS SECTION */}
                                 <div className="col-lg-8 col-md-7">
+
+                                    {/* EVENT TITLE */}
+                                    <h2 className="fw-bold m-0">{orderData?.event?.name}</h2>
+                                    <div className="text-muted mb-3">
+                                        Hosted By{" "}
+                                        <a href="#">
+                                            #{orderData?.event?.companyInfo?.name || "Company"}
+                                        </a>
+                                    </div>
+
+                                    {/* BLUE TOP BAR */}
+                                    <div className="row text-white p-3 rounded mb-4" style={{ background: "#3d6db5" }}>
+                                        <div className="col-md-4 border-end">
+                                            <strong>Event Start Date</strong>
+                                            <div>
+                                                {orderData?.event?.date_from
+                                                    ? format(new Date(orderData.event.date_from), "EEE, dd MMM yyyy | hh:mm a")
+                                                    : "N/A"}
+                                            </div>
+                                        </div>
+
+                                        <div className="col-md-4 border-end">
+                                            <strong>Event End Date</strong>
+                                            <div>
+                                                {orderData?.event?.date_to
+                                                    ? format(new Date(orderData.event.date_to), "EEE, dd MMM yyyy | hh:mm a")
+                                                    : "N/A"}
+                                            </div>
+                                        </div>
+
+                                        <div className="col-md-4">
+                                            <strong>Event Location</strong>
+                                            <div>
+                                                {orderData?.event?.location || "--"}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* ===================== */}
+                                    {/* ORDER DETAILS CARD */}
+                                    {/* ===================== */}
+                                    <div className="border rounded p-4 bg-light mb-4">
+
+                                        <h5 className="fw-bold mb-3">
+                                             {
+                                                orderData?.orderItems?.some(i => i.type === "appointment")
+                                                    ? "Appointment Details"
+                                                    : "Order Details:"
+                                            }
+                                            </h5>
+
+                                        {/* ORDER ID */}
+                                        <div className="row mb-2">
+                                            <div className="col-4 fw-bold"> {
+                                                orderData?.orderItems?.some(i => i.type === "appointment")
+                                                    ? "Appointment ID :"
+                                                    : "Order ID :"
+                                            }</div>
+                                            <div className="col-8">{orderData?.order_uid}</div>
+                                        </div>
+
+                                        {/* APPOINTMENT NAME (ONCE) */}
+                                        <div className="row mb-2">
+                                            <div className="col-4 fw-bold">Appointment Name :</div>
+                                            <div className="col-8">
+                                                {
+                                                    orderData?.orderItems?.find(i => i.type === "appointment")
+                                                        ?.appointment?.wellnessList?.name || "N/A"
+                                                }
+                                            </div>
+                                        </div>
+
+                                        {/* LOCATION (APPOINTMENT) */}
+                                        <div className="row mb-2">
+                                            <div className="col-4 fw-bold"> {
+                                                orderData?.orderItems?.some(i => i.type === "appointment")
+                                                    ? "Appointment Location :"
+                                                    : "Location :"
+                                            }</div>
+                                            <div className="col-8">
+                                                {
+                                                    orderData?.orderItems?.find(i => i.type === "appointment")
+                                                        ?.appointment?.wellnessList?.location || "N/A"
+                                                }
+                                            </div>
+                                        </div>
+
+                                        {/* PURCHASE DATE */}
+                                        <div className="row mb-2">
+                                            <div className="col-4 fw-bold">Purchase Date :</div>
+                                            <div className="col-8">
+                                                {orderData?.createdAt
+                                                    ? format(new Date(orderData.createdAt), "EEE, dd MMM yyyy | hh:mm a")
+                                                    : "N/A"}
+                                            </div>
+                                        </div>
+
+                                        <hr />
+
+                                        {/* ===================== */}
+                                        {/* APPOINTMENT SESSIONS */}
+                                        {/* ===================== */}
+                                        {orderData?.orderItems
+                                            ?.filter(item => item.type === "appointment")
+                                            .map((item, index) => {
+
+                                                const currency =
+                                                    item?.appointment?.wellnessList?.currencyName?.Currency_symbol || "";
+
+                                                return (
+                                                    <div key={item.id} className="mb-3 p-3 border rounded bg-white">
+
+                                                        {/* SESSION HEADER */}
+                                                        <div className="d-flex justify-content-between align-items-center mb-2">
+                                                            <strong>
+                                                                Appointment - {index + 1}
+                                                            </strong>
+
+                                                            <button
+                                                                className="btn btn-danger btn-sm d-print-none"
+                                                                disabled={item.cancel_status === "cancel"}
+                                                                onClick={() => handleCancelAppointment(item.id)}
+                                                            >
+                                                                {item.cancel_status === "cancel"
+                                                                    ? "Cancelled"
+                                                                    : "Cancel Appointment"}
+                                                            </button>
+                                                        </div>
+
+                                                        <div className="row align-items-center">
+                                                            {/* QR */}
+                                                            <div className="col-md-3 text-center">
+                                                                {item.qr_image_url && (
+                                                                    <img
+                                                                        src={item.qr_image_url}
+                                                                        alt="QR"
+                                                                        className="border rounded p-2"
+                                                                        style={{ width: "110px" }}
+                                                                    />
+                                                                )}
+                                                            </div>
+
+                                                            {/* DATE / TIME / PRICE */}
+                                                            <div className="col-md-9">
+                                                                <div className="mb-1">
+                                                                    <strong>Date & Time :</strong>{" "}
+                                                                    {format(new Date(item.appointment?.date), "EEE, dd MMM yyyy")}
+                                                                    {" | "}
+                                                                    {formatTime(item.appointment?.slot_start_time)} –{" "}
+                                                                    {formatTime(item.appointment?.slot_end_time)}
+                                                                </div>
+
+                                                                <div className="fw-bold text-success">
+                                                                    Amount : {currency} {item.appointment?.price || 0}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                );
+                                            })}
+                                    </div>
+
+                                    {/* ===================== */}
+                                    {/* PAYMENT SUMMARY CARD */}
+                                    {/* ===================== */}
+                                    <div className="border rounded p-4 bg-white">
+
+                                        <h5 className="fw-bold mb-3">Payment Summary</h5>
+
+                                        {(() => {
+                                            const currency =
+                                                orderData?.orderItems?.find(i => i.type === "appointment")
+                                                    ?.appointment?.wellnessList?.currencyName?.Currency_symbol || "";
+
+                                            return (
+                                                <>
+                                                    <div className="d-flex justify-content-between mb-2">
+                                                        <span>Total Amount</span>
+                                                        <span>{currency} {orderData?.sub_total || 0}</span>
+                                                    </div>
+
+                                                    <div className="d-flex justify-content-between mb-2">
+                                                        <span>Discount</span>
+                                                        <span>{currency} {orderData?.discount_amount || 0}</span>
+                                                    </div>
+
+                                                    <div className="d-flex justify-content-between mb-2">
+                                                        <span>Tax</span>
+                                                        <span>{currency} {orderData?.tax_total || 0}</span>
+                                                    </div>
+
+                                                    <hr />
+
+                                                    <div className="d-flex justify-content-between fw-bold text-success">
+                                                        <span>Total Paid</span>
+                                                        <span>{currency} {orderData?.grand_total || 0}</span>
+                                                    </div>
+                                                </>
+                                            );
+                                        })()}
+                                    </div>
+
+                                </div>
+
+
+
+                                {/* <div className="col-lg-8 col-md-7">
                                     <h2 className="fw-bold m-0">{orderData?.event?.name}</h2>
                                     <div className="text-muted mb-3">Hosted By <a href="#"> #{orderData?.event?.companyInfo?.name || 'Company'}</a></div>
-                                    {/* BLUE TOP BAR */}
+                                 
                                     <div className="row text-white p-3 rounded mb-4" style={{ background: "#3d6db5" }}>
                                         <div className="col-md-4 border-end">
                                             <div className="d-flex align-items-center">
@@ -160,7 +370,6 @@ export default function MyOrdersDetails({ userId }) {
                                                 <i className="bi bi-calendar-week me-2"></i>
                                                 <div>
                                                     <strong>End Date</strong>
-                                                    {/* <div>Wed 01st Jan, 2025 | 05:00 PM</div> */}
                                                     <div> {orderData?.event?.date_to
                                                         ? format(new Date(orderData?.event.date_to), "EEE, dd MMM yyyy | hh:mm a")
                                                         : "N/A"}</div>
@@ -177,8 +386,6 @@ export default function MyOrdersDetails({ userId }) {
                                             </div>
                                         </div>
                                     </div>
-
-                                    {/* TICKETS SECTION */}
                                     <h5 className="fw-bold">Tickets</h5>
                                     <div className="text-muted mb-3" style={{ fontSize: "14px" }}>
                                         You have to name all your tickets below before you can print or download them.
@@ -215,37 +422,31 @@ export default function MyOrdersDetails({ userId }) {
                                         return (
                                             <div key={item.id} className="border rounded p-3 bg-light mb-4">
 
-                                                {/* ORDER ID */}
                                                 <div className="row mb-2">
                                                     <div className="col-4 fw-bold">Order ID :</div>
                                                     <div className="col-8">{orderData.order_uid}</div>
                                                 </div>
 
-                                                {/* Ticket Type / Appointment Name */}
                                                 <div className="row mb-2">
                                                     <div className="col-4 fw-bold">{typeLabel} :</div>
                                                     <div className="col-8">{ticketType}</div>
                                                 </div>
 
-                                                {/* Purchase Date */}
                                                 <div className="row mb-2">
                                                     <div className="col-4 fw-bold">Purchase Date :</div>
                                                     <div className="col-8">{purchaseDate}</div>
                                                 </div>
 
-                                                {/* Date & Time */}
                                                 <div className="row mb-2">
                                                     <div className="col-4 fw-bold">Date & Time :</div>
                                                     <div className="col-8">{dateInfo}</div>
                                                 </div>
 
-                                                {/* Location */}
                                                 <div className="row mb-2">
                                                     <div className="col-4 fw-bold">Location :</div>
                                                     <div className="col-8">{location}</div>
                                                 </div>
 
-                                                {/* QR Code */}
                                                 {item.qr_image_url && (
                                                     <div className="row mb-3">
                                                         <div className="col-4 fw-bold">QR Code :</div>
@@ -259,7 +460,6 @@ export default function MyOrdersDetails({ userId }) {
                                                     </div>
                                                 )}
 
-                                                {/* Ticket Holder Name → ONLY for Tickets */}
                                                 {!isAppointment && (
                                                     <div className="row mb-3">
                                                         <div className="col-4 fw-bold">Ticket Holder Name :</div>
@@ -274,10 +474,8 @@ export default function MyOrdersDetails({ userId }) {
                                                     </div>
                                                 )}
 
-                                                {/* BUTTONS */}
                                                 <div className="d-flex justify-content-end gap-2">
 
-                                                    {/* Ticket Buttons */}
                                                     {!isAppointment && (
                                                         <>
                                                             <button className="btn btn-success" disabled>Print Ticket</button>
@@ -285,7 +483,6 @@ export default function MyOrdersDetails({ userId }) {
                                                         </>
                                                     )}
 
-                                                    {/* Appointment Button */}
                                                     {isAppointment && (
                                                         <button
                                                             className="btn btn-danger"
@@ -305,7 +502,6 @@ export default function MyOrdersDetails({ userId }) {
 
                                                 </div>
 
-                                                {/* AMOUNT SUMMARY (required by testing team) */}
                                                 <hr />
 
                                                 <div className="mt-3">
@@ -340,7 +536,7 @@ export default function MyOrdersDetails({ userId }) {
                                         );
                                     })}
 
-                                </div>
+                                </div> */}
                             </div>
                         </div>
                     )}

@@ -2929,7 +2929,8 @@ span.stp2-monte25-nm {
 }
 
 .careyes-chekout-new .care-new-check .checkout-innr .checkot-lft .ck-event-dtl {
-  margin-top: 50px;
+  /* margin-top: 50px; */
+  margin-top: 9px;
 }
 
 .careyes-chekout-new .care-new-check .checkout-innr .checkot-lft .ck-event-dtl h3 {
@@ -3285,7 +3286,8 @@ span.stp2-monte25-nm {
 }
 
 .careyes-chekout-new .care-new-check-secnd .scnd-flw-amnts {
-  margin: 40px 0;
+  /* margin: 40px 0; */
+  margin: 10px 0;
 }
 
 .careyes-chekout-new .care-new-check-secnd .scnd-flw-amnts h3 {
@@ -3473,7 +3475,8 @@ span.stp2-monte25-nm {
 }
 
 .oxmonten2025EvntSec .care-new-check .checkout-innr .checkot-lft .eventsBxSec {
-  margin-bottom: 50px;
+  /* margin-bottom: 50px; */
+  margin-bottom: 0px;
 }
 
 .oxmonten2025EvntSec .care-new-check .checkout-innr .checkot-lft .ck-event-dtl .marginTpMinus4 .amountCrt {
@@ -4873,4 +4876,18 @@ input[type="date"] {
   border: 1px solid #ccc;
   padding: 10px;
   border-radius: 8px;
+}
+
+.appointment-model .modal-content{max-width: 1060px;
+    margin: auto;}
+
+    .appointment-model .checkout-innr .checkot-rgt .checkot-rgt-bnr{
+      height: 150px !important;
+    }
+     .appointment-model .checkout-innr .checkot-rgt .checkot-rgt-bnr img{
+      width: 90%;
+    }
+     .appointment-model .checkot-tct-purcs{padding-bottom: 50px !important;}
+     .modal-dialog.cart-modal-size.appointment-model {
+    max-width: 1060px;
 }
