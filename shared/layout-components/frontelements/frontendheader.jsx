@@ -147,14 +147,14 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
                             <i className="fas fa-user" /> My Profile
                           </Link>
                         </li>
-                        <li>
+                        {/* <li>
                           <Link
                             href="/tickets/my-tickets"
                             className="dropdownLink"
                           >
                             <i className="fas fa-ticket-alt" /> My Tickets
                           </Link>
-                        </li>
+                        </li> */}
                         <li>
                           <Link href="/event/my-event" className="dropdownLink">
                             <i className="fas fa-calendar-alt" /> My Events

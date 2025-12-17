@@ -52,7 +52,6 @@ const EventDetailPage = ({ event, slug }) => {
   const [backgroundImage, setIsMobile] = useState("/assets/front-images/about-slider_bg.jpg");
   const [isLoading, setIsLoading] = useState(true);
   const [appointmentData, setAppointmentData] = useState([]);
-
   const formatTime = (timeString) => {
     if (!timeString) return "";
 
@@ -421,7 +420,7 @@ const EventDetailPage = ({ event, slug }) => {
 
 
 
-
+  {event.status == "Y" && (
       <section className="py-4">
         <div className="container">
           {appointmentData?.length > 0 && (
@@ -577,13 +576,12 @@ const EventDetailPage = ({ event, slug }) => {
                     </div>
                   </div>
                 ))}
-
-
               </div>
             </>
           )}
         </div>
       </section>
+  )}
 
       {/* ✅ Cart Modal */}
       {

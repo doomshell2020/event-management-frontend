@@ -174,7 +174,7 @@ export default function CheckOutComponents({
         ticketingFeeDetails
     });
 
-    const { ticketTotal,appointmentTotal, addonTotal, totalTicketAndAddonPrice, discountAmount, totalAfterDiscount, totalTax, finalTotalAmount, payableAmount } = breakdown;
+    const { ticketTotal, appointmentTotal, addonTotal, totalTicketAndAddonPrice, discountAmount, totalAfterDiscount, totalTax, finalTotalAmount, payableAmount } = breakdown;
     // return
     /////////////////////////////////Cart calculation End///////////////////////////////////
 
@@ -283,7 +283,7 @@ export default function CheckOutComponents({
                 <>
                     <LoadingComponent isActive={isLoading} />
 
-                    <div className="secon-flw">
+                    {/* <div className="secon-flw">
                         <Row className="mrgn-ck-x">
                             <Col md={7} className="crt-pdng-x">
                                 <div
@@ -295,60 +295,28 @@ export default function CheckOutComponents({
                                             })`,
                                     }}
 
-                                > <img src={`https://eboxtickets.com/images/eboxticket_dark_logo.png`} alt="Logo" />
+                                > 
+                                <img src={`https://eboxtickets.com/images/eboxticket_dark_logo.png`} alt="Logo" />
                                 </div>
                             </Col>
                             <Col md={5} className="crt-pdng-x">
                                 <div className="scd-hd-cnt">
                                     <div className="text-center">
                                         <h2 className="ck-mn-hd">{eventName}</h2>
-                                        {/* <p>November 6 - 9, 2025</p> */}
                                     </div>
                                 </div>
                             </Col>
                         </Row>
-                    </div>
+                    </div> */}
 
                     <div className="scnd-flw-amnts">
-                        <h3>YOUR APPOINTMENTS</h3>
+                        {/* <h3>YOUR APPOINTMENTS</h3> */}
 
                         <Row className="align-items-end justify-content-between">
-                            {/* tickets name with price  */}
-                            <Col xl={5} md={6}>
-                                <div className="amnt-stl-inr">
-                                    {cart &&
-                                        cart.map((element, index) => {
-                                            return (
-                                                <div className="tct-amt" key={index}>
-                                                    <p>
-                                                        {element.count}x{" "}
-                                                        <span className="stp2-monte25-nm">
-                                                            {element.item_type == "appointment" &&
-                                                                element.display_name
-                                                                ? element.display_name
-                                                                : "Unknown"}
-                                                        </span>
-                                                    </p>
-                                                    <span className="stp2-monte25-nm">
-                                                        {" "}
-                                                        {currencySymbol}
-                                                        {element.item_type == "appointment" &&
-                                                            element.ticket_price
-                                                            ? (
-                                                                element.ticket_price *
-                                                                element.count
-                                                            ).toLocaleString() : 0}
-                                                    </span>
-                                                </div>
-                                            );
-                                        })}
-                                </div>
-                            </Col>
-
                             {/* total ticket price and taxes */}
                             <Col xl={5} md={6}>
-                                <div className="amnt-stl-inr">
-                                    <div className="tct-amt">
+                                <div className="amnt-stl-inr d-flex justify-content-between">
+                                    <div className="tct-amt gap-2">
                                         <p>APPOINTMENTS: </p>
                                         <span>
                                             {currencySymbol}
@@ -363,7 +331,7 @@ export default function CheckOutComponents({
                                                 .toLocaleString()}
                                         </span>
                                     </div>
-                                    <div className="tct-amt">
+                                    <div className="tct-amt gap-2">
                                         <p>TAXES & FEES :</p>{" "}
                                         <span>
                                             {currencySymbol}
@@ -372,13 +340,23 @@ export default function CheckOutComponents({
                                     </div>
                                 </div>
                             </Col>
+                             <Col xl={5} md={6}>
+                             <div className="amnt-stl-inr">
+                             <div className="tct-amt gap-2 d-flex">
+                                        <p>TOTAL:</p>{" "}
+                                        <span>
+                                            {currencySymbol}
+                                            {finalTotalAmount}
+                                        </span>
+                                    </div>
+                                    </div>
+                                    </Col>
                         </Row>
 
                         {/* Total Price */}
-                        <Row className="ttl-amts justify-content-between">
+                        {/* <Row className="ttl-amts justify-content-between">
                             <Col xl={5} md={6} />
                             <Col xl={5} md={6}>
-                                {/* Coupon / Discount Line */}
                                 {couponDetails && (
                                     <div className="tct-amt mb-2">
                                         <p><strong>STAFF ID DISCOUNT:</strong></p>
@@ -395,7 +373,7 @@ export default function CheckOutComponents({
                                         </span>
                                     </div>
                                 )}
-                                <div className="tct-amt">
+                                <div className="tct-amt gap-2">
                                     <p>TOTAL:</p>{" "}
                                     <p>
                                         {currencySymbol}
@@ -403,7 +381,7 @@ export default function CheckOutComponents({
                                     </p>
                                 </div>
                             </Col>
-                        </Row>
+                        </Row> */}
                     </div>
 
                     {clientSecret && (
