@@ -1,6 +1,7 @@
 import React, { useMemo, useState, useRef, useEffect } from "react";
 import FrontendHeader from "@/shared/layout-components/frontelements/frontendheader";
 import FrontendFooter from "@/shared/layout-components/frontelements/frontendfooter";
+import FrontLeftSideBar from "@/shared/layout-components/frontelements/front-left-side-bar";
 import Link from "next/link";
 import {
     CForm,
@@ -291,9 +292,8 @@ export default function OrganizerEvents({ userId }) {
                                                                                 target="_blank"
                                                                                 rel="noopener noreferrer"
                                                                                 style={{
-                                                                                    fontSize: "1.1rem",
+                                                                                   
                                                                                     fontWeight: "600",
-                                                                                    color: "#0d6efd",
                                                                                     textDecoration: "none",
                                                                                 }}
                                                                             >
@@ -428,7 +428,7 @@ export default function OrganizerEvents({ userId }) {
                                                                             }
                                                                         >
                                                                             {event.status == "Y" ? (
-                                                                                <i className="bi bi-x-circle-fill text-danger"></i>
+                                                                                <i className="bi bi-x-circle-fill"></i>
                                                                             ) : (
                                                                                 <i className="bi bi-check-circle-fill text-success"></i>
                                                                             )}

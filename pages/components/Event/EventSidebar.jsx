@@ -64,7 +64,7 @@ const EventSidebar = ({ eventId }) => {
                         { href: `/event/export-tickets/${eventId}`, icon: "bi bi-wallet2", label: "Export Tickets" },
                         { href: `/event/analytics/${eventId}`, icon: "bi bi-bar-chart", label: "Analytics" },
                         { href: `/event/payouts/${eventId}`, icon: "bi bi-wallet2", label: "Payouts" },
-                        { href: `/event/edit-event/${eventId}/manage-committee`, icon: "bi bi-people", label: "Committee" },
+                        { href: `/event/edit-event/${eventId}/committee/manage-committee`, icon: "bi bi-people", label: "Committee" },
                         { href: `/event/tickets/${eventId}`, icon: "fas fa-ticket-alt", label: "Tickets" },
                         { href: `/event/ticket-reports/${eventId}`, icon: "fas fa-chart-bar", label: "Ticket Reports" },
                     ].map((item, idx) => (

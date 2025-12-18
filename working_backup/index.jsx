@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import FrontendHeader from "@/shared/layout-components/frontelements/frontendheader";
 import FrontendFooter from "@/shared/layout-components/frontelements/frontendfooter";
+import FrontLeftSideBar from "@/shared/layout-components/frontelements/front-left-side-bar";
 import Link from "next/link";
 import {
     CForm,
@@ -294,6 +295,7 @@ const MyEventsPage = () => {
     return (
         <>
             <FrontendHeader backgroundImage={backgroundImage} />
+            {/* <FrontLeftSideBar /> */}
 
             <section id="myevent-deshbord">
                 <div className="d-flex">
@@ -313,7 +315,7 @@ const MyEventsPage = () => {
                                     </div>
                                 </div>
                             ) : (
-                                <section id="post-eventpg edit-event-page">
+                                <section id="post-eventpg">
 
                                     <EventHeaderSection eventDetails={eventDetails} />
 
@@ -366,7 +368,7 @@ const MyEventsPage = () => {
                                                     </div>
 
                                                     {/* Timezone */}
-                                                    <div className="col-md-3">
+                                                    <div className="col-md-6">
                                                         <label className="form-label">
                                                             Timezone <span className="text-danger">*</span>
                                                         </label>
@@ -386,7 +388,7 @@ const MyEventsPage = () => {
                                                         </select>
                                                     </div>
 
-                                                    <div className="col-md-3">
+                                                    <div className="col-md-6">
                                                         <label className="form-label">
                                                             Company <span className="text-danger">*</span>
                                                         </label>
@@ -405,7 +407,7 @@ const MyEventsPage = () => {
                                                         </select>
                                                     </div>
 
-                                                    <div className="col-md-3">
+                                                    <div className="col-md-6">
                                                         <label className="form-label">
                                                             Country <span className="text-danger">*</span>
                                                         </label>
@@ -424,7 +426,7 @@ const MyEventsPage = () => {
                                                         </select>
                                                     </div>
 
-                                                    <div className="col-md-3">
+                                                    <div className="col-md-6">
                                                         <label className="form-label">
                                                             Currency <span className="text-danger">*</span>
                                                         </label>
@@ -479,7 +481,7 @@ const MyEventsPage = () => {
                                                         />
                                                     </div>
 
-                                                    <div className="col-md-3">
+                                                    <div className="col-md-6">
                                                         <label className="form-label">
                                                             Event Start:- (
                                                             {formatDateTimeShort(eventDetails?.date_from?.local)}
@@ -494,7 +496,7 @@ const MyEventsPage = () => {
                                                         />
                                                     </div>
 
-                                                    <div className="col-md-3">
+                                                    <div className="col-md-6">
                                                         <label className="form-label">
                                                             Event End:- (
                                                             {formatDateTimeShort(eventDetails?.date_to?.local)}
@@ -511,7 +513,7 @@ const MyEventsPage = () => {
 
                                                     {!isFree && (
                                                         <>
-                                                            <div className="col-md-3">
+                                                            <div className="col-md-6">
                                                                 <label className="form-label">
                                                                     Sale Start:- (
                                                                     {formatDateTimeShort(eventDetails?.sale_start?.local)}
@@ -526,7 +528,7 @@ const MyEventsPage = () => {
                                                                 />
                                                             </div>
 
-                                                            <div className="col-md-3">
+                                                            <div className="col-md-6">
                                                                 <label className="form-label">
                                                                     Sale End:- (
                                                                     {formatDateTimeShort(eventDetails?.sale_end?.local)}
@@ -545,7 +547,7 @@ const MyEventsPage = () => {
 
                                                     {!isFree && (
                                                         <>
-                                                            <div className="col-md-4">
+                                                            <div className="col-md-6">
                                                                 <label className="form-label">
                                                                     Ticket Limit per person <span className="text-danger">*</span>
                                                                 </label>
@@ -562,7 +564,7 @@ const MyEventsPage = () => {
                                                                 </select>
                                                             </div>
 
-                                                            <div className="col-md-4">
+                                                            <div className="col-md-6">
                                                                 <label className="form-label">
                                                                     Approval Expiry <span className="text-danger">*</span>
                                                                 </label>
@@ -584,7 +586,7 @@ const MyEventsPage = () => {
 
                                                     )}
 
-                                                    <div className="col-md-4">
+                                                    <div className="col-md-6">
                                                         <label htmlFor="formFile" className="form-label">
                                                             Update Image{" "}
                                                             <small className="text-danger">(Size 550×550 JPG, JPEG, PNG Max 2MB)</small>

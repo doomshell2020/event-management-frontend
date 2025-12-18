@@ -433,7 +433,7 @@ export default function CartModal({ show, handleClose, eventId }) {
     };
 
     const increaseAddon = async (addon) => {
-        const addonId = addon?.id;       
+        const addonId = addon?.id;
         try {
             setLoadingId(addonId);
 
@@ -733,7 +733,7 @@ export default function CartModal({ show, handleClose, eventId }) {
             onHide={handleClose}
             backdrop="static"
             keyboard={true}
-            dialogClassName="cart-modal-size"
+            dialogClassName="cart-modal-size cart-mdl-only"
             className="careyes-chekout-new oxmonten2025EvntSec"
         >
             {!showNextStep ? (
@@ -761,7 +761,8 @@ export default function CartModal({ show, handleClose, eventId }) {
 
                                                             {/* EVENT IMAGE BIG SIZE */}
                                                             <Col md={5}>
-                                                                <div className="evt-innr-dtl" style={{ textAlign: "center" }}>
+                                                                <h2 className="cart-mdl-title">{eventData.name}</h2>
+                                                                <div className="cartmdl-left-img" style={{ textAlign: "center" }}>
                                                                     <Image
                                                                         src={eventData.feat_image}
                                                                         alt={eventData.name}
@@ -771,310 +772,412 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                         style={{
                                                                             borderRadius: "12px",
                                                                             width: "100%",
-                                                                            height: "auto",
+                                                                            height: "100%",
                                                                             objectFit: "cover"
                                                                         }}
                                                                     />
 
-                                                                    <div className="monte-evntcnts mt-3">
-                                                                        <strong style={{ fontSize: "18px" }}>
-                                                                            {eventData.location}
-                                                                        </strong>
 
-                                                                        <p style={{ marginTop: "6px", fontSize: "15px", color: "#555" }}>
-                                                                            {formatEventDateRange(
-                                                                                eventData.date_from?.local,
-                                                                                eventData.date_to?.local
-                                                                            )}
-                                                                        </p>
-                                                                    </div>
+                                                                </div>
+                                                                <div className="event-crt-deta mt-2 text-center">
+                                                                    <strong className="mdl-event-name">
+                                                                        {eventData.location}
+                                                                    </strong>
+
+                                                                    <p style={{ color: "#555" }}>
+                                                                        {formatEventDateRange(
+                                                                            eventData.date_from?.local,
+                                                                            eventData.date_to?.local
+                                                                        )}
+                                                                    </p>
                                                                 </div>
                                                             </Col>
 
                                                             {/* DESCRIPTION WITH SHOW MORE/LESS */}
                                                             <Col md={7}>
-                                                                <div className="event-description mt-2">
-                                                                    <div
-                                                                        style={{
-                                                                            maxHeight: showFullDesc ? "none" : "90px",
-                                                                            overflow: "hidden",
-                                                                            position: "relative",
-                                                                            fontSize: "15px",
-                                                                            lineHeight: "22px"
-                                                                        }}
-                                                                        dangerouslySetInnerHTML={{
-                                                                            __html: eventData.desp,
-                                                                        }}
-                                                                    />
 
-                                                                    {/* SHOW MORE / LESS BUTTON */}
-                                                                    <button
-                                                                        type="button"
-                                                                        onClick={() => setShowFullDesc(!showFullDesc)}
-                                                                        style={{
-                                                                            marginTop: "10px",
-                                                                            background: "none",
-                                                                            border: "none",
-                                                                            color: "#007bff",
-                                                                            cursor: "pointer",
-                                                                            fontWeight: "600",
-                                                                            padding: 0
-                                                                        }}
-                                                                    >
-                                                                        {showFullDesc ? "Show Less ▲" : "Show More ▼"}
-                                                                    </button>
-                                                                </div>
+                                                                {eventData.tickets?.length > 0 && (
+                                                                    <div className="ticket-section">
+                                                                        <h5 className="mb-3">Available Tickets</h5>
+
+                                                                        {eventData.tickets.map((ticket, i) => {
+                                                                            const pricingId = ticket?.id;
+                                                                            const cartItem = normalCart.find(item => item.uniqueId == pricingId);
+                                                                            const isLoading = loadingId == pricingId;
+
+                                                                            return (
+                                                                                <div key={i} className="ticket-item only-ticket">
+
+                                                                                    <div className="d-flex justify-content-between align-items-center ticket-infobox">
+                                                                                        <div className="ticket-info">
+                                                                                            <strong style={{ fontSize: "15px" }}>{ticket.title}</strong>
+                                                                                            <p className="mt-2">Base Price: ₹{ticket.price}</p>
+
+                                                                                        </div>
+
+
+                                                                                        {/* Counter */}
+                                                                                        {isLoading ? (
+                                                                                            <Spinner size="sm" />
+                                                                                        ) : (
+                                                                                            <div className="d-flex align-items-center counter-btn">
+
+                                                                                                {/* Decrease */}
+                                                                                                <button
+                                                                                                    className="btn btn-sm text-white"
+                                                                                                    onClick={() => decreaseTicket(ticket)}
+                                                                                                    disabled={isLoading}
+                                                                                                >
+                                                                                                    –
+                                                                                                </button>
+
+                                                                                                {/* Count */}
+                                                                                                <span
+                                                                                                    className="mx-2 text-white"
+                                                                                                    style={{
+                                                                                                        fontSize: "11px",
+                                                                                                        width: "20px",
+                                                                                                        textAlign: "center",
+                                                                                                        display: "flex",
+                                                                                                        justifyContent: "center",
+                                                                                                        margin: "0px 5px",
+                                                                                                    }}
+                                                                                                >
+                                                                                                    {cartItem?.count || 0}
+                                                                                                </span>
+
+                                                                                                {/* Increase */}
+                                                                                                <button
+                                                                                                    className="btn btn-sm text-white"
+                                                                                                    onClick={() => increaseTicket(ticket)}
+                                                                                                    disabled={isLoading}
+                                                                                                >
+                                                                                                    +
+                                                                                                </button>
+
+                                                                                            </div>
+                                                                                        )}
+                                                                                    </div>
+
+
+
+
+                                                                                    {ticket.pricings?.length > 0 && (
+                                                                                        <div className="pricing-tier mt-2">
+                                                                                            {ticket.pricings.map((p, idx) => (
+                                                                                                <div key={idx} className="d-flex justify-content-between">
+                                                                                                    <span>{p.date}</span>
+                                                                                                    <span>₹{p.price}</span>
+                                                                                                </div>
+                                                                                            ))}
+                                                                                        </div>
+                                                                                    )}
+
+                                                                                </div>
+
+
+
+
+                                                                            );
+
+
+                                                                        })}
+
+
+                                                                        <div className="ticket-item only-ticket ticket-addon">
+                                                                            <div className="d-flex justify-content-between align-items-center ticket-infobox">
+                                                                                <div className="ticket-info">
+                                                                                    <strong style={{ fontSize: "15px" }}>Ticket Second</strong><span class="addon-badge">ADDON</span>
+
+                                                                                    <p className="mt-2">Base Price: ₹20</p>
+                                                                                </div>
+                                                                                <div className="d-flex align-items-center counter-btn">
+                                                                                    <button className="btn btn-sm text-white">–</button>
+
+                                                                                    <span
+                                                                                        className="mx-2 text-white"
+                                                                                        style={{
+                                                                                            fontSize: "11px",
+                                                                                            width: "20px",
+                                                                                            textAlign: "center",
+                                                                                            display: "flex",
+                                                                                            justifyContent: "center",
+                                                                                            margin: "0px 5px",
+                                                                                        }}
+                                                                                    >
+                                                                                        1
+                                                                                    </span>
+
+                                                                                    <button className="btn btn-sm text-white">+</button>
+                                                                                </div>
+                                                                            </div>
+
+
+
+                                                                        </div>
+
+
+                                                                    </div>
+
+                                                                )}
+
+
+
+
+
                                                             </Col>
+
+                                                            {/* AVAILABLE TICKETS */}
+                                                            {eventData.tickets?.length > 0 && (
+                                                                <div className="ticket-section mt-4">
+                                                                    <h5 className="mb-3">Available Tickets</h5>
+
+                                                                    {eventData.tickets.map((ticket, i) => {
+                                                                        // console.log('ticket :', ticket);
+
+                                                                        const pricingId = ticket?.id;
+                                                                        const cartItem = normalCart.find(item => item.uniqueId == pricingId);
+                                                                        const isLoading = loadingId == pricingId;
+                                                                        return (
+                                                                            <div key={i} className="ticket-box mb-3 p-3 border rounded shadow-sm">
+
+                                                                                <div className="d-flex justify-content-between align-items-center">
+                                                                                    <strong style={{ fontSize: "17px" }}>{ticket.title}</strong>
+
+                                                                                    {/* Counter */}
+                                                                                    {isLoading ? (
+                                                                                        <Spinner size="sm" />
+                                                                                    ) : (
+                                                                                        <div className="d-flex align-items-center">
+
+                                                                                            {/* Decrease */}
+                                                                                            <button
+                                                                                                className="btn btn-sm btn-outline-secondary"
+                                                                                                onClick={() => decreaseTicket(ticket)}
+                                                                                                disabled={isLoading}
+                                                                                            >
+                                                                                                –
+                                                                                            </button>
+
+                                                                                            {/* Count */}
+                                                                                            <span
+                                                                                                className="mx-2"
+                                                                                                style={{
+                                                                                                    fontSize: "16px",
+                                                                                                    width: "25px",
+                                                                                                    textAlign: "center",
+                                                                                                    display: "flex",
+                                                                                                    justifyContent: "center"
+                                                                                                }}
+                                                                                            >
+                                                                                                {cartItem?.count || 0}
+                                                                                            </span>
+
+                                                                                            {/* Increase */}
+                                                                                            <button
+                                                                                                className="btn btn-sm btn-outline-primary"
+                                                                                                onClick={() => increaseTicket(ticket)}
+                                                                                                disabled={isLoading}
+                                                                                            >
+                                                                                                +
+                                                                                            </button>
+
+                                                                                        </div>
+                                                                                    )}
+                                                                                </div>
+
+                                                                                {/* Pricing Display */}
+                                                                                <p className="mt-2">Base Price: ₹{ticket.price}</p>
+
+                                                                                {ticket.pricings?.length > 0 && (
+                                                                                    <div className="pricing-tier mt-2">
+                                                                                        {ticket.pricings.map((p, idx) => (
+                                                                                            <div key={idx} className="d-flex justify-content-between">
+                                                                                                <span>{p.date}</span>
+                                                                                                <span>₹{p.price}</span>
+                                                                                            </div>
+                                                                                        ))}
+                                                                                    </div>
+                                                                                )}
+
+                                                                            </div>
+                                                                        );
+                                                                    })}
+                                                                </div>
+                                                            )}
+
+                                                            {eventData.addons?.length > 0 && (
+                                                                <div className="ticket-section mt-4">
+                                                                    <h5 className="mb-3">Available Addons</h5>
+
+                                                                    {eventData.addons.map((addon, i) => {
+                                                                        const addonId = addon.id;
+                                                                        // console.log('addonId :', addonId);
+                                                                        const cartItem = addonCart.find(
+                                                                            (item) => item.uniqueId == addonId
+                                                                        );
+                                                                        // console.log('cartItem :', cartItem);
+                                                                        const isLoading = loadingId == addonId;
+
+                                                                        return (
+                                                                            <div
+                                                                                key={i}
+                                                                                className="ticket-box mb-3 p-3 border rounded shadow-sm"
+                                                                            >
+                                                                                <div className="d-flex justify-content-between align-items-center">
+                                                                                    {/* Addon Name */}
+                                                                                    <strong style={{ fontSize: "17px" }}>
+                                                                                        {addon.name}
+                                                                                    </strong>
+
+                                                                                    {/* Counter */}
+                                                                                    {isLoading ? (
+                                                                                        <Spinner size="sm" />
+                                                                                    ) : (
+                                                                                        <div className="d-flex align-items-center">
+                                                                                            {/* Decrease */}
+                                                                                            <button
+                                                                                                className="btn btn-sm btn-outline-secondary"
+                                                                                                onClick={() => decreaseAddon(addon)}
+                                                                                                disabled={isLoading}
+                                                                                            >
+                                                                                                –
+                                                                                            </button>
+
+                                                                                            {/* Count */}
+                                                                                            <span
+                                                                                                className="mx-2"
+                                                                                                style={{
+                                                                                                    fontSize: "16px",
+                                                                                                    width: "25px",
+                                                                                                    textAlign: "center",
+                                                                                                    display: "flex",
+                                                                                                    justifyContent: "center",
+                                                                                                }}
+                                                                                            >
+                                                                                                {cartItem?.count || 0}
+                                                                                            </span>
+
+                                                                                            {/* Increase */}
+                                                                                            <button
+                                                                                                className="btn btn-sm btn-outline-primary"
+                                                                                                onClick={() => increaseAddon(addon)}
+                                                                                                disabled={isLoading}
+                                                                                            >
+                                                                                                +
+                                                                                            </button>
+                                                                                        </div>
+                                                                                    )}
+                                                                                </div>
+
+                                                                                {/* Price */}
+                                                                                <p className="mt-2">
+                                                                                    Price: ₹{addon.price}
+                                                                                </p>
+
+                                                                                {/* Description */}
+                                                                                {addon.description && (
+                                                                                    <p className="text-muted">
+                                                                                        {addon.description}
+                                                                                    </p>
+                                                                                )}
+                                                                            </div>
+                                                                        );
+                                                                    })}
+                                                                </div>
+                                                            )}
+
+                                                            {/* AVAILABLE SLOTS */}
+                                                            {eventData.slots?.length > 0 && (
+                                                                <div className="slot-section mt-4">
+                                                                    <h5 className="mb-3">Event Slots</h5>
+
+                                                                    {eventData.slots.map((slot) => {
+                                                                        const pricingId = slot.pricings?.[0]?.id;
+
+                                                                        // Find matching slot count from cart
+                                                                        const cartItem = slotCart.find(item => item.uniqueId == pricingId);
+
+                                                                        const isLoading = loadingId == pricingId;
+
+                                                                        return (
+                                                                            <div key={slot.id} className="slot-box p-3 border rounded mb-3 shadow-sm">
+
+                                                                                <div className="d-flex justify-content-between align-items-center">
+                                                                                    <strong style={{ fontSize: "17px" }}>
+                                                                                        {slot.slot_name}
+                                                                                    </strong>
+
+                                                                                    {/* Counter */}
+                                                                                    {isLoading ? <Spinner size="sm" /> :
+                                                                                        <div className="d-flex align-items-center">
+
+                                                                                            {/* Decrease */}
+                                                                                            <button
+                                                                                                className="btn btn-sm btn-outline-secondary"
+                                                                                                onClick={() => decreaseSlot(slot)}
+                                                                                                disabled={isLoading}
+                                                                                            >
+                                                                                                –
+                                                                                            </button>
+
+                                                                                            {/* Count / Loading */}
+                                                                                            <span
+                                                                                                className="mx-2"
+                                                                                                style={{
+                                                                                                    fontSize: "16px",
+                                                                                                    width: "25px",
+                                                                                                    textAlign: "center",
+                                                                                                    display: "flex",
+                                                                                                    justifyContent: "center"
+                                                                                                }}
+                                                                                            >
+                                                                                                {cartItem?.count || 0}
+                                                                                            </span>
+
+                                                                                            {/* Increase */}
+                                                                                            <button
+                                                                                                className="btn btn-sm btn-outline-primary"
+                                                                                                onClick={() => increaseSlot(slot)}
+                                                                                                disabled={isLoading}
+                                                                                            >
+                                                                                                +
+                                                                                            </button>
+
+                                                                                        </div>
+                                                                                    }
+
+                                                                                </div>
+
+                                                                                {/* Slot Time */}
+                                                                                <p className="mt-2">
+                                                                                    {formatReadableDate(slot.slot_date)} — {slot.start_time} to {slot.end_time}
+                                                                                </p>
+
+                                                                                <p className="text-muted">{slot.description}</p>
+
+                                                                                {/* Pricing List */}
+                                                                                {slot.pricings?.length > 0 && (
+                                                                                    <div className="pricing-tier">
+                                                                                        {slot.pricings.map((p, idx) => (
+                                                                                            <div key={idx} className="d-flex justify-content-between">
+                                                                                                <span>{p.date}</span>
+                                                                                                <span>₹{p.price}</span>
+                                                                                            </div>
+                                                                                        ))}
+                                                                                    </div>
+                                                                                )}
+                                                                            </div>
+                                                                        );
+                                                                    })}
+
+                                                                </div>
+                                                            )}
+
+
                                                         </Row>
                                                     </div>
                                                 </div>
-
-                                                {/* AVAILABLE TICKETS */}
-                                                {eventData.tickets?.length > 0 && (
-                                                    <div className="ticket-section mt-4">
-                                                        <h5 className="mb-3">Available Tickets</h5>
-
-                                                        {eventData.tickets.map((ticket, i) => {
-                                                            // console.log('ticket :', ticket);
-
-                                                            const pricingId = ticket?.id;
-                                                            const cartItem = normalCart.find(item => item.uniqueId == pricingId);
-                                                            const isLoading = loadingId == pricingId;
-                                                            return (
-                                                                <div key={i} className="ticket-box mb-3 p-3 border rounded shadow-sm">
-
-                                                                    <div className="d-flex justify-content-between align-items-center">
-                                                                        <strong style={{ fontSize: "17px" }}>{ticket.title}</strong>
-
-                                                                        {/* Counter */}
-                                                                        {isLoading ? (
-                                                                            <Spinner size="sm" />
-                                                                        ) : (
-                                                                            <div className="d-flex align-items-center">
-
-                                                                                {/* Decrease */}
-                                                                                <button
-                                                                                    className="btn btn-sm btn-outline-secondary"
-                                                                                    onClick={() => decreaseTicket(ticket)}
-                                                                                    disabled={isLoading}
-                                                                                >
-                                                                                    –
-                                                                                </button>
-
-                                                                                {/* Count */}
-                                                                                <span
-                                                                                    className="mx-2"
-                                                                                    style={{
-                                                                                        fontSize: "16px",
-                                                                                        width: "25px",
-                                                                                        textAlign: "center",
-                                                                                        display: "flex",
-                                                                                        justifyContent: "center"
-                                                                                    }}
-                                                                                >
-                                                                                    {cartItem?.count || 0}
-                                                                                </span>
-
-                                                                                {/* Increase */}
-                                                                                <button
-                                                                                    className="btn btn-sm btn-outline-primary"
-                                                                                    onClick={() => increaseTicket(ticket)}
-                                                                                    disabled={isLoading}
-                                                                                >
-                                                                                    +
-                                                                                </button>
-
-                                                                            </div>
-                                                                        )}
-                                                                    </div>
-
-                                                                    {/* Pricing Display */}
-                                                                    <p className="mt-2">Base Price: ₹{ticket.price}</p>
-
-                                                                    {ticket.pricings?.length > 0 && (
-                                                                        <div className="pricing-tier mt-2">
-                                                                            {ticket.pricings.map((p, idx) => (
-                                                                                <div key={idx} className="d-flex justify-content-between">
-                                                                                    <span>{p.date}</span>
-                                                                                    <span>₹{p.price}</span>
-                                                                                </div>
-                                                                            ))}
-                                                                        </div>
-                                                                    )}
-
-                                                                </div>
-                                                            );
-                                                        })}
-                                                    </div>
-                                                )}
-
-                                                {eventData.addons?.length > 0 && (
-                                                    <div className="ticket-section mt-4">
-                                                        <h5 className="mb-3">Available Addons</h5>
-
-                                                        {eventData.addons.map((addon, i) => {
-                                                            const addonId = addon.id;
-                                                            // console.log('addonId :', addonId);
-                                                            const cartItem = addonCart.find(
-                                                                (item) => item.uniqueId == addonId
-                                                            );
-                                                            // console.log('cartItem :', cartItem);
-                                                            const isLoading = loadingId == addonId;
-
-                                                            return (
-                                                                <div
-                                                                    key={i}
-                                                                    className="ticket-box mb-3 p-3 border rounded shadow-sm"
-                                                                >
-                                                                    <div className="d-flex justify-content-between align-items-center">
-                                                                        {/* Addon Name */}
-                                                                        <strong style={{ fontSize: "17px" }}>
-                                                                            {addon.name}
-                                                                        </strong>
-
-                                                                        {/* Counter */}
-                                                                        {isLoading ? (
-                                                                            <Spinner size="sm" />
-                                                                        ) : (
-                                                                            <div className="d-flex align-items-center">
-                                                                                {/* Decrease */}
-                                                                                <button
-                                                                                    className="btn btn-sm btn-outline-secondary"
-                                                                                    onClick={() => decreaseAddon(addon)}
-                                                                                    disabled={isLoading}
-                                                                                >
-                                                                                    –
-                                                                                </button>
-
-                                                                                {/* Count */}
-                                                                                <span
-                                                                                    className="mx-2"
-                                                                                    style={{
-                                                                                        fontSize: "16px",
-                                                                                        width: "25px",
-                                                                                        textAlign: "center",
-                                                                                        display: "flex",
-                                                                                        justifyContent: "center",
-                                                                                    }}
-                                                                                >
-                                                                                    {cartItem?.count || 0}
-                                                                                </span>
-
-                                                                                {/* Increase */}
-                                                                                <button
-                                                                                    className="btn btn-sm btn-outline-primary"
-                                                                                    onClick={() => increaseAddon(addon)}
-                                                                                    disabled={isLoading}
-                                                                                >
-                                                                                    +
-                                                                                </button>
-                                                                            </div>
-                                                                        )}
-                                                                    </div>
-
-                                                                    {/* Price */}
-                                                                    <p className="mt-2">
-                                                                        Price: ₹{addon.price}
-                                                                    </p>
-
-                                                                    {/* Description */}
-                                                                    {addon.description && (
-                                                                        <p className="text-muted">
-                                                                            {addon.description}
-                                                                        </p>
-                                                                    )}
-                                                                </div>
-                                                            );
-                                                        })}
-                                                    </div>
-                                                )}
-
-                                                {/* AVAILABLE SLOTS */}
-                                                {eventData.slots?.length > 0 && (
-                                                    <div className="slot-section mt-4">
-                                                        <h5 className="mb-3">Event Slots</h5>
-
-                                                        {eventData.slots.map((slot) => {
-                                                            const pricingId = slot.pricings?.[0]?.id;
-
-                                                            // Find matching slot count from cart
-                                                            const cartItem = slotCart.find(item => item.uniqueId == pricingId);
-
-                                                            const isLoading = loadingId == pricingId;
-
-                                                            return (
-                                                                <div key={slot.id} className="slot-box p-3 border rounded mb-3 shadow-sm">
-
-                                                                    <div className="d-flex justify-content-between align-items-center">
-                                                                        <strong style={{ fontSize: "17px" }}>
-                                                                            {slot.slot_name}
-                                                                        </strong>
-
-                                                                        {/* Counter */}
-                                                                        {isLoading ? <Spinner size="sm" /> :
-                                                                            <div className="d-flex align-items-center">
-
-                                                                                {/* Decrease */}
-                                                                                <button
-                                                                                    className="btn btn-sm btn-outline-secondary"
-                                                                                    onClick={() => decreaseSlot(slot)}
-                                                                                    disabled={isLoading}
-                                                                                >
-                                                                                    –
-                                                                                </button>
-
-                                                                                {/* Count / Loading */}
-                                                                                <span
-                                                                                    className="mx-2"
-                                                                                    style={{
-                                                                                        fontSize: "16px",
-                                                                                        width: "25px",
-                                                                                        textAlign: "center",
-                                                                                        display: "flex",
-                                                                                        justifyContent: "center"
-                                                                                    }}
-                                                                                >
-                                                                                    {cartItem?.count || 0}
-                                                                                </span>
-
-                                                                                {/* Increase */}
-                                                                                <button
-                                                                                    className="btn btn-sm btn-outline-primary"
-                                                                                    onClick={() => increaseSlot(slot)}
-                                                                                    disabled={isLoading}
-                                                                                >
-                                                                                    +
-                                                                                </button>
-
-                                                                            </div>
-                                                                        }
-
-                                                                    </div>
-
-                                                                    {/* Slot Time */}
-                                                                    <p className="mt-2">
-                                                                        {formatReadableDate(slot.slot_date)} — {slot.start_time} to {slot.end_time}
-                                                                    </p>
-
-                                                                    <p className="text-muted">{slot.description}</p>
-
-                                                                    {/* Pricing List */}
-                                                                    {slot.pricings?.length > 0 && (
-                                                                        <div className="pricing-tier">
-                                                                            {slot.pricings.map((p, idx) => (
-                                                                                <div key={idx} className="d-flex justify-content-between">
-                                                                                    <span>{p.date}</span>
-                                                                                    <span>₹{p.price}</span>
-                                                                                </div>
-                                                                            ))}
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-                                                            );
-                                                        })}
-
-                                                    </div>
-                                                )}
 
                                             </div>
                                         </Col>

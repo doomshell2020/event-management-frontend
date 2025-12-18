@@ -89,7 +89,7 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
 
                 {isLoggedIn && (
                   <>
-                    <Link href="/tickets/my-tickets" className="navLink">
+                    <Link href="/orders" className="navLink">
                       My Tickets
                     </Link>
 
