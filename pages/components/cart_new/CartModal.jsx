@@ -853,7 +853,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                         ];
 
                                                                         // Per-ticket selected member
-                                                                        const [selectedMember, setSelectedMember] = React.useState(null);
+                                                                        const [selectedMember, setSelectedMember] = useState(null);
 
                                                                         return (
                                                                             <div
