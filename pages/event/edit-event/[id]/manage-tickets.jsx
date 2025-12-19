@@ -177,7 +177,7 @@ const ManageTickets = () => {
 
                     <div className="event-righcontent">
                         <div className="dsa_contant">
-                            <section id="post-eventpg edit-event-page">
+                            <section id="post-eventpg">
                                 <EventHeaderSection eventDetails={eventDetails} />
 
                                 <h4 className="text-24">Manage Tickets</h4>
@@ -246,20 +246,20 @@ const ManageTickets = () => {
                                     ) : ticketsList.length == 0 ? (
                                         <p className="text-muted">No tickets found for this event.</p>
                                     ) : (ticketsList.map((ticket) => (
-                                        <div key={ticket.id} className="row item_bg m-0 p-2 px-3 mb-2 align-items-center">
-                                            <div className="col-sm-8">
+                                        <div key={ticket.id} className="row item_bg m-0 p-2 mb-2 align-items-center manage-ticket-type">
+                                            <div className="col-sm-9">
                                                 <p className="body-text mb-1">
                                                     <strong>{ticket.title}</strong> (₹{ticket.price})
                                                     <br /> Sold: {ticket.sold_count || 0} / {ticket.count}
                                                 </p>
                                                 <div className="row">
-                                                    <div className="col-md-4">
+                                                    <div className="col-md-3">
                                                         <p className="body-text mb-0 d-flex align-items-center">
                                                             <Ticket size={16} className="me-2 text-primary" />
                                                             {ticket.type == "open_sales" ? "Open Sale" : "Committee Sales"}
                                                         </p>
                                                     </div>
-                                                    <div className="col-md-4">
+                                                    <div className="col-md-3">
                                                         <p className="body-text mb-0 d-flex align-items-center">
                                                             {ticket.access_type}
                                                         </p>
@@ -293,7 +293,7 @@ const ManageTickets = () => {
                                                 </div>
                                             </div>
 
-                                            <div className="col-sm-4 text-end">
+                                            <div className="col-sm-3 text-end">
                                                 {ticket.type == "committee_sales" && (
                                                     <button
                                                         className="btn btn-warning btn-sm rounded-pill fw-bold px-3 me-2"
@@ -305,7 +305,7 @@ const ManageTickets = () => {
 
                                                 <div className="dropdown d-inline position-relative">
                                                     <button
-                                                        className="btn btn-primary btn-sm rounded-pill"
+                                                        className="btn btn-primary btn-sm"
                                                         type="button"
                                                         onClick={() => setOpenDropdown(openDropdown == ticket.id ? null : ticket.id)}
                                                     >
@@ -314,8 +314,12 @@ const ManageTickets = () => {
 
                                                     {openDropdown == ticket.id && (
                                                         <ul
-                                                            className="dropdown-menu show position-absolute end-0"
-                                                            style={{ display: "block", zIndex: 999 }}
+                                                            className="dropdown-menu show position-absolute"
+                                                            style={{
+                                                                display: "block",
+                                                                zIndex: 999,
+                                                                left: "-120px",top:"24px"
+                                                            }}
                                                         >
                                                             {/* Edit */}
                                                             <li>

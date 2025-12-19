@@ -120,20 +120,24 @@ export default function CheckOutComponents({
     <>
       <Modal.Header>
         {/* BACK BUTTON (ICON) */}
-        <Button onClick={() => showNextStep(false)}>
+        <Button
+          className="p-0 paynow-back"
+          onClick={() => showNextStep(false)}
+
+        >
           <i className="bi bi-arrow-left fs-4"></i>
         </Button>
 
         <Button
           onClick={handleModalClose}
-          className="btn-close ms-auto"
+          className="btn-close ms-auto py-0 ps-0 paynow-close d-flex justify-content-center align-items-center"
           variant=""
         >
           <i className="bi bi-x-lg"></i>
         </Button>
       </Modal.Header>
 
-      <Modal.Body className="px-3 care-new-check-secnd care-accom-scd-flw">
+      <Modal.Body className="py-3 px-0 care-new-check-secnd care-accom-scd-flw paynow-mdl-container mb-0">
         {isLoading && (
           <div
             style={{
@@ -150,11 +154,11 @@ export default function CheckOutComponents({
           </div>
         )}
 
-        <div className="secon-flw">
-          <Row className="mrgn-ck-x">
-            <Col md={7} className="crt-pdng-x">
+        <div className="secon-flw paynow-mdl-rowbox rounded-0">
+          <Row className="g-0">
+            <Col md={6}>
               <div
-                className="scd-hd-img monte-snd-bnr"
+                className="scd-hd-img pay-now-leftimg rounded-0"
                 style={{ backgroundImage: `url(${eventImage})` }}
               >
                 <img
@@ -164,20 +168,20 @@ export default function CheckOutComponents({
               </div>
             </Col>
 
-            <Col md={5} className="crt-pdng-x">
-              <div className="scd-hd-cnt text-center">
+            <Col md={6}>
+              <div className="scd-hd-cnt text-center paynow-titlesec">
                 <h2 className="ck-mn-hd">{eventName}</h2>
               </div>
             </Col>
           </Row>
         </div>
 
-        <div className="scnd-flw-amnts">
+        <div className="scnd-flw-amnts paynow-amout-flow mb-0">
           <h3>YOUR TICKETS</h3>
 
           <Row className="align-items-end justify-content-between">
-            <Col xl={5} md={6}>
-              <div className="amnt-stl-inr">
+            <Col md={12}>
+              <div className="amnt-stl-inr amout-first-row">
                 {cart.map((el, i) => (
                   <div className="tct-amt" key={i}>
                     <p>
@@ -195,8 +199,8 @@ export default function CheckOutComponents({
               </div>
             </Col>
 
-            <Col xl={5} md={6}>
-              <div className="amnt-stl-inr">
+            <Col md={12}>
+              <div className="amnt-stl-inr pt-4">
                 <div className="tct-amt">
                   <p>TOTAL :</p>
                   <span>
@@ -205,7 +209,7 @@ export default function CheckOutComponents({
                   </span>
                 </div>
 
-                <div className="tct-amt">
+                <div className="tct-amt mb-2">
                   <p>TAXES & FEES :</p>
                   <span>
                     {currencySymbol}
@@ -216,10 +220,10 @@ export default function CheckOutComponents({
             </Col>
           </Row>
 
-          <Row className="ttl-amts justify-content-between">
-            <Col xl={5} md={6} />
-            <Col xl={5} md={6}>
-              <div className="tct-amt">
+          <Row className="ttl-amts justify-content-between border-0">
+
+            <Col md={12}>
+              <div className="tct-amt amount-last-row">
                 <p>TOTAL:</p>
                 <p>
                   {currencySymbol}

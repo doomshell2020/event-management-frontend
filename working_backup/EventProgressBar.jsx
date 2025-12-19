@@ -4,6 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import api from "@/utils/api";
 
+// Ajay sir 
+
 const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
     const pathname = usePathname();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);

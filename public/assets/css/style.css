@@ -146,7 +146,7 @@ p.des_h::after {
   color: #000;
   font-size: 16px;
   flex: 1 0 auto;
-    min-width: 180px; 
+  min-width: 180px; 
   position: relative;
   text-align: center;
 }
@@ -960,7 +960,7 @@ footer .footer-policybox li a:hover {
 /* event detail page start */
 #event-detail-page {
   position: relative;
-  padding: 80px 0px;
+  padding: 80px 0px 60px;
   background-color: #fff;
   animation-name: fadeInDown;
 }
@@ -973,7 +973,17 @@ footer .footer-policybox li a:hover {
 }
 
 #event-detail-page .ticker_imgmn img {
-  width: 100%;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    image-rendering: auto;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    transform: none !important;border-radius: 13px;
+}
+#event-detail-page .ticker_imgmn {
+    width: 100%;
+    height: 300px;border-radius: 13px;
 }
 
 #event-detail-page .event_bg {
@@ -998,49 +1008,71 @@ footer .footer-policybox li a:hover {
 }
 
 #event-detail-page .social i {
-  padding-top: 11px;
-  text-align: center;
-  color: #ffffff;
-  height: 40px;
-  width: 40px;
-  border-radius: 50%;
-  background-color: #3d6db5;
-  border-color: #1bbc9b;
-  font-size: 18px;
+    padding-top: 11px;
+    text-align: center;
+    color: #ffffff;
+    height: 37px;
+    width: 37px;
+    border-radius: 50%;
+    background-color: #3d6db5;
+    border-color: #1bbc9b;
+    font-size: 15px;
 }
 
 #event-detail-page .event-ticket-box .section-heading h2 {
-  font-size: 32px;
+  font-size: 28px;margin-bottom: 20px;
 }
 
 #event-detail-page .event-ticket-box .section-heading h6 {
-  font-size: 16px;
+  font-size: 15px;
+}
+#event-detail-page .event-ticket-box button {
+    background-color: #14B8A6;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    border-radius: 4px;
 }
 
 #event-detail-page .event-ticket-box .section-heading h6 a {
   color: #4183C4;
 }
 
-#event-detail-page .info,
-#ticket-detailpage .info {
-  margin-top: 17px;
-  background: #3d6db5;
-  border-radius: 5px;
-  color: #fff;
-  padding: 15px 14px;
+#event-detail-page .info, #ticket-detailpage .info {
+    margin-top: 17px;
+    background: #4b6989;
+    border-radius: 4px;
+    color: #fff;
 }
 
-#ticket-detailpage .info ul li,
-#event-detail-page .info ul li {
-  width: inherit;
-  list-style: none;
-  position: relative;
+#ticket-detailpage .info ul li, #event-detail-page .info ul li {
+    width: inherit;
+    list-style: none;
+    position: relative;
+    padding: 13px 11px 10px;
+}
+#ticket-detailpage .info ul li::before,
+#event-detail-page .info ul li::before {
+    content: "";
+    position: absolute;
+    right: 27px;
+    top: 0;
+    width: 1px;
+    height: 100%;
+    background-color: #ffffff87;
+}
+#ticket-detailpage .info ul li:last-child::before,
+#event-detail-page .info ul li:last-child::before {
+    display: none;
+}
+#event-detail-page .event-ticket-box .event_desp h1 img {
+    max-width: 300px;
+    display: block;margin-bottom: 11px;
 }
 
 #event-detail-page .info h6,
 #ticket-detailpage .info h6 {
-  font-size: 16px;
-  margin-bottom: 5px;
+  font-size: 15px;
+  margin-bottom: 4px;
 }
 
 #event-detail-page .info h6 svg,
@@ -1050,11 +1082,23 @@ footer .footer-policybox li a:hover {
   margin-right: 5px;
   vertical-align: bottom;
 }
+#event-detail-page .event-ticket-box .event_desp .manage_img img.audi_img {
+    max-width: 300px;
+}
+#event-detail-page .event-ticket-box .event_desp .manage_img{
+    text-align: left !important;
+}
+
 
 #event-detail-page .info span,
 #ticket-detailpage .info span {
   color: #ffffff;
-  font-size: 12px;
+  font-size: 12px;text-transform: capitalize;
+}
+.appoinment-checkbtn {
+    padding-top: 18px;
+    border-top: 1px solid #ccc;
+    margin-top: 12px;
 }
 
 #event-detail-page .event_Sub_h {
@@ -1109,7 +1153,30 @@ footer .footer-policybox li a:hover {
   text-align: right;
   margin-top: 30px;
 }
-
+.event-appointment-sec {
+    padding: 40px 0px;
+    background-color: #f4f9ff;
+}
+.event-appointment-sec h5 {
+    font-size: 21px;
+}
+.event-appo-img .card-img-top {
+    height: 100% !important;
+}
+.event-appointment-sec .event-appo-img{height: 210px;}.event-appointment-sec .card-body h6 {font-size: 15px;}
+.event-appointment-sec .slot-btn {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    padding-left: 31px !important;
+    position: relative;
+}
+.event-appointment-sec .slot-btn input.form-check-input.me-3 {
+    width: 16px;
+    height: 16px;
+    top: 15px;
+    left: 8px;
+    margin: 0 !important;
+    border-radius: 0px;
+}
 /* event detail page end */
 /* cart page start */
 #cart {
@@ -1889,7 +1956,6 @@ li.menu_line {
     margin-top: 22px;
     display: flex;
     justify-content: space-between;
-    border-color: hsl(var(--border));
     padding: 1rem;
 }
 .careyes-chekout-new .cart-mdl-only .model-left-content {
@@ -1902,6 +1968,7 @@ li.menu_line {
     line-height: normal;
     font-weight: 700;
 }
+
 .careyes-chekout-new .cart-mdl-only .cart-mdl-innercontent {
     margin-bottom: 1.5rem;
 }
@@ -1924,6 +1991,7 @@ cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: 0.15s;
     border: 2px solid;border-radius: .5rem;
 }
+
 .careyes-chekout-new .cart-mdl-only .ticket-item.only-ticket {
     border-left-width: 4px;
        border-color: hsl(174 62% 44% / 1);
@@ -1940,9 +2008,11 @@ cubic-bezier(0.4, 0, 0.2, 1);
     background: linear-gradient(135deg, #fffbfb, #efe9dd);
     border: 2px dashed #c9b896;
 }
+
 .careyes-chekout-new .cart-mdl-only .ticket-item.ticket-addon .ticket-infobox:before {
     content: "✨";
 }
+
 .careyes-chekout-new .cart-mdl-only .ticket-item.ticket-addon .addon-badge {
     margin-left: 0.5rem;
     border-radius: 9999px;
@@ -1959,11 +2029,13 @@ cubic-bezier(0.4, 0, 0.2, 1);
     line-height: 1.25rem;
     margin-top: 0px !important;
 }
+
 .careyes-chekout-new .cart-mdl-only .chackout-box {
     background-color: #ede9e0;
     padding: 20px;
     border-radius: 19px;
 }
+
 .careyes-chekout-new .cart-mdl-only .chackout-box h2 {
     font-size: 22px;
 }
@@ -1976,6 +2048,7 @@ cubic-bezier(0.4, 0, 0.2, 1);
     padding: 10px 15px;
     border-radius: 7px;
 }
+
 .careyes-chekout-new .cart-mdl-only .chackout-box .chackout-detabox .delete-btn {
     display: flex;
     justify-content: center;
@@ -1986,8 +2059,9 @@ cubic-bezier(0.4, 0, 0.2, 1);
     color: #000000;
     margin-top: 1px;
 }
-.careyes-chekout-new .cart-mdl-only .modal-content{  max-width: 1060px;
-    margin: auto;}
+/* .careyes-chekout-new .cart-mdl-only .modal-content{  max-width: 1060px;
+    margin: auto;} */
+
   .careyes-chekout-new .cart-mdl-only .chackout-box .chackout-detabox .apply-cd.my-3 input.form-control {
     font-size: 13px;
 }
@@ -1995,15 +2069,34 @@ cubic-bezier(0.4, 0, 0.2, 1);
     font-size: 12px;
     margin-bottom: 11px;
 }
-.careyes-chekout-new .cart-mdl-only {
+
+/* .careyes-chekout-new .cart-mdl-only {
     max-width: 1060px !important;
-}
+} */
+
 .careyes-chekout-new .cart-mdl-only .only-ticket .counter-btn {
     background-color: black;
     border-radius: 48px; padding: 0px 5px;
 }
 
 /*________________ only-cart model design end ____________*/
+/*________________ cart chackout paynow model start ____________*/
+.cart-mdl-only .paynow-back{line-height: normal;}.cart-mdl-only .paynow-back i{color: #000;}
+.cart-mdl-only .paynow-close {line-height: normal;}.cart-mdl-only .paynow-close i{font-size: 16px;}
+.secon-flw.paynow-mdl-rowbox .row {margin: 0;}.secon-flw.paynow-mdl-rowbox .row .col-md-6 {padding: 0;}
+.modal-content:has(.paynow-mdl-rowbox) {border: 0;}
+.secon-flw.paynow-mdl-rowbox .row .pay-now-leftimg{height: auto !important;padding: 70px 10px;}
+.secon-flw.paynow-mdl-rowbox .row .pay-now-leftimg img{width: 80%;}
+.secon-flw.paynow-mdl-rowbox .row .paynow-titlesec{justify-content: center;}
+.cart-mdl-only .paynow-mdl-container .paynow-amout-flow {padding: 0px 20px;margin: 20px 0 0px !important;}
+.cart-mdl-only .paynow-mdl-container .paynow-amout-flow .tct-amt p {font-weight: 600;}
+.cart-mdl-only .paynow-mdl-container .secon-flw.paynow-mdl-rowbox .row .paynow-titlesec h2{font-size: 37px;}
+.cart-mdl-only .paynow-mdl-container .paynow-amout-flow .amout-first-row{padding-bottom: 20px;border-bottom: 1px solid;}
+.cart-mdl-only .paynow-mdl-container .paynow-amout-flow .amount-last-row{margin-top: 0px !important;padding-top: 15px;border-top: 1px solid;}
+
+
+/*________________ cart chackout paynow model end ____________*/
+
 /* ===============================
    COMMON CARD STYLE 
 ================================ */
@@ -2050,6 +2143,7 @@ cubic-bezier(0.4, 0, 0.2, 1);
     backface-visibility: hidden;
     transform: none !important;
 }
+
 #my-order-module .inner_box .image_br::after {
     position: absolute;
     bottom: 0px;
@@ -2063,10 +2157,12 @@ cubic-bezier(0.4, 0, 0.2, 1);
     min-width: 110px;
     text-align: center;letter-spacing: 0.6px;
 }
+
 #my-order-module .appointment-card .inner_box .image_br::after {
     content: "Appointment";
     background: rgb(57, 131, 197);
 }
+
 #my-order-module .appointment-card .inner_box .ticket-count {
     color: #3983c5;
 }
@@ -2087,6 +2183,7 @@ cubic-bezier(0.4, 0, 0.2, 1);
 #my-order-module .appointment-card .title {
   color: #1e40af;
 }
+
 #my-order-module .inner_box .title {
     font-size: 20px;
     margin-bottom: 8px !important;
@@ -2769,7 +2866,7 @@ a.active {
 }
 
 .modal-content {
-  border-radius: 30px !important;
+  border-radius: 15px !important;
 }
 
 /* monti-inset */

@@ -120,6 +120,26 @@ const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
         return false;
     };
 
+    // ================================
+    // 🔥 ACTIVE STEP LOGIC (FIXED + SSR SAFE)
+    // ================================
+    const getActiveStepIndex = () => {
+        if (pathname?.includes("manage-committee")) return 2;
+
+        if (
+            pathname?.includes("manage-tickets") ||
+            pathname?.includes("manage-addons") ||
+            pathname?.includes("manage-questions") ||
+            pathname?.includes("manage-package")
+        ) return 1;
+
+        if (pathname?.includes("publish-event")) return 3;
+
+        return 0; // Manage Event
+    };
+
+    const activeIndex = getActiveStepIndex();
+
     return (
         <>
             {/* ===== Event Name + Dropdown + View Button ===== */}
@@ -140,13 +160,15 @@ const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
                         <ul className="dropdown-menu show" aria-labelledby="eventDropdownMenu">
                             {loading && (
                                 <li className="dropdown-item text-center">
-                                    <div className="spinner-border spinner-border-sm text-primary me-2" role="status" />
+                                    <div className="spinner-border spinner-border-sm text-primary me-2" />
                                     Loading events...
                                 </li>
                             )}
 
-                            {!loading && eventData.length == 0 && (
-                                <li className="dropdown-item text-muted text-center">No events found</li>
+                            {!loading && eventData.length === 0 && (
+                                <li className="dropdown-item text-muted text-center">
+                                    No events found
+                                </li>
                             )}
 
                             {!loading &&
@@ -196,29 +218,27 @@ const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
                 </div>
             </div>
 
-            {/* ===== Progress Bar ===== */}
-            {/* ===== Progress Bar ===== */}
+            {/* ===== Progress Bar (ORIGINAL MARKUP + FIXED LOGIC) ===== */}
             {showProgress && (
                 <div className="prosection">
                     <div className="table-responsive">
                         <div className="scroll_tab w-auto px-2">
                             <ul id="progressbar">
-                                {steps.map((step, index) => {
-                                    const isActive = checkActiveStep(step);
-                                    return (
-                                        <li key={index} className={isActive ? "active" : ""}>
-                                            <Link className="fw-semibold" href={step.path}>
-                                                {step.label}
-                                            </Link>
-                                        </li>
-                                    );
-                                })}
+                                {steps.map((step, index) => (
+                                    <li
+                                        key={index}
+                                        className={index <= activeIndex ? "active" : ""}
+                                    >
+                                        <Link className="fw-semibold" href={step.path}>
+                                            {step.label}
+                                        </Link>
+                                    </li>
+                                ))}
                             </ul>
                         </div>
                     </div>
                 </div>
             )}
-
         </>
     );
 };

@@ -11,6 +11,8 @@ import EventSidebar from "@/pages/components/Event/EventSidebar";
 import { Eye, EyeOff, Lock, Settings, CheckCircle, XCircle, Ticket } from "lucide-react";
 import { Form, Button, Modal } from "react-bootstrap";
 
+// ajay sir 
+
 const ManageTickets = () => {
     const router = useRouter();
     const { id } = router.query;
