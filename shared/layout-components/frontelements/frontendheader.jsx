@@ -4,9 +4,9 @@ import { useRouter } from "next/router";
 import { handleLogout } from "@/utils/logout";
 import Cookies from "js-cookie";
 import { isTokenValid } from "@/utils/checkAuth";
-import CartModal from "@/pages/components/cart_new/CartModal";
 import { useCart } from "@/shared/layout-components/layout/CartContext";
 import { useAuth } from "../layout/AuthContext";
+import CartModal from "@/pages/components/cart_new/CartModal";
 
 const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
 
@@ -14,10 +14,8 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
     backgroundImage ?? "/assets/front-images/slider_bg9.jpg"
   );
 
-  const { cartCount } = useCart();
-  const { loadingAuth,user } = useAuth();
-  // console.log('cartCount :', cartCount);
-
+  const { cartCount,eventId } = useCart();
+  const { loadingAuth, user } = useAuth();
 
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -233,13 +231,14 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
       {/* ✅ Cart Modal */}
       {
         showCart && (
+
           <CartModal
             show={showCart}
             handleClose={() => setShowCart(false)}
+            eventId={eventId}
           />
         )
       }
-
 
     </>
   );

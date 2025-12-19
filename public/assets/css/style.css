@@ -5171,6 +5171,23 @@ input[type="date"] {
   }
 }
 
+.ticket-type-badge {
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+    margin-left: 8px;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+}
+
+/* COMMITTEE badge */
+.ticket-type-badge.committee {
+    background: linear-gradient(135deg, #6f42c1, #845ef7);
+    color: #fff;
+}
+
+
 @media (max-width: 359px) {
   .accomo-gobck {
     padding: 8px 2px;

@@ -165,7 +165,7 @@ const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
                                 </li>
                             )}
 
-                            {!loading && eventData.length === 0 && (
+                            {!loading && eventData.length == 0 && (
                                 <li className="dropdown-item text-muted text-center">
                                     No events found
                                 </li>

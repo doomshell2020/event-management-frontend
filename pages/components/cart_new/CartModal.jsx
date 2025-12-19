@@ -41,6 +41,7 @@ const LoadingComponent = ({ isActive }) => {
 
 export default function CartModal({ show, handleClose, eventId }) {
     const { cart, refreshCart, eventData, normalCart, addonCart, slotCart, loadingCart, setEventId } = useCart();
+    // console.log('eventData :', eventData);
 
     const [isLoading, setIsLoading] = useState(true);
     const [cartLoading, setCartLoading] = useState(false);
@@ -749,6 +750,24 @@ export default function CartModal({ show, handleClose, eventId }) {
         );
     };
 
+    const requestCommitteeTicket = async (ticket, selectedMember) => {
+        try {
+
+            const cartData = {
+                event_id: eventId,
+                count: 1,               // default count
+                item_type: "committesale",          // "slot"
+                ticket_id: ticket.id,        // not needed for slot
+            }
+
+            console.log('>>>>>>>>>>', ticket);
+            return false;
+
+        } catch (error) {
+            console.log('>>>>>>>>>>', error);
+            return false;
+        }
+    }
 
     return (
         <Modal
@@ -769,14 +788,12 @@ export default function CartModal({ show, handleClose, eventId }) {
 
                     <Modal.Body className="px-3 care-new-check">
                         <LoadingComponent isActive={isLoading} />
-                        {!isLoading && eventData && (
-                            // <form onSubmit={handlePurchase}>
+                        {eventData && (
                             <div className="checkout-innr">
                                 <Row>
                                     {/* LEFT SIDE */}
                                     <Col lg={8}>
                                         <div className="model-left-content">
-                                            {/* <h2 className="ck-mn-hd">{eventData.name}</h2> */}
 
                                             <div className="cart-mdl-innercontent">
                                                 <Row className="align-items-start">
@@ -815,100 +832,166 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                         </div>
                                                     </Col>
 
-                                                    {/* DESCRIPTION WITH SHOW MORE/LESS */}
                                                     <Col md={7}>
-                                                        {(eventData.tickets?.length > 0 ||
-                                                            eventData.addons?.length > 0 ||
-                                                            eventData.slots?.length > 0) && (
+                                                        {(eventData.tickets?.length > 0 || eventData.addons?.length > 0 || eventData.slots?.length > 0) && (
+                                                            <div className="ticket-section">
+                                                                <h5 className="mb-3">Available Tickets</h5>
 
-                                                                <div className="ticket-section">
-                                                                    <h5 className="mb-3">Available Items</h5>
-
-                                                                    {/* 🎟️ TICKETS */}
-                                                                    {eventData.tickets?.map((ticket, i) => {
-                                                                        const cartItem = normalCart.find(
-                                                                            item => item.uniqueId == ticket.id
-                                                                        );
+                                                                {/* 🎟️ TICKETS */}
+                                                                {eventData.tickets
+                                                                    ?.filter(ticket => ticket.hidden !== "Y")
+                                                                    .map((ticket, i) => {
+                                                                        const cartItem = normalCart.find(item => item.uniqueId == ticket.id);
                                                                         const isLoading = loadingId == ticket.id;
+                                                                        const isSoldOut = ticket.sold_out == "Y";
+                                                                        const isCommittee = ticket.type == "committee_sales";
+                                                                        const committeeStatus = ticket.committee_status || null;
+
+                                                                        const committeeMembers = [
+                                                                            { name: "John Doe", email: "john@example.com", id: 1 },
+                                                                            { name: "Rupam Singh", email: "rupam@example.com", id: 2 },
+                                                                        ];
+
+                                                                        // Per-ticket selected member
+                                                                        const [selectedMember, setSelectedMember] = React.useState(null);
 
                                                                         return (
-                                                                            <div key={`ticket-${i}`} className="ticket-item only-ticket">
+                                                                            <div
+                                                                                key={`ticket-${i}`}
+                                                                                className={`ticket-item only-ticket ${isCommittee ? "committee-ticket" : ""}`}
+                                                                                style={{ display: "flex", flexDirection: "column", gap: "10px", padding: "10px 15px", borderBottom: "1px solid #eee" }}
+                                                                            >
                                                                                 <div className="d-flex justify-content-between align-items-center ticket-infobox">
-                                                                                    <div className="ticket-info">
-                                                                                        <strong style={{ fontSize: "15px" }}>{ticket.title}</strong>
-                                                                                        <p className="mt-2">Base Price: ₹{formatPrice(ticket.price)}</p>
+
+                                                                                    {/* LEFT INFO */}
+                                                                                    <div className="ticket-info" style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                                                                                        <strong style={{ fontSize: "15px" }}>
+                                                                                            {ticket.title}
+                                                                                            {isCommittee && <span className="ticket-type-badge committee">COMMITTEE</span>}
+                                                                                        </strong>
+                                                                                        <p className="mt-1">Base Price: ₹{formatPrice(ticket.price)}</p>
+
+                                                                                        {/* MEMBER DROPDOWN ONLY FOR REQUEST */}
+                                                                                        {isCommittee && committeeStatus == null && (
+                                                                                            <select
+                                                                                                className="form-select"
+                                                                                                value={selectedMember?.id || ""}
+                                                                                                onChange={e => {
+                                                                                                    const member = committeeMembers.find(m => m.id == e.target.value);
+                                                                                                    setSelectedMember(member);
+                                                                                                }}
+                                                                                            >
+                                                                                                <option value="">Select Member</option>
+                                                                                                {committeeMembers.map(member => (
+                                                                                                    <option key={member.id} value={member.id}>
+                                                                                                        {member.name} ({member.email})
+                                                                                                    </option>
+                                                                                                ))}
+                                                                                            </select>
+                                                                                        )}
                                                                                     </div>
 
-                                                                                    <Counter
-                                                                                        count={cartItem?.count || 0}
-                                                                                        loading={isLoading}
-                                                                                        onInc={() => increaseTicket(ticket)}
-                                                                                        onDec={() => decreaseTicket(ticket)}
-                                                                                    />
+                                                                                    {/* RIGHT ACTION */}
+                                                                                    {isSoldOut ? (
+                                                                                        <div className="sold-out-box">Sold Out</div>
+                                                                                    ) : isCommittee ? (
+                                                                                        committeeStatus == "approved" ? (
+                                                                                            <Counter
+                                                                                                count={cartItem?.count || 0}
+                                                                                                loading={isLoading}
+                                                                                                onInc={() => increaseTicket(ticket)}
+                                                                                                onDec={() => decreaseTicket(ticket)}
+                                                                                            />
+                                                                                        ) : committeeStatus == "pending" ? (
+                                                                                            <div className="committee-status pending">Request Sent</div>
+                                                                                        ) : committeeStatus == "rejected" ? (
+                                                                                            <div className="committee-status rejected">Rejected</div>
+                                                                                        ) : (
+                                                                                            selectedMember && (
+                                                                                                <button
+                                                                                                    className="btn btn-sm request-committee-btn"
+                                                                                                    onClick={() => requestCommitteeTicket(ticket, selectedMember)}
+                                                                                                >
+                                                                                                    Request
+                                                                                                </button>
+                                                                                            )
+                                                                                        )
+                                                                                    ) : (
+                                                                                        <Counter
+                                                                                            count={cartItem?.count || 0}
+                                                                                            loading={isLoading}
+                                                                                            onInc={() => increaseTicket(ticket)}
+                                                                                            onDec={() => decreaseTicket(ticket)}
+                                                                                        />
+                                                                                    )}
                                                                                 </div>
                                                                             </div>
                                                                         );
                                                                     })}
 
-                                                                    {/* ➕ ADDONS */}
-                                                                    {eventData.addons?.map((addon, i) => {
-                                                                        const cartItem = addonCart.find(
-                                                                            item => item.uniqueId == addon.id
-                                                                        );
+                                                                {/* ➕ ADDONS */}
+                                                                {eventData.addons
+                                                                    ?.filter(addon => addon.hidden !== "Y")
+                                                                    .map((addon, i) => {
+                                                                        const cartItem = addonCart.find(item => item.uniqueId == addon.id);
                                                                         const isLoading = loadingId == addon.id;
+                                                                        const isSoldOut = addon.sold_out == "Y";
 
                                                                         return (
                                                                             <div key={`addon-${i}`} className="ticket-item only-ticket ticket-addon">
                                                                                 <div className="d-flex justify-content-between align-items-center ticket-infobox">
                                                                                     <div className="ticket-info">
-                                                                                        <strong style={{ fontSize: "15px" }}>
-                                                                                            {addon.name}
-                                                                                            <span className="addon-badge">ADDON</span>
-                                                                                        </strong>
+                                                                                        <strong style={{ fontSize: "15px" }}>{addon.name} <span className="addon-badge">ADDON</span></strong>
                                                                                         <p className="mt-2">Price: {currencySymbol}{formatPrice(addon.price)}</p>
                                                                                     </div>
-
-                                                                                    <Counter
-                                                                                        count={cartItem?.count || 0}
-                                                                                        loading={isLoading}
-                                                                                        onInc={() => increaseAddon(addon)}
-                                                                                        onDec={() => decreaseAddon(addon)}
-                                                                                    />
+                                                                                    {isSoldOut ? (
+                                                                                        <div className="sold-out-box">Sold Out</div>
+                                                                                    ) : (
+                                                                                        <Counter
+                                                                                            count={cartItem?.count || 0}
+                                                                                            loading={isLoading}
+                                                                                            onInc={() => increaseAddon(addon)}
+                                                                                            onDec={() => decreaseAddon(addon)}
+                                                                                        />
+                                                                                    )}
                                                                                 </div>
                                                                             </div>
                                                                         );
                                                                     })}
 
-                                                                    {/* ⏰ SLOTS */}
-                                                                    {eventData.slots?.map((slot, i) => {
+                                                                {/* ⏰ SLOTS */}
+                                                                {eventData.slots
+                                                                    ?.filter(slot => slot.hidden !== "Y")
+                                                                    .map((slot, i) => {
                                                                         const pricingId = slot.pricings?.[0]?.id;
-                                                                        const cartItem = slotCart.find(
-                                                                            item => item.uniqueId == pricingId
-                                                                        );
+                                                                        const cartItem = slotCart.find(item => item.uniqueId == pricingId);
                                                                         const isLoading = loadingId == pricingId;
+                                                                        const isSoldOut = slot.sold_out == "Y";
 
                                                                         return (
                                                                             <div key={`slot-${i}`} className="ticket-item only-ticket">
                                                                                 <div className="d-flex justify-content-between align-items-center ticket-infobox">
                                                                                     <div className="ticket-info">
                                                                                         <strong>{slot.slot_name}</strong>
-                                                                                        <p className="mt-2">
-                                                                                            {formatReadableDate(slot.slot_date)} | {slot.start_time} - {slot.end_time}
-                                                                                        </p>
+                                                                                        <p className="mt-2">{formatReadableDate(slot.slot_date)} | {slot.start_time} - {slot.end_time}</p>
                                                                                     </div>
-
-                                                                                    <Counter
-                                                                                        count={cartItem?.count || 0}
-                                                                                        loading={isLoading}
-                                                                                        onInc={() => increaseSlot(slot)}
-                                                                                        onDec={() => decreaseSlot(slot)}
-                                                                                    />
+                                                                                    {isSoldOut ? (
+                                                                                        <div className="sold-out-box">Sold Out</div>
+                                                                                    ) : (
+                                                                                        <Counter
+                                                                                            count={cartItem?.count || 0}
+                                                                                            loading={isLoading}
+                                                                                            onInc={() => increaseSlot(slot)}
+                                                                                            onDec={() => decreaseSlot(slot)}
+                                                                                        />
+                                                                                    )}
                                                                                 </div>
                                                                             </div>
                                                                         );
                                                                     })}
-                                                                </div>
-                                                            )}
+
+                                                            </div>
+                                                        )}
                                                     </Col>
                                                 </Row>
                                             </div>
@@ -918,8 +1001,8 @@ export default function CartModal({ show, handleClose, eventId }) {
 
                                     {/* RIGHT SIDE (CART SUMMARY) */}
 
-                                    {cart?.length > 0 ? (
-                                        <Col lg={4}>
+                                    <Col lg={4}>
+                                        {cart?.length > 0 ? (
                                             <div className="chackout-box">
                                                 <h2>Checkout</h2>
                                                 <div className="monte25-tct-purcs">
@@ -1013,7 +1096,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                     if (grand_total == 0) {
                                                                         e.preventDefault();
                                                                         handleFreeTicket();
-                                                                    }else{
+                                                                    } else {
                                                                         handlePurchase(e);
                                                                     }
                                                                 }}
@@ -1027,7 +1110,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                         />
                                                                         Processing...
                                                                     </>
-                                                                ) : grand_total === 0 ? (
+                                                                ) : grand_total == 0 ? (
                                                                     "FREE TICKET"
                                                                 ) : (
                                                                     "PURCHASE"
@@ -1038,18 +1121,15 @@ export default function CartModal({ show, handleClose, eventId }) {
 
                                                 </div>
                                             </div>
-                                        </Col>
-                                    ) : (
-                                        <Col lg={4}>
+                                        ) : (
                                             <div className="chackout-box">
                                                 <h3 className="text-center mt-3">Cart is Empty</h3>
                                             </div>
-                                        </Col>
-                                    )}
+                                        )}
+                                    </Col>
 
                                 </Row>
                             </div>
-                            // </form>
                         )}
                     </Modal.Body>
                 </>
@@ -1064,8 +1144,9 @@ export default function CartModal({ show, handleClose, eventId }) {
                     tax_total={tax_total}
                     grand_total={grand_total}
                 />
-            )}
+            )
+            }
 
-        </Modal>
+        </Modal >
     );
 }
