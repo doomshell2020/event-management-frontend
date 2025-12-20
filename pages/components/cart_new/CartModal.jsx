@@ -769,6 +769,11 @@ export default function CartModal({ show, handleClose, eventId }) {
         }
     }
 
+    // Store selected committee member per ticket
+    const [selectedMembers, setSelectedMembers] = useState({});
+    // console.log('selectedMembers :', selectedMembers);
+
+
     return (
         <Modal
             show={show}
@@ -852,9 +857,6 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                             { name: "Rupam Singh", email: "rupam@example.com", id: 2 },
                                                                         ];
 
-                                                                        // Per-ticket selected member
-                                                                        const [selectedMember, setSelectedMember] = useState(null);
-
                                                                         return (
                                                                             <div
                                                                                 key={`ticket-${i}`}
@@ -875,10 +877,16 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                                         {isCommittee && committeeStatus == null && (
                                                                                             <select
                                                                                                 className="form-select"
-                                                                                                value={selectedMember?.id || ""}
-                                                                                                onChange={e => {
-                                                                                                    const member = committeeMembers.find(m => m.id == e.target.value);
-                                                                                                    setSelectedMember(member);
+                                                                                                value={selectedMembers[ticket.id]?.id || ""}
+                                                                                                onChange={(e) => {
+                                                                                                    const member = committeeMembers.find(
+                                                                                                        m => m.id == e.target.value
+                                                                                                    );
+
+                                                                                                    setSelectedMembers(prev => ({
+                                                                                                        ...prev,
+                                                                                                        [ticket.id]: member
+                                                                                                    }));
                                                                                                 }}
                                                                                             >
                                                                                                 <option value="">Select Member</option>
@@ -888,6 +896,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                                                     </option>
                                                                                                 ))}
                                                                                             </select>
+
                                                                                         )}
                                                                                     </div>
 
@@ -907,10 +916,15 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                                         ) : committeeStatus == "rejected" ? (
                                                                                             <div className="committee-status rejected">Rejected</div>
                                                                                         ) : (
-                                                                                            selectedMember && (
+                                                                                            selectedMembers[ticket.id] && (
                                                                                                 <button
                                                                                                     className="btn btn-sm request-committee-btn"
-                                                                                                    onClick={() => requestCommitteeTicket(ticket, selectedMember)}
+                                                                                                    onClick={() =>
+                                                                                                        requestCommitteeTicket(
+                                                                                                            ticket,
+                                                                                                            selectedMembers[ticket.id]
+                                                                                                        )
+                                                                                                    }
                                                                                                 >
                                                                                                     Request
                                                                                                 </button>
