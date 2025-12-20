@@ -91,7 +91,7 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
                       My Tickets
                     </Link>
 
-                    {/* ✅ Cart button (not link) but keeps your class */}
+                    {/* Cart button (not link) but keeps your class */}
                     <a
                       href="#"
                       className="navLink position-relative"
@@ -108,6 +108,14 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
                         </span>
                       )}
                     </a>
+
+                    {/* Committee */}
+                    <Link href="/committee/event" className="navLink">
+                      Committee
+                        <span className="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-danger">
+                          {cartCount}
+                        </span>
+                    </Link>
 
                   </>
                 )}

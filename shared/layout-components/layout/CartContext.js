@@ -27,13 +27,11 @@ export const CartProvider = ({ children }) => {
 
             const finalEventId = passedEventId ?? eventId;
             const query = finalEventId ? `?event_id=${finalEventId}` : "";
-            // console.log('query :', query);
 
             const res = await api.get(`/api/v1/cart/list${query}`);
             const data = res?.data?.data || {};
             const event = data.event || null;
             const cartItems = data.cart || [];
-            // console.log('cartItems :', cartItems);
 
             // Save event + items
             setEventData(event);

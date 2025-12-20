@@ -718,7 +718,6 @@ export default function CartModal({ show, handleClose, eventId }) {
 
     const [isBtnLoading, setIsBtnLoading] = useState(false);
 
-    // purchase ticket button....._.
     const handlePurchase = async (event) => {
         event.preventDefault();
         setIsBtnLoading(true);
@@ -750,28 +749,51 @@ export default function CartModal({ show, handleClose, eventId }) {
         );
     };
 
-    const requestCommitteeTicket = async (ticket, selectedMember) => {
-        try {
-
-            const cartData = {
-                event_id: eventId,
-                count: 1,               // default count
-                item_type: "committesale",          // "slot"
-                ticket_id: ticket.id,        // not needed for slot
-            }
-
-            console.log('>>>>>>>>>>', ticket);
-            return false;
-
-        } catch (error) {
-            console.log('>>>>>>>>>>', error);
-            return false;
-        }
-    }
 
     // Store selected committee member per ticket
     const [selectedMembers, setSelectedMembers] = useState({});
-    // console.log('selectedMembers :', selectedMembers);
+    const requestCommitteeTicket = async (ticket, selectedMember) => {
+        try {
+            Swal.fire({
+                title: "Requesting ticket...",
+                text: "Please wait",
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            const cartData = {
+                event_id: eventId,
+                item_type: "committesale",
+                ticket_id: ticket.id,
+                count: 1,
+                committee_member_id: selectedMember.id
+            };
+            const response = await api.post("/api/v1/cart/add", cartData);
+            Swal.close();
+            if (response?.data?.success) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Request Sent",
+                    text: "Committee ticket request sent successfully"
+                });
+            }
+        } catch (error) {
+            Swal.close();
+            const errorMessage =
+                error?.response?.data?.error?.message ||
+                "Something went wrong";
+            Swal.fire({
+                icon: "error",
+                title: "Request Failed",
+                text: errorMessage
+            });
+
+            console.log("Committee Request Error:", error);
+            return false;
+        }
+    };
 
 
     return (
@@ -852,10 +874,21 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                         const isCommittee = ticket.type == "committee_sales";
                                                                         const committeeStatus = ticket.committee_status || null;
 
-                                                                        const committeeMembers = [
-                                                                            { name: "John Doe", email: "john@example.com", id: 1 },
-                                                                            { name: "Rupam Singh", email: "rupam@example.com", id: 2 },
-                                                                        ];
+                                                                        const committeeMembers = isCommittee
+                                                                            ? ticket.committeeAssignedTickets
+                                                                                ?.filter(ct =>
+                                                                                    ct.status == "Y" &&                 // assigned ticket active
+                                                                                    ct.committeeMember?.status == "Y" && // committee member active
+                                                                                    ct.committeeMember?.user              // safety
+                                                                                )
+                                                                                ?.map(ct => ({
+                                                                                    id: ct.committeeMember.user.id,
+                                                                                    name: `${ct.committeeMember.user.first_name} ${ct.committeeMember.user.last_name}`.trim(),
+                                                                                    email: ct.committeeMember.user.email
+                                                                                })) || []
+                                                                            : [];
+
+
 
                                                                         return (
                                                                             <div
@@ -890,12 +923,14 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                                                 }}
                                                                                             >
                                                                                                 <option value="">Select Member</option>
+
                                                                                                 {committeeMembers.map(member => (
                                                                                                     <option key={member.id} value={member.id}>
-                                                                                                        {member.name} ({member.email})
+                                                                                                        {member.name}
                                                                                                     </option>
                                                                                                 ))}
                                                                                             </select>
+
 
                                                                                         )}
                                                                                     </div>
