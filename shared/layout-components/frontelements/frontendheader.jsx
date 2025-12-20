@@ -110,7 +110,7 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
                     </a>
 
                     {/* Committee */}
-                    <Link href="/committee/event" className="navLink">
+                    <Link href="/committee/ticket" className="navLink">
                       Committee
                         <span className="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-danger">
                           {cartCount}
