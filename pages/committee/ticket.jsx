@@ -8,6 +8,7 @@ import Cookies from "js-cookie";
 import TicketCountTabs from "@/pages/components/Event/TicketCountTabs";
 
 const CommitteeEventCard = ({ event }) => {
+console.log('event :', event);
     const router = useRouter();
 
     const handleClick = () => {
@@ -17,29 +18,12 @@ const CommitteeEventCard = ({ event }) => {
     return (
         <div
             onClick={handleClick}
-            style={{
-                display: "flex",
-                gap: "16px",
-                padding: "16px",
-                borderRadius: "10px",
-                background: "#ffffff",
-                border: "1px solid #e6e6e6",
-                boxShadow: "0 6px 16px rgba(0,0,0,0.05)",
-                cursor: "pointer",
-                transition: "all 0.25s ease",
-                height: "100%",
-            }}
-            onMouseEnter={(e) =>
-                (e.currentTarget.style.transform = "translateY(-4px)")
-            }
-            onMouseLeave={(e) =>
-                (e.currentTarget.style.transform = "translateY(0)")
-            }
+            className="d-flex gap-3 p-3 rounded bg-white border shadow-sm cursor-pointer"
         >
             {/* IMAGE */}
             <img
-                src={event.image}
-                alt="Event"
+                src={event.feat_image || "/assets/front-images/event-demo.jpg"}
+                alt={event.name}
                 style={{
                     width: "140px",
                     height: "100px",
@@ -50,35 +34,28 @@ const CommitteeEventCard = ({ event }) => {
 
             {/* DETAILS */}
             <div style={{ flex: 1 }}>
-                <h5 style={{ marginBottom: "6px" }}>{event.title}</h5>
-                <p style={{ color: "#6c757d", marginBottom: "10px" }}>
-                    @{event.subtitle}
+                <h5 className="mb-1">{event.name}</h5>
+
+                <p className="text-muted mb-2">
+                    @{event.location}
                 </p>
 
-                <p style={{ fontSize: "14px", marginBottom: "4px" }}>
-                    📅 <strong>Start:</strong> {event.start}
-                </p>
-                <p style={{ fontSize: "14px", marginBottom: "6px" }}>
-                    📅 <strong>End:</strong> {event.end}
+                <p className="mb-1 fs-14">
+                    📅 <strong>Start:</strong> {event.date_from?.local}
                 </p>
 
-                <span
-                    style={{
-                        display: "inline-block",
-                        marginTop: "6px",
-                        fontSize: "12px",
-                        padding: "4px 12px",
-                        background: "#dc3545",
-                        color: "#fff",
-                        borderRadius: "20px",
-                    }}
-                >
+                <p className="mb-2 fs-14">
+                    📅 <strong>End:</strong> {event.date_to?.local}
+                </p>
+
+                <span className="badge bg-danger px-3 py-2">
                     View Requests →
                 </span>
             </div>
         </div>
     );
 };
+
 
 export async function getServerSideProps(context) {
     try {
@@ -95,7 +72,7 @@ export async function getServerSideProps(context) {
 
         // ✅ Fetch ALL committee requests (no status filter)
         const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/committee/requests/Y`,
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/committee/requests/T`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -105,6 +82,8 @@ export async function getServerSideProps(context) {
 
         const data = await res.json();
         const apiData = data?.data?.list || [];
+        const eventsList = data?.data?.events || [];
+        console.log('apiData :', eventsList);
 
         // ✅ Calculate counts
         const counts = {
@@ -114,14 +93,15 @@ export async function getServerSideProps(context) {
         };
 
         apiData.forEach(item => {
-            if (item.status === "N") counts.pending++;
-            if (item.status === "Y") counts.approved++;
-            if (item.status === "I") counts.ignored++;
+            if (item.status == "N") counts.pending++;
+            if (item.status == "Y") counts.approved++;
+            if (item.status == "I") counts.ignored++;
         });
-        
+
         return {
             props: {
                 counts,
+                eventsList
             },
         };
 
@@ -135,12 +115,14 @@ export async function getServerSideProps(context) {
                     approved: 0,
                     ignored: 0,
                 },
+                eventsList
             },
         };
     }
 }
 
-const CommitteePage = ({ counts }) => {
+const CommitteePage = ({ counts, eventsList }) => {
+// console.log('eventsList :', eventsList);
 
     const [activeTab, setMyActiveTab] = useState("ticket");
     const router = useRouter()
@@ -193,7 +175,7 @@ const CommitteePage = ({ counts }) => {
 
                         {/* EVENTS GRID (6-6) */}
                         <div className="row mt-4">
-                            {events.map((event) => (
+                            {eventsList.map((event) => (
                                 <div key={event.id} className="col-md-6 mb-4">
                                     <CommitteeEventCard event={event} />
                                 </div>

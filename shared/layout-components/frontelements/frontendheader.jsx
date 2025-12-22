@@ -14,7 +14,7 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
     backgroundImage ?? "/assets/front-images/slider_bg9.jpg"
   );
 
-  const { cartCount,eventId } = useCart();
+  const { cartCount, eventId } = useCart();
   const { loadingAuth, user } = useAuth();
 
   const router = useRouter();
@@ -27,8 +27,6 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
     if (cartCount == 0) return;  // stop if cart is empty
     setShowCart(true);
   };
-
-
 
   useEffect(() => {
     const checkLoginStatus = () => {
@@ -109,13 +107,17 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
                       )}
                     </a>
 
-                    {/* Committee */}
-                    <Link href="/committee/ticket" className="navLink">
-                      Committee
-                        <span className="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-danger">
-                          {cartCount}
-                        </span>
-                    </Link>
+                    {user?.committeeAssigned && (
+                      <Link href="/committee/ticket" className="navLink position-relative">
+                        Committee
+
+                        {user?.committeePendingCount > 0 && (
+                          <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            {user.committeePendingCount}
+                          </span>
+                        )}
+                      </Link>
+                    )}
 
                   </>
                 )}
