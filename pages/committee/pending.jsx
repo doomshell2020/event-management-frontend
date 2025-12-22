@@ -7,7 +7,6 @@ import TicketCountTabs from "@/pages/components/Event/TicketCountTabs";
 export async function getServerSideProps(context) {
     try {
         const token = context.req.cookies?.userAuthToken || null;
-        // console.log('token :', token);
 
         if (!token) {
             return {
@@ -19,7 +18,7 @@ export async function getServerSideProps(context) {
         }
 
         // 🔥 Call your backend API
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/committee/requests?status=pending`,
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/committee/requests/N`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -28,18 +27,28 @@ export async function getServerSideProps(context) {
         );
 
         const data = await res.json();
+        const apiData = data?.data?.list || [];
+
+        // calculate counts
+        const counts = {
+            pending: 0,
+            approved: 0,
+            ignored: 0,
+        };
+
+        apiData.forEach(item => {
+            if (item.status == 'N') counts.pending++;
+            if (item.status == 'Y') counts.approved++;
+            if (item.status == 'I') counts.ignored++;
+        });
 
         return {
             props: {
-                pendingRequests: data.requests || [],
-                counts: {
-                    pending: data.counts?.pending || 0,
-                    approved: data.counts?.approved || 0,
-                    ignored: data.counts?.ignored || 0,
-                    completed: data.counts?.completed || 0,
-                },
+                pendingRequests: apiData,
+                counts,
             },
         };
+
     } catch (error) {
         console.error("SSR Error:", error);
 
@@ -103,49 +112,66 @@ const CommitteePending = ({ pendingRequests, counts }) => {
                                 </thead>
 
                                 <tbody>
-                                    {pendingRequests.length > 0 ? (
-                                        pendingRequests.map((item, index) => (
-                                            <tr key={item.id}>
-                                                <td>{index + 1}</td>
+                                    {pendingRequests.filter(item => item.status == "N").length > 0 ? (
+                                        pendingRequests
+                                            .filter(item => item.status == "N")
+                                            .map((item, index) => {
+                                                const user = item.user || {};
+                                                const ticket = item.TicketType || {};
 
-                                                <td>
-                                                    <img
-                                                        src={item.image || "/assets/front-images/no-image.png"}
-                                                        alt="User"
-                                                        style={{
-                                                            width: "60px",
-                                                            height: "60px",
-                                                            objectFit: "cover",
-                                                            borderRadius: "6px",
-                                                            border: "1px solid #ddd",
-                                                        }}
-                                                    />
-                                                </td>
+                                                return (
+                                                    <tr key={item.id}>
+                                                        <td>{index + 1}</td>
 
-                                                <td>
-                                                    <div style={{ fontWeight: "600" }}>{item.userName}</div>
-                                                    <div style={{ fontSize: "13px", color: "#6c757d" }}>
-                                                        {item.eventName}
-                                                    </div>
-                                                </td>
+                                                        {/* USER IMAGE */}
+                                                        <td>
+                                                            <img
+                                                                src={
+                                                                    user.profile_image
+                                                                        ? `${process.env.NEXT_PUBLIC_IMAGE_URL}/${user.profile_image}`
+                                                                        : "/assets/front-images/no-image.png"
+                                                                }
+                                                                alt="User"
+                                                                style={{
+                                                                    width: "60px",
+                                                                    height: "60px",
+                                                                    objectFit: "cover",
+                                                                    borderRadius: "6px",
+                                                                    border: "1px solid #ddd",
+                                                                }}
+                                                            />
+                                                        </td>
 
-                                                <td>
-                                                    <div>{item.price}</div>
-                                                    <button className="btn btn-success btn-sm mt-1">
-                                                        ✉
-                                                    </button>
-                                                </td>
+                                                        {/* USER DETAILS */}
+                                                        <td>
+                                                            <div style={{ fontWeight: "600" }}>
+                                                                {user.first_name} {user.last_name}
+                                                            </div>
+                                                            <div style={{ fontSize: "13px", color: "#6c757d" }}>
+                                                                {user.email}
+                                                            </div>
+                                                        </td>
 
-                                                <td>
-                                                    <button className="btn btn-primary btn-sm me-2">
-                                                        Approve
-                                                    </button>
-                                                    <button className="btn btn-danger btn-sm">
-                                                        Ignore
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        ))
+                                                        {/* TICKET DETAILS */}
+                                                        <td>
+                                                            <div>{ticket.title}</div>
+                                                            <div style={{ fontSize: "13px", color: "#6c757d" }}>
+                                                                ₹{ticket.price} × {item.no_tickets}
+                                                            </div>
+                                                        </td>
+
+                                                        {/* ACTIONS */}
+                                                        <td>
+                                                            <button className="btn btn-success btn-sm me-2">
+                                                                Approve
+                                                            </button>
+                                                            <button className="btn btn-danger btn-sm">
+                                                                Ignore
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })
                                     ) : (
                                         <tr>
                                             <td colSpan="5" className="text-center py-4">
@@ -153,7 +179,9 @@ const CommitteePending = ({ pendingRequests, counts }) => {
                                             </td>
                                         </tr>
                                     )}
+
                                 </tbody>
+
                             </table>
                         </div>
                     </div>

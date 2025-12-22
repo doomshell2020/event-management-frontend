@@ -62,9 +62,9 @@ const OrderItemCard = ({ item, orderData, handleCancelAppointment }) => {
                     )}
 
                     {/* QUANTITY */}
-                    <div className="mb-1">
+                    {/* <div className="mb-1">
                         <strong>Quantity :</strong> {item.count}
-                    </div>
+                    </div> */}
 
                     {/* PRICE */}
                     <div className="fw-bold text-success">

@@ -5,7 +5,7 @@ import FrontendHeader from "@/shared/layout-components/frontelements/frontendhea
 import FrontendFooter from "@/shared/layout-components/frontelements/frontendfooter";
 import api from "@/utils/api";
 import Cookies from "js-cookie";
-import TicketCountTabs from "@/pages/components/Event/TicketCountTabs"
+import TicketCountTabs from "@/pages/components/Event/TicketCountTabs";
 
 const CommitteeEventCard = ({ event }) => {
     const router = useRouter();
@@ -80,7 +80,68 @@ const CommitteeEventCard = ({ event }) => {
     );
 };
 
-const CommitteePage = () => {
+export async function getServerSideProps(context) {
+    try {
+        const token = context.req.cookies?.userAuthToken || null;
+
+        if (!token) {
+            return {
+                redirect: {
+                    destination: "/login",
+                    permanent: false,
+                },
+            };
+        }
+
+        // ✅ Fetch ALL committee requests (no status filter)
+        const res = await fetch(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/committee/requests/Y`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        );
+
+        const data = await res.json();
+        const apiData = data?.data?.list || [];
+
+        // ✅ Calculate counts
+        const counts = {
+            pending: 0,   // N
+            approved: 0,  // Y
+            ignored: 0,   // I
+        };
+
+        apiData.forEach(item => {
+            if (item.status === "N") counts.pending++;
+            if (item.status === "Y") counts.approved++;
+            if (item.status === "I") counts.ignored++;
+        });
+        
+        return {
+            props: {
+                counts,
+            },
+        };
+
+    } catch (error) {
+        console.error("SSR Error:", error);
+
+        return {
+            props: {
+                counts: {
+                    pending: 0,
+                    approved: 0,
+                    ignored: 0,
+                },
+            },
+        };
+    }
+}
+
+const CommitteePage = ({ counts }) => {
+
     const [activeTab, setMyActiveTab] = useState("ticket");
     const router = useRouter()
 
@@ -127,12 +188,7 @@ const CommitteePage = () => {
                         <TicketCountTabs
                             active={activeTab}
                             onChange={setActiveTab}
-                            counts={{
-                                pending: 0,
-                                approved: 0,
-                                ignored: 0,
-                                completed: 0,
-                            }}
+                            counts={counts}
                         />
 
                         {/* EVENTS GRID (6-6) */}
