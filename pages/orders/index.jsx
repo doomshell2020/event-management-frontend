@@ -10,9 +10,10 @@ export default function MyOrders({ userId }) {
     const [backgroundImage, setIsMobile] = useState('/assets/front-images/about-slider_bg.jpg');
     const [orderData, setOrderData] = useState([]);
     console.log("---orderData", orderData)
-    const [loading, setLoading] = useState(true); // ✅ Added loading state
+    const [loading, setLoading] = useState(true);
+
     const fetchOrders = async () => {
-        setLoading(true); // start loading
+        setLoading(true);
         try {
             const res = await api.get(`/api/v1/orders`);
             if (res.data.success) {
@@ -24,7 +25,7 @@ export default function MyOrders({ userId }) {
             console.error("Error fetching events:", error);
             setOrderData([]);
         } finally {
-            setLoading(false); // stop loading after API call
+            setLoading(false);
         }
     };
 
@@ -35,13 +36,15 @@ export default function MyOrders({ userId }) {
     return (
         <>
             <FrontendHeader backgroundImage={backgroundImage} />
-            <section id="my-ticket-module">
+
+            <section id="my-order-module">
                 <div className="container">
                     <div className="section-heading">
                         <h1>Orders</h1>
                         <h2 className="mt-4">My Orders</h2>
                         <p className="text-center text-14">Here you can manage your Orders</p>
                     </div>
+
                     <div className="my-ticketcontainer">
                         <div className="row">
 
@@ -51,52 +54,45 @@ export default function MyOrders({ userId }) {
                                     <div className="mt-2">Loading orders...</div>
                                 </div>
                             ) : orderData && orderData.length > 0 ? (
-                                orderData.map((order, index) => {
+                                orderData.map((order) => {
                                     const eventName = order?.event?.name || "N/A";
                                     const orderUID = order?.order_uid || "N/A";
                                     const purchaseDate = order?.createdAt
                                         ? format(new Date(order.createdAt), "dd MMM yyyy, hh:mm a")
                                         : "N/A";
-                                    // Total Tickets Count
+
                                     const totalTickets = order?.orderItems?.reduce(
                                         (sum, item) => sum + (item.count || 0),
                                         0
                                     );
 
-                                    const currencySymbol = order?.orderItems?.[0]?.appointment?.wellnessList?.currencyName?.Currency_symbol || "";
-                                    // console.log("--------currencySymbol",currencySymbol)
+                                    const currencySymbol =
+                                        order?.orderItems?.[0]?.appointment?.wellnessList?.currencyName?.Currency_symbol || "";
 
                                     return (
-                                        <div key={order.id} className="col-lg-6 col-md-12">
-                                            <div className="up_events position-relative">
-                                                {order?.orderItems[0]?.type === "appointment" && (
-                                                    <span
-                                                        className="position-absolute d-flex align-items-center gap-1"
-                                                        style={{
-                                                            top: "10px",
-                                                            right: "10px",
-                                                            padding: "6px 12px",
-                                                            fontSize: "12px",
-                                                            borderRadius: "8px",
-                                                            zIndex: 10,
-                                                            background: "#1e40af",
-                                                            color: "#fff",
-                                                            fontWeight: 500
-                                                        }}
-                                                    >
-                                                        <i className="fa-solid fa-calendar-check"></i>
-                                                        Appointment
-                                                    </span>
+                                        <div key={order.id} className="col-lg-6 col-md-12 mb-4">
 
-                                                )}
-
+                                            {/* ✅ ONLY CHANGE IS HERE (class condition added) */}
+                                            <div
+                                                className={`up_events position-relative 
+                                                ${order?.orderItems?.[0]?.type === "appointment"
+                                                        ? "appointment-card"
+                                                        : "ticket-card"
+                                                    }`}
+                                            >
 
 
                                                 <Link href={`/orders/${order.id}`}>
                                                     <div className="inner_box">
-                                                        <div className="row d-flex align-items-center justify-content-center g-0">
+                                                        <div className="row d-flex align-items-end justify-content-center g-0">
+
                                                             <div className="col-sm-5">
-                                                                <div className="image_br d-flex align-items-center w-100 overflow-hidden" style={{ height: "220px" }}>
+                                                                <h3 className="title m-0 fw-bold">
+                                                                        {eventName}
+                                                                    </h3>
+                                                                <div
+                                                                    className="image_br"
+                                                                >
                                                                     <img
                                                                         className="event_img w-100"
                                                                         src={
@@ -104,7 +100,6 @@ export default function MyOrders({ userId }) {
                                                                                 ? order.event.feat_image
                                                                                 : "/assets/front-images/my-tacket-section.jpg"
                                                                         }
-                                                                        // src="/assets/front-images/my-tacket-section.jpg"
                                                                         alt="IMG"
                                                                     />
                                                                 </div>
@@ -112,8 +107,6 @@ export default function MyOrders({ userId }) {
 
                                                             <div className="col-sm-7">
                                                                 <div className="event_contant">
-                                                                    <h3 className="title m-0 fw-bold">{eventName}</h3>
-
                                                                     <p className="time d-inline-block m-0 p-0">
                                                                         <strong style={{ width: "70px", display: "inline-block" }}>Order ID</strong>
                                                                         <span style={{ width: "10px", display: "inline-block", fontWeight: "bold" }}>:</span>
@@ -127,23 +120,22 @@ export default function MyOrders({ userId }) {
                                                                     </p>
 
                                                                     <div className="d-flex justify-content-start align-items-center mb-1">
-
-                                                                        <p className="time m-0 p-0 me-4">
-                                                                            <strong style={{ width: "100px", display: "inline-block" }}> {order?.orderItems?.[0]?.type === "appointment"
-                                                                                ? "Appointments"
-                                                                                : "Total Tickets"}</strong>
+                                                                        <p className="time m-0 p-0 me-4 ticket-count">
+                                                                            <strong style={{ width: "100px", display: "inline-block" }}>
+                                                                                {order?.orderItems?.[0]?.type === "appointment"
+                                                                                    ? "Appointments"
+                                                                                    : "Total Tickets"}
+                                                                            </strong>
                                                                             <span style={{ width: "10px", display: "inline-block", fontWeight: "bold" }}>:</span>
                                                                             {totalTickets}
                                                                         </p>
 
                                                                         <p className="time m-0 p-0">
-                                                                            <strong style={{ width: "70px", display: "inline-block" }}> Amount</strong>
+                                                                            <strong style={{ width: "70px", display: "inline-block" }}>Amount</strong>
                                                                             <span style={{ width: "10px", display: "inline-block", fontWeight: "bold" }}>:</span>
-                                                                            {currencySymbol}{" "}{order.total_amount}
+                                                                            {currencySymbol} {order.total_amount}
                                                                         </p>
-
                                                                     </div>
-
 
                                                                     <p className="time d-inline-block m-0 p-0">
                                                                         <i className="bi bi-calendar-week me-1"></i>
@@ -152,7 +144,6 @@ export default function MyOrders({ userId }) {
                                                                         {order?.event?.date_from
                                                                             ? format(new Date(order.event.date_from), "EEE, dd MMM yyyy | hh:mm a")
                                                                             : "N/A"}
-                                                                        {/* Wed, 17 Sep 2025 | 12:00 AM */}
                                                                     </p>
 
                                                                     <p className="time m-0">
@@ -162,10 +153,11 @@ export default function MyOrders({ userId }) {
                                                                         {order?.event?.date_to
                                                                             ? format(new Date(order.event.date_to), "EEE, dd MMM yyyy | hh:mm a")
                                                                             : "N/A"}
-                                                                        {/* Thu, 18 Sep 2025 | 11:00 PM */}
                                                                     </p>
 
-                                                                    <span className="d-block">@ {order?.event?.location}</span>
+                                                                    <span className="d-block ticket-location">
+                                                                        @ {order?.event?.location}
+                                                                    </span>
                                                                 </div>
                                                             </div>
 
@@ -177,7 +169,6 @@ export default function MyOrders({ userId }) {
                                     );
                                 })
                             ) : (
-
                                 <div className="col-12 text-center py-5">
                                     <img
                                         src="/assets/front-images/no-data.svg"
@@ -186,7 +177,6 @@ export default function MyOrders({ userId }) {
                                     />
                                     <div className="mt-2 fw-bold text-muted">No Orders Found</div>
                                 </div>
-
                             )}
 
                         </div>
@@ -206,10 +196,12 @@ export default function MyOrders({ userId }) {
                                 </p>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </section>
+
             <FrontendFooter />
         </>
-    )
+    );
 }

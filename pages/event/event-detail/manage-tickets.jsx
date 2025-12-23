@@ -178,7 +178,7 @@ const MyEventsPage = () => {
                     </div>
                     <div className="event-righcontent">
                         <div className="dsa_contant">
-                            <section id="post-eventpg edit-event-page">
+                            <section id="post-eventpg">
                                 <div className="event_names d-flex justify-content-between align-items-center p-2 px-3 mb-3">
                                     <div className="dropdown">
                                         <button

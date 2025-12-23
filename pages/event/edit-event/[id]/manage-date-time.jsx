@@ -352,7 +352,7 @@ const ManageDateTime = () => {
 
                     <div className="event-righcontent flex-grow-1">
                         <div className="dsa_contant">
-                            <section id="post-eventpg edit-event-page">
+                            <section id="post-eventpg">
                                 <EventHeaderSection eventDetails={eventDetails} />
 
                                 <div className="d-flex align-items-start mt-3">

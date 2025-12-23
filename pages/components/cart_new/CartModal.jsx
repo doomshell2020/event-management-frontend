@@ -11,6 +11,7 @@ import Image from "next/image";
 import api from "@/utils/api";
 import Swal from "sweetalert2";
 import { useCart } from "@/shared/layout-components/layout/CartContext";
+import CheckoutForm from "@/pages/components/cart_new/CheckOut";
 
 
 // Loader Component
@@ -47,6 +48,8 @@ export default function CartModal({ show, handleClose, eventId }) {
     const [loadingId, setLoadingId] = useState(null); // track which pricing ID is loading
     const [adminFees, setAdminFees] = useState(8);
     const [eventDetails, setEventDetails] = useState(null);
+
+    const [showNextStep, setShowNextStep] = useState(false);
 
     useEffect(() => {
         setIsLoading(loadingCart);
@@ -461,13 +464,15 @@ export default function CartModal({ show, handleClose, eventId }) {
 
     const handlePayNow = async () => {
         if (payLoading) return; // Prevent double click
-        setPayLoading(true);
+        // setPayLoading(true);
+        setShowNextStep(true);
+        return
         try {
-            const res = await api.post("/api/v1/orders/create", {
-                event_id: eventId,
-                total_amount: finalTotal,
-                payment_method: "Online"
-            });
+            // const res = await api.post("/api/v1/orders/create", {
+            //     event_id: eventId,
+            //     total_amount: finalTotal,
+            //     payment_method: "Online"
+            // });
             handleClose(false)
 
             // SUCCESS POPUP
@@ -480,7 +485,7 @@ export default function CartModal({ show, handleClose, eventId }) {
 
             // console.log("Order created:", res.data);
 
-            await refreshCart(eventId || undefined);
+            // await refreshCart(eventId || undefined);
 
             // OPTIONAL: redirect to payment page
             // navigate("/payment");
@@ -546,364 +551,437 @@ export default function CartModal({ show, handleClose, eventId }) {
             onHide={handleClose}
             backdrop="static"
             keyboard={true}
-            dialogClassName="cart-modal-size"
+            dialogClassName="cart-modal-size cart-mdl-only"
             className="careyes-chekout-new oxmonten2025EvntSec"
         >
-            <Modal.Header>
-                <Button onClick={handleClose} className="btn-close ms-auto">
-                    ×
-                </Button>
-            </Modal.Header>
+            {!showNextStep ? (
+                <>
+                    <Modal.Header>
+                        <Button onClick={handleClose} className="btn-close ms-auto">
+                            ×
+                        </Button>
+                    </Modal.Header>
 
-            <Modal.Body className="px-3 care-new-check">
-                <LoadingComponent isActive={isLoading} />
+                    <Modal.Body className="px-3 care-new-check">
+                        <LoadingComponent isActive={isLoading} />
 
-                {!isLoading && eventData && (
-                    <div className="checkout-innr">
-                        <Row className="gy-4">
-                            {/* LEFT SIDE */}
-                            <Col lg={8}>
-                                <div className="checkot-lft">
-                                    <h2 className="ck-mn-hd">{eventData.name}</h2>
+                        {!isLoading && eventData && (
+                            <div className="checkout-innr">
+                                <Row>
+                                    {/* LEFT SIDE */}
+                                    <Col lg={8}>
+                                        <div className="model-left-content">
 
-                                    <div className="ck-event-dtl">
-                                        <div className="eventsBxSec">
-                                            <Row className="gy-3 align-items-start">
+                                            <div className="cart-mdl-innercontent">
+                                                <Row className="align-items-start">
 
-                                                {/* EVENT IMAGE BIG SIZE */}
-                                                <Col md={5}>
-                                                    <div className="evt-innr-dtl" style={{ textAlign: "center" }}>
-                                                        <Image
-                                                            src={eventData.feat_image}
-                                                            alt={eventData.name}
-                                                            width={380}
-                                                            height={380}
-                                                            className="firstDayEvent"
-                                                            style={{
-                                                                borderRadius: "12px",
-                                                                width: "100%",
-                                                                height: "auto",
-                                                                objectFit: "cover"
-                                                            }}
-                                                        />
+                                                    {/* EVENT IMAGE BIG SIZE */}
+                                                    <Col md={5}>
+                                                        <h2 className="cart-mdl-title">{eventData.name}</h2>
+                                                        <div className="cartmdl-left-img" style={{ textAlign: "center" }}>
+                                                            <Image
+                                                                src={eventData.feat_image}
+                                                                alt={eventData.name}
+                                                                width={380}
+                                                                height={380}
+                                                                className="firstDayEvent"
+                                                                style={{
+                                                                    borderRadius: "12px",
+                                                                    width: "100%",
+                                                                    height: "100%",
+                                                                    objectFit: "cover"
+                                                                }}
+                                                            />
 
-                                                        <div className="monte-evntcnts mt-3">
-                                                            <strong style={{ fontSize: "18px" }}>
+
+                                                        </div>
+                                                        <div className="event-crt-deta mt-2 text-center">
+                                                            <strong className="mdl-event-name">
                                                                 {eventData.location}
                                                             </strong>
 
-                                                            <p style={{ marginTop: "6px", fontSize: "15px", color: "#555" }}>
+                                                            <p style={{ color: "#555" }}>
                                                                 {formatEventDateRange(
                                                                     eventData.date_from?.local,
                                                                     eventData.date_to?.local
                                                                 )}
                                                             </p>
                                                         </div>
-                                                    </div>
-                                                </Col>
+                                                    </Col>
 
-                                                {/* DESCRIPTION WITH SHOW MORE/LESS */}
-                                                <Col md={7}>
-                                                    <div className="event-description mt-2">
-                                                        <div
-                                                            style={{
-                                                                maxHeight: showFullDesc ? "none" : "90px",
-                                                                overflow: "hidden",
-                                                                position: "relative",
-                                                                fontSize: "15px",
-                                                                lineHeight: "22px"
-                                                            }}
-                                                            dangerouslySetInnerHTML={{
-                                                                __html: eventData.desp,
-                                                            }}
-                                                        />
+                                                    {/* DESCRIPTION WITH SHOW MORE/LESS */}
+                                                    <Col md={7}>
 
-                                                        {/* SHOW MORE / LESS BUTTON */}
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => setShowFullDesc(!showFullDesc)}
-                                                            style={{
-                                                                marginTop: "10px",
-                                                                background: "none",
-                                                                border: "none",
-                                                                color: "#007bff",
-                                                                cursor: "pointer",
-                                                                fontWeight: "600",
-                                                                padding: 0
-                                                            }}
-                                                        >
-                                                            {showFullDesc ? "Show Less ▲" : "Show More ▼"}
-                                                        </button>
-                                                    </div>
-                                                </Col>
-                                            </Row>
-                                        </div>
-                                    </div>
+                                                        {eventData.tickets?.length > 0 && (
+                                                            <div className="ticket-section">
+                                                                <h5 className="mb-3">Available Tickets</h5>
 
-                                    {/* AVAILABLE TICKETS */}
-                                    {eventData.tickets?.length > 0 && (
-                                        <div className="ticket-section mt-4">
-                                            <h5 className="mb-3">Available Tickets</h5>
+                                                                {eventData.tickets.map((ticket, i) => {
+                                                                    const pricingId = ticket?.id;
+                                                                    const cartItem = normalCart.find(item => item.uniqueId == pricingId);
+                                                                    const isLoading = loadingId == pricingId;
 
-                                            {eventData.tickets.map((ticket, i) => {
-                                                const pricingId = ticket?.id;
-                                                const cartItem = normalCart.find(item => item.uniqueId == pricingId);
-                                                const isLoading = loadingId == pricingId;
-                                                return (
-                                                    <div key={i} className="ticket-box mb-3 p-3 border rounded shadow-sm">
+                                                                    return (
+                                                                        <div key={i} className="ticket-item only-ticket">
 
-                                                        <div className="d-flex justify-content-between align-items-center">
-                                                            <strong style={{ fontSize: "17px" }}>{ticket.title}</strong>
+                                                                            <div className="d-flex justify-content-between align-items-center ticket-infobox">
+                                                                                <div className="ticket-info">
+                                                                                    <strong style={{ fontSize: "15px" }}>{ticket.title}</strong>
+                                                                                    <p className="mt-2">Base Price: ₹{ticket.price}</p>
 
-                                                            {/* Counter */}
-                                                            {isLoading ? (
-                                                                <Spinner size="sm" />
-                                                            ) : (
-                                                                <div className="d-flex align-items-center">
+                                                                                </div>
 
-                                                                    {/* Decrease */}
-                                                                    <button
-                                                                        className="btn btn-sm btn-outline-secondary"
-                                                                        onClick={() => decreaseTicket(ticket)}
-                                                                        disabled={isLoading}
-                                                                    >
-                                                                        –
-                                                                    </button>
 
-                                                                    {/* Count */}
-                                                                    <span
-                                                                        className="mx-2"
-                                                                        style={{
-                                                                            fontSize: "16px",
-                                                                            width: "25px",
-                                                                            textAlign: "center",
-                                                                            display: "flex",
-                                                                            justifyContent: "center"
-                                                                        }}
-                                                                    >
-                                                                        {cartItem?.count || 0}
-                                                                    </span>
+                                                                                {/* Counter */}
+                                                                                {isLoading ? (
+                                                                                    <Spinner size="sm" />
+                                                                                ) : (
+                                                                                    <div className="d-flex align-items-center counter-btn">
 
-                                                                    {/* Increase */}
-                                                                    <button
-                                                                        className="btn btn-sm btn-outline-primary"
-                                                                        onClick={() => increaseTicket(ticket)}
-                                                                        disabled={isLoading}
-                                                                    >
-                                                                        +
-                                                                    </button>
+                                                                                        {/* Decrease */}
+                                                                                        <button
+                                                                                            className="btn btn-sm text-white"
+                                                                                            onClick={() => decreaseTicket(ticket)}
+                                                                                            disabled={isLoading}
+                                                                                        >
+                                                                                            –
+                                                                                        </button>
+
+                                                                                        {/* Count */}
+                                                                                        <span
+                                                                                            className="mx-2 text-white"
+                                                                                            style={{
+                                                                                                fontSize: "11px",
+                                                                                                width: "20px",
+                                                                                                textAlign: "center",
+                                                                                                display: "flex",
+                                                                                                justifyContent: "center",
+                                                                                                margin: "0px 5px",
+                                                                                            }}
+                                                                                        >
+                                                                                            {cartItem?.count || 0}
+                                                                                        </span>
+
+                                                                                        {/* Increase */}
+                                                                                        <button
+                                                                                            className="btn btn-sm text-white"
+                                                                                            onClick={() => increaseTicket(ticket)}
+                                                                                            disabled={isLoading}
+                                                                                        >
+                                                                                            +
+                                                                                        </button>
+
+                                                                                    </div>
+                                                                                )}
+                                                                            </div>
+
+
+
+
+                                                                            {ticket.pricings?.length > 0 && (
+                                                                                <div className="pricing-tier mt-2">
+                                                                                    {ticket.pricings.map((p, idx) => (
+                                                                                        <div key={idx} className="d-flex justify-content-between">
+                                                                                            <span>{p.date}</span>
+                                                                                            <span>₹{p.price}</span>
+                                                                                        </div>
+                                                                                    ))}
+                                                                                </div>
+                                                                            )}
+
+                                                                        </div>
+
+
+
+
+                                                                    );
+
+
+                                                                })}
+
+
+                                                                <div className="ticket-item only-ticket ticket-addon">
+                                                                    <div className="d-flex justify-content-between align-items-center ticket-infobox">
+                                                                        <div className="ticket-info">
+                                                                            <strong style={{ fontSize: "15px" }}>Ticket Second</strong><span class="addon-badge">ADDON</span>
+
+                                                                            <p className="mt-2">Base Price: ₹20</p>
+                                                                        </div>
+                                                                        <div className="d-flex align-items-center counter-btn">
+                                                                            <button className="btn btn-sm text-white">–</button>
+
+                                                                            <span
+                                                                                className="mx-2 text-white"
+                                                                                style={{
+                                                                                    fontSize: "11px",
+                                                                                    width: "20px",
+                                                                                    textAlign: "center",
+                                                                                    display: "flex",
+                                                                                    justifyContent: "center",
+                                                                                    margin: "0px 5px",
+                                                                                }}
+                                                                            >
+                                                                                1
+                                                                            </span>
+
+                                                                            <button className="btn btn-sm text-white">+</button>
+                                                                        </div>
+                                                                    </div>
+
+
 
                                                                 </div>
-                                                            )}
-                                                        </div>
 
-                                                        {/* Pricing Display */}
-                                                        <p className="mt-2">Base Price: ₹{ticket.price}</p>
 
-                                                        {ticket.pricings?.length > 0 && (
-                                                            <div className="pricing-tier mt-2">
-                                                                {ticket.pricings.map((p, idx) => (
-                                                                    <div key={idx} className="d-flex justify-content-between">
-                                                                        <span>{p.date}</span>
-                                                                        <span>₹{p.price}</span>
-                                                                    </div>
-                                                                ))}
                                                             </div>
+
                                                         )}
 
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-                                    )}
 
 
-                                    {/* AVAILABLE SLOTS */}
-                                    {eventData.slots?.length > 0 && (
-                                        <div className="slot-section mt-4">
-                                            <h5 className="mb-3">Event Slots</h5>
 
-                                            {eventData.slots.map((slot) => {
-                                                const pricingId = slot.pricings?.[0]?.id;
 
-                                                // Find matching slot count from cart
-                                                const cartItem = slotCart.find(item => item.uniqueId == pricingId);
+                                                    </Col>
+                                                </Row>
 
-                                                const isLoading = loadingId == pricingId;
+                                            </div>
 
-                                                return (
-                                                    <div key={slot.id} className="slot-box p-3 border rounded mb-3 shadow-sm">
+                                            {/* AVAILABLE TICKETS */}
 
-                                                        <div className="d-flex justify-content-between align-items-center">
-                                                            <strong style={{ fontSize: "17px" }}>
-                                                                {slot.slot_name}
-                                                            </strong>
 
-                                                            {/* Counter */}
-                                                            {isLoading ? <Spinner size="sm" /> :
-                                                                <div className="d-flex align-items-center">
 
-                                                                    {/* Decrease */}
-                                                                    <button
-                                                                        className="btn btn-sm btn-outline-secondary"
-                                                                        onClick={() => decreaseSlot(slot)}
-                                                                        disabled={isLoading}
-                                                                    >
-                                                                        –
-                                                                    </button>
+                                            {/* AVAILABLE SLOTS */}
+                                            {eventData.slots?.length > 0 && (
+                                                <div className="slot-section mt-4">
+                                                    <h5 className="mb-3">Event Slots</h5>
 
-                                                                    {/* Count / Loading */}
-                                                                    <span
-                                                                        className="mx-2"
-                                                                        style={{
-                                                                            fontSize: "16px",
-                                                                            width: "25px",
-                                                                            textAlign: "center",
-                                                                            display: "flex",
-                                                                            justifyContent: "center"
-                                                                        }}
-                                                                    >
-                                                                        {cartItem?.count || 0}
-                                                                    </span>
+                                                    {eventData.slots.map((slot) => {
+                                                        const pricingId = slot.pricings?.[0]?.id;
 
-                                                                    {/* Increase */}
-                                                                    <button
-                                                                        className="btn btn-sm btn-outline-primary"
-                                                                        onClick={() => increaseSlot(slot)}
-                                                                        disabled={isLoading}
-                                                                    >
-                                                                        +
-                                                                    </button>
+                                                        // Find matching slot count from cart
+                                                        const cartItem = slotCart.find(item => item.uniqueId == pricingId);
+
+                                                        const isLoading = loadingId == pricingId;
+
+                                                        return (
+                                                            <div key={slot.id} className="slot-box p-3 border rounded mb-3 shadow-sm">
+
+                                                                <div className="d-flex justify-content-between align-items-center">
+                                                                    <strong style={{ fontSize: "17px" }}>
+                                                                        {slot.slot_name}
+                                                                    </strong>
+
+                                                                    {/* Counter */}
+                                                                    {isLoading ? <Spinner size="sm" /> :
+                                                                        <div className="d-flex align-items-center">
+
+                                                                            {/* Decrease */}
+                                                                            <button
+                                                                                className="btn btn-sm"
+                                                                                onClick={() => decreaseSlot(slot)}
+                                                                                disabled={isLoading}
+                                                                            >
+                                                                                –
+                                                                            </button>
+
+                                                                            {/* Count / Loading */}
+                                                                            <span
+                                                                                className="mx-2"
+                                                                                style={{
+                                                                                    fontSize: "11px",
+                                                                                    width: "20px",
+                                                                                    textAlign: "center",
+                                                                                    display: "flex",
+                                                                                    justifyContent: "center",
+                                                                                    margin: "0px 5px",
+                                                                                }}
+                                                                            >
+                                                                                {cartItem?.count || 0}
+                                                                            </span>
+
+                                                                            {/* Increase */}
+                                                                            <button
+                                                                                className="btn btn-sm "
+                                                                                onClick={() => increaseSlot(slot)}
+                                                                                disabled={isLoading}
+                                                                            >
+                                                                                +
+                                                                            </button>
+
+                                                                        </div>
+                                                                    }
 
                                                                 </div>
-                                                            }
 
-                                                        </div>
+                                                                {/* Slot Time */}
+                                                                <p className="mt-2">
+                                                                    {formatReadableDate(slot.slot_date)} — {slot.start_time} to {slot.end_time}
+                                                                </p>
 
-                                                        {/* Slot Time */}
-                                                        <p className="mt-2">
-                                                            {formatReadableDate(slot.slot_date)} — {slot.start_time} to {slot.end_time}
-                                                        </p>
+                                                                <p className="text-muted">{slot.description}</p>
 
-                                                        <p className="text-muted">{slot.description}</p>
-
-                                                        {/* Pricing List */}
-                                                        {slot.pricings?.length > 0 && (
-                                                            <div className="pricing-tier">
-                                                                {slot.pricings.map((p, idx) => (
-                                                                    <div key={idx} className="d-flex justify-content-between">
-                                                                        <span>{p.date}</span>
-                                                                        <span>₹{p.price}</span>
+                                                                {/* Pricing List */}
+                                                                {slot.pricings?.length > 0 && (
+                                                                    <div className="pricing-tier">
+                                                                        {slot.pricings.map((p, idx) => (
+                                                                            <div key={idx} className="d-flex justify-content-between">
+                                                                                <span>{p.date}</span>
+                                                                                <span>₹{p.price}</span>
+                                                                            </div>
+                                                                        ))}
                                                                     </div>
-                                                                ))}
+                                                                )}
                                                             </div>
-                                                        )}
-                                                    </div>
-                                                );
-                                            })}
+                                                        );
+                                                    })}
+
+                                                </div>
+                                            )}
+
 
                                         </div>
-                                    )}
+
+                                        <div className="event-description mt-2">
+                                            <div
+                                                style={{
+                                                    maxHeight: showFullDesc ? "none" : "90px",
+                                                    overflow: "hidden",
+                                                    position: "relative",
+                                                    fontSize: "15px",
+                                                    lineHeight: "22px"
+                                                }}
+                                                dangerouslySetInnerHTML={{
+                                                    __html: eventData.desp,
+                                                }}
+                                            />
+
+                                            {/* SHOW MORE / LESS BUTTON */}
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowFullDesc(!showFullDesc)}
+                                                style={{
+                                                    marginTop: "10px",
+                                                    background: "none",
+                                                    border: "none",
+                                                    color: "#007bff",
+                                                    cursor: "pointer",
+                                                    fontWeight: "600",
+                                                    padding: 0
+                                                }}
+                                            >
+                                                {showFullDesc ? "Show Less ▲" : "Show More ▼"}
+                                            </button>
+                                        </div>
+                                    </Col>
 
 
-                                </div>
-                            </Col>
+                                    {/* RIGHT SIDE (CART SUMMARY) */}
+                                    <Col lg={4}>
+                                        <div className="chackout-box">
+                                            <h2>Checkout</h2>
+
+                                            {cart?.length > 0 ? (
+                                                <div className="monte25-tct-purcs">
+                                                    <h6>YOUR TICKETS</h6>
+
+                                                    {cart.map((item) => {
+                                                        const itemPrice = Number(item.ticket_price || 0);
+                                                        const itemTotal = item.count * itemPrice;
+
+                                                        return (
+                                                            <div key={item.id} className="chackout-detabox mb-3">
+                                                                <div className="d-flex justify-content-between align-items-center mb-2">
+                                                                    <strong>{item.display_name}</strong>
+
+                                                                    <button
+                                                                        className="btn btn-sm delete-btn"
+                                                                        onClick={() => handleDeleteItem(item.id)}
+                                                                    >
+                                                                        <i className="bi bi-trash"></i>
+                                                                    </button>
+                                                                </div>
+
+                                                                <div className="d-flex justify-content-between">
+                                                                    <p className="mb-0">
+                                                                        {item.count} × ${itemPrice.toFixed(2)}
+                                                                    </p>
+
+                                                                    <p className="mb-0">${itemTotal.toFixed(2)}</p>
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })}
 
 
-                            {/* RIGHT SIDE (CART SUMMARY) */}
-                            <Col lg={4}>
-                                <div className="checkot-rgt">
-                                    <h2>Checkout</h2>
+                                                    <h6 className="mt-4">
+                                                        TOTAL {totalTickets} ITEM{totalTickets > 1 ? "S" : ""}
+                                                    </h6>
 
-                                    {cart?.length > 0 ? (
-                                        <div className="monte25-tct-purcs">
-                                            <h6>YOUR TICKETS</h6>
+                                                    <div className="apply-cd my-3">
+                                                        <InputGroup>
+                                                            <input
+                                                                type="text"
+                                                                placeholder="Promo code"
+                                                                className="form-control"
+                                                            />
+                                                        </InputGroup>
+                                                    </div>
 
-                                            {cart.map((item) => {
-                                                const itemPrice = Number(item.ticket_price || 0);
-                                                const itemTotal = item.count * itemPrice;
-
-                                                return (
-                                                    <div key={item.id} className="ticket-item mb-3">
-                                                        <div className="d-flex justify-content-between align-items-center">
-                                                            <strong>{item.display_name}</strong>
-
-                                                            <button
-                                                                className="btn btn-sm btn-outline-danger"
-                                                                onClick={() => handleDeleteItem(item.id)}
-                                                            >
-                                                                <i className="bi bi-trash"></i>
-                                                            </button>
+                                                    <div className="tickt-ttl-prs">
+                                                        <div className="d-flex justify-content-between">
+                                                            <p>PRICE</p>
+                                                            <span>${priceTotal.toFixed(2)}</span>
                                                         </div>
 
                                                         <div className="d-flex justify-content-between">
-                                                            <p className="mb-0">
-                                                                {item.count} × ${itemPrice.toFixed(2)}
-                                                            </p>
+                                                            <p>FEES ({adminFees}%)</p>
+                                                            <span>${feeTotal.toFixed(2)}</span>
+                                                        </div>
 
-                                                            <p className="mb-0">${itemTotal.toFixed(2)}</p>
+                                                        <div className="d-flex justify-content-between total">
+                                                            <p>TOTAL</p>
+                                                            <p>${finalTotal.toFixed(2)}</p>
                                                         </div>
                                                     </div>
-                                                );
-                                            })}
+
+                                                    {/* PAY NOW BUTTON */}
+                                                    <Button
+                                                        variant="primary"
+                                                        className="w-100 py-2"
+                                                        style={{ fontSize: "15px", fontWeight: "600" }}
+                                                        onClick={handlePayNow}
+                                                        disabled={payLoading}
+                                                    >
+                                                        {payLoading ? "Processing..." : "PAY NOW"}
+                                                    </Button>
 
 
-                                            <h6 className="mt-4">
-                                                TOTAL {totalTickets} ITEM{totalTickets > 1 ? "S" : ""}
-                                            </h6>
 
-                                            <div className="apply-cd my-3">
-                                                <InputGroup>
-                                                    <input
-                                                        type="text"
-                                                        placeholder="Promo code"
-                                                        className="form-control"
-                                                    />
-                                                </InputGroup>
-                                            </div>
-
-                                            <div className="tickt-ttl-prs">
-                                                <div className="d-flex justify-content-between">
-                                                    <p>PRICE</p>
-                                                    <span>${priceTotal.toFixed(2)}</span>
                                                 </div>
-
-                                                <div className="d-flex justify-content-between">
-                                                    <p>FEES ({adminFees}%)</p>
-                                                    <span>${feeTotal.toFixed(2)}</span>
-                                                </div>
-
-                                                <div className="d-flex justify-content-between total">
-                                                    <p>TOTAL</p>
-                                                    <p>${finalTotal.toFixed(2)}</p>
-                                                </div>
-                                            </div>
-
-                                            {/* PAY NOW BUTTON */}
-                                            <Button
-                                                variant="primary"
-                                                className="w-100 py-2"
-                                                style={{ fontSize: "18px", fontWeight: "600" }}
-                                                onClick={handlePayNow}
-                                                disabled={payLoading}
-                                            >
-                                                {payLoading ? "Processing..." : "PAY NOW"}
-                                            </Button>
-
-
-
+                                            ) : (
+                                                <h3 className="text-center mt-5">Cart is Empty</h3>
+                                            )}
                                         </div>
-                                    ) : (
-                                        <h3 className="text-center mt-5">Cart is Empty</h3>
-                                    )}
-                                </div>
-                            </Col>
+                                    </Col>
 
 
-                        </Row>
-                    </div>
-                )}
-            </Modal.Body>
+                                </Row>
+                            </div>
+                        )}
+                    </Modal.Body>
+                </>
+            ) : (
+                <CheckoutForm
+                    eventId={eventId}
+                    handleModalClose={handleClose}
+                    showNextStep={setShowNextStep}
+                    adminFees={adminFees}
+                    couponDetails={null}
+                    sub_total={100}
+                    tax_total={8}
+                    grand_total={108}
+                />
+            )}
         </Modal>
     );
 }

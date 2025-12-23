@@ -11,10 +11,9 @@ const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
     const [loading, setLoading] = useState(false);
     const showProgress = isProgressBarShow !== false;
 
-    // console.log('//////////',eventDetails);
-
-
-    // Fetch Event List
+    // ================================
+    // Fetch Event List (ORIGINAL)
+    // ================================
     const fetchEvents = async () => {
         setLoading(true);
         try {
@@ -37,13 +36,11 @@ const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
     }, []);
 
     // ================================
-    // STATIC MENU ORDER (SERIAL BASED)
+    // STATIC MENU ORDER (ORIGINAL)
     // ================================
-
     let steps = [];
 
     if (eventDetails?.entry_type && eventDetails.entry_type !== "event") {
-        // CASE 1 → entry_type ≠ "event"
         steps = [
             {
                 serial: 1,
@@ -72,7 +69,6 @@ const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
             },
         ];
     } else {
-        // CASE 2 → entry_type = "event"
         steps = [
             {
                 serial: 1,
@@ -97,34 +93,30 @@ const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
         ];
     }
 
-    // Highlight Active Step
-    const checkActiveStep = (step) => {
-        const stepSegment = step.path.split("/event/")[1];
-
-        if (pathname?.includes(stepSegment)) {
-            return true;
-        }
+    // ================================
+    // 🔥 ACTIVE STEP LOGIC (FIXED + SSR SAFE)
+    // ================================
+    const getActiveStepIndex = () => {
+        if (pathname?.includes("manage-committee")) return 2;
 
         if (
-            step.label == "Manage Tickets" &&
-            (
-                pathname?.includes("/manage-tickets") ||
-                pathname?.includes("/manage-addons") ||
-                pathname?.includes("/manage-questions") ||
-                pathname?.includes("/manage-package")
-            )
-        ) {
-            return true;
-        }
+            pathname?.includes("manage-tickets") ||
+            pathname?.includes("manage-addons") ||
+            pathname?.includes("manage-questions") ||
+            pathname?.includes("manage-package")
+        ) return 1;
 
-        return false;
+        if (pathname?.includes("publish-event")) return 3;
+
+        return 0; // Manage Event
     };
+
+    const activeIndex = getActiveStepIndex();
 
     return (
         <>
-            {/* ===== Event Name + Dropdown + View Button ===== */}
+            {/* ===== Event Name + Dropdown + View Button (ORIGINAL) ===== */}
             <div className="event_names d-flex justify-content-between align-items-center p-2 px-3 mb-3">
-
                 {/* Dropdown */}
                 <div className="dropdown">
                     <button
@@ -140,13 +132,15 @@ const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
                         <ul className="dropdown-menu show" aria-labelledby="eventDropdownMenu">
                             {loading && (
                                 <li className="dropdown-item text-center">
-                                    <div className="spinner-border spinner-border-sm text-primary me-2" role="status" />
+                                    <div className="spinner-border spinner-border-sm text-primary me-2" />
                                     Loading events...
                                 </li>
                             )}
 
-                            {!loading && eventData.length == 0 && (
-                                <li className="dropdown-item text-muted text-center">No events found</li>
+                            {!loading && eventData.length === 0 && (
+                                <li className="dropdown-item text-muted text-center">
+                                    No events found
+                                </li>
                             )}
 
                             {!loading &&
@@ -187,8 +181,8 @@ const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
                     <Link
                         href={`/event/${eventDetails?.id}/${eventDetails?.slug}`}
                         className="btn rounded-md text-sm text-white"
-                        rel="noopener noreferrer"
                         target="_blank"
+                        rel="noopener noreferrer"
                         style={{ backgroundColor: "#00b56a" }}
                     >
                         <i className="bi bi-eye-fill"></i> View Event
@@ -196,29 +190,27 @@ const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
                 </div>
             </div>
 
-            {/* ===== Progress Bar ===== */}
-            {/* ===== Progress Bar ===== */}
+            {/* ===== Progress Bar (ORIGINAL MARKUP + FIXED LOGIC) ===== */}
             {showProgress && (
                 <div className="prosection">
                     <div className="table-responsive">
                         <div className="scroll_tab w-auto px-2">
                             <ul id="progressbar">
-                                {steps.map((step, index) => {
-                                    const isActive = checkActiveStep(step);
-                                    return (
-                                        <li key={index} className={isActive ? "active" : ""}>
-                                            <Link className="fw-semibold" href={step.path}>
-                                                {step.label}
-                                            </Link>
-                                        </li>
-                                    );
-                                })}
+                                {steps.map((step, index) => (
+                                    <li
+                                        key={index}
+                                        className={index <= activeIndex ? "active" : ""}
+                                    >
+                                        <Link className="fw-semibold" href={step.path}>
+                                            {step.label}
+                                        </Link>
+                                    </li>
+                                ))}
                             </ul>
                         </div>
                     </div>
                 </div>
             )}
-
         </>
     );
 };

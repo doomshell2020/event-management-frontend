@@ -43,6 +43,9 @@ span {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+body{
+  font-family: Lato, 'Helvetica Neue', Arial, Helvetica, sans-serif;font-weight: 400 !important;
+}
 
 ul li {
   list-style: none;
@@ -131,6 +134,10 @@ p.des_h::after {
   margin: 20px 35px 22px !important;
   padding-left: 0px;
   overflow: hidden;
+  display: flex;
+    flex-wrap: nowrap;        
+    justify-content: space-between;
+    align-items: center;
   counter-reset: step;
 }
 
@@ -138,8 +145,8 @@ p.des_h::after {
   list-style-type: none;
   color: #000;
   font-size: 16px;
-  width: 25% !important;
-  float: left;
+  flex: 1 0 auto;
+    min-width: 180px; 
   position: relative;
   text-align: center;
 }
@@ -791,14 +798,14 @@ img.arrow-img {
 }
 
 #calculator .range-slider__value {
-  width: 60px;
+  width: 64px;
   line-height: 20px;
   border-radius: 3px;
   background: #2c3e50;
   padding: 5px 10px;
   margin-left: 8px;
   font-size: 16px;
-  font-weight: bold;
+  font-weight: normal;
 }
 
 #calculator .range-slider__value::before {
@@ -891,7 +898,7 @@ footer .footer-logo {
   color: #fff;
   width: 60%;
   margin: 30px auto 30px;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .f-social-list {
@@ -924,7 +931,7 @@ footer .copyright-dv a {
 
 footer .copyright-dv {
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .footer-policybox {
@@ -943,7 +950,7 @@ footer .footer-policybox li {
 footer .footer-policybox li a {
   color: #fff;
   position: relative;
-  font-weight: 600;
+  font-weight: 400;
 }
 
 footer .footer-policybox li a:hover {
@@ -953,20 +960,36 @@ footer .footer-policybox li a:hover {
 /* event detail page start */
 #event-detail-page {
   position: relative;
-  padding: 80px 0px;
+  padding: 80px 0px 60px;
   background-color: #fff;
   animation-name: fadeInDown;
 }
 
 #event-detail-page .ticker_img {
   width: 100%;
-  padding-right: 10px;
   z-index: 9;
   animation-name: fadeInDown;
 }
+#event-detail-page .event-ticket-box {
+    height: 100%;
+    background-color: #dae9ff;
+    padding: 20px;
+    border-radius: 13px;
+}
 
 #event-detail-page .ticker_imgmn img {
-  width: 100%;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    image-rendering: auto;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    transform: none !important;border-radius: 13px;
+}
+#event-detail-page .ticker_imgmn {
+    width: 100%;
+    height: 270px;
+    border-radius: 13px;
 }
 
 #event-detail-page .event_bg {
@@ -991,49 +1014,71 @@ footer .footer-policybox li a:hover {
 }
 
 #event-detail-page .social i {
-  padding-top: 11px;
-  text-align: center;
-  color: #ffffff;
-  height: 40px;
-  width: 40px;
-  border-radius: 50%;
-  background-color: #3d6db5;
-  border-color: #1bbc9b;
-  font-size: 18px;
+    padding-top: 11px;
+    text-align: center;
+    color: #ffffff;
+    height: 37px;
+    width: 37px;
+    border-radius: 50%;
+    background-color: #3d6db5;
+    border-color: #1bbc9b;
+    font-size: 15px;
 }
 
 #event-detail-page .event-ticket-box .section-heading h2 {
-  font-size: 32px;
+  font-size: 28px;margin-bottom: 20px;
 }
 
 #event-detail-page .event-ticket-box .section-heading h6 {
-  font-size: 16px;
+  font-size: 15px;
+}
+#event-detail-page .event-ticket-box button {
+    background-color: #14B8A6;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    border-radius: 4px;
 }
 
 #event-detail-page .event-ticket-box .section-heading h6 a {
   color: #4183C4;
 }
 
-#event-detail-page .info,
-#ticket-detailpage .info {
-  margin-top: 17px;
-  background: #3d6db5;
-  border-radius: 5px;
-  color: #fff;
-  padding: 15px 14px;
+#event-detail-page .info, #ticket-detailpage .info {
+    margin-top: 17px;
+    background: #4b6989;
+    border-radius: 4px;
+    color: #fff;
 }
 
-#ticket-detailpage .info ul li,
-#event-detail-page .info ul li {
-  width: inherit;
-  list-style: none;
-  position: relative;
+#ticket-detailpage .info ul li, #event-detail-page .info ul li {
+    width: inherit;
+    list-style: none;
+    position: relative;
+    padding: 13px 11px 10px;
+}
+#ticket-detailpage .info ul li::before,
+#event-detail-page .info ul li::before {
+    content: "";
+    position: absolute;
+    right: 27px;
+    top: 0;
+    width: 1px;
+    height: 100%;
+    background-color: #ffffff87;
+}
+#ticket-detailpage .info ul li:last-child::before,
+#event-detail-page .info ul li:last-child::before {
+    display: none;
+}
+ .event_desp h1 img {
+    max-width: 300px;
+    display: block;margin-bottom: 11px;
 }
 
 #event-detail-page .info h6,
 #ticket-detailpage .info h6 {
-  font-size: 16px;
-  margin-bottom: 5px;
+  font-size: 15px;
+  margin-bottom: 4px;
 }
 
 #event-detail-page .info h6 svg,
@@ -1043,11 +1088,23 @@ footer .footer-policybox li a:hover {
   margin-right: 5px;
   vertical-align: bottom;
 }
+ .event_desp .manage_img img.audi_img {
+    max-width: 300px;
+}
+.event_desp .manage_img{
+    text-align: left !important;
+}
+
 
 #event-detail-page .info span,
 #ticket-detailpage .info span {
   color: #ffffff;
-  font-size: 12px;
+  font-size: 12px;text-transform: capitalize;
+}
+.appoinment-checkbtn {
+    padding-top: 18px;
+    border-top: 1px solid #ccc;
+    margin-top: 12px;
 }
 
 #event-detail-page .event_Sub_h {
@@ -1102,7 +1159,63 @@ footer .footer-policybox li a:hover {
   text-align: right;
   margin-top: 30px;
 }
+.event-appointment-sec {
+    padding: 30px 0px 40px;
+    background-color: #f4f9ff;
+}
+.event-appointment-sec h5 {
+    font-size: 21px;
+    font-size: 28px;
+    font-weight: 600;
+}
+.event-appo-img .card-img-top {
+    height: 100% !important;border-radius: 12px;
+}
+#event-detail-page .event_desp {
+    padding-bottom: 20px;
+}
+.event-appointment-sec .event-appo-img{height: 210px;}.event-appointment-sec .card-body h6 {font-size: 17px;}
+.event-appointment-sec .slot-btn {
+    padding-left: 31px !important;
+    position: relative;
+}
+.event-appointment-sec .card .card-body p {
+    color: black;
+}
+.event-appointment-sec .card .card-body .card-description p {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.event-appointment-sec .card .card-body p i {
+   color: rgb(33, 166, 122);
+    font-size: 16px;
+}
+.event-appointment-sec .slot-btn input.form-check-input.me-3 {
+    width: 17px;
+    height: 17px;
+    top: 15px;
+    left: 8px;
+    margin: 0 !important;
+    border-radius: 19px;
+}
+.only-single-cart .card .event-appo-img {
+    width: 30%;
+    height: 100%;
+}
+.col-md-12.only-single-cart .appoinment-checkbtn button {
+    width: max-content !important;
+    margin-left: auto;
+    display: block;
+}
 
+
+.only-single-cart .card {
+    display: flex;
+    flex-direction: row;
+}
 /* event detail page end */
 /* cart page start */
 #cart {
@@ -1503,6 +1616,9 @@ section#request-demo {
   padding-right: 10px;
   font-size: 14px;
 }
+.freeEventCheck .form-check-input {
+   margin-top: 0px;
+}
 
 .freeEventCheck .form-check-input:checked[type=checkbox] {
   filter: invert(1) !important;
@@ -1586,6 +1702,11 @@ section#request-demo {
   font-size: 16px;
   display: flex;
   align-items: center;
+}
+#myevent-deshbord .event-sidebar ul li.active > a,
+#myevent-deshbord .event-sidebar ul li.active > button {
+color: #ffffff !important;
+    background: #275191 !important;
 }
 
 #myevent-deshbord .event-sidebar ul.components2 li a {
@@ -1692,16 +1813,20 @@ li.menu_line {
 }
 
 #myevent-deshbord .desbord-content table thead th {
-  border-bottom: 0px solid #dee2e6;
-  font-size: 15px;
-  font-weight: 400;
-  vertical-align: initial;
+    border-bottom: 0px solid #dee2e6;
+    font-size: 14px;
+    font-weight: 400;
+    vertical-align: initial;
+    /* border-color: #2858a1; */
 }
 
 #myevent-deshbord .desbord-content table> :not(caption)>*>* {
   border-width: 1px 1px;
   padding: 12px 8px;
   font-size: 12px;
+}
+#myevent-deshbord .desbord-content table > :not(caption) > tr > td a {
+    font-size: 12px !important;
 }
 
 .my-ticket-box .Con_center {
@@ -1719,13 +1844,12 @@ li.menu_line {
   margin-bottom: 5px;
   padding: 7px 5px;
   font-size: 12px;
-  width: 48%;
+  width: 50%;
   border-radius: 5px;
   display: inline-block;
   margin-left: 0px;
   margin-top: 0px;
   line-height: normal;
-  margin-right: 2px;
 }
 
 .my-ticket-box .Con_center button.edit {
@@ -1741,7 +1865,6 @@ li.menu_line {
 }
 
 .my-ticket-box .Con_center .edit i {
-  font-weight: 900;
   color: #fff;
   vertical-align: middle;
 }
@@ -1761,7 +1884,6 @@ li.menu_line {
 
 .my-ticket-box .Con_center a.enable_btn {
   background: #018e26;
-  margin-right: 5px;
 }
 
 #myevent-deshbord .paginator,
@@ -1865,6 +1987,245 @@ li.menu_line {
   color: #0083b5;
   font-size: 14px;
   margin-top: 5px;
+}
+
+/*___________________ only-cart model design start _____________*/
+
+.careyes-chekout-new .cart-mdl-only .modal-header {
+    border-top: 1px solid #757575;
+    margin-top: 22px;
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem;
+}
+.careyes-chekout-new .cart-mdl-only .model-left-content {
+    overflow-y: auto;
+    padding: 0px 25px 25px;
+}
+.careyes-chekout-new .cart-mdl-only .cart-mdl-title{
+      margin-bottom: .5rem;
+    font-size: 1.5rem;
+    line-height: normal;
+    font-weight: 700;
+}
+.careyes-chekout-new .cart-mdl-only .cart-mdl-innercontent {
+    margin-bottom: 1.5rem;
+}
+.careyes-chekout-new .cart-mdl-only  .cartmdl-left-img {
+    height: 204px;
+    width: 100%;
+}
+.careyes-chekout-new .cart-mdl-only .mdl-event-name{font-size: 0.875rem;line-height: 1.25rem;
+}
+.careyes-chekout-new .cart-mdl-only .event-crt-deta p{text-align: center;font-size: 0.75rem;line-height: 1rem;}
+.careyes-chekout-new .cart-mdl-only .ticket-item {
+    margin-bottom: 0.75rem;
+    padding: 1rem;
+    --tw-shadow: 0 1px 2px 0 rgb(0 0 0 / .05);
+    --tw-shadow-colored: 0 1px 2px 0 var(--tw-shadow-color);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 rgba(0, 0, 0, 0)), var(--tw-ring-shadow, 0 0 rgba(0, 0, 0, 0)), var(--tw-shadow);
+    transition-property: all;
+    transition-timing-function: 
+cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 0.15s;
+    border: 2px solid;border-radius: .5rem;
+}
+.careyes-chekout-new .cart-mdl-only .ticket-item.only-ticket {
+    border-left-width: 4px;
+       border-color: hsl(174 62% 44% / 1);
+}
+ .careyes-chekout-new .cart-mdl-only .ticket-item .ticket-infobox:before {
+    content: "🎫";
+    margin-right: .5rem;
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+}
+
+.careyes-chekout-new .cart-mdl-only .ticket-item.ticket-addon {
+    border-style: dashed;
+    background: linear-gradient(135deg, #fffbfb, #efe9dd);
+    border: 2px dashed #c9b896;
+}
+.careyes-chekout-new .cart-mdl-only .ticket-item.ticket-addon .ticket-infobox:before {
+    content: "✨";
+}
+.careyes-chekout-new .cart-mdl-only .ticket-item.ticket-addon .addon-badge {
+    margin-left: 0.5rem;
+    border-radius: 9999px;
+    padding: 3px 0.5rem;
+    font-size: 11px;
+    line-height: 1rem;
+    font-weight: 500;
+    background-color: #b5a687;
+    color: white;
+}
+.careyes-chekout-new .cart-mdl-only .ticket-info{flex: 1 1 0%;}
+.careyes-chekout-new .cart-mdl-only .ticket-info p {
+    font-size: 12px;
+    line-height: 1.25rem;
+    margin-top: 0px !important;
+}
+.careyes-chekout-new .cart-mdl-only .chackout-box {
+    background-color: #ede9e0;
+    padding: 20px;
+    border-radius: 19px;
+}
+.careyes-chekout-new .cart-mdl-only .chackout-box h2 {
+    font-size: 22px;
+}
+.careyes-chekout-new .cart-mdl-only .chackout-box h6 {
+    font-size: 12px;
+    margin-top: 1rem !important;
+}
+.careyes-chekout-new .cart-mdl-only .chackout-box .chackout-detabox{
+      border: 1px solid;
+    padding: 10px 15px;
+    border-radius: 7px;
+}
+.careyes-chekout-new .cart-mdl-only .chackout-box .chackout-detabox .delete-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(459deg, #ffffff, #efe9dd);
+}
+.careyes-chekout-new .cart-mdl-only .chackout-box .chackout-detabox .delete-btn i {
+    color: #000000;
+    margin-top: 1px;
+}
+/* .careyes-chekout-new .cart-mdl-only .modal-content{  max-width: 1060px;
+    margin: auto;} */
+  .careyes-chekout-new .cart-mdl-only .chackout-box .chackout-detabox .apply-cd.my-3 input.form-control {
+    font-size: 13px;
+}
+.careyes-chekout-new .cart-mdl-only .chackout-box .chackout-detabox .tickt-ttl-prs p {
+    font-size: 12px;
+    margin-bottom: 11px;
+}
+/* .careyes-chekout-new .cart-mdl-only {
+    max-width: 1060px !important;
+} */
+.careyes-chekout-new .cart-mdl-only .only-ticket .counter-btn {
+    background-color: black;
+    border-radius: 48px; padding: 0px 5px;
+}
+
+/*________________ only-cart model design end ____________*/
+/*________________ cart chackout paynow model start ____________*/
+.cart-mdl-only .paynow-back{line-height: normal;}.cart-mdl-only .paynow-back i{color: #000;}
+.cart-mdl-only .paynow-close {line-height: normal;}.cart-mdl-only .paynow-close i{font-size: 16px;}
+.secon-flw.paynow-mdl-rowbox .row {margin: 0;}.secon-flw.paynow-mdl-rowbox .row .col-md-6 {padding: 0;}
+.modal-content:has(.paynow-mdl-rowbox) {border: 0;}
+.secon-flw.paynow-mdl-rowbox .row .pay-now-leftimg{height: auto !important;padding: 70px 10px;}
+.secon-flw.paynow-mdl-rowbox .row .pay-now-leftimg img{width: 80%;}
+.secon-flw.paynow-mdl-rowbox .row .paynow-titlesec{justify-content: center;}
+.cart-mdl-only .paynow-mdl-container .paynow-amout-flow {padding: 0px 20px;margin: 20px 0 0px !important;}
+.cart-mdl-only .paynow-mdl-container .paynow-amout-flow .tct-amt p {font-weight: 600;}
+.cart-mdl-only .paynow-mdl-container .secon-flw.paynow-mdl-rowbox .row .paynow-titlesec h2{font-size: 37px;}
+.cart-mdl-only .paynow-mdl-container .paynow-amout-flow .amout-first-row{padding-bottom: 20px;border-bottom: 1px solid;}
+.cart-mdl-only .paynow-mdl-container .paynow-amout-flow .amount-last-row{margin-top: 0px !important;padding-top: 15px;border-top: 1px solid;}
+
+
+/*________________ cart chackout paynow model end ____________*/
+
+/* ===============================
+   COMMON CARD STYLE 
+================================ */
+#my-order-module .up_events {
+    background: #fff;
+    border-radius: 4px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    border-left: 14px solid;
+}
+
+#my-order-module .up_events:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.1);
+}
+#my-order-module .appointment-card {
+  border-left-color:  rgb(57 131 197);
+}
+#my-order-module .event_contant p {
+    margin-bottom: 6px !important;
+}
+
+#my-order-module .appointment-card .position-absolute {
+  border-left-color: #4f66b1;
+  color: #fff;
+}
+
+#my-order-module .ticket-card {
+    border-left-color: #319b58;
+}
+
+#my-order-module .inner_box .image_br {
+    position: relative;
+    border-radius: 12px;
+    height: 160px;
+    overflow: hidden;
+}
+#my-order-module .inner_box .image_br img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    image-rendering: auto;
+    backface-visibility: hidden;
+    transform: none !important;
+}
+#my-order-module .inner_box .image_br::after {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    color: #fff;
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 4px 4px 4px 7px;
+    font-weight: 600;
+    width: max-content;
+    min-width: 110px;
+    text-align: center;letter-spacing: 0.6px;
+}
+#my-order-module .appointment-card .inner_box .image_br::after {
+    content: "Appointment";
+    background: rgb(57, 131, 197);
+}
+#my-order-module .appointment-card .inner_box .ticket-count {
+    color: #3983c5;
+}
+#my-order-module .appointment-card .inner_box p i{color: #3983c5;}
+#my-order-module .appointment-card .inner_box .ticket-location{color: #3983c5;}
+#my-order-module .ticket-card .inner_box .image_br::after {
+  content: "Ticket";
+  background: #319b58;
+}
+#my-order-module .ticket-card .inner_box .ticket-count {
+    color: #319b58;
+}
+#my-order-module .ticket-card .inner_box p i {
+    color: #319b58;
+}
+#my-order-module .ticket-card .inner_box .ticket-location{color: #319b58;}
+
+#my-order-module .appointment-card .title {
+  color: #1e40af;
+}
+#my-order-module .inner_box .title {
+    font-size: 20px;
+    margin-bottom: 8px !important;
+}
+#my-order-module .inner_box {
+    padding: 10px 15px 15px 10px;
+}
+
+#my-order-module .ticket-card .title {
+  color: #319b58;
+}
+
+#my-order-module .event_contant span.d-block {
+  font-size: 13px;
+  color: #555;
+  margin-top: 6px;
 }
 
 /* my ticket page end */
@@ -1987,6 +2348,7 @@ li.menu_line {
 #myevent-deshbord .event_names button {
   padding: 4px 10px;
   font-size: 15px;
+  text-transform: capitalize;
 }
 
 #myevent-deshbord .prosection {
@@ -2528,7 +2890,7 @@ a.active {
 }
 
 .modal-content {
-  border-radius: 30px !important;
+  border-radius: 15px !important;
 }
 
 /* monti-inset */
