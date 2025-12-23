@@ -107,6 +107,7 @@ const CheckoutForm = ({ showNextStep, clientSecret }) => {
     }, [elements]);
 
     return (
+        <div className="px-3 pb-3">
         <Form noValidate validated={validated} onSubmit={handleSubmit}>
             <LoadingComponent isActive={isLoading} />
 
@@ -219,16 +220,15 @@ const CheckoutForm = ({ showNextStep, clientSecret }) => {
                 <Form.Check
                     required
                     label="I ACKNOWLEDGE THAT I HAVE READ AND FULLY UNDERSTAND
-THESE TERMS OF SERVICE AND THIS WAIVER AND RELEASE OF
-LIABILITY. I UNDERSTAND THAT BY AGREEING TO THESE TERMS
-OF SERVICE AND THIS WAIVER AND RELEASE I AM GIVING UP
-SUBSTANTIAL RIGHTS, AND I DO SO KNOWINGLY AND
-VOLUNTARILY WITHOUT ANY INDUCEMENT OR DURESS."
+                        THESE TERMS OF SERVICE AND THIS WAIVER AND RELEASE OF
+                        LIABILITY. I UNDERSTAND THAT BY AGREEING TO THESE TERMS
+                        OF SERVICE AND THIS WAIVER AND RELEASE I AM GIVING UP
+                        SUBSTANTIAL RIGHTS, AND I DO SO KNOWINGLY AND
+                        VOLUNTARILY WITHOUT ANY INDUCEMENT OR DURESS."
                     // feedback="Please check the terms and conditions."
                     feedbackType="invalid"
                 />
             </div>
-
 
             <div className="secon-flw-btn">
                 <Row className="gy-2">
@@ -256,6 +256,7 @@ VOLUNTARILY WITHOUT ANY INDUCEMENT OR DURESS."
                 </Row>
             </div>
         </Form>
+        </div>
     );
 };
 

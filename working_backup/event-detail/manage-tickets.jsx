@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import FrontendHeader from "@/shared/layout-components/frontelements/frontendheader";
 import FrontendFooter from "@/shared/layout-components/frontelements/frontendfooter";
+import FrontLeftSideBar from "@/shared/layout-components/frontelements/front-left-side-bar";
 import Link from "next/link";
 import axios from "axios";
 import {
@@ -23,7 +24,7 @@ const MyEventsPage = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [isLeftRight, setIsLeftRight] = useState(false);
     const [isOpenWiggins, setIsOpenWiggins] = useState(false);
-    // console.log("isOpenWiggins", isOpenWiggins);
+    console.log("isOpenWiggins", isOpenWiggins);
     // const [isLeftRightWiggins, setIsLeftRightWiggins] = useState(false);
     const [show, setShow] = useState(false);
     const [complimentary, setComplimentary] = useState(false);
@@ -37,6 +38,7 @@ const MyEventsPage = () => {
     return (
         <>
             <FrontendHeader backgroundImage={backgroundImage} />
+            {/* <FrontLeftSideBar /> */}
 
             <section id="myevent-deshbord">
                 <div className="d-flex">

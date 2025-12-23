@@ -11,14 +11,13 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         const storedToken = Cookies.get("userAuthToken");
-        const storedUser =
-            localStorage.getItem("user") || sessionStorage.getItem("user");
+        const storedUser = localStorage.getItem("user") || sessionStorage.getItem("user");
 
         if (storedToken && storedUser) {
             try {
                 const userObj = JSON.parse(storedUser);
-                setUser(userObj);         // 👉 Correct user set
-                setToken(storedToken);    // 👉 Correct token set
+                setUser(userObj); 
+                setToken(storedToken);
                 setIsLoggedIn(true);
             } catch (err) {
                 console.error("Invalid user format:", err);

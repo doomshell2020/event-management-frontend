@@ -91,7 +91,7 @@ const OrderConfirmationPage = () => {
                             details. Please keep it for your records.
                         </p>
 
-                        <div
+                        {/* <div
                             style={{
                                 backgroundColor: "#f3f4f6",
                                 padding: "16px",
@@ -107,7 +107,7 @@ const OrderConfirmationPage = () => {
                             <p style={{ margin: "4px 0" }}>
                                 <strong>Payment Status:</strong> Paid
                             </p>
-                        </div>
+                        </div> */}
 
                         <div
                             style={{

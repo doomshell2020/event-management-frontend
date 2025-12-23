@@ -4,6 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import api from "@/utils/api";
 
+// Ajay sir 
+
 const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
     const pathname = usePathname();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -83,7 +85,7 @@ const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
             {
                 serial: 3,
                 label: "Manage Committee",
-                path: `/event/edit-event/${eventDetails?.id}/committee/manage-committee`,
+                path: `/event/edit-event/${eventDetails?.id}/manage-committee`,
             },
             {
                 serial: 4,
@@ -137,7 +139,7 @@ const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
                                 </li>
                             )}
 
-                            {!loading && eventData.length == 0 && (
+                            {!loading && eventData.length === 0 && (
                                 <li className="dropdown-item text-muted text-center">
                                     No events found
                                 </li>

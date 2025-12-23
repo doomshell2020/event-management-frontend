@@ -798,14 +798,14 @@ img.arrow-img {
 }
 
 #calculator .range-slider__value {
-  width: 64px;
+  width: 60px;
   line-height: 20px;
   border-radius: 3px;
   background: #2c3e50;
   padding: 5px 10px;
   margin-left: 8px;
   font-size: 16px;
-  font-weight: normal;
+  font-weight: bold;
 }
 
 #calculator .range-slider__value::before {
@@ -898,7 +898,7 @@ footer .footer-logo {
   color: #fff;
   width: 60%;
   margin: 30px auto 30px;
-  font-weight: 500;
+  font-weight: 700;
 }
 
 .f-social-list {
@@ -931,7 +931,7 @@ footer .copyright-dv a {
 
 footer .copyright-dv {
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 700;
 }
 
 .footer-policybox {
@@ -950,7 +950,7 @@ footer .footer-policybox li {
 footer .footer-policybox li a {
   color: #fff;
   position: relative;
-  font-weight: 400;
+  font-weight: 600;
 }
 
 footer .footer-policybox li a:hover {
@@ -960,35 +960,20 @@ footer .footer-policybox li a:hover {
 /* event detail page start */
 #event-detail-page {
   position: relative;
-  padding: 80px 0px 60px;
+  padding: 80px 0px;
   background-color: #fff;
   animation-name: fadeInDown;
 }
 
 #event-detail-page .ticker_img {
   width: 100%;
+  padding-right: 10px;
   z-index: 9;
   animation-name: fadeInDown;
 }
-#event-detail-page .event-ticket-box {
-    height: 100%;
-    background-color: #dae9ff;
-    padding: 20px;
-    border-radius: 13px;
-}
 
 #event-detail-page .ticker_imgmn img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    image-rendering: auto;
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-    transform: none !important;border-radius: 13px;
-}
-#event-detail-page .ticker_imgmn {
-    width: 100%;
-    height: 300px;border-radius: 13px;
+  width: 100%;
 }
 
 #event-detail-page .event_bg {
@@ -1013,71 +998,49 @@ footer .footer-policybox li a:hover {
 }
 
 #event-detail-page .social i {
-    padding-top: 11px;
-    text-align: center;
-    color: #ffffff;
-    height: 37px;
-    width: 37px;
-    border-radius: 50%;
-    background-color: #3d6db5;
-    border-color: #1bbc9b;
-    font-size: 15px;
+  padding-top: 11px;
+  text-align: center;
+  color: #ffffff;
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+  background-color: #3d6db5;
+  border-color: #1bbc9b;
+  font-size: 18px;
 }
 
 #event-detail-page .event-ticket-box .section-heading h2 {
-  font-size: 28px;margin-bottom: 20px;
+  font-size: 32px;
 }
 
 #event-detail-page .event-ticket-box .section-heading h6 {
-  font-size: 15px;
-}
-#event-detail-page .event-ticket-box button {
-    background-color: #14B8A6;
-    letter-spacing: 0.5px;
-    font-weight: 600;
-    border-radius: 4px;
+  font-size: 16px;
 }
 
 #event-detail-page .event-ticket-box .section-heading h6 a {
   color: #4183C4;
 }
 
-#event-detail-page .info, #ticket-detailpage .info {
-    margin-top: 17px;
-    background: #4b6989;
-    border-radius: 4px;
-    color: #fff;
+#event-detail-page .info,
+#ticket-detailpage .info {
+  margin-top: 17px;
+  background: #3d6db5;
+  border-radius: 5px;
+  color: #fff;
+  padding: 15px 14px;
 }
 
-#ticket-detailpage .info ul li, #event-detail-page .info ul li {
-    width: inherit;
-    list-style: none;
-    position: relative;
-    padding: 13px 11px 10px;
-}
-#ticket-detailpage .info ul li::before,
-#event-detail-page .info ul li::before {
-    content: "";
-    position: absolute;
-    right: 27px;
-    top: 0;
-    width: 1px;
-    height: 100%;
-    background-color: #ffffff87;
-}
-#ticket-detailpage .info ul li:last-child::before,
-#event-detail-page .info ul li:last-child::before {
-    display: none;
-}
- .event_desp h1 img {
-    max-width: 300px;
-    display: block;margin-bottom: 11px;
+#ticket-detailpage .info ul li,
+#event-detail-page .info ul li {
+  width: inherit;
+  list-style: none;
+  position: relative;
 }
 
 #event-detail-page .info h6,
 #ticket-detailpage .info h6 {
-  font-size: 15px;
-  margin-bottom: 4px;
+  font-size: 16px;
+  margin-bottom: 5px;
 }
 
 #event-detail-page .info h6 svg,
@@ -1087,23 +1050,11 @@ footer .footer-policybox li a:hover {
   margin-right: 5px;
   vertical-align: bottom;
 }
- .event_desp .manage_img img.audi_img {
-    max-width: 300px;
-}
-.event_desp .manage_img{
-    text-align: left !important;
-}
-
 
 #event-detail-page .info span,
 #ticket-detailpage .info span {
   color: #ffffff;
-  font-size: 12px;text-transform: capitalize;
-}
-.appoinment-checkbtn {
-    padding-top: 18px;
-    border-top: 1px solid #ccc;
-    margin-top: 12px;
+  font-size: 12px;
 }
 
 #event-detail-page .event_Sub_h {
@@ -1158,63 +1109,7 @@ footer .footer-policybox li a:hover {
   text-align: right;
   margin-top: 30px;
 }
-.event-appointment-sec {
-    padding: 30px 0px 40px;
-    background-color: #f4f9ff;
-}
-.event-appointment-sec h5 {
-    font-size: 21px;
-    font-size: 28px;
-    font-weight: 600;
-}
-.event-appo-img .card-img-top {
-    height: 100% !important;border-radius: 12px;
-}
-#event-detail-page .event_desp {
-    padding-bottom: 20px;
-}
-.event-appointment-sec .event-appo-img{height: 210px;}.event-appointment-sec .card-body h6 {font-size: 17px;}
-.event-appointment-sec .slot-btn {
-    padding-left: 31px !important;
-    position: relative;
-}
-.event-appointment-sec .card .card-body p {
-    color: black;
-}
-.event-appointment-sec .card .card-body .card-description p {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.event-appointment-sec .card .card-body p i {
-   color: rgb(33, 166, 122);
-    font-size: 16px;
-}
-.event-appointment-sec .slot-btn input.form-check-input.me-3 {
-    width: 17px;
-    height: 17px;
-    top: 15px;
-    left: 8px;
-    margin: 0 !important;
-    border-radius: 19px;
-}
-.only-single-cart .card .event-appo-img {
-    width: 30%;
-    height: 100%;
-}
-.col-md-12.only-single-cart .appoinment-checkbtn button {
-    width: max-content !important;
-    margin-left: auto;
-    display: block;
-}
 
-
-.only-single-cart .card {
-    display: flex;
-    flex-direction: row;
-}
 /* event detail page end */
 /* cart page start */
 #cart {
@@ -1615,9 +1510,6 @@ section#request-demo {
   padding-right: 10px;
   font-size: 14px;
 }
-.freeEventCheck .form-check-input {
-   margin-top: 0px;
-}
 
 .freeEventCheck .form-check-input:checked[type=checkbox] {
   filter: invert(1) !important;
@@ -1813,7 +1705,7 @@ li.menu_line {
 
 #myevent-deshbord .desbord-content table thead th {
     border-bottom: 0px solid #dee2e6;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 400;
     vertical-align: initial;
     /* border-color: #2858a1; */
@@ -1843,12 +1735,13 @@ li.menu_line {
   margin-bottom: 5px;
   padding: 7px 5px;
   font-size: 12px;
-  width: 50%;
+  width: 49%;
   border-radius: 5px;
   display: inline-block;
   margin-left: 0px;
   margin-top: 0px;
   line-height: normal;
+  margin-right: 2px;
 }
 
 .my-ticket-box .Con_center button.edit {
@@ -1883,6 +1776,7 @@ li.menu_line {
 
 .my-ticket-box .Con_center a.enable_btn {
   background: #018e26;
+  margin-right: 5px;
 }
 
 #myevent-deshbord .paginator,
@@ -1995,6 +1889,7 @@ li.menu_line {
     margin-top: 22px;
     display: flex;
     justify-content: space-between;
+    border-color: hsl(var(--border));
     padding: 1rem;
 }
 .careyes-chekout-new .cart-mdl-only .model-left-content {
@@ -2091,8 +1986,8 @@ cubic-bezier(0.4, 0, 0.2, 1);
     color: #000000;
     margin-top: 1px;
 }
-/* .careyes-chekout-new .cart-mdl-only .modal-content{  max-width: 1060px;
-    margin: auto;} */
+.careyes-chekout-new .cart-mdl-only .modal-content{  max-width: 1060px;
+    margin: auto;}
   .careyes-chekout-new .cart-mdl-only .chackout-box .chackout-detabox .apply-cd.my-3 input.form-control {
     font-size: 13px;
 }
@@ -2100,32 +1995,15 @@ cubic-bezier(0.4, 0, 0.2, 1);
     font-size: 12px;
     margin-bottom: 11px;
 }
-/* .careyes-chekout-new .cart-mdl-only {
+.careyes-chekout-new .cart-mdl-only {
     max-width: 1060px !important;
-} */
+}
 .careyes-chekout-new .cart-mdl-only .only-ticket .counter-btn {
     background-color: black;
     border-radius: 48px; padding: 0px 5px;
 }
 
 /*________________ only-cart model design end ____________*/
-/*________________ cart chackout paynow model start ____________*/
-.cart-mdl-only .paynow-back{line-height: normal;}.cart-mdl-only .paynow-back i{color: #000;}
-.cart-mdl-only .paynow-close {line-height: normal;}.cart-mdl-only .paynow-close i{font-size: 16px;}
-.secon-flw.paynow-mdl-rowbox .row {margin: 0;}.secon-flw.paynow-mdl-rowbox .row .col-md-6 {padding: 0;}
-.modal-content:has(.paynow-mdl-rowbox) {border: 0;}
-.secon-flw.paynow-mdl-rowbox .row .pay-now-leftimg{height: auto !important;padding: 70px 10px;}
-.secon-flw.paynow-mdl-rowbox .row .pay-now-leftimg img{width: 80%;}
-.secon-flw.paynow-mdl-rowbox .row .paynow-titlesec{justify-content: center;}
-.cart-mdl-only .paynow-mdl-container .paynow-amout-flow {padding: 0px 20px;margin: 20px 0 0px !important;}
-.cart-mdl-only .paynow-mdl-container .paynow-amout-flow .tct-amt p {font-weight: 600;}
-.cart-mdl-only .paynow-mdl-container .secon-flw.paynow-mdl-rowbox .row .paynow-titlesec h2{font-size: 37px;}
-.cart-mdl-only .paynow-mdl-container .paynow-amout-flow .amout-first-row{padding-bottom: 20px;border-bottom: 1px solid;}
-.cart-mdl-only .paynow-mdl-container .paynow-amout-flow .amount-last-row{margin-top: 0px !important;padding-top: 15px;border-top: 1px solid;}
-
-
-/*________________ cart chackout paynow model end ____________*/
-
 /* ===============================
    COMMON CARD STYLE 
 ================================ */
@@ -2891,7 +2769,7 @@ a.active {
 }
 
 .modal-content {
-  border-radius: 15px !important;
+  border-radius: 30px !important;
 }
 
 /* monti-inset */
@@ -5195,23 +5073,6 @@ input[type="date"] {
     width: 100%;
   }
 }
-
-.ticket-type-badge {
-    font-size: 10px;
-    padding: 3px 8px;
-    border-radius: 12px;
-    font-weight: 600;
-    margin-left: 8px;
-    letter-spacing: 0.4px;
-    text-transform: uppercase;
-}
-
-/* COMMITTEE badge */
-.ticket-type-badge.committee {
-    background: linear-gradient(135deg, #6f42c1, #845ef7);
-    color: #fff;
-}
-
 
 @media (max-width: 359px) {
   .accomo-gobck {

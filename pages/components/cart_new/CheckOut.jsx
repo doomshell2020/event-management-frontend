@@ -93,6 +93,7 @@ export default function CheckOutComponents({
         const user = await fetchMemberProfile();
         if (!user?.id) throw new Error("User not found");
 
+<<<<<<< HEAD
         // await api.post("/api/v1/payment/create-payment-intent", {
         //   user_id: user.id,
         //   event_id: eventId,
@@ -107,6 +108,20 @@ export default function CheckOutComponents({
         // });
         setIsLoading(false);
 
+=======
+        await api.post("/api/v1/payment/create-payment-intent", {
+          user_id: user.id,
+          event_id: eventId,
+          sub_total: roundAmount(sub_total),
+          tax_total: roundAmount(tax_total),
+          grand_total: roundAmount(grand_total),
+          currency: currencyName,
+          discount_amount: 0,
+          cartData,
+        }).then(res => {
+          setClientSecret(res?.data?.data?.clientSecret);
+        });
+>>>>>>> main
       } catch (err) {
         intentCreatedRef.current = false;
         console.error("Payment intent error:", err);
@@ -125,12 +140,19 @@ export default function CheckOutComponents({
         <Button
           className="p-0 paynow-back"
           onClick={() => showNextStep(false)}
+<<<<<<< HEAD
           
+=======
+
+>>>>>>> main
         >
           <i className="bi bi-arrow-left fs-4"></i>
         </Button>
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> main
         <Button
           onClick={handleModalClose}
           className="btn-close ms-auto py-0 ps-0 paynow-close d-flex justify-content-center align-items-center"
@@ -224,7 +246,11 @@ export default function CheckOutComponents({
           </Row>
 
           <Row className="ttl-amts justify-content-between border-0">
+<<<<<<< HEAD
             
+=======
+
+>>>>>>> main
             <Col md={12}>
               <div className="tct-amt amount-last-row">
                 <p>TOTAL:</p>

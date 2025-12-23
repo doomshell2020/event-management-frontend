@@ -80,6 +80,7 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
     };
 
     const [slotCart, setSlotCart] = useState({});
+    
     useEffect(() => {
         if (!show) return;
 
@@ -285,7 +286,7 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
             onHide={handleClose}
             backdrop="static"
             keyboard={true}
-            dialogClassName="cart-modal-size"
+            dialogClassName="cart-modal-size appointment-model"
             className="careyes-chekout-new oxmonten2025EvntSec"
         >
             {!showNextStep ? (
@@ -295,10 +296,8 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
                             ×
                         </Button>
                     </Modal.Header>
-
                     <Modal.Body className="px-3 care-new-check">
                         <LoadingComponent isActive={isLoading} />
-
                         {!isLoading && eventDetails && (
                             <form onSubmit={handlePurchase}>
                                 <div className="checkout-innr">
@@ -306,19 +305,98 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
                                         {/* LEFT SIDE */}
                                         <Col lg={8} className="men-innr-sec">
                                             <div className="checkot-lft">
-                                                {/* EVENT NAME */}
-                                                <h2 className="ck-mn-hd">{eventDetails.name}</h2>
-
-                                                <span
-                                                    className="check-25-lft-pra"
-                                                    dangerouslySetInnerHTML={{
-                                                        __html: eventDetails.desp,
-                                                    }}
-                                                />
-                                                {/* EVENT IMAGE + DETAILS */}
-                                                <div className="ck-event-dtl">
+                                             <div className="ck-event-dtl">
                                                     <div className="eventsBxSec">
                                                         <Row className="align-items-center gy-3 marginTpMinus4">
+                                                            {eventDetails.wellness?.length > 0 && (
+                                                                <div className="ticket-section">
+                                                                    {eventDetails.wellness.map((w) => (
+                                                                        <div key={w.id}>
+                                                                            <h5
+                                                                                style={{
+                                                                                    fontSize: "18px",
+                                                                                    fontWeight: 600,
+                                                                                    marginBottom: "12px",
+                                                                                }}
+                                                                            >
+                                                                                {w.name}
+                                                                            </h5>
+
+                                                                            {/* Card */}
+                                                                            <div className="ticket-box p-3 border rounded shadow-sm">
+                                                                                {w.wellnessSlots?.length > 0 ? (
+                                                                                    w.wellnessSlots.map((slot) => (
+                                                                                        <div
+                                                                                            key={slot.id}
+                                                                                            style={{
+                                                                                                display: "flex",
+                                                                                                alignItems: "center",
+                                                                                                justifyContent: "space-between",
+                                                                                                padding: "14px 16px",
+                                                                                                marginBottom: "12px",
+                                                                                                borderRadius: "8px",
+                                                                                                border: "2px solid #198754",
+                                                                                                backgroundColor: "rgba(25, 135, 84, 0.12)",
+                                                                                            }}
+                                                                                        >
+                                                                                            {/* Left Side */}
+                                                                                            <div
+                                                                                                style={{
+                                                                                                    display: "flex",
+                                                                                                    alignItems: "center",
+                                                                                                    gap: "14px",
+                                                                                                }}
+                                                                                            >
+                                                                                                <span
+                                                                                                    style={{
+                                                                                                        width: "18px",
+                                                                                                        height: "18px",
+                                                                                                        borderRadius: "4px",
+                                                                                                        backgroundColor: "#198754",
+                                                                                                        display: "flex",
+                                                                                                        alignItems: "center",
+                                                                                                        justifyContent: "center",
+                                                                                                        color: "#fff",
+                                                                                                        fontSize: "12px",
+                                                                                                        fontWeight: "bold",
+                                                                                                    }}
+                                                                                                >
+                                                                                                    ✓
+                                                                                                </span>
+
+                                                                                                <span style={{ fontWeight: 600, fontSize: "15px" }}>
+                                                                                                    <i className="bi bi-calendar me-1"></i>
+                                                                                                    {formatReadableDate(slot.date)}
+                                                                                                </span>
+
+                                                                                                <span style={{ color: "#6c757d", fontSize: "14px" }}>
+                                                                                                    <i className="bi bi-clock me-1"></i>
+                                                                                                    {formatTime(slot.slot_start_time)} –{" "}
+                                                                                                    {formatTime(slot.slot_end_time)}
+                                                                                                </span>
+                                                                                            </div>
+
+                                                                                            {/* Price */}
+                                                                                            <div style={{ fontWeight: 600, fontSize: "16px" }}>
+                                                                                                {w?.currencyName?.Currency_symbol} {slot.price}
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    ))
+                                                                                ) : (
+                                                                                    <p style={{ color: "#6c757d" }}>No slots available</p>
+                                                                                )}
+                                                                            </div>
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                            )}
+                                                        </Row>
+
+
+
+
+
+                                                        {/* <Row className="align-items-center gy-3 marginTpMinus4">
                                                             {eventDetails.wellness?.length > 0 && (
                                                                 <div className="ticket-section mt-4">
                                                                     <h5 className="mb-3">Available Appointments</h5>
@@ -327,92 +405,72 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
                                                                             key={w.id}
                                                                             className="ticket-box mb-4 p-3 border rounded shadow-sm"
                                                                         >
-
-                                                                            {/* Appointment Name */}
+                                                                         
                                                                             <strong style={{ fontSize: "17px" }}>{w.name}</strong>
+                                                                    
 
-                                                                            {/* Appointment Image (only if exists) */}
-                                                                            {w.Image && (
-                                                                                <div className="w-50 my-3">
-                                                                                    <Image
-                                                                                        src={w.Image}
-                                                                                        alt={w.name}
-                                                                                        width={500}
-                                                                                        height={300}
-                                                                                        style={{
-                                                                                            borderRadius: "10px",
-                                                                                            width: "50%",
-                                                                                            height: "auto",
-                                                                                            objectFit: "cover",
-                                                                                        }}
-                                                                                    />
-                                                                                </div>
-                                                                            )}
-
-                                                                            {/* Appointment Description */}
-                                                                            <div
-                                                                                className="mt-2"
-                                                                                dangerouslySetInnerHTML={{ __html: w.description }}
-                                                                            />
-
-                                                                            {/* Slots */}
                                                                             {w.wellnessSlots?.length > 0 ? (
                                                                                 w.wellnessSlots.map((slot) => (
                                                                                     <div
                                                                                         key={slot.id}
-                                                                                        className="slot-box p-3 border rounded mb-3 shadow-sm"
+                                                                                        style={{
+                                                                                            display: "flex",
+                                                                                            alignItems: "center",
+                                                                                            justifyContent: "space-between",
+                                                                                            padding: "14px 16px",
+                                                                                            marginBottom: "12px",
+                                                                                            borderRadius: "8px",
+                                                                                            border: "2px solid #198754",
+                                                                                            backgroundColor: "rgba(25, 135, 84, 0.12)",
+                                                                                        }}
                                                                                     >
-                                                                                        <div className="d-flex justify-content-between align-items-center">
-                                                                                            <strong style={{ fontSize: "17px" }}>
-                                                                                                Date:  {formatReadableDate(slot.date)}
-                                                                                            </strong>
-                                                                                            {/* <Col sm={3} xs={6} className="mt-0">
-                                                                                    <div className="evnt-dtl-rgt monte-ticy-butn">
-
-                                                                                      
-                                                                                        <Button
-                                                                                            variant=""
-                                                                                            onClick={() => decreaseSlot(slot)}
-                                                                                            disabled={decreaseLoadingId === slot.id}
+                                                                                        <div
+                                                                                            style={{
+                                                                                                display: "flex",
+                                                                                                alignItems: "center",
+                                                                                                gap: "14px",
+                                                                                            }}
                                                                                         >
-                                                                                            {decreaseLoadingId === slot.id ? (
-                                                                                                <span className="spinner-border spinner-border-sm"></span>
-                                                                                            ) : (
-                                                                                                "-"
-                                                                                            )}
-                                                                                        </Button>
-                                                                                        <span>{slotCart[slot.id]?.count || 0}</span>
-                                                                                        <Button
-                                                                                            variant=""
-                                                                                            onClick={() => increaseSlot(slot)}
-                                                                                            disabled={increaseLoadingId === slot.id}
-                                                                                        >
-                                                                                            {increaseLoadingId === slot.id ? (
-                                                                                                <span className="spinner-border spinner-border-sm"></span>
-                                                                                            ) : (
-                                                                                                "+"
-                                                                                            )}
-                                                                                        </Button>
+                                                                                            <span
+                                                                                                style={{
+                                                                                                    width: "18px",
+                                                                                                    height: "18px",
+                                                                                                    borderRadius: "4px",
+                                                                                                    backgroundColor: "#198754",
+                                                                                                    display: "flex",
+                                                                                                    alignItems: "center",
+                                                                                                    justifyContent: "center",
+                                                                                                    color: "#fff",
+                                                                                                    fontSize: "12px",
+                                                                                                    fontWeight: "bold",
+                                                                                                }}
+                                                                                            >
+                                                                                                ✓
+                                                                                            </span>
 
-                                                                                    </div>
-                                                                                </Col> */}
+                                                                                            <span style={{ fontWeight: 600, fontSize: "15px" }}>
+                                                                                                <i className="bi bi-calendar me-1"></i>
+                                                                                                {formatReadableDate(slot.date)}
+                                                                                            </span>
+
+                                                                                            <span style={{ color: "#6c757d", fontSize: "14px" }}>
+                                                                                                  <i className="bi bi-clock me-1"></i>
+                                                                                                {formatTime(slot.slot_start_time)} – {formatTime(slot.slot_end_time)}
+                                                                                            </span>
                                                                                         </div>
-                                                                                        <p className="mt-2">
-                                                                                            Time: {formatTime(slot.slot_start_time)} to {formatTime(slot.slot_end_time)}
-                                                                                        </p>
-                                                                                        <p><strong>Location: {w?.location}</strong></p>
 
-                                                                                        <p><strong>Price: {w?.currencyName?.Currency_symbol}{" "}{slot.price}</strong></p>
+                                                                                        <div style={{ fontWeight: 600, fontSize: "16px" }}>
+                                                                                            {w?.currencyName?.Currency_symbol} {slot.price}
+                                                                                        </div>
                                                                                     </div>
                                                                                 ))
                                                                             ) : (
-                                                                                <p className="text-muted">No slots available</p>
-                                                                            )}
-                                                                        </div>
+                                                                                <p style={{ color: "#6c757d" }}>No slots available</p>
+                                                                            )} </div>
                                                                     ))}
                                                                 </div>
                                                             )}
-                                                        </Row>
+                                                        </Row> */}
                                                     </div>
                                                 </div>
 
@@ -424,69 +482,13 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
                                         {/* RIGHT SIDE (CART SUMMARY) */}
                                         <Col lg={4} className="crys-accomo-rgt men-innr-sec monten25-rgt-pnl">
                                             <div className="checkot-rgt">
-                                                {/* <h2>Checkout</h2> */}
-                                                <div
-                                                    className="checkot-rgt-bnr mont25rgt-bnt "
-                                                    style={{
-                                                        backgroundImage: `url(${eventDetails.feat_image
-                                                            ? `${eventDetails.feat_image}`
-                                                            : `https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/1024px-No_image_available.svg.png`
-                                                            })`,
-                                                    }}
-                                                > <img
-                                                        src={`https://eboxtickets.com/images/eboxticket_dark_logo.png`}
-                                                        alt="Logo"
-                                                    />
-                                                </div>
                                                 {cart.length > 0 ? (
                                                     <div className="checkot-tct-purcs monte25-tct-purcs">
-                                                        <h6>YOUR APPOINTMENTS</h6>
-
-                                                        {cart.map((item, index) => (
-
-                                                            <div key={index + Math.random(100)} className="yr-tct-dtl">
-                                                                <p className="yr-tct-dtl-para">
-                                                                    {item.count}x{" "}
-                                                                    <span>
-                                                                        {item.item_type == "appointment" &&
-                                                                            item.display_name
-                                                                            ? item.display_name
-                                                                            : "Unknown"}
-                                                                    </span>
-                                                                </p>
-                                                                <p
-                                                                    style={{ cursor: "pointer" }}
-                                                                    title="Delete Item"
-                                                                >
-                                                                    {/* {currencySymbol} */}
-                                                                    {item.item_type == "appointment" &&
-                                                                        item.currency_symbol
-                                                                        ? item.currency_symbol
-                                                                        : "Unknown"}{' '}
-                                                                    {item.item_type == "appointment" &&
-                                                                        item.display_name
-                                                                        ? (
-                                                                            item?.ticket_price *
-                                                                            item.count
-                                                                        ).toLocaleString()
-                                                                        : 0}
-                                                                    {/* <img
-                                                            src={`/assets/img/caryes-ticket-dlt.png`}
-                                                            alt="delete-icon"
-                                                            onClick={() =>
-                                                                handleDeleteCartItem(item.id)
-                                                            } // Assuming you implement this function
-                                                        /> */}
-                                                                </p>
-                                                            </div>
-                                                        ))}
-
-
-                                                        <div className="apply-cd mt-5">
+                                                        <div className="apply-cd mt-1">
                                                             <InputGroup className="input-group">
                                                                 <Form.Control
                                                                     className="form-control"
-                                                                    placeholder="ENTER STAFF ID"
+                                                                    placeholder="COUPON CODE"
                                                                     type="text"
                                                                     value={coupon}
                                                                     onChange={(e) =>
@@ -516,7 +518,7 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
                                                             </InputGroup>
                                                         </div>
 
-                                                        <div className="tickt-ttl-prs">
+                                                        <div className="tickt-ttl-prs my-3">
                                                             <div className="tct-ttl-innr">
                                                                 <p>SUBTOTAL</p>
                                                                 <span>
@@ -558,8 +560,6 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
                                                                 </p>
                                                             </div>
                                                         </div>
-
-
                                                     </div>
                                                 ) : (
                                                     <h3 className="text-center mt-5">Cart is Empty</h3>
@@ -572,7 +572,7 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
                                                         className="btn"
                                                         type="submit"
                                                         style={{
-                                                            backgroundColor: "#fca3bb",
+                                                            backgroundColor: "#df3b67ff",
                                                             color: "white",
                                                             borderRadius: "30px",
                                                             padding: "10px 24px",
@@ -594,58 +594,9 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
                                                         {finalTotal == 0
                                                             ? "FREE TICKET"
                                                             : "PURCHASE"}
-                                                        {/* //     onClick={() => {
-                                                //         if (finalTotal == 0) {
-                                                //             handleFreeTicket();
-                                                //         } else {
-                                                //             handlePurchase();
-                                                //         }
-                                                //     }}
-                                                // >
-                                                //     {finalTotal == 0 ? "FREE TICKET" : "PURCHASE"} */}
+
                                                     </Button>
-
                                                 </div>
-
-
-
-                                                // <Button
-                                                //     type="submit"
-                                                //     disabled={isBtnLoading}   // 🔥 Prevent double click
-                                                // style={{
-                                                //     backgroundColor: "#ff4da6",
-                                                //     color: "white",
-                                                //     borderRadius: "8px",
-                                                //     padding: "10px 16px",
-                                                //     fontWeight: "600",
-                                                //     border: "none",
-                                                //     width: "100%",
-                                                //     opacity: isBtnLoading ? 0.7 : 1, // loader look
-                                                //     cursor: isBtnLoading ? "not-allowed" : "pointer"
-                                                // }}
-                                                //     onClick={() => {
-                                                //         if (finalTotal == 0) {
-                                                //             handleFreeTicket();
-                                                //         } else {
-                                                //             handlePurchase();
-                                                //         }
-                                                //     }}
-                                                // >
-                                                //     {isBtnLoading ? (
-                                                //         <span
-                                                //             className="spinner-border spinner-border-sm"
-                                                //             role="status"
-                                                //             style={{ marginRight: "8px" }}
-                                                //         ></span>
-                                                //     ) : null}
-
-                                                //     {isBtnLoading
-                                                //         ? "Processing..."
-                                                //         : finalTotal == 0
-                                                //             ? "FREE TICKET"
-                                                //             : "PURCHASE"}
-                                                // </Button>
-
                                             )}
 
                                         </Col>

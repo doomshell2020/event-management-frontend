@@ -12,7 +12,7 @@ import api from "@/utils/api";
 import Swal from "sweetalert2";
 import { useCart } from "@/shared/layout-components/layout/CartContext";
 import CheckoutForm from "@/pages/components/cart_new/CheckOut";
-
+import { formatPrice } from "@/utils/commonFunction";
 
 // Loader Component
 const LoadingComponent = ({ isActive }) => {
@@ -40,16 +40,17 @@ const LoadingComponent = ({ isActive }) => {
 };
 
 export default function CartModal({ show, handleClose, eventId }) {
-
-    const { cart, refreshCart, eventData, normalCart, slotCart, loadingCart, setEventId } = useCart();
+    const { cart, refreshCart, eventData, normalCart, addonCart, slotCart, loadingCart, setEventId } = useCart();
+    // console.log('eventData :', eventData);
 
     const [isLoading, setIsLoading] = useState(true);
     const [cartLoading, setCartLoading] = useState(false);
     const [loadingId, setLoadingId] = useState(null); // track which pricing ID is loading
     const [adminFees, setAdminFees] = useState(8);
-    const [eventDetails, setEventDetails] = useState(null);
-
     const [showNextStep, setShowNextStep] = useState(false);
+
+    const currencySymbol = eventData?.currencyName?.Currency_symbol || "₹";
+    const currencyName = (eventData?.currencyName?.Currency || "INR").toLowerCase();
 
     useEffect(() => {
         setIsLoading(loadingCart);
@@ -70,6 +71,7 @@ export default function CartModal({ show, handleClose, eventId }) {
         ticket_price_id: null,  // not needed for slot
         package_id: null,       // not needed for slot
     });
+
 
     const increaseCart = async (cartId) => {
         return await api.put(`/api/v1/cart/increase/${cartId}`);
@@ -266,9 +268,6 @@ export default function CartModal({ show, handleClose, eventId }) {
             setLoadingId(ticketId);
 
             const existing = normalCart.find(item => item.uniqueId == ticketId);
-            // console.log('normalCart :', normalCart);
-            // console.log('existing :', existing);
-            // return false
 
             if (existing) {
                 await increaseCart(existing.cartId);
@@ -433,14 +432,187 @@ export default function CartModal({ show, handleClose, eventId }) {
         }
     };
 
+    const increaseAddon = async (addon) => {
+        const addonId = addon?.id;
+        try {
+            setLoadingId(addonId);
+
+            const existing = addonCart.find(
+                item => item.uniqueId == addonId
+            );
+
+            if (existing) {
+                await increaseCart(existing.cartId);
+            } else {
+                await addToCart({
+                    event_id: eventId,
+                    item_type: "addon",
+                    addons_id: addonId,
+                    count: 1
+                });
+            }
+
+            await refreshCart(eventId);
+
+        } catch (err) {
+
+            if (err?.response?.status == 409) {
+
+                const result = await Swal.fire({
+                    title: "Items from another event found!",
+                    text:
+                        err?.response?.data?.message ||
+                        "Your cart has products from another event. Clear it?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, Clear Cart",
+                    cancelButtonText: "No",
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    reverseButtons: true
+                });
+
+                if (!result.isConfirmed) {
+                    setLoadingId(null);
+                    return;
+                }
+
+                // Loader
+                Swal.fire({
+                    title: "Clearing Cart...",
+                    text: "Please wait",
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    didOpen: () => Swal.showLoading()
+                });
+
+                await clearCart();
+
+                Swal.fire({
+                    title: "Cart Cleared",
+                    text: "You can add items now.",
+                    icon: "success",
+                    timer: 1200,
+                    showConfirmButton: false
+                });
+
+                // Retry add addon
+                try {
+                    await addToCart({
+                        event_id: eventId,
+                        item_type: "addon",
+                        addon_id: addonId,
+                        count: 1
+                    });
+
+                    await refreshCart(eventId);
+
+                    Swal.fire({
+                        icon: "success",
+                        title: "Added Successfully",
+                        timer: 1200,
+                        showConfirmButton: false
+                    });
+
+                } catch (retryError) {
+                    console.log("Retry addon error:", retryError);
+                    Swal.fire({
+                        icon: "error",
+                        title: "Failed",
+                        text: "Could not add the addon after clearing cart."
+                    });
+                }
+
+                setLoadingId(null);
+                return;
+            }
+
+            console.log("Increase addon error:", err);
+
+        } finally {
+            setLoadingId(null);
+        }
+    };
+
+    const decreaseAddon = async (addon) => {
+        const addonId = addon?.id;
+
+        try {
+            setLoadingId(addonId);
+
+            const existing = addonCart.find(
+                item => item.uniqueId == addonId
+            );
+
+            if (!existing) return;
+
+            if (existing.count > 1) {
+                await decreaseCart(existing.cartId);
+            } else {
+                await deleteCart(existing.cartId);
+            }
+
+            await refreshCart(eventId);
+
+        } catch (err) {
+
+            if (err?.response?.status == 409) {
+
+                const result = await Swal.fire({
+                    title: "Items from another event found!",
+                    text:
+                        err?.response?.data?.message ||
+                        "Your cart belongs to another event. Clear it?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, Clear Cart",
+                    cancelButtonText: "No",
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    reverseButtons: true
+                });
+
+                if (!result.isConfirmed) {
+                    setLoadingId(null);
+                    return;
+                }
+
+                Swal.fire({
+                    title: "Clearing...",
+                    text: "Please wait...",
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    didOpen: () => Swal.showLoading()
+                });
+
+                await clearCart();
+
+                Swal.close();
+
+                Swal.fire({
+                    title: "Cart Cleared",
+                    text: "You can continue now.",
+                    icon: "success",
+                    timer: 1200,
+                    showConfirmButton: false
+                });
+            }
+
+            console.log("Decrease addon error:", err);
+
+        } finally {
+            setLoadingId(null);
+        }
+    };
+
     // Calculate Totals
     const totalTickets = cart.reduce((n, item) => n + item.count, 0);
-    const priceTotal = cart.reduce(
+    const sub_total = cart.reduce(
         (n, item) => n + item.count * item.ticket_price,
         0
     );
-    const feeTotal = (priceTotal * adminFees) / 100;
-    const finalTotal = priceTotal + feeTotal;
+    const tax_total = (sub_total * adminFees) / 100;
+    const grand_total = sub_total + tax_total;
 
     const formatEventDateRange = (start, end) => {
         if (!start || !end) return "";
@@ -470,18 +642,18 @@ export default function CartModal({ show, handleClose, eventId }) {
         try {
             // const res = await api.post("/api/v1/orders/create", {
             //     event_id: eventId,
-            //     total_amount: finalTotal,
+            //     total_amount: grand_total,
             //     payment_method: "Online"
             // });
             handleClose(false)
 
             // SUCCESS POPUP
-            Swal.fire({
-                icon: "success",
-                title: "Order Created!",
-                text: res?.data?.message || "Your order has been created successfully.",
-                confirmButtonText: "OK",
-            });
+            // Swal.fire({
+            //     icon: "success",
+            //     title: "Order Created!",
+            //     text: res?.data?.message || "Your order has been created successfully.",
+            //     confirmButtonText: "OK",
+            // });
 
             // console.log("Order created:", res.data);
 
@@ -545,6 +717,86 @@ export default function CartModal({ show, handleClose, eventId }) {
         });
     };
 
+    const [isBtnLoading, setIsBtnLoading] = useState(false);
+
+    const handlePurchase = async (event) => {
+        event.preventDefault();
+        setIsBtnLoading(true);
+        setTimeout(() => {
+            setShowNextStep(true);
+            setIsBtnLoading(false);
+        }, 1000);
+    };
+
+    const Counter = ({ count = 0, onInc, onDec, loading }) => {
+        if (loading) return <Spinner size="sm" />;
+
+        return (
+            <div className="d-flex align-items-center counter-btn">
+                <button className="btn btn-sm text-white" onClick={onDec}>–</button>
+
+                <span className="mx-2 text-white" style={{
+                    fontSize: "11px",
+                    width: "20px",
+                    textAlign: "center",
+                    display: "flex",
+                    justifyContent: "center",
+                }}>
+                    {count}
+                </span>
+
+                <button className="btn btn-sm text-white" onClick={onInc}>+</button>
+            </div>
+        );
+    };
+
+
+    // Store selected committee member per ticket
+    const [selectedMembers, setSelectedMembers] = useState({});
+    const requestCommitteeTicket = async (ticket, selectedMember) => {
+        try {
+            Swal.fire({
+                title: "Requesting ticket...",
+                text: "Please wait",
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            const cartData = {
+                event_id: eventId,
+                item_type: "committesale",
+                ticket_id: ticket.id,
+                count: 1,
+                committee_member_id: selectedMember.id
+            };
+            const response = await api.post("/api/v1/cart/add", cartData);
+            Swal.close();
+            if (response?.data?.success) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Request Sent",
+                    text: "Committee ticket request sent successfully"
+                });
+            }
+        } catch (error) {
+            Swal.close();
+            const errorMessage =
+                error?.response?.data?.error?.message ||
+                "Something went wrong";
+            Swal.fire({
+                icon: "error",
+                title: "Request Failed",
+                text: errorMessage
+            });
+
+            console.log("Committee Request Error:", error);
+            return false;
+        }
+    };
+
+
     return (
         <Modal
             show={show}
@@ -564,8 +816,7 @@ export default function CartModal({ show, handleClose, eventId }) {
 
                     <Modal.Body className="px-3 care-new-check">
                         <LoadingComponent isActive={isLoading} />
-
-                        {!isLoading && eventData && (
+                        {eventData && (
                             <div className="checkout-innr">
                                 <Row>
                                     {/* LEFT SIDE */}
@@ -609,278 +860,202 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                         </div>
                                                     </Col>
 
-                                                    {/* DESCRIPTION WITH SHOW MORE/LESS */}
                                                     <Col md={7}>
-
-                                                        {eventData.tickets?.length > 0 && (
+                                                        {(eventData.tickets?.length > 0 || eventData.addons?.length > 0 || eventData.slots?.length > 0) && (
                                                             <div className="ticket-section">
                                                                 <h5 className="mb-3">Available Tickets</h5>
 
-                                                                {eventData.tickets.map((ticket, i) => {
-                                                                    const pricingId = ticket?.id;
-                                                                    const cartItem = normalCart.find(item => item.uniqueId == pricingId);
-                                                                    const isLoading = loadingId == pricingId;
+                                                                {/* 🎟️ TICKETS */}
+                                                                {eventData.tickets
+                                                                    ?.filter(ticket => ticket.hidden !== "Y")
+                                                                    .map((ticket, i) => {
+                                                                        const cartItem = normalCart.find(item => item.uniqueId == ticket.id);
+                                                                        const isLoading = loadingId == ticket.id;
+                                                                        const isSoldOut = ticket.sold_out == "Y";
+                                                                        const isCommittee = ticket.type == "committee_sales";
+                                                                        const committeeStatus = ticket.committee_status || null;
 
-                                                                    return (
-                                                                        <div key={i} className="ticket-item only-ticket">
-
-                                                                            <div className="d-flex justify-content-between align-items-center ticket-infobox">
-                                                                                <div className="ticket-info">
-                                                                                    <strong style={{ fontSize: "15px" }}>{ticket.title}</strong>
-                                                                                    <p className="mt-2">Base Price: ₹{ticket.price}</p>
-
-                                                                                </div>
-
-
-                                                                                {/* Counter */}
-                                                                                {isLoading ? (
-                                                                                    <Spinner size="sm" />
-                                                                                ) : (
-                                                                                    <div className="d-flex align-items-center counter-btn">
-
-                                                                                        {/* Decrease */}
-                                                                                        <button
-                                                                                            className="btn btn-sm text-white"
-                                                                                            onClick={() => decreaseTicket(ticket)}
-                                                                                            disabled={isLoading}
-                                                                                        >
-                                                                                            –
-                                                                                        </button>
-
-                                                                                        {/* Count */}
-                                                                                        <span
-                                                                                            className="mx-2 text-white"
-                                                                                            style={{
-                                                                                                fontSize: "11px",
-                                                                                                width: "20px",
-                                                                                                textAlign: "center",
-                                                                                                display: "flex",
-                                                                                                justifyContent: "center",
-                                                                                                margin: "0px 5px",
-                                                                                            }}
-                                                                                        >
-                                                                                            {cartItem?.count || 0}
-                                                                                        </span>
-
-                                                                                        {/* Increase */}
-                                                                                        <button
-                                                                                            className="btn btn-sm text-white"
-                                                                                            onClick={() => increaseTicket(ticket)}
-                                                                                            disabled={isLoading}
-                                                                                        >
-                                                                                            +
-                                                                                        </button>
-
-                                                                                    </div>
-                                                                                )}
-                                                                            </div>
+                                                                        const committeeMembers = isCommittee
+                                                                            ? ticket.committeeAssignedTickets
+                                                                                ?.filter(ct =>
+                                                                                    ct.status == "Y" &&                 // assigned ticket active
+                                                                                    ct.committeeMember?.status == "Y" && // committee member active
+                                                                                    ct.committeeMember?.user              // safety
+                                                                                )
+                                                                                ?.map(ct => ({
+                                                                                    id: ct.committeeMember.user.id,
+                                                                                    name: `${ct.committeeMember.user.first_name} ${ct.committeeMember.user.last_name}`.trim(),
+                                                                                    email: ct.committeeMember.user.email
+                                                                                })) || []
+                                                                            : [];
 
 
 
-
-                                                                            {ticket.pricings?.length > 0 && (
-                                                                                <div className="pricing-tier mt-2">
-                                                                                    {ticket.pricings.map((p, idx) => (
-                                                                                        <div key={idx} className="d-flex justify-content-between">
-                                                                                            <span>{p.date}</span>
-                                                                                            <span>₹{p.price}</span>
-                                                                                        </div>
-                                                                                    ))}
-                                                                                </div>
-                                                                            )}
-
-                                                                        </div>
-
-
-
-
-                                                                    );
-
-
-                                                                })}
-
-
-                                                                <div className="ticket-item only-ticket ticket-addon">
-                                                                    <div className="d-flex justify-content-between align-items-center ticket-infobox">
-                                                                        <div className="ticket-info">
-                                                                            <strong style={{ fontSize: "15px" }}>Ticket Second</strong><span class="addon-badge">ADDON</span>
-
-                                                                            <p className="mt-2">Base Price: ₹20</p>
-                                                                        </div>
-                                                                        <div className="d-flex align-items-center counter-btn">
-                                                                            <button className="btn btn-sm text-white">–</button>
-
-                                                                            <span
-                                                                                className="mx-2 text-white"
-                                                                                style={{
-                                                                                    fontSize: "11px",
-                                                                                    width: "20px",
-                                                                                    textAlign: "center",
-                                                                                    display: "flex",
-                                                                                    justifyContent: "center",
-                                                                                    margin: "0px 5px",
-                                                                                }}
+                                                                        return (
+                                                                            <div
+                                                                                key={`ticket-${i}`}
+                                                                                className={`ticket-item only-ticket ${isCommittee ? "committee-ticket" : ""}`}
+                                                                                style={{ display: "flex", flexDirection: "column", gap: "10px", padding: "10px 15px", borderBottom: "1px solid #eee" }}
                                                                             >
-                                                                                1
-                                                                            </span>
+                                                                                <div className="d-flex justify-content-between align-items-center ticket-infobox">
 
-                                                                            <button className="btn btn-sm text-white">+</button>
-                                                                        </div>
-                                                                    </div>
+                                                                                    {/* LEFT INFO */}
+                                                                                    <div className="ticket-info" style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                                                                                        <strong style={{ fontSize: "15px" }}>
+                                                                                            {ticket.title}
+                                                                                            {isCommittee && <span className="ticket-type-badge committee">COMMITTEE</span>}
+                                                                                        </strong>
+                                                                                        <p className="mt-1">Base Price: ₹{formatPrice(ticket.price)}</p>
+
+                                                                                        {/* MEMBER DROPDOWN ONLY FOR REQUEST */}
+                                                                                        {isCommittee && committeeStatus == null && (
+                                                                                            <select
+                                                                                                className="form-select"
+                                                                                                value={selectedMembers[ticket.id]?.id || ""}
+                                                                                                onChange={(e) => {
+                                                                                                    const member = committeeMembers.find(
+                                                                                                        m => m.id == e.target.value
+                                                                                                    );
+
+                                                                                                    setSelectedMembers(prev => ({
+                                                                                                        ...prev,
+                                                                                                        [ticket.id]: member
+                                                                                                    }));
+                                                                                                }}
+                                                                                            >
+                                                                                                <option value="">Select Member</option>
+
+                                                                                                {committeeMembers.map(member => (
+                                                                                                    <option key={member.id} value={member.id}>
+                                                                                                        {member.name}
+                                                                                                    </option>
+                                                                                                ))}
+                                                                                            </select>
 
 
+                                                                                        )}
+                                                                                    </div>
 
-                                                                </div>
+                                                                                    {/* RIGHT ACTION */}
+                                                                                    {isSoldOut ? (
+                                                                                        <div className="sold-out-box">Sold Out</div>
+                                                                                    ) : isCommittee ? (
+                                                                                        committeeStatus == "approved" ? (
+                                                                                            <Counter
+                                                                                                count={cartItem?.count || 0}
+                                                                                                loading={isLoading}
+                                                                                                onInc={() => increaseTicket(ticket)}
+                                                                                                onDec={() => decreaseTicket(ticket)}
+                                                                                            />
+                                                                                        ) : committeeStatus == "pending" ? (
+                                                                                            <div className="committee-status pending">Request Sent</div>
+                                                                                        ) : committeeStatus == "rejected" ? (
+                                                                                            <div className="committee-status rejected">Rejected</div>
+                                                                                        ) : (
+                                                                                            selectedMembers[ticket.id] && (
+                                                                                                <button
+                                                                                                    className="btn btn-sm request-committee-btn"
+                                                                                                    onClick={() =>
+                                                                                                        requestCommitteeTicket(
+                                                                                                            ticket,
+                                                                                                            selectedMembers[ticket.id]
+                                                                                                        )
+                                                                                                    }
+                                                                                                >
+                                                                                                    Request
+                                                                                                </button>
+                                                                                            )
+                                                                                        )
+                                                                                    ) : (
+                                                                                        <Counter
+                                                                                            count={cartItem?.count || 0}
+                                                                                            loading={isLoading}
+                                                                                            onInc={() => increaseTicket(ticket)}
+                                                                                            onDec={() => decreaseTicket(ticket)}
+                                                                                        />
+                                                                                    )}
+                                                                                </div>
+                                                                            </div>
+                                                                        );
+                                                                    })}
 
+                                                                {/* ➕ ADDONS */}
+                                                                {eventData.addons
+                                                                    ?.filter(addon => addon.hidden !== "Y")
+                                                                    .map((addon, i) => {
+                                                                        const cartItem = addonCart.find(item => item.uniqueId == addon.id);
+                                                                        const isLoading = loadingId == addon.id;
+                                                                        const isSoldOut = addon.sold_out == "Y";
+
+                                                                        return (
+                                                                            <div key={`addon-${i}`} className="ticket-item only-ticket ticket-addon">
+                                                                                <div className="d-flex justify-content-between align-items-center ticket-infobox">
+                                                                                    <div className="ticket-info">
+                                                                                        <strong style={{ fontSize: "15px" }}>{addon.name} <span className="addon-badge">ADDON</span></strong>
+                                                                                        <p className="mt-2">Price: {currencySymbol}{formatPrice(addon.price)}</p>
+                                                                                    </div>
+                                                                                    {isSoldOut ? (
+                                                                                        <div className="sold-out-box">Sold Out</div>
+                                                                                    ) : (
+                                                                                        <Counter
+                                                                                            count={cartItem?.count || 0}
+                                                                                            loading={isLoading}
+                                                                                            onInc={() => increaseAddon(addon)}
+                                                                                            onDec={() => decreaseAddon(addon)}
+                                                                                        />
+                                                                                    )}
+                                                                                </div>
+                                                                            </div>
+                                                                        );
+                                                                    })}
+
+                                                                {/* ⏰ SLOTS */}
+                                                                {eventData.slots
+                                                                    ?.filter(slot => slot.hidden !== "Y")
+                                                                    .map((slot, i) => {
+                                                                        const pricingId = slot.pricings?.[0]?.id;
+                                                                        const cartItem = slotCart.find(item => item.uniqueId == pricingId);
+                                                                        const isLoading = loadingId == pricingId;
+                                                                        const isSoldOut = slot.sold_out == "Y";
+
+                                                                        return (
+                                                                            <div key={`slot-${i}`} className="ticket-item only-ticket">
+                                                                                <div className="d-flex justify-content-between align-items-center ticket-infobox">
+                                                                                    <div className="ticket-info">
+                                                                                        <strong>{slot.slot_name}</strong>
+                                                                                        <p className="mt-2">{formatReadableDate(slot.slot_date)} | {slot.start_time} - {slot.end_time}</p>
+                                                                                    </div>
+                                                                                    {isSoldOut ? (
+                                                                                        <div className="sold-out-box">Sold Out</div>
+                                                                                    ) : (
+                                                                                        <Counter
+                                                                                            count={cartItem?.count || 0}
+                                                                                            loading={isLoading}
+                                                                                            onInc={() => increaseSlot(slot)}
+                                                                                            onDec={() => decreaseSlot(slot)}
+                                                                                        />
+                                                                                    )}
+                                                                                </div>
+                                                                            </div>
+                                                                        );
+                                                                    })}
 
                                                             </div>
 
                                                         )}
-
-
-
-
-
                                                     </Col>
                                                 </Row>
-
                                             </div>
 
-                                            {/* AVAILABLE TICKETS */}
-
-
-
-                                            {/* AVAILABLE SLOTS */}
-                                            {eventData.slots?.length > 0 && (
-                                                <div className="slot-section mt-4">
-                                                    <h5 className="mb-3">Event Slots</h5>
-
-                                                    {eventData.slots.map((slot) => {
-                                                        const pricingId = slot.pricings?.[0]?.id;
-
-                                                        // Find matching slot count from cart
-                                                        const cartItem = slotCart.find(item => item.uniqueId == pricingId);
-
-                                                        const isLoading = loadingId == pricingId;
-
-                                                        return (
-                                                            <div key={slot.id} className="slot-box p-3 border rounded mb-3 shadow-sm">
-
-                                                                <div className="d-flex justify-content-between align-items-center">
-                                                                    <strong style={{ fontSize: "17px" }}>
-                                                                        {slot.slot_name}
-                                                                    </strong>
-
-                                                                    {/* Counter */}
-                                                                    {isLoading ? <Spinner size="sm" /> :
-                                                                        <div className="d-flex align-items-center">
-
-                                                                            {/* Decrease */}
-                                                                            <button
-                                                                                className="btn btn-sm"
-                                                                                onClick={() => decreaseSlot(slot)}
-                                                                                disabled={isLoading}
-                                                                            >
-                                                                                –
-                                                                            </button>
-
-                                                                            {/* Count / Loading */}
-                                                                            <span
-                                                                                className="mx-2"
-                                                                                style={{
-                                                                                    fontSize: "11px",
-                                                                                    width: "20px",
-                                                                                    textAlign: "center",
-                                                                                    display: "flex",
-                                                                                    justifyContent: "center",
-                                                                                    margin: "0px 5px",
-                                                                                }}
-                                                                            >
-                                                                                {cartItem?.count || 0}
-                                                                            </span>
-
-                                                                            {/* Increase */}
-                                                                            <button
-                                                                                className="btn btn-sm "
-                                                                                onClick={() => increaseSlot(slot)}
-                                                                                disabled={isLoading}
-                                                                            >
-                                                                                +
-                                                                            </button>
-
-                                                                        </div>
-                                                                    }
-
-                                                                </div>
-
-                                                                {/* Slot Time */}
-                                                                <p className="mt-2">
-                                                                    {formatReadableDate(slot.slot_date)} — {slot.start_time} to {slot.end_time}
-                                                                </p>
-
-                                                                <p className="text-muted">{slot.description}</p>
-
-                                                                {/* Pricing List */}
-                                                                {slot.pricings?.length > 0 && (
-                                                                    <div className="pricing-tier">
-                                                                        {slot.pricings.map((p, idx) => (
-                                                                            <div key={idx} className="d-flex justify-content-between">
-                                                                                <span>{p.date}</span>
-                                                                                <span>₹{p.price}</span>
-                                                                            </div>
-                                                                        ))}
-                                                                    </div>
-                                                                )}
-                                                            </div>
-                                                        );
-                                                    })}
-
-                                                </div>
-                                            )}
-
-
-                                        </div>
-
-                                        <div className="event-description mt-2">
-                                            <div
-                                                style={{
-                                                    maxHeight: showFullDesc ? "none" : "90px",
-                                                    overflow: "hidden",
-                                                    position: "relative",
-                                                    fontSize: "15px",
-                                                    lineHeight: "22px"
-                                                }}
-                                                dangerouslySetInnerHTML={{
-                                                    __html: eventData.desp,
-                                                }}
-                                            />
-
-                                            {/* SHOW MORE / LESS BUTTON */}
-                                            <button
-                                                type="button"
-                                                onClick={() => setShowFullDesc(!showFullDesc)}
-                                                style={{
-                                                    marginTop: "10px",
-                                                    background: "none",
-                                                    border: "none",
-                                                    color: "#007bff",
-                                                    cursor: "pointer",
-                                                    fontWeight: "600",
-                                                    padding: 0
-                                                }}
-                                            >
-                                                {showFullDesc ? "Show Less ▲" : "Show More ▼"}
-                                            </button>
                                         </div>
                                     </Col>
 
-
                                     {/* RIGHT SIDE (CART SUMMARY) */}
-                                    <Col lg={4}>
-                                        <div className="chackout-box">
-                                            <h2>Checkout</h2>
 
-                                            {cart?.length > 0 ? (
+                                    <Col lg={4}>
+                                        {cart?.length > 0 ? (
+                                            <div className="chackout-box">
+                                                <h2>Checkout</h2>
                                                 <div className="monte25-tct-purcs">
                                                     <h6>YOUR TICKETS</h6>
 
@@ -903,10 +1078,10 @@ export default function CartModal({ show, handleClose, eventId }) {
 
                                                                 <div className="d-flex justify-content-between">
                                                                     <p className="mb-0">
-                                                                        {item.count} × ${itemPrice.toFixed(2)}
+                                                                        {item.count} × {currencySymbol} {formatPrice(itemPrice)}
                                                                     </p>
 
-                                                                    <p className="mb-0">${itemTotal.toFixed(2)}</p>
+                                                                    <p className="mb-0">{currencySymbol} {formatPrice(itemTotal)}</p>
                                                                 </div>
                                                             </div>
                                                         );
@@ -930,40 +1105,79 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                     <div className="tickt-ttl-prs">
                                                         <div className="d-flex justify-content-between">
                                                             <p>PRICE</p>
-                                                            <span>${priceTotal.toFixed(2)}</span>
+                                                            <span>{currencySymbol}{formatPrice(sub_total)}</span>
                                                         </div>
 
                                                         <div className="d-flex justify-content-between">
                                                             <p>FEES ({adminFees}%)</p>
-                                                            <span>${feeTotal.toFixed(2)}</span>
+                                                            <span>{currencySymbol}{formatPrice(tax_total)}</span>
                                                         </div>
 
                                                         <div className="d-flex justify-content-between total">
                                                             <p>TOTAL</p>
-                                                            <p>${finalTotal.toFixed(2)}</p>
+                                                            <p>{currencySymbol}{formatPrice(grand_total)}</p>
                                                         </div>
                                                     </div>
 
                                                     {/* PAY NOW BUTTON */}
-                                                    <Button
-                                                        variant="primary"
-                                                        className="w-100 py-2"
-                                                        style={{ fontSize: "15px", fontWeight: "600" }}
-                                                        onClick={handlePayNow}
-                                                        disabled={payLoading}
-                                                    >
-                                                        {payLoading ? "Processing..." : "PAY NOW"}
-                                                    </Button>
 
+                                                    {grand_total > 0 && (
+                                                        <div className="by-nw-btn accomofl-ck-bt">
+                                                            <Button
+                                                                variant=""
+                                                                className="btn"
+                                                                type="submit"
+                                                                disabled={isBtnLoading}
+                                                                style={{
+                                                                    backgroundColor: "#fca3bb",
+                                                                    color: "white",
+                                                                    borderRadius: "30px",
+                                                                    padding: "10px 24px",
+                                                                    fontWeight: "600",
+                                                                    border: "none",
+                                                                    width: "50%",
+                                                                    display: "block",
+                                                                    margin: "20px auto 0",
+                                                                    opacity: isBtnLoading ? 0.7 : 1,
+                                                                    cursor: isBtnLoading ? "not-allowed" : "pointer"
+                                                                }}
+                                                                onClick={(e) => {
+                                                                    if (isBtnLoading) return;
 
+                                                                    if (grand_total == 0) {
+                                                                        e.preventDefault();
+                                                                        handleFreeTicket();
+                                                                    } else {
+                                                                        handlePurchase(e);
+                                                                    }
+                                                                }}
+                                                            >
+                                                                {isBtnLoading ? (
+                                                                    <>
+                                                                        <span
+                                                                            className="spinner-border spinner-border-sm me-2"
+                                                                            role="status"
+                                                                            aria-hidden="true"
+                                                                        />
+                                                                        Processing...
+                                                                    </>
+                                                                ) : grand_total == 0 ? (
+                                                                    "FREE TICKET"
+                                                                ) : (
+                                                                    "PURCHASE"
+                                                                )}
+                                                            </Button>
+                                                        </div>
+                                                    )}
 
                                                 </div>
-                                            ) : (
-                                                <h3 className="text-center mt-5">Cart is Empty</h3>
-                                            )}
-                                        </div>
+                                            </div>
+                                        ) : (
+                                            <div className="chackout-box">
+                                                <h3 className="text-center mt-3">Cart is Empty</h3>
+                                            </div>
+                                        )}
                                     </Col>
-
 
                                 </Row>
                             </div>
@@ -977,11 +1191,13 @@ export default function CartModal({ show, handleClose, eventId }) {
                     showNextStep={setShowNextStep}
                     adminFees={adminFees}
                     couponDetails={null}
-                    sub_total={100}
-                    tax_total={8}
-                    grand_total={108}
+                    sub_total={sub_total}
+                    tax_total={tax_total}
+                    grand_total={grand_total}
                 />
-            )}
-        </Modal>
+            )
+            }
+
+        </Modal >
     );
 }

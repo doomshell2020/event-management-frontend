@@ -9,7 +9,9 @@ import { format } from "date-fns"; // helps format dates
 export default function MyOrders({ userId }) {
     const [backgroundImage, setIsMobile] = useState('/assets/front-images/about-slider_bg.jpg');
     const [orderData, setOrderData] = useState([]);
-    const [loading, setLoading] = useState(true); // ✅ Added loading state
+    console.log("---orderData", orderData)
+    const [loading, setLoading] = useState(true);
+
     const fetchOrders = async () => {
         setLoading(true);
         try {
@@ -118,11 +120,12 @@ export default function MyOrders({ userId }) {
                                                                     </p>
 
                                                                     <div className="d-flex justify-content-start align-items-center mb-1">
-
-                                                                        <p className="time m-0 p-0 me-4">
-                                                                            <strong style={{ width: "100px", display: "inline-block" }}> {order?.orderItems?.[0]?.type == "appointment"
-                                                                                ? "Appointments"
-                                                                                : "Total Tickets"}</strong>
+                                                                        <p className="time m-0 p-0 me-4 ticket-count">
+                                                                            <strong style={{ width: "100px", display: "inline-block" }}>
+                                                                                {order?.orderItems?.[0]?.type === "appointment"
+                                                                                    ? "Appointments"
+                                                                                    : "Total Tickets"}
+                                                                            </strong>
                                                                             <span style={{ width: "10px", display: "inline-block", fontWeight: "bold" }}>:</span>
                                                                             {totalTickets}
                                                                         </p>
@@ -130,7 +133,7 @@ export default function MyOrders({ userId }) {
                                                                         <p className="time m-0 p-0">
                                                                             <strong style={{ width: "70px", display: "inline-block" }}>Amount</strong>
                                                                             <span style={{ width: "10px", display: "inline-block", fontWeight: "bold" }}>:</span>
-                                                                            {currencySymbol}{" "}{order.grand_total}
+                                                                            {currencySymbol} {order.total_amount}
                                                                         </p>
                                                                     </div>
 

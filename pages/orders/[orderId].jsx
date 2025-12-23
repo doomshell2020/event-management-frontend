@@ -1,80 +1,87 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/router";
-import Link from "next/link";
 import FrontendHeader from "@/shared/layout-components/frontelements/frontendheader";
 import FrontendFooter from "@/shared/layout-components/frontelements/frontendfooter";
 import api from "@/utils/api";
-import { format } from "date-fns"; // helps format dates
 import Swal from "sweetalert2";
+import OrderDetails from "../components/OrderDetails/OrderDetails";
 
-export default function MyOrdersDetails({ userId }) {
-    const [backgroundImage, setIsMobile] = useState('/assets/front-images/about-slider_bg.jpg');
+export default function MyOrdersDetails() {
     const router = useRouter();
     const { orderId } = router.query;
-    const [orderData, setOrderData] = useState({});
-    const [loading, setLoading] = useState(true); // ✅ Added loading state
-    const fetchOrders = async () => {
-        setLoading(true); // start loading
+
+    const [backgroundImage] = useState(
+        "/assets/front-images/about-slider_bg.jpg"
+    );
+
+    const [orderData, setOrderData] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    // ===============================
+    // FETCH ORDER DETAILS
+    // ===============================
+    const fetchOrders = useCallback(async () => {
+        if (!orderId) return;
+
+        setLoading(true);
         try {
             const res = await api.get(`/api/v1/orders/details/${orderId}`);
-            if (res.data.success) {
-                setOrderData(res.data.data || {});
+            if (res.data?.success) {
+                setOrderData(res.data.data);
             } else {
-                setOrderData([]);
+                setOrderData(null);
             }
         } catch (error) {
-            console.error("Error fetching events:", error);
-            setOrderData([]);
+            console.error("Error fetching order:", error);
+            setOrderData(null);
         } finally {
-            setLoading(false); // stop loading after API call
+            setLoading(false);
         }
-    };
-
-    useEffect(() => {
-        if (!orderId) return;
-        fetchOrders();
     }, [orderId]);
 
+    useEffect(() => {
+        fetchOrders();
+    }, [fetchOrders]);
 
-
-    const handleCancelAppointment = async (order_id) => {
+    // ===============================
+    // CANCEL APPOINTMENT
+    // ===============================
+    const handleCancelAppointment = async (order_item_id) => {
         const result = await Swal.fire({
             title: "Are you sure?",
             text: "This action will permanently cancel the appointment.",
             icon: "warning",
             showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
             confirmButtonText: "Yes, cancel it!",
         });
+
         if (!result.isConfirmed) return;
+
         try {
             Swal.fire({
                 title: "Canceling...",
-                text: "Please wait while the appointment is being cancelled.",
+                text: "Please wait",
                 allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                },
+                didOpen: () => Swal.showLoading(),
             });
-            const response = await api.put(`/api/v1/orders/cancel-appointment/${order_id}`);
-            const resData = response.data;
-            if (resData?.success) {
+
+            const response = await api.put(
+                `/api/v1/orders/cancel-appointment/${order_item_id}`
+            );
+
+            if (response.data?.success) {
                 Swal.fire({
                     icon: "success",
-                    title: "Cancelled!",
-                    text: "The appointment has been cancelled successfully.",
-                    // timer: 1500,
-                    // showConfirmButton: false,
+                    title: "Cancelled",
+                    text: "Appointment cancelled successfully.",
                 });
 
-                // ✅ Refresh your event list
-                fetchOrders();
+                fetchOrders(); // 🔄 refresh
             } else {
                 Swal.fire({
                     icon: "error",
                     title: "Error",
-                    text: resData?.message || "Failed to cancel the appointment.",
+                    text: response.data?.message || "Cancellation failed.",
                 });
             }
         } catch (error) {
@@ -82,272 +89,72 @@ export default function MyOrdersDetails({ userId }) {
             Swal.fire({
                 icon: "error",
                 title: "Error",
-                text: "Something went wrong. Please try again later.",
+                text: "Something went wrong. Please try again.",
             });
         }
     };
 
-    // date format AM-PM
-    function formatTime(timeString) {
-        if (!timeString) return "";
-        const [hour, minute] = timeString.split(":");
-        const date = new Date();
-        date.setHours(hour, minute);
-
-        return date.toLocaleTimeString("en-US", {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: true
-        });
-    }
-
-
-
-
     return (
         <>
             <FrontendHeader backgroundImage={backgroundImage} />
+
             <section id="my-ticket-module">
                 <div className="container">
                     <div className="section-heading">
                         <h1>Orders</h1>
                         <h2 className="mt-4">Order Details</h2>
-                        {/* <p className="text-center text-14">Here you can manage your Orders</p> */}
                     </div>
-                    {loading ? (
+
+                    {/* LOADING */}
+                    {loading && (
                         <div className="col-12 text-center py-5">
-                            <div className="spinner-border text-primary" role="status"></div>
-                            <div className="mt-2">Loading orders...</div>
+                            <div className="spinner-border text-primary" />
+                            <div className="mt-2">Loading Orders...</div>
                         </div>
-                    ) : (
+                    )}
+
+                    {/* NO DATA */}
+                    {!loading && !orderData && (
+                        <div className="text-center py-5">
+                            <h5>No order details found.</h5>
+                        </div>
+                    )}
+
+                    {/* DATA */}
+                    {!loading && orderData && (
                         <div className="my-ticketcontainer py-4">
                             <div className="row g-4">
 
-                                {/* LEFT IMAGE SECTION */}
+                                {/* LEFT IMAGE */}
                                 <div className="col-lg-4 col-md-5">
                                     <div className="border rounded overflow-hidden">
                                         <img
                                             src={
-                                                orderData?.event?.feat_image_url
-                                                    ? orderData.event.feat_image_url
-                                                    : "/assets/front-images/my-tacket-section.jpg"
+                                                orderData?.event?.feat_image_url ||
+                                                "/assets/front-images/my-tacket-section.jpg"
                                             }
                                             alt="Event"
                                             className="w-100"
-                                            style={{ height: "280px", objectFit: "cover" }}
+                                            style={{
+                                                height: "280px",
+                                                objectFit: "cover",
+                                            }}
                                         />
                                     </div>
                                 </div>
 
-                                {/* RIGHT DETAILS SECTION */}
-                                <div className="col-lg-8 col-md-7">
-                                    <h2 className="fw-bold m-0">{orderData?.event?.name}</h2>
-                                    <div className="text-muted mb-3">Hosted By <a href="#"> #{orderData?.event?.companyInfo?.name || 'Company'}</a></div>
-                                    {/* BLUE TOP BAR */}
-                                    <div className="row text-white p-3 rounded mb-4" style={{ background: "#3d6db5" }}>
-                                        <div className="col-md-4 border-end">
-                                            <div className="d-flex align-items-center">
-                                                <i className="bi bi-calendar-week me-2"></i>
-                                                <div>
-                                                    <strong>Start Date</strong>
-                                                    <div> {orderData?.event?.date_from
-                                                        ? format(new Date(orderData?.event.date_from), "EEE, dd MMM yyyy | hh:mm a")
-                                                        : "N/A"}</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="col-md-4 border-end">
-                                            <div className="d-flex align-items-center">
-                                                <i className="bi bi-calendar-week me-2"></i>
-                                                <div>
-                                                    <strong>End Date</strong>
-                                                    {/* <div>Wed 01st Jan, 2025 | 05:00 PM</div> */}
-                                                    <div> {orderData?.event?.date_to
-                                                        ? format(new Date(orderData?.event.date_to), "EEE, dd MMM yyyy | hh:mm a")
-                                                        : "N/A"}</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="col-md-4">
-                                            <div className="d-flex align-items-center">
-                                                <i className="bi bi-geo-alt me-2"></i>
-                                                <div>
-                                                    <strong>Location</strong>
-                                                    <div>{orderData?.event?.location}</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* TICKETS SECTION */}
-                                    <h5 className="fw-bold">Tickets</h5>
-                                    <div className="text-muted mb-3" style={{ fontSize: "14px" }}>
-                                        You have to name all your tickets below before you can print or download them.
-                                    </div>
-
-                                    {orderData?.orderItems?.map((item, index) => {
-                                        // Detect Type
-                                        const isTicket = item.type === "ticket_price";
-                                        const isAppointment = item.type === "appointment";
-                                        const currencyName = item.appointment?.wellnessList?.currencyName?.Currency_symbol;
-                                        // Dynamic Label
-                                        const typeLabel = isAppointment ? "Appointment Name" : "Ticket Type";
-
-                                        // Ticket / Appointment Title
-                                        const ticketType = isTicket
-                                            ? item.slot?.slot_name || "Ticket"
-                                            : item.appointment?.wellnessList?.name || "Appointment";
-
-                                        // Purchase Date
-                                        const purchaseDate = orderData?.createdAt
-                                            ? format(new Date(orderData.createdAt), "EEE, dd MMM yyyy | hh:mm a")
-                                            : "N/A";
-
-                                        // Location
-                                        const location = isTicket
-                                            ? orderData?.event?.location
-                                            : item.appointment?.wellnessList?.location || "N/A";
-
-                                        // Date & Time
-                                        const dateInfo = isTicket
-                                            ? `${item.slot?.slot_date} | ${formatTime(item.slot?.start_time)} - ${formatTime(item.slot?.end_time)}`
-                                            : `${format(new Date(item.appointment?.date), "EEE, dd MMM yyyy")} | ${formatTime(item.appointment?.slot_start_time)} - ${formatTime(item.appointment?.slot_end_time)}`;
-
-                                        return (
-                                            <div key={item.id} className="border rounded p-3 bg-light mb-4">
-
-                                                {/* ORDER ID */}
-                                                <div className="row mb-2">
-                                                    <div className="col-4 fw-bold">Order ID :</div>
-                                                    <div className="col-8">{orderData.order_uid}</div>
-                                                </div>
-
-                                                {/* Ticket Type / Appointment Name */}
-                                                <div className="row mb-2">
-                                                    <div className="col-4 fw-bold">{typeLabel} :</div>
-                                                    <div className="col-8">{ticketType}</div>
-                                                </div>
-
-                                                {/* Purchase Date */}
-                                                <div className="row mb-2">
-                                                    <div className="col-4 fw-bold">Purchase Date :</div>
-                                                    <div className="col-8">{purchaseDate}</div>
-                                                </div>
-
-                                                {/* Date & Time */}
-                                                <div className="row mb-2">
-                                                    <div className="col-4 fw-bold">Date & Time :</div>
-                                                    <div className="col-8">{dateInfo}</div>
-                                                </div>
-
-                                                {/* Location */}
-                                                <div className="row mb-2">
-                                                    <div className="col-4 fw-bold">Location :</div>
-                                                    <div className="col-8">{location}</div>
-                                                </div>
-
-                                                {/* QR Code */}
-                                                {item.qr_image_url && (
-                                                    <div className="row mb-3">
-                                                        <div className="col-4 fw-bold">QR Code :</div>
-                                                        <div className="col-8">
-                                                            <img
-                                                                src={item.qr_image_url}
-                                                                alt="QR"
-                                                                style={{ width: "120px", border: "1px solid #ccc", padding: "4px", borderRadius: "6px" }}
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                )}
-
-                                                {/* Ticket Holder Name → ONLY for Tickets */}
-                                                {!isAppointment && (
-                                                    <div className="row mb-3">
-                                                        <div className="col-4 fw-bold">Ticket Holder Name :</div>
-                                                        <div className="col-8">
-                                                            <input
-                                                                type="text"
-                                                                className="form-control"
-                                                                defaultValue={item.holder_name || ""}
-                                                                placeholder="Enter Ticket Holder Name"
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                )}
-
-                                                {/* BUTTONS */}
-                                                <div className="d-flex justify-content-end gap-2">
-
-                                                    {/* Ticket Buttons */}
-                                                    {!isAppointment && (
-                                                        <>
-                                                            <button className="btn btn-success" disabled>Print Ticket</button>
-                                                            <button className="btn btn-primary" disabled>Save Name</button>
-                                                        </>
-                                                    )}
-
-                                                    {/* Appointment Button */}
-                                                    {isAppointment && (
-                                                        <button
-                                                            className="btn btn-danger"
-                                                            disabled={item.cancel_status === "cancel"}
-                                                            onClick={(e) => {
-                                                                e.preventDefault();
-                                                                if (item.cancel_status !== "cancel") {
-                                                                    handleCancelAppointment(item.id);
-                                                                }
-                                                            }}
-                                                        >
-                                                            {item.cancel_status === "cancel"
-                                                                ? "Cancelled"
-                                                                : "Cancel Appointment"}
-                                                        </button>
-                                                    )}
-
-                                                </div>
-
-                                                {/* AMOUNT SUMMARY (required by testing team) */}
-                                                <hr />
-
-                                                <div className="mt-3">
-                                                    <h5 className="fw-bold">Payment Summary</h5>
-
-                                                    <div className="row mb-1">
-                                                        <div className="col-4 fw-bold">Total Amount :</div>
-                                                        <div className="col-8">{currencyName}{' '}{orderData.subtotal || orderData.total_amount}</div>
-                                                    </div>
-                                                    <div className="row mb-1">
-                                                        <div className="col-4 fw-bold">Discount :</div>
-                                                        <div className="col-8">{currencyName}{' '}{orderData.tax || 0}</div>
-                                                    </div>
-                                                    <div className="row mb-1">
-                                                        <div className="col-4 fw-bold">Tax :</div>
-                                                        <div className="col-8">{currencyName}{' '}{orderData.tax || 0}</div>
-                                                    </div>
-
-                                                    {orderData.discount > 0 && (
-                                                        <div className="row mb-1">
-                                                            <div className="col-4 fw-bold">Discount :</div>
-                                                            <div className="col-8">-{currencyName}{' '}{orderData.discount}</div>
-                                                        </div>
-                                                    )}
-
-                                                    <div className="row fw-bold text-success mt-2">
-                                                        <div className="col-4">Total Paid :</div>
-                                                        <div className="col-8">{currencyName}{' '}{orderData.total_amount}</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-
-                                </div>
+                                {/* RIGHT DETAILS */}
+                                <OrderDetails
+                                    orderData={orderData}
+                                    handleCancelAppointment={handleCancelAppointment}
+                                />
                             </div>
                         </div>
                     )}
                 </div>
             </section>
+
             <FrontendFooter />
         </>
-    )
+    );
 }
