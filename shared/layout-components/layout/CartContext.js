@@ -29,6 +29,7 @@ export const CartProvider = ({ children }) => {
             const query = finalEventId ? `?event_id=${finalEventId}` : "";
 
             const res = await api.get(`/api/v1/cart/list${query}`);
+            // console.log('res :', res);
             const data = res?.data?.data || {};
             const event = data.event || null;
             const cartItems = data.cart || [];

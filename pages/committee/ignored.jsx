@@ -6,6 +6,8 @@ import FrontendFooter from "@/shared/layout-components/frontelements/frontendfoo
 import api from "@/utils/api";
 import Cookies from "js-cookie";
 import TicketCountTabs from "@/pages/components/Event/TicketCountTabs"
+import Swal from "sweetalert2";
+
 
 export async function getServerSideProps(context) {
     try {
@@ -20,8 +22,8 @@ export async function getServerSideProps(context) {
             };
         }
 
-        // 🔥 Call your backend API
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/committee/requests/I`,
+        const res = await fetch(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/committee/requests/I`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -29,27 +31,24 @@ export async function getServerSideProps(context) {
             }
         );
 
-        const data = await res.json();
-        const apiData = data?.data?.list || [];
+        const json = await res.json();
 
-        // calculate counts
-        const counts = {
-            pending: 0,
-            approved: 0,
-            ignored: 0,
-        };
+        const list = json?.data?.list || [];
+        const assets = json?.data?.assets || {};
 
-        apiData.forEach(item => {
-            if (item.status == 'N') counts.pending++;
-            if (item.status == 'Y') counts.approved++;
-            if (item.status == 'I') counts.ignored++;
+        const counts = { pending: 0, approved: 0, ignored: 0 };
+
+        list.forEach(item => {
+            if (item.status === "N") counts.pending++;
+            if (item.status === "Y") counts.approved++;
+            if (item.status === "I") counts.ignored++;
         });
 
-        console.log('counts :', counts);
         return {
             props: {
-                pendingRequests: apiData,
+                ignoredRequests: list,
                 counts,
+                assets,
             },
         };
 
@@ -58,26 +57,78 @@ export async function getServerSideProps(context) {
 
         return {
             props: {
-                pendingRequests: [],
-                counts: {
-                    pending: 0,
-                    approved: 0,
-                    ignored: 0,
-                    completed: 0,
-                },
+                ignoredRequests: [],
+                counts: { pending: 0, approved: 0, ignored: 0 },
+                assets: {},
             },
         };
     }
 }
 
-const CommitteeIgnored = ({ pendingRequests, counts }) => {
+const CommitteeIgnored = ({ ignoredRequests, counts, assets }) => {
     const [activeTab, setMyActiveTab] = useState("ignored");
-
     const router = useRouter();
+    const [ignoredReqList, setIgnoredRedList] = useState(ignoredRequests); // local state to update list
 
     const setActiveTab = (tab) => {
         setMyActiveTab(tab);
         router.push(`/committee/${tab}`);
+    };
+
+    // ✅ filter once
+    const ignoredList = ignoredReqList.filter(item => item.status == "I");
+
+
+    // ✅ Handle Approve / Ignore
+    const handleAction = async (itemId, actionType) => {
+        // console.log('itemId, actionType :', itemId, actionType);
+        // return false
+
+        const actionText = actionType == "approve" ? "Approve" : "Ignore";
+
+        const result = await Swal.fire({
+            title: `Are you sure you want to ${actionText} this request?`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: actionText,
+            cancelButtonText: "Cancel",
+            reverseButtons: true,
+        });
+
+        if (result.isConfirmed) {
+            try {
+                Swal.fire({
+                    title: `${actionText}ing...`,
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading(),
+                });
+
+                const res = await api.post(`/api/v1/committee/action`, {
+                    cart_id: itemId,
+                    action: actionType, // "approve" or "ignore"
+                });
+
+                Swal.close();
+
+                if (res.data.success) {
+                    Swal.fire({
+                        icon: "success",
+                        title: `${actionText} Successful`,
+                        text: `The request has been ${actionText.toLowerCase()}d.`,
+                    });
+
+                    // Update local state to remove handled item
+                    setIgnoredRedList(prev => prev.filter(item => item.id !== itemId));
+                }
+            } catch (error) {
+                Swal.close();
+                Swal.fire({
+                    icon: "error",
+                    title: "Action Failed",
+                    text: error?.response?.data?.error?.message || "Something went wrong",
+                });
+            }
+        }
     };
 
     return (
@@ -101,7 +152,7 @@ const CommitteeIgnored = ({ pendingRequests, counts }) => {
                             counts={counts}
                         />
 
-                        <div className="table-responsive">
+                        <div className="table-responsive mt-4">
                             <table className="table table-hover align-middle">
                                 <thead className="bg-dark text-white">
                                     <tr>
@@ -114,75 +165,73 @@ const CommitteeIgnored = ({ pendingRequests, counts }) => {
                                 </thead>
 
                                 <tbody>
-                                    {pendingRequests.filter(item => item.status == "I").length > 0 ? (
-                                        pendingRequests
-                                            .filter(item => item.status == "I")
-                                            .map((item, index) => {
-                                                const user = item.user || {};
-                                                const ticket = item.TicketType || {};
+                                    {ignoredList.length > 0 ? (
+                                        ignoredList.map((item, index) => {
+                                            const user = item.user || {};
+                                            const ticket = item.TicketType || {};
 
-                                                return (
-                                                    <tr key={item.id}>
-                                                        <td>{index + 1}</td>
+                                            const profileImage = user.profile_image
+                                                ? `${assets.profile_image_path}/${user.profile_image}`
+                                                : "/assets/front-images/no-image.png";
 
-                                                        {/* USER IMAGE */}
-                                                        <td>
-                                                            <img
-                                                                src={
-                                                                    user.profile_image
-                                                                        ? `${process.env.NEXT_PUBLIC_IMAGE_URL}/${user.profile_image}`
-                                                                        : "/assets/front-images/no-image.png"
-                                                                }
-                                                                alt="User"
-                                                                style={{
-                                                                    width: "60px",
-                                                                    height: "60px",
-                                                                    objectFit: "cover",
-                                                                    borderRadius: "6px",
-                                                                    border: "1px solid #ddd",
-                                                                }}
-                                                            />
-                                                        </td>
+                                            return (
+                                                <tr key={item.id}>
+                                                    <td>{index + 1}</td>
 
-                                                        {/* USER DETAILS */}
-                                                        <td>
-                                                            <div style={{ fontWeight: "600" }}>
-                                                                {user.first_name} {user.last_name}
-                                                            </div>
-                                                            <div style={{ fontSize: "13px", color: "#6c757d" }}>
-                                                                {user.email}
-                                                            </div>
-                                                        </td>
+                                                    {/* USER IMAGE */}
+                                                    <td>
+                                                        <img
+                                                            src={profileImage}
+                                                            alt="User"
+                                                            style={{
+                                                                width: "60px",
+                                                                height: "60px",
+                                                                objectFit: "cover",
+                                                                borderRadius: "6px",
+                                                                border: "1px solid #ddd",
+                                                            }}
+                                                        />
+                                                    </td>
 
-                                                        {/* TICKET DETAILS */}
-                                                        <td>
-                                                            <div>{ticket.title}</div>
-                                                            <div style={{ fontSize: "13px", color: "#6c757d" }}>
-                                                                ₹{ticket.price} × {item.no_tickets}
-                                                            </div>
-                                                        </td>
+                                                    {/* USER DETAILS */}
+                                                    <td>
+                                                        <div style={{ fontWeight: 600 }}>
+                                                            {user.first_name} {user.last_name}
+                                                        </div>
+                                                        <div className="text-muted fs-13">
+                                                            {user.email}
+                                                        </div>
+                                                    </td>
 
-                                                        {/* ACTIONS */}
-                                                        <td>
+                                                    {/* TICKET */}
+                                                    <td>
+                                                        <div>{ticket.title}</div>
+                                                        <div className="text-muted fs-13">
+                                                            ₹{ticket.price} × {item.no_tickets}
+                                                        </div>
+                                                    </td>
 
-                                                            <button className="btn btn-danger btn-sm">
-                                                                Ignore
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                );
-                                            })
+                                                    {/* ACTION */}
+                                                    <td>
+                                                        <button
+                                                            className="btn btn-success btn-sm me-2"
+                                                            onClick={() => handleAction(item.id, "approve")}
+                                                        >
+                                                            Approve
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })
                                     ) : (
                                         <tr>
                                             <td colSpan="5" className="text-center py-4">
-                                                No pending requests found
+                                                No ignored requests found
                                             </td>
                                         </tr>
                                     )}
                                 </tbody>
-
                             </table>
-
                         </div>
                     </div>
                 </div>

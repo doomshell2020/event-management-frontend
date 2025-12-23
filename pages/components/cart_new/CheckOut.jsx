@@ -25,6 +25,7 @@ export default function CheckOutComponents({
   sub_total,
 }) {
   const { cart, eventData } = useCart();
+  console.log('cart :', cart);
   const router = useRouter();
 
   const [clientSecret, setClientSecret] = useState("");
@@ -43,12 +44,14 @@ export default function CheckOutComponents({
   const cartData = useMemo(() => {
     return cart.map((item) => {
       const idMap = {
+        id: item.id,
         ticket: item.ticket_id,
         addon: item.addon_id,
         package: item.package_id,
       };
 
       return {
+        id: item.id,
         ticketType: item.item_type,
         ticketId: idMap[item.item_type] || item.id,
         quantity: item.count || 1,

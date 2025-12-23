@@ -1,6 +1,6 @@
 const TicketCountTabs = ({ active, onChange, counts }) => {
+
     const tabBase = {
-        cursor: "pointer",
         fontSize: "14px",
         paddingBottom: "6px",
         transition: "all 0.2s ease",
@@ -11,11 +11,31 @@ const TicketCountTabs = ({ active, onChange, counts }) => {
         fontWeight: "600",
         color: "#dc3545",
         borderBottom: "2px solid #dc3545",
+        cursor: "default",
     };
 
     const normalStyle = {
         ...tabBase,
         color: "#555",
+        cursor: "pointer",
+    };
+
+    const disabledStyle = {
+        ...tabBase,
+        color: "#bbb",
+        cursor: "not-allowed",
+    };
+
+    // helper
+    const getStyle = (tab, count) => {
+        if (active == tab) return activeStyle;
+        if (count == 0) return disabledStyle;
+        return normalStyle;
+    };
+
+    const handleClick = (tab, count) => {
+        if (count == 0 || active == tab) return;
+        onChange(tab);
     };
 
     return (
@@ -30,37 +50,43 @@ const TicketCountTabs = ({ active, onChange, counts }) => {
                 paddingBottom: "10px",
             }}
         >
+            {/* Ticket Count (always clickable) */}
             <li
-                style={active === "ticket" ? activeStyle : normalStyle}
-                onClick={() => onChange("ticket")}
+                style={getStyle("ticket", 1)}
+                onClick={() => handleClick("ticket", 1)}
             >
                 Ticket Count
             </li>
+
             <li
-                style={active === "pending" ? activeStyle : normalStyle}
-                onClick={() => onChange("pending")}
+                style={getStyle("pending", counts.pending)}
+                onClick={() => handleClick("pending", counts.pending)}
             >
                 Pending ({counts.pending})
             </li>
+
             <li
-                style={active === "approved" ? activeStyle : normalStyle}
-                onClick={() => onChange("approved")}
+                style={getStyle("approved", counts.approved)}
+                onClick={() => handleClick("approved", counts.approved)}
             >
                 Approved ({counts.approved})
             </li>
+
             <li
-                style={active === "ignored" ? activeStyle : normalStyle}
-                onClick={() => onChange("ignored")}
+                style={getStyle("ignored", counts.ignored)}
+                onClick={() => handleClick("ignored", counts.ignored)}
             >
                 Ignored ({counts.ignored})
             </li>
+
             <li
-                style={active === "completed" ? activeStyle : normalStyle}
-                onClick={() => onChange("completed")}
+                style={getStyle("completed", counts.completed)}
+                onClick={() => handleClick("completed", counts.completed)}
             >
                 Completed ({counts.completed})
             </li>
         </ul>
     );
 };
+
 export default TicketCountTabs;

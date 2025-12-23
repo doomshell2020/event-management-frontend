@@ -5,27 +5,77 @@ import FrontendHeader from "@/shared/layout-components/frontelements/frontendhea
 import FrontendFooter from "@/shared/layout-components/frontelements/frontendfooter";
 import api from "@/utils/api";
 import Cookies from "js-cookie";
-import TicketCountTabs from "@/pages/components/Event/TicketCountTabs"
+import TicketCountTabs from "@/pages/components/Event/TicketCountTabs";
 
+export async function getServerSideProps(context) {
+    try {
+        const token = context.req.cookies?.userAuthToken || null;
 
-const CommitteeCompleted = () => {
+        if (!token) {
+            return {
+                redirect: {
+                    destination: "/login",
+                    permanent: false,
+                },
+            };
+        }
+
+        const res = await fetch(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/committee/requests/C`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        );
+
+        const json = await res.json();
+
+        const list = json?.data?.list || [];
+        const assets = json?.data?.assets || {};
+
+        const counts = { pending: 0, approved: 0, ignored: 0, completed: 0 };
+
+        list.forEach(item => {
+            if (item.status == "N") counts.pending++;
+            if (item.status == "Y") counts.approved++;
+            if (item.status == "I") counts.ignored++;
+            if (item.status == "C") counts.completed++;
+        });
+
+        return {
+            props: {
+                completedRequests: list,
+                counts,
+                assets,
+            },
+        };
+
+    } catch (error) {
+        console.error("SSR Error:", error);
+
+        return {
+            props: {
+                completedRequests: [],
+                counts: { pending: 0, approved: 0, ignored: 0, completed: 0 },
+                assets: {},
+            },
+        };
+    }
+}
+
+const CommitteeCompleted = ({ completedRequests, counts, assets }) => {
+
     const [activeTab, setMyActiveTab] = useState("completed");
-    const router = useRouter()
+    const router = useRouter();
 
     const setActiveTab = (tab) => {
         setMyActiveTab(tab);
         router.push(`/committee/${tab}`);
-    }
+    };
 
-    const pendingRequests = [
-        {
-            id: 1,
-            userName: "lokesh saini",
-            eventName: "Yuli Dejesus",
-            price: "€0.00 EUR",
-            image: "/assets/front-images/no-image.png",
-        },
-    ];
+    // ✅ filter once
+    const completedList = completedRequests.filter(item => item.status == "C");
 
     return (
         <>
@@ -45,15 +95,10 @@ const CommitteeCompleted = () => {
                         <TicketCountTabs
                             active={activeTab}
                             onChange={setActiveTab}
-                            counts={{
-                                pending: 0,
-                                approved: 0,
-                                ignored: 0,
-                                completed: 0,
-                            }}
+                            counts={counts}
                         />
 
-                        <div className="table-responsive">
+                        <div className="table-responsive mt-4">
                             <table className="table table-hover align-middle">
                                 <thead className="bg-dark text-white">
                                     <tr>
@@ -61,73 +106,75 @@ const CommitteeCompleted = () => {
                                         <th>Image</th>
                                         <th>Name</th>
                                         <th>Ticket</th>
-                                        <th>Action</th>
+                                        <th>Status</th>
                                     </tr>
                                 </thead>
 
                                 <tbody>
-                                    {pendingRequests.length > 0 ? (
-                                        pendingRequests.map((item, index) => (
-                                            <tr key={item.id}>
-                                                {/* SR NO */}
-                                                <td>{index + 1}</td>
+                                    {completedList.length > 0 ? (
+                                        completedList.map((item, index) => {
+                                            const user = item.user || {};
+                                            const ticket = item.TicketType || {};
 
-                                                {/* IMAGE */}
-                                                <td>
-                                                    <img
-                                                        src={item.image}
-                                                        alt="User"
-                                                        style={{
-                                                            width: "60px",
-                                                            height: "60px",
-                                                            objectFit: "cover",
-                                                            borderRadius: "6px",
-                                                            border: "1px solid #ddd",
-                                                        }}
-                                                    />
-                                                </td>
+                                            const profileImage = user.profile_image
+                                                ? `${assets.profile_image_path}/${user.profile_image}`
+                                                : "/assets/front-images/no-image.png";
 
-                                                {/* NAME */}
-                                                <td>
-                                                    <div style={{ fontWeight: "600" }}>{item.userName}</div>
-                                                    <div style={{ fontSize: "13px", color: "#6c757d" }}>
-                                                        {item.eventName}
-                                                    </div>
-                                                </td>
+                                            return (
+                                                <tr key={item.id}>
+                                                    <td>{index + 1}</td>
 
-                                                {/* TICKET */}
-                                                <td>
-                                                    <div>{item.price}</div>
-                                                    <button
-                                                        className="btn btn-success btn-sm mt-1"
-                                                        title="Send Email"
-                                                    >
-                                                        ✉
-                                                    </button>
-                                                </td>
+                                                    {/* IMAGE */}
+                                                    <td>
+                                                        <img
+                                                            src={profileImage}
+                                                            alt="User"
+                                                            style={{
+                                                                width: "60px",
+                                                                height: "60px",
+                                                                objectFit: "cover",
+                                                                borderRadius: "6px",
+                                                                border: "1px solid #ddd",
+                                                            }}
+                                                        />
+                                                    </td>
 
-                                                {/* ACTION */}
-                                                <td>
-                                                    <button className="btn btn-primary btn-sm me-2">
-                                                        Approve
-                                                    </button>
-                                                    <button className="btn btn-danger btn-sm">
-                                                        Ignore
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        ))
+                                                    {/* USER */}
+                                                    <td>
+                                                        <div style={{ fontWeight: 600 }}>
+                                                            {user.first_name} {user.last_name}
+                                                        </div>
+                                                        <div className="text-muted fs-13">
+                                                            {user.email}
+                                                        </div>
+                                                    </td>
+
+                                                    {/* TICKET */}
+                                                    <td>
+                                                        <div>{ticket.title}</div>
+                                                        <div className="text-muted fs-13">
+                                                            ₹{ticket.price} × {item.no_tickets}
+                                                        </div>
+                                                    </td>
+
+                                                    {/* STATUS */}
+                                                    <td>
+                                                        <span className="badge bg-success">
+                                                            Completed
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })
                                     ) : (
                                         <tr>
                                             <td colSpan="5" className="text-center py-4">
-                                                No pending requests found
+                                                No completed requests found
                                             </td>
                                         </tr>
                                     )}
                                 </tbody>
-
                             </table>
-
                         </div>
                     </div>
                 </div>

@@ -749,10 +749,14 @@ export default function CartModal({ show, handleClose, eventId }) {
         );
     };
 
-
     // Store selected committee member per ticket
     const [selectedMembers, setSelectedMembers] = useState({});
-    const requestCommitteeTicket = async (ticket, selectedMember) => {
+
+    const requestCommitteeTicket = async (ticket, selectedMember) => {  
+
+        // 1️⃣ Prepare question answers
+        const questionAnswers = buildQuestionAnswers(ticket.id);
+
         try {
             Swal.fire({
                 title: "Requesting ticket...",
@@ -768,7 +772,8 @@ export default function CartModal({ show, handleClose, eventId }) {
                 item_type: "committesale",
                 ticket_id: ticket.id,
                 count: 1,
-                committee_member_id: selectedMember.id
+                committee_member_id: selectedMember.id,
+                questionAnswers
             };
             const response = await api.post("/api/v1/cart/add", cartData);
             Swal.close();
@@ -793,6 +798,79 @@ export default function CartModal({ show, handleClose, eventId }) {
             console.log("Committee Request Error:", error);
             return false;
         }
+    };
+
+    const [ticketAnswers, setTicketAnswers] = useState({});
+
+    const handleQuestionChange = (ticketId, questionId, value) => {
+        setTicketAnswers(prev => {
+            const tId = String(ticketId);
+            const qId = String(questionId);
+
+            // If empty → remove question answer
+            if (typeof value == "string" && value.trim() == "") {
+                const updatedTicket = { ...(prev[tId] || {}) };
+                delete updatedTicket[qId];
+
+                // If no questions left → remove ticket object
+                if (Object.keys(updatedTicket).length == 0) {
+                    const updatedState = { ...prev };
+                    delete updatedState[tId];
+                    return updatedState;
+                }
+
+                return {
+                    ...prev,
+                    [tId]: updatedTicket
+                };
+            }
+
+            // Normal set
+            return {
+                ...prev,
+                [tId]: {
+                    ...prev[tId],
+                    [qId]: value
+                }
+            };
+        });
+    };
+
+
+    const validateTicketQuestions = (ticketId, ticketQuestions) => {
+
+        const missingQuestions = [];
+
+        for (let q of ticketQuestions) {
+            const answer =
+                ticketAnswers?.[String(ticketId)]?.[String(q.id)];
+
+            if (
+                answer == undefined ||
+                answer == null ||
+                (typeof answer == "string" && answer.trim() == "")
+            ) {
+                missingQuestions.push(q.question);
+            }
+        }
+
+        if (missingQuestions.length > 0) {
+            return {
+                valid: false,
+                message: `Please answer the following questions:\n\n• ${missingQuestions.join("\n• ")}`
+            };
+        }
+
+        return { valid: true };
+    };
+
+    const buildQuestionAnswers = (ticketId) => {
+        const answersObj = ticketAnswers?.[String(ticketId)] || {};
+
+        return Object.entries(answersObj).map(([questionId, answer]) => ({
+            question_id: Number(questionId),
+            answer: answer
+        }));
     };
 
 
@@ -877,9 +955,9 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                         const committeeMembers = isCommittee
                                                                             ? ticket.committeeAssignedTickets
                                                                                 ?.filter(ct =>
-                                                                                    ct.status == "Y" &&                 // assigned ticket active
-                                                                                    ct.committeeMember?.status == "Y" && // committee member active
-                                                                                    ct.committeeMember?.user              // safety
+                                                                                    ct.status == "Y" &&
+                                                                                    ct.committeeMember?.status == "Y" &&
+                                                                                    ct.committeeMember?.user
                                                                                 )
                                                                                 ?.map(ct => ({
                                                                                     id: ct.committeeMember.user.id,
@@ -888,7 +966,13 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                                 })) || []
                                                                             : [];
 
-
+                                                                        // ✅ Filter questions that belong to this ticket
+                                                                        const ticketQuestions = eventData.questions?.filter(q =>
+                                                                            q.ticket_type_id
+                                                                                .split(",")
+                                                                                .map(id => id.trim())
+                                                                                .includes(ticket.id.toString())
+                                                                        ) || [];
 
                                                                         return (
                                                                             <div
@@ -897,25 +981,20 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                                 style={{ display: "flex", flexDirection: "column", gap: "10px", padding: "10px 15px", borderBottom: "1px solid #eee" }}
                                                                             >
                                                                                 <div className="d-flex justify-content-between align-items-center ticket-infobox">
-
                                                                                     {/* LEFT INFO */}
                                                                                     <div className="ticket-info" style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                                                                                         <strong style={{ fontSize: "15px" }}>
                                                                                             {ticket.title}
                                                                                             {isCommittee && <span className="ticket-type-badge committee">COMMITTEE</span>}
                                                                                         </strong>
-                                                                                        <p className="mt-1">Base Price: ₹{formatPrice(ticket.price)}</p>
+                                                                                        <p className="mt-1">Base Price: {currencySymbol}{formatPrice(ticket.price)}</p>
 
-                                                                                        {/* MEMBER DROPDOWN ONLY FOR REQUEST */}
                                                                                         {isCommittee && committeeStatus == null && (
                                                                                             <select
                                                                                                 className="form-select"
                                                                                                 value={selectedMembers[ticket.id]?.id || ""}
                                                                                                 onChange={(e) => {
-                                                                                                    const member = committeeMembers.find(
-                                                                                                        m => m.id == e.target.value
-                                                                                                    );
-
+                                                                                                    const member = committeeMembers.find(m => m.id == e.target.value);
                                                                                                     setSelectedMembers(prev => ({
                                                                                                         ...prev,
                                                                                                         [ticket.id]: member
@@ -923,15 +1002,12 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                                                 }}
                                                                                             >
                                                                                                 <option value="">Select Member</option>
-
                                                                                                 {committeeMembers.map(member => (
                                                                                                     <option key={member.id} value={member.id}>
                                                                                                         {member.name}
                                                                                                     </option>
                                                                                                 ))}
                                                                                             </select>
-
-
                                                                                         )}
                                                                                     </div>
 
@@ -954,12 +1030,29 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                                             selectedMembers[ticket.id] && (
                                                                                                 <button
                                                                                                     className="btn btn-sm request-committee-btn"
-                                                                                                    onClick={() =>
-                                                                                                        requestCommitteeTicket(
-                                                                                                            ticket,
-                                                                                                            selectedMembers[ticket.id]
-                                                                                                        )
-                                                                                                    }
+                                                                                                    onClick={() => {
+                                                                                                        const ticketQuestions = eventData.questions?.filter(q =>
+                                                                                                            q.ticket_type_id
+                                                                                                                .split(",")
+                                                                                                                .map(id => id.trim())
+                                                                                                                .includes(ticket.id.toString())
+                                                                                                        ) || [];
+
+                                                                                                        const validation = validateTicketQuestions(ticket.id, ticketQuestions);
+                                                                                                        console.log('validation :', validation);
+
+                                                                                                        if (!validation.valid) {
+                                                                                                            Swal.fire({
+                                                                                                                icon: "warning",
+                                                                                                                title: "Incomplete Information",
+                                                                                                                text: validation.message
+                                                                                                            });
+                                                                                                            return;
+                                                                                                        }
+
+                                                                                                        requestCommitteeTicket(ticket, selectedMembers[ticket.id]);
+                                                                                                    }}
+
                                                                                                 >
                                                                                                     Request
                                                                                                 </button>
@@ -974,9 +1067,69 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                                         />
                                                                                     )}
                                                                                 </div>
+
+                                                                                {/* 🎯 Questions for this ticket only */}
+                                                                                {ticketQuestions.map(q => (
+                                                                                    <div key={q.id} className="ticket-question" style={{ marginTop: "10px" }}>
+                                                                                        {/* ✅ Question Label */}
+                                                                                        <label style={{ fontWeight: 500 }}>{q.question}</label>
+
+                                                                                        {/* 🎯 Agree → Yes / No */}
+                                                                                        {q.type == "Agree" && (
+                                                                                            <div>
+                                                                                                <label style={{ marginRight: "10px" }}>
+                                                                                                    <input
+                                                                                                        type="radio"
+                                                                                                        name={`q_${ticket.id}_${q.id}`}
+                                                                                                        value="Y"
+                                                                                                        checked={ticketAnswers?.[ticket.id]?.[q.id] == "Y"}
+                                                                                                        onChange={(e) => handleQuestionChange(ticket.id, q.id, e.target.value)}
+                                                                                                    /> Yes
+                                                                                                </label>
+                                                                                                <label>
+                                                                                                    <input
+                                                                                                        type="radio"
+                                                                                                        name={`q_${ticket.id}_${q.id}`}
+                                                                                                        value="N"
+                                                                                                        checked={ticketAnswers?.[ticket.id]?.[q.id] == "N"}
+                                                                                                        onChange={(e) => handleQuestionChange(ticket.id, q.id, e.target.value)}
+                                                                                                    /> No
+                                                                                                </label>
+                                                                                            </div>
+                                                                                        )}
+
+                                                                                        {/* 🎯 Select → Dropdown */}
+                                                                                        {q.type == "Select" && (
+                                                                                            <select
+                                                                                                className="form-select"
+                                                                                                value={ticketAnswers?.[ticket.id]?.[q.id] || ""}
+                                                                                                onChange={(e) => handleQuestionChange(ticket.id, q.id, e.target.value)}
+                                                                                            >
+                                                                                                <option value="">Select</option>
+                                                                                                {q.questionItems.map(item => (
+                                                                                                    <option key={item.id} value={item.items}>
+                                                                                                        {item.items}
+                                                                                                    </option>
+                                                                                                ))}
+                                                                                            </select>
+                                                                                        )}
+
+                                                                                        {/* 🎯 Text → Input */}
+                                                                                        {q.type == "Text" && (
+                                                                                            <input
+                                                                                                type="text"
+                                                                                                className="form-control"
+                                                                                                placeholder={q.question}
+                                                                                                value={ticketAnswers?.[ticket.id]?.[q.id] || ""}
+                                                                                                onChange={(e) => handleQuestionChange(ticket.id, q.id, e.target.value)}
+                                                                                            />
+                                                                                        )}
+                                                                                    </div>
+                                                                                ))}
                                                                             </div>
                                                                         );
                                                                     })}
+
 
                                                                 {/* ➕ ADDONS */}
                                                                 {eventData.addons

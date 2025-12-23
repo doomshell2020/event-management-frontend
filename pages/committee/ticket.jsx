@@ -7,22 +7,35 @@ import api from "@/utils/api";
 import Cookies from "js-cookie";
 import TicketCountTabs from "@/pages/components/Event/TicketCountTabs";
 
-const CommitteeEventCard = ({ event }) => {
-console.log('event :', event);
+const CommitteeEventCard = ({ event, assets }) => {
     const router = useRouter();
 
     const handleClick = () => {
         router.push(`/committee/ticket-details/${event.id}`);
     };
 
+    const formatDate = (dateStr) => {
+        if (!dateStr) return "--";
+        return new Date(dateStr).toLocaleString("en-IN", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+        });
+    };
+
+    const eventImage = event.feat_image
+        ? `${assets.event_image_path}/${event.feat_image}`
+        : "/assets/front-images/event-demo.jpg";
+
     return (
         <div
             onClick={handleClick}
             className="d-flex gap-3 p-3 rounded bg-white border shadow-sm cursor-pointer"
         >
-            {/* IMAGE */}
             <img
-                src={event.feat_image || "/assets/front-images/event-demo.jpg"}
+                src={eventImage}
                 alt={event.name}
                 style={{
                     width: "140px",
@@ -32,7 +45,6 @@ console.log('event :', event);
                 }}
             />
 
-            {/* DETAILS */}
             <div style={{ flex: 1 }}>
                 <h5 className="mb-1">{event.name}</h5>
 
@@ -41,11 +53,11 @@ console.log('event :', event);
                 </p>
 
                 <p className="mb-1 fs-14">
-                    📅 <strong>Start:</strong> {event.date_from?.local}
+                    📅 <strong>Start:</strong> {formatDate(event.date_from)}
                 </p>
 
                 <p className="mb-2 fs-14">
-                    📅 <strong>End:</strong> {event.date_to?.local}
+                    📅 <strong>End:</strong> {formatDate(event.date_to)}
                 </p>
 
                 <span className="badge bg-danger px-3 py-2">
@@ -55,7 +67,6 @@ console.log('event :', event);
         </div>
     );
 };
-
 
 export async function getServerSideProps(context) {
     try {
@@ -70,9 +81,7 @@ export async function getServerSideProps(context) {
             };
         }
 
-        // ✅ Fetch ALL committee requests (no status filter)
-        const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/committee/requests/T`,
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/committee/requests/T`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -80,17 +89,13 @@ export async function getServerSideProps(context) {
             }
         );
 
-        const data = await res.json();
-        const apiData = data?.data?.list || [];
-        const eventsList = data?.data?.events || [];
-        console.log('apiData :', eventsList);
+        const json = await res.json();
+        const apiData = json?.data?.list || [];
+        const eventsList = json?.data?.events || [];
+        const assets = json?.data?.assets || {};
 
-        // ✅ Calculate counts
-        const counts = {
-            pending: 0,   // N
-            approved: 0,  // Y
-            ignored: 0,   // I
-        };
+        // ✅ counts
+        const counts = { pending: 0, approved: 0, ignored: 0 };
 
         apiData.forEach(item => {
             if (item.status == "N") counts.pending++;
@@ -101,7 +106,8 @@ export async function getServerSideProps(context) {
         return {
             props: {
                 counts,
-                eventsList
+                eventsList,
+                assets
             },
         };
 
@@ -110,19 +116,16 @@ export async function getServerSideProps(context) {
 
         return {
             props: {
-                counts: {
-                    pending: 0,
-                    approved: 0,
-                    ignored: 0,
-                },
-                eventsList
+                counts: { pending: 0, approved: 0, ignored: 0 },
+                eventsList: [],
+                assets: {}
             },
         };
     }
 }
 
-const CommitteePage = ({ counts, eventsList }) => {
-// console.log('eventsList :', eventsList);
+const CommitteePage = ({ counts, eventsList, assets }) => {
+    // console.log('eventsList :', eventsList);
 
     const [activeTab, setMyActiveTab] = useState("ticket");
     const router = useRouter()
@@ -175,12 +178,22 @@ const CommitteePage = ({ counts, eventsList }) => {
 
                         {/* EVENTS GRID (6-6) */}
                         <div className="row mt-4">
-                            {eventsList.map((event) => (
-                                <div key={event.id} className="col-md-6 mb-4">
-                                    <CommitteeEventCard event={event} />
+                            {eventsList.length > 0 ? (
+                                eventsList.map(event => (
+                                    <div key={event.id} className="col-md-6 mb-4">
+                                        <CommitteeEventCard
+                                            event={event}
+                                            assets={assets}
+                                        />
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="text-center text-muted mt-4">
+                                    No committee events found
                                 </div>
-                            ))}
+                            )}
                         </div>
+
                     </div>
                 </div>
             </section>

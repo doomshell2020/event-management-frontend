@@ -1,79 +1,75 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
+import Swal from "sweetalert2";
 import FrontendHeader from "@/shared/layout-components/frontelements/frontendheader";
 import FrontendFooter from "@/shared/layout-components/frontelements/frontendfooter";
 import TicketCountTabs from "@/pages/components/Event/TicketCountTabs";
-
-export async function getServerSideProps(context) {
-    try {
-        const token = context.req.cookies?.userAuthToken || null;
-
-        if (!token) {
-            return {
-                redirect: {
-                    destination: "/login",
-                    permanent: false,
-                },
-            };
-        }
-
-        // 🔥 Call your backend API
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/committee/requests/N`,
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            }
-        );
-
-        const data = await res.json();
-        const apiData = data?.data?.list || [];
-
-        // calculate counts
-        const counts = {
-            pending: 0,
-            approved: 0,
-            ignored: 0,
-        };
-
-        apiData.forEach(item => {
-            if (item.status == 'N') counts.pending++;
-            if (item.status == 'Y') counts.approved++;
-            if (item.status == 'I') counts.ignored++;
-        });
-
-        return {
-            props: {
-                pendingRequests: apiData,
-                counts,
-            },
-        };
-
-    } catch (error) {
-        console.error("SSR Error:", error);
-
-        return {
-            props: {
-                pendingRequests: [],
-                counts: {
-                    pending: 0,
-                    approved: 0,
-                    ignored: 0,
-                    completed: 0,
-                },
-            },
-        };
-    }
-}
+import api from "@/utils/api";
 
 
-const CommitteePending = ({ pendingRequests, counts }) => {
+const CommitteePending = ({ pendingRequests, counts, assets }) => {
     const [activeTab, setMyActiveTab] = useState("pending");
+    const [requests, setRequests] = useState(pendingRequests); // local state to update list
+    // console.log('requests :', requests);
     const router = useRouter();
 
     const setActiveTab = (tab) => {
         setMyActiveTab(tab);
         router.push(`/committee/${tab}`);
+    };
+
+    const pendingList = requests.filter(item => item.status == "N");
+
+    // ✅ Handle Approve / Ignore
+    const handleAction = async (itemId, actionType) => {
+        // console.log('itemId, actionType :', itemId, actionType);
+        // return false
+
+        const actionText = actionType == "approve" ? "Approve" : "Ignore";
+
+        const result = await Swal.fire({
+            title: `Are you sure you want to ${actionText} this request?`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: actionText,
+            cancelButtonText: "Cancel",
+            reverseButtons: true,
+        });
+
+        if (result.isConfirmed) {
+            try {
+                Swal.fire({
+                    title: `${actionText}ing...`,
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading(),
+                });
+
+                const res = await api.post(`/api/v1/committee/action`, {
+                    cart_id: itemId,
+                    action: actionType, // "approve" or "ignore"
+                });
+
+                Swal.close();
+
+                if (res.data.success) {
+                    Swal.fire({
+                        icon: "success",
+                        title: `${actionText} Successful`,
+                        text: `The request has been ${actionText.toLowerCase()}d.`,
+                    });
+
+                    // Update local state to remove handled item
+                    setRequests(prev => prev.filter(item => item.id !== itemId));
+                }
+            } catch (error) {
+                Swal.close();
+                Swal.fire({
+                    icon: "error",
+                    title: "Action Failed",
+                    text: error?.response?.data?.error?.message || "Something went wrong",
+                });
+            }
+        }
     };
 
     return (
@@ -91,14 +87,12 @@ const CommitteePending = ({ pendingRequests, counts }) => {
                     </div>
 
                     <div className="profil_deaile mx-auto">
-                        {/* TABS */}
                         <TicketCountTabs
                             active={activeTab}
                             onChange={setActiveTab}
                             counts={counts}
                         />
 
-                        {/* TABLE */}
                         <div className="table-responsive mt-4">
                             <table className="table table-hover align-middle">
                                 <thead className="bg-dark text-white">
@@ -112,66 +106,59 @@ const CommitteePending = ({ pendingRequests, counts }) => {
                                 </thead>
 
                                 <tbody>
-                                    {pendingRequests.filter(item => item.status == "N").length > 0 ? (
-                                        pendingRequests
-                                            .filter(item => item.status == "N")
-                                            .map((item, index) => {
-                                                const user = item.user || {};
-                                                const ticket = item.TicketType || {};
+                                    {pendingList.length > 0 ? (
+                                        pendingList.map((item, index) => {
+                                            const user = item.user || {};
+                                            const ticket = item.TicketType || {};
+                                            const profileImage = user.profile_image
+                                                ? `${assets.profile_image_path}/${user.profile_image}`
+                                                : "/assets/front-images/no-image.png";
 
-                                                return (
-                                                    <tr key={item.id}>
-                                                        <td>{index + 1}</td>
-
-                                                        {/* USER IMAGE */}
-                                                        <td>
-                                                            <img
-                                                                src={
-                                                                    user.profile_image
-                                                                        ? `${process.env.NEXT_PUBLIC_IMAGE_URL}/${user.profile_image}`
-                                                                        : "/assets/front-images/no-image.png"
-                                                                }
-                                                                alt="User"
-                                                                style={{
-                                                                    width: "60px",
-                                                                    height: "60px",
-                                                                    objectFit: "cover",
-                                                                    borderRadius: "6px",
-                                                                    border: "1px solid #ddd",
-                                                                }}
-                                                            />
-                                                        </td>
-
-                                                        {/* USER DETAILS */}
-                                                        <td>
-                                                            <div style={{ fontWeight: "600" }}>
-                                                                {user.first_name} {user.last_name}
-                                                            </div>
-                                                            <div style={{ fontSize: "13px", color: "#6c757d" }}>
-                                                                {user.email}
-                                                            </div>
-                                                        </td>
-
-                                                        {/* TICKET DETAILS */}
-                                                        <td>
-                                                            <div>{ticket.title}</div>
-                                                            <div style={{ fontSize: "13px", color: "#6c757d" }}>
-                                                                ₹{ticket.price} × {item.no_tickets}
-                                                            </div>
-                                                        </td>
-
-                                                        {/* ACTIONS */}
-                                                        <td>
-                                                            <button className="btn btn-success btn-sm me-2">
-                                                                Approve
-                                                            </button>
-                                                            <button className="btn btn-danger btn-sm">
-                                                                Ignore
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                );
-                                            })
+                                            return (
+                                                <tr key={item.id}>
+                                                    <td>{index + 1}</td>
+                                                    <td>
+                                                        <img
+                                                            src={profileImage}
+                                                            alt="User"
+                                                            style={{
+                                                                width: "60px",
+                                                                height: "60px",
+                                                                objectFit: "cover",
+                                                                borderRadius: "6px",
+                                                                border: "1px solid #ddd",
+                                                            }}
+                                                        />
+                                                    </td>
+                                                    <td>
+                                                        <div style={{ fontWeight: 600 }}>
+                                                            {user.first_name} {user.last_name}
+                                                        </div>
+                                                        <div className="text-muted fs-13">{user.email}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div>{ticket.title}</div>
+                                                        <div className="text-muted fs-13">
+                                                            ₹{ticket.price} × {item.no_tickets}
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <button
+                                                            className="btn btn-success btn-sm me-2"
+                                                            onClick={() => handleAction(item.id, "approve")}
+                                                        >
+                                                            Approve
+                                                        </button>
+                                                        <button
+                                                            className="btn btn-danger btn-sm"
+                                                            onClick={() => handleAction(item.id, "ignore")}
+                                                        >
+                                                            Ignore
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })
                                     ) : (
                                         <tr>
                                             <td colSpan="5" className="text-center py-4">
@@ -179,9 +166,7 @@ const CommitteePending = ({ pendingRequests, counts }) => {
                                             </td>
                                         </tr>
                                     )}
-
                                 </tbody>
-
                             </table>
                         </div>
                     </div>
@@ -194,3 +179,61 @@ const CommitteePending = ({ pendingRequests, counts }) => {
 };
 
 export default CommitteePending;
+
+
+export async function getServerSideProps(context) {
+    try {
+        const token = context.req.cookies?.userAuthToken || null;
+
+        if (!token) {
+            return {
+                redirect: {
+                    destination: "/login",
+                    permanent: false,
+                },
+            };
+        }
+
+        const res = await fetch(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/committee/requests/N`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        );
+
+        const json = await res.json();
+        const list = json?.data?.list || [];
+        const assets = json?.data?.assets || {};
+
+        const counts = { pending: 0, approved: 0, ignored: 0 };
+
+        list.forEach(item => {
+            if (item.status == "N") counts.pending++;
+            if (item.status == "Y") counts.approved++;
+            if (item.status == "I") counts.ignored++;
+        });
+
+        return {
+            props: {
+                pendingRequests: list,
+                counts,
+                assets,
+            },
+        };
+
+    } catch (error) {
+        console.error("SSR Error:", error);
+
+        return {
+            props: {
+                pendingRequests: [],
+                counts: { pending: 0, approved: 0, ignored: 0 },
+                assets: {},
+            },
+        };
+    }
+}
+
+
