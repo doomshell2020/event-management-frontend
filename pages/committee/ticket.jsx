@@ -29,44 +29,50 @@ const CommitteeEventCard = ({ event, assets }) => {
         ? `${assets.event_image_path}/${event.feat_image}`
         : "/assets/front-images/event-demo.jpg";
 
+
     return (
         <div
             onClick={handleClick}
-            className="d-flex gap-3 p-3 rounded bg-white border shadow-sm cursor-pointer"
+            className="committee-event-sec bg-white border shadow-sm rounded-3 p-3 cursor-pointer"
         >
-            <img
-                src={eventImage}
-                alt={event.name}
-                style={{
-                    width: "140px",
-                    height: "100px",
-                    objectFit: "cover",
-                    borderRadius: "8px",
-                }}
-            />
+            <div className="row align-items-stretch">
+                <div className="col-4 d-flex">
+                    <div className="event-img-wrap w-100 d-flex align-items-center justify-content-center">
+                        <img
+                            src={eventImage}
+                            alt={event.name}
+                            className="img-fluid rounded-3"
+                        />
+                    </div>
+                </div>
+                <div className="col-8 d-flex">
+                    <div className="w-100 d-flex flex-column justify-content-center">
+                        <h6 className="fw-semibold mb-1">
+                            {event.name}
+                        </h6>
 
-            <div style={{ flex: 1 }}>
-                <h5 className="mb-1">{event.name}</h5>
+                        <p className="text-muted mb-2">
+                            @{event.location}
+                        </p>
+                        <p className="mb-1">
+                            📅 <strong>Start:</strong> {formatDate(event.date_from)}
+                        </p>
 
-                <p className="text-muted mb-2">
-                    @{event.location}
-                </p>
+                        <p className="mb-2">
+                            📅 <strong>End:</strong> {formatDate(event.date_to)}
+                        </p>
 
-                <p className="mb-1 fs-14">
-                    📅 <strong>Start:</strong> {formatDate(event.date_from)}
-                </p>
+                        <span className="btn text-white btn-sm rounded-pill align-self-start px-3">
+                            View Requests →
+                        </span>
+                    </div>
+                </div>
 
-                <p className="mb-2 fs-14">
-                    📅 <strong>End:</strong> {formatDate(event.date_to)}
-                </p>
-
-                <span className="btn text-white btn-sm rounded-pill align-self-start px-3">
-                    View Requests →
-                </span>
             </div>
         </div>
     );
 };
+
 
 export async function getServerSideProps(context) {
     try {
@@ -159,7 +165,7 @@ const CommitteePage = ({ counts, eventsList, assets }) => {
                         <div className="row mt-4">
                             {eventsList.map((event) => (
                                 <div key={event.id} className="col-md-6 mb-3">
-                                    <CommitteeEventCard event={event} assets={assets}  />
+                                    <CommitteeEventCard event={event} assets={assets} />
                                 </div>
                             ))}
                         </div>
