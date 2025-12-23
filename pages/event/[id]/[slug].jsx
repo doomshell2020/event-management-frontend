@@ -10,8 +10,6 @@ import Swal from "sweetalert2";
 import { useRouter } from "next/router";
 import api from "@/utils/api";
 
-
-
 export async function getServerSideProps({ params }) {
   const { id, slug } = params;
 
@@ -405,15 +403,7 @@ const EventDetailPage = ({ event, slug }) => {
         </div>
       </section>
 
-
-
-<<<<<<< HEAD
-
       <section className=" event-appointment-sec">
-=======
-  {event.status == "Y" && (
-      <section className="py-4">
->>>>>>> main
         <div className="container">
           {appointmentData?.length > 0 && (
             <>
@@ -582,9 +572,6 @@ const EventDetailPage = ({ event, slug }) => {
           )}
         </div>
       </section>
-  )}
-
-
 
       {/* ✅ Cart Modal */}
       {
