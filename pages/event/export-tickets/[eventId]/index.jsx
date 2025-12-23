@@ -98,7 +98,7 @@ const ExportTickets = () => {
                     <div className="event-righcontent">
                         <div className="dsa_contant">
 
-                            <section id="post-eventpg edit-event-page">
+                            <section id="post-eventpg">
 
                                 <EventHeaderSection eventDetails={eventDetails} isProgressBarShow={false} />
 

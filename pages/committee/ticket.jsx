@@ -60,7 +60,7 @@ const CommitteeEventCard = ({ event, assets }) => {
                     📅 <strong>End:</strong> {formatDate(event.date_to)}
                 </p>
 
-                <span className="badge bg-danger px-3 py-2">
+                <span className="btn text-white btn-sm rounded-pill align-self-start px-3">
                     View Requests →
                 </span>
             </div>
@@ -125,7 +125,6 @@ export async function getServerSideProps(context) {
 }
 
 const CommitteePage = ({ counts, eventsList, assets }) => {
-    // console.log('eventsList :', eventsList);
 
     const [activeTab, setMyActiveTab] = useState("ticket");
     const router = useRouter()
@@ -134,26 +133,6 @@ const CommitteePage = ({ counts, eventsList, assets }) => {
         setMyActiveTab(tab);
         router.push(`/committee/${tab}`);
     }
-
-    // 🔥 Static event list (can be API later)
-    const events = [
-        {
-            id: 108,
-            title: "Yuli Dejesus",
-            subtitle: "Voluptates cupiditat",
-            start: "Fri, 19 Dec 2025 | 03:00 PM",
-            end: "Wed, 31 Dec 2025 | 12:00 AM",
-            image: "/assets/front-images/event-demo.jpg",
-        },
-        {
-            id: 109,
-            title: "Careyes Festival",
-            subtitle: "Music & Culture",
-            start: "Mon, 22 Dec 2025 | 05:00 PM",
-            end: "Thu, 25 Dec 2025 | 01:00 AM",
-            image: "/assets/front-images/event-demo.jpg",
-        },
-    ];
 
     return (
         <>
@@ -178,20 +157,11 @@ const CommitteePage = ({ counts, eventsList, assets }) => {
 
                         {/* EVENTS GRID (6-6) */}
                         <div className="row mt-4">
-                            {eventsList.length > 0 ? (
-                                eventsList.map(event => (
-                                    <div key={event.id} className="col-md-6 mb-4">
-                                        <CommitteeEventCard
-                                            event={event}
-                                            assets={assets}
-                                        />
-                                    </div>
-                                ))
-                            ) : (
-                                <div className="text-center text-muted mt-4">
-                                    No committee events found
+                            {eventsList.map((event) => (
+                                <div key={event.id} className="col-md-6 mb-3">
+                                    <CommitteeEventCard event={event} assets={assets}  />
                                 </div>
-                            )}
+                            ))}
                         </div>
 
                     </div>

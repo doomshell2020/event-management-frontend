@@ -146,7 +146,7 @@ p.des_h::after {
   color: #000;
   font-size: 16px;
   flex: 1 0 auto;
-  min-width: 180px; 
+    min-width: 180px; 
   position: relative;
   text-align: center;
 }
@@ -798,14 +798,14 @@ img.arrow-img {
 }
 
 #calculator .range-slider__value {
-  width: 60px;
+  width: 64px;
   line-height: 20px;
   border-radius: 3px;
   background: #2c3e50;
   padding: 5px 10px;
   margin-left: 8px;
   font-size: 16px;
-  font-weight: bold;
+  font-weight: normal;
 }
 
 #calculator .range-slider__value::before {
@@ -898,7 +898,7 @@ footer .footer-logo {
   color: #fff;
   width: 60%;
   margin: 30px auto 30px;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .f-social-list {
@@ -931,7 +931,7 @@ footer .copyright-dv a {
 
 footer .copyright-dv {
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .footer-policybox {
@@ -950,7 +950,7 @@ footer .footer-policybox li {
 footer .footer-policybox li a {
   color: #fff;
   position: relative;
-  font-weight: 600;
+  font-weight: 400;
 }
 
 footer .footer-policybox li a:hover {
@@ -967,9 +967,14 @@ footer .footer-policybox li a:hover {
 
 #event-detail-page .ticker_img {
   width: 100%;
-  padding-right: 10px;
   z-index: 9;
   animation-name: fadeInDown;
+}
+#event-detail-page .event-ticket-box {
+    height: 100%;
+    background-color: #dae9ff;
+    padding: 20px;
+    border-radius: 13px;
 }
 
 #event-detail-page .ticker_imgmn img {
@@ -1064,7 +1069,7 @@ footer .footer-policybox li a:hover {
 #event-detail-page .info ul li:last-child::before {
     display: none;
 }
-#event-detail-page .event-ticket-box .event_desp h1 img {
+ .event_desp h1 img {
     max-width: 300px;
     display: block;margin-bottom: 11px;
 }
@@ -1082,10 +1087,10 @@ footer .footer-policybox li a:hover {
   margin-right: 5px;
   vertical-align: bottom;
 }
-#event-detail-page .event-ticket-box .event_desp .manage_img img.audi_img {
+ .event_desp .manage_img img.audi_img {
     max-width: 300px;
 }
-#event-detail-page .event-ticket-box .event_desp .manage_img{
+.event_desp .manage_img{
     text-align: left !important;
 }
 
@@ -1154,30 +1159,195 @@ footer .footer-policybox li a:hover {
   margin-top: 30px;
 }
 .event-appointment-sec {
-    padding: 40px 0px;
+    padding: 30px 0px 40px;
     background-color: #f4f9ff;
 }
 .event-appointment-sec h5 {
     font-size: 21px;
+    font-size: 28px;
+    font-weight: 600;
 }
 .event-appo-img .card-img-top {
-    height: 100% !important;
+    height: 100% !important;border-radius: 12px;
 }
-.event-appointment-sec .event-appo-img{height: 210px;}.event-appointment-sec .card-body h6 {font-size: 15px;}
+#event-detail-page .event_desp {
+    padding-bottom: 20px;
+}
+.event-appointment-sec .event-appo-img{height: 210px;}.event-appointment-sec .card-body h6 {font-size: 17px;}
 .event-appointment-sec .slot-btn {
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
     padding-left: 31px !important;
     position: relative;
 }
+.event-appointment-sec .card .card-body p {
+    color: black;
+}
+.event-appointment-sec .card .card-body .card-description p {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.event-appointment-sec .card .card-body p i {
+   color: rgb(33, 166, 122);
+    font-size: 16px;
+}
 .event-appointment-sec .slot-btn input.form-check-input.me-3 {
-    width: 16px;
-    height: 16px;
+    width: 17px;
+    height: 17px;
     top: 15px;
     left: 8px;
     margin: 0 !important;
-    border-radius: 0px;
+    border-radius: 19px;
+}
+.only-single-cart .card .event-appo-img {
+    width: 30%;
+    height: 100%;
+}
+.col-md-12.only-single-cart .appoinment-checkbtn button {
+    width: max-content !important;
+    margin-left: auto;
+    display: block;
+}
+
+
+.only-single-cart .card {
+    display: flex;
+    flex-direction: row;
 }
 /* event detail page end */
+
+/* committee-event-sec css start */
+.committee-event-sec {
+    transition: all 0.3s ease;
+    cursor: pointer;
+    background-image: linear-gradient(104deg, #e2f3ff, transparent);
+}
+.committee-event-sec:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+}
+.committee-event-sec .row {
+    height: 100%;
+}
+
+.committee-event-sec .event-img-wrap {
+    height: 100%;
+    overflow: hidden;
+    border-radius: 10px;
+}
+.committee-event-sec .event-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 10px;
+}
+.committee-event-sec .event-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.committee-event-sec h6 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #222;
+}
+.committee-event-sec .event-location {
+    font-size: 13px;
+    color: #777;
+}
+.committee-event-sec .event-dates {
+    font-size: 13px;
+    color: #444;
+}
+.committee-event-sec .btn {
+    transition: all 0.3s ease;
+        background-color: #e62d56;
+}
+
+/* committee-event-sec css end */
+/* committee-event detail page css start */
+.committee-event-detailpg .custom-card {
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+}
+
+.committee-event-detailpg .custom-input {
+    border-radius: 5px;
+    padding: 9px 14px;
+    border: 1px solid #ced4da !important;
+    font-size: 14px;
+    color: #000;
+    height: auto;
+    background-color: hsl(220, 14%, 96%);
+}
+
+.committee-event-detailpg .custom-input:focus {
+  border-color: #ff5a3c;
+  box-shadow: none;
+}
+
+.committee-event-detailpg .icon-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.committee-event-detailpg .icon-badge.orange {
+  background: #ffe7e2;
+  color: #ff5a3c;
+}
+
+.committee-event-detailpg .icon-badge.purple {
+  background: #f1eaff;
+  color: #7b5cff;
+}
+
+.committee-event-detailpg .btn-copy {
+    background: #e62d56;
+    color: #fff;
+    border-radius: 6px;
+    border: none;
+    min-width: 139px;
+}
+
+.committee-event-detailpg .btn-copy:hover {
+  background: #d61b46;
+}
+
+.committee-event-detailpg .custom-note {
+    border-radius: 12px;
+    font-size: 13px;
+    color: #555;
+}
+
+.committee-event-detailpg .btn-submit {
+    background: #e62d56;
+    color: #fff;
+    padding: 11px;
+    border-radius: 5px;
+    font-weight: 600;
+    border: none;
+    min-width: 120px;
+    margin-left: auto;
+    width: max-content;
+    display: block;
+}
+.committee-event-detailpg .icon-badge::before,
+.committee-event-detailpg .icon-badge::after {
+  content: none !important;
+}
+.committee-event-detailpg .btn-submit:hover {
+  background: #d61b46;
+}
+
+/* committee-event detail page css end */
 /* cart page start */
 #cart {
   margin: 35px 0px 50px;
@@ -1577,6 +1747,9 @@ section#request-demo {
   padding-right: 10px;
   font-size: 14px;
 }
+.freeEventCheck .form-check-input {
+   margin-top: 0px;
+}
 
 .freeEventCheck .form-check-input:checked[type=checkbox] {
   filter: invert(1) !important;
@@ -1772,7 +1945,7 @@ li.menu_line {
 
 #myevent-deshbord .desbord-content table thead th {
     border-bottom: 0px solid #dee2e6;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 400;
     vertical-align: initial;
     /* border-color: #2858a1; */
@@ -1802,13 +1975,12 @@ li.menu_line {
   margin-bottom: 5px;
   padding: 7px 5px;
   font-size: 12px;
-  width: 49%;
+  width: 50%;
   border-radius: 5px;
   display: inline-block;
   margin-left: 0px;
   margin-top: 0px;
   line-height: normal;
-  margin-right: 2px;
 }
 
 .my-ticket-box .Con_center button.edit {
@@ -1843,7 +2015,6 @@ li.menu_line {
 
 .my-ticket-box .Con_center a.enable_btn {
   background: #018e26;
-  margin-right: 5px;
 }
 
 #myevent-deshbord .paginator,
@@ -1968,7 +2139,6 @@ li.menu_line {
     line-height: normal;
     font-weight: 700;
 }
-
 .careyes-chekout-new .cart-mdl-only .cart-mdl-innercontent {
     margin-bottom: 1.5rem;
 }
@@ -1991,7 +2161,6 @@ cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: 0.15s;
     border: 2px solid;border-radius: .5rem;
 }
-
 .careyes-chekout-new .cart-mdl-only .ticket-item.only-ticket {
     border-left-width: 4px;
        border-color: hsl(174 62% 44% / 1);
@@ -2008,11 +2177,9 @@ cubic-bezier(0.4, 0, 0.2, 1);
     background: linear-gradient(135deg, #fffbfb, #efe9dd);
     border: 2px dashed #c9b896;
 }
-
 .careyes-chekout-new .cart-mdl-only .ticket-item.ticket-addon .ticket-infobox:before {
     content: "✨";
 }
-
 .careyes-chekout-new .cart-mdl-only .ticket-item.ticket-addon .addon-badge {
     margin-left: 0.5rem;
     border-radius: 9999px;
@@ -2029,13 +2196,11 @@ cubic-bezier(0.4, 0, 0.2, 1);
     line-height: 1.25rem;
     margin-top: 0px !important;
 }
-
 .careyes-chekout-new .cart-mdl-only .chackout-box {
     background-color: #ede9e0;
     padding: 20px;
     border-radius: 19px;
 }
-
 .careyes-chekout-new .cart-mdl-only .chackout-box h2 {
     font-size: 22px;
 }
@@ -2048,7 +2213,6 @@ cubic-bezier(0.4, 0, 0.2, 1);
     padding: 10px 15px;
     border-radius: 7px;
 }
-
 .careyes-chekout-new .cart-mdl-only .chackout-box .chackout-detabox .delete-btn {
     display: flex;
     justify-content: center;
@@ -2061,7 +2225,6 @@ cubic-bezier(0.4, 0, 0.2, 1);
 }
 /* .careyes-chekout-new .cart-mdl-only .modal-content{  max-width: 1060px;
     margin: auto;} */
-
   .careyes-chekout-new .cart-mdl-only .chackout-box .chackout-detabox .apply-cd.my-3 input.form-control {
     font-size: 13px;
 }
@@ -2069,11 +2232,9 @@ cubic-bezier(0.4, 0, 0.2, 1);
     font-size: 12px;
     margin-bottom: 11px;
 }
-
 /* .careyes-chekout-new .cart-mdl-only {
     max-width: 1060px !important;
 } */
-
 .careyes-chekout-new .cart-mdl-only .only-ticket .counter-btn {
     background-color: black;
     border-radius: 48px; padding: 0px 5px;
@@ -2143,7 +2304,6 @@ cubic-bezier(0.4, 0, 0.2, 1);
     backface-visibility: hidden;
     transform: none !important;
 }
-
 #my-order-module .inner_box .image_br::after {
     position: absolute;
     bottom: 0px;
@@ -2157,12 +2317,10 @@ cubic-bezier(0.4, 0, 0.2, 1);
     min-width: 110px;
     text-align: center;letter-spacing: 0.6px;
 }
-
 #my-order-module .appointment-card .inner_box .image_br::after {
     content: "Appointment";
     background: rgb(57, 131, 197);
 }
-
 #my-order-module .appointment-card .inner_box .ticket-count {
     color: #3983c5;
 }
@@ -2183,7 +2341,6 @@ cubic-bezier(0.4, 0, 0.2, 1);
 #my-order-module .appointment-card .title {
   color: #1e40af;
 }
-
 #my-order-module .inner_box .title {
     font-size: 20px;
     margin-bottom: 8px !important;

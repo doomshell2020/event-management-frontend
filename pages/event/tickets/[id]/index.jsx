@@ -177,7 +177,7 @@ const ManageTickets = () => {
 
                     <div className="event-righcontent">
                         <div className="dsa_contant">
-                            <section id="post-eventpg edit-event-page">
+                            <section id="post-eventpg">
                                 <EventHeaderSection eventDetails={eventDetails} />
 
                                 <h4 className="text-24">Manage Tickets</h4>

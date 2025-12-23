@@ -11,10 +11,9 @@ const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
     const [loading, setLoading] = useState(false);
     const showProgress = isProgressBarShow !== false;
 
-    // console.log('//////////',eventDetails);
-
-
-    // Fetch Event List
+    // ================================
+    // Fetch Event List (ORIGINAL)
+    // ================================
     const fetchEvents = async () => {
         setLoading(true);
         try {
@@ -37,13 +36,11 @@ const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
     }, []);
 
     // ================================
-    // STATIC MENU ORDER (SERIAL BASED)
+    // STATIC MENU ORDER (ORIGINAL)
     // ================================
-
     let steps = [];
 
     if (eventDetails?.entry_type && eventDetails.entry_type !== "event") {
-        // CASE 1 → entry_type ≠ "event"
         steps = [
             {
                 serial: 1,
@@ -72,7 +69,6 @@ const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
             },
         ];
     } else {
-        // CASE 2 → entry_type = "event"
         steps = [
             {
                 serial: 1,
@@ -97,29 +93,6 @@ const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
         ];
     }
 
-    // Highlight Active Step
-    const checkActiveStep = (step) => {
-        const stepSegment = step.path.split("/event/")[1];
-
-        if (pathname?.includes(stepSegment)) {
-            return true;
-        }
-
-        if (
-            step.label == "Manage Tickets" &&
-            (
-                pathname?.includes("/manage-tickets") ||
-                pathname?.includes("/manage-addons") ||
-                pathname?.includes("/manage-questions") ||
-                pathname?.includes("/manage-package")
-            )
-        ) {
-            return true;
-        }
-
-        return false;
-    };
-
     // ================================
     // 🔥 ACTIVE STEP LOGIC (FIXED + SSR SAFE)
     // ================================
@@ -142,9 +115,8 @@ const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
 
     return (
         <>
-            {/* ===== Event Name + Dropdown + View Button ===== */}
+            {/* ===== Event Name + Dropdown + View Button (ORIGINAL) ===== */}
             <div className="event_names d-flex justify-content-between align-items-center p-2 px-3 mb-3">
-
                 {/* Dropdown */}
                 <div className="dropdown">
                     <button
@@ -209,8 +181,8 @@ const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
                     <Link
                         href={`/event/${eventDetails?.id}/${eventDetails?.slug}`}
                         className="btn rounded-md text-sm text-white"
-                        rel="noopener noreferrer"
                         target="_blank"
+                        rel="noopener noreferrer"
                         style={{ backgroundColor: "#00b56a" }}
                     >
                         <i className="bi bi-eye-fill"></i> View Event

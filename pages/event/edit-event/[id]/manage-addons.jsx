@@ -170,8 +170,13 @@ const ManageAddons = () => {
 
                     <div className="event-righcontent">
                         <div className="dsa_contant">
+<<<<<<< HEAD
+                            <section id="post-eventpg">
+                                
+=======
                             <section id="post-eventpg edit-event-page">
 
+>>>>>>> main
                                 <EventHeaderSection eventDetails={eventDetails} />
 
                                 <h4 className="text-24">Manage Tickets</h4>

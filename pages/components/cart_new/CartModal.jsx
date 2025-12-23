@@ -52,7 +52,6 @@ export default function CartModal({ show, handleClose, eventId }) {
     const currencySymbol = eventData?.currencyName?.Currency_symbol || "₹";
     const currencyName = (eventData?.currencyName?.Currency || "INR").toLowerCase();
 
-
     useEffect(() => {
         setIsLoading(loadingCart);
     }, [loadingCart]);
@@ -637,7 +636,9 @@ export default function CartModal({ show, handleClose, eventId }) {
 
     const handlePayNow = async () => {
         if (payLoading) return; // Prevent double click
-        setPayLoading(true);
+        // setPayLoading(true);
+        setShowNextStep(true);
+        return
         try {
             // const res = await api.post("/api/v1/orders/create", {
             //     event_id: eventId,
@@ -1193,6 +1194,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                     })}
 
                                                             </div>
+
                                                         )}
                                                     </Col>
                                                 </Row>

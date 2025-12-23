@@ -126,7 +126,6 @@ export default function CheckOutComponents({
         <Button
           className="p-0 paynow-back"
           onClick={() => showNextStep(false)}
-
         >
           <i className="bi bi-arrow-left fs-4"></i>
         </Button>
@@ -224,7 +223,6 @@ export default function CheckOutComponents({
           </Row>
 
           <Row className="ttl-amts justify-content-between border-0">
-
             <Col md={12}>
               <div className="tct-amt amount-last-row">
                 <p>TOTAL:</p>
