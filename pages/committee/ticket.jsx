@@ -8,7 +8,7 @@ import Cookies from "js-cookie";
 import TicketCountTabs from "@/pages/components/Event/TicketCountTabs";
 
 const CommitteeEventCard = ({ event }) => {
-console.log('event :', event);
+    console.log('event :', event);
     const router = useRouter();
 
     const handleClick = () => {
@@ -17,42 +17,45 @@ console.log('event :', event);
 
     return (
         <div
-            onClick={handleClick}
-            className="d-flex gap-3 p-3 rounded bg-white border shadow-sm cursor-pointer"
-        >
-            {/* IMAGE */}
-            <img
-                src={event.feat_image || "/assets/front-images/event-demo.jpg"}
-                alt={event.name}
-                style={{
-                    width: "140px",
-                    height: "100px",
-                    objectFit: "cover",
-                    borderRadius: "8px",
-                }}
-            />
-
-            {/* DETAILS */}
-            <div style={{ flex: 1 }}>
-                <h5 className="mb-1">{event.name}</h5>
+    onClick={handleClick}
+    className="committee-event-sec bg-white border shadow-sm rounded-3 p-3 cursor-pointer"
+>
+    <div className="row align-items-stretch">
+        <div className="col-4 d-flex">
+            <div className="event-img-wrap w-100 d-flex align-items-center justify-content-center">
+                <img
+                    src={event.feat_image || "/assets/front-images/event-demo.jpg"}
+                    alt={event.name}
+                    className="img-fluid rounded-3"
+                />
+            </div>
+        </div>
+        <div className="col-8 d-flex">
+            <div className="w-100 d-flex flex-column justify-content-center">
+                <h6 className="fw-semibold mb-1">
+                    {event.name}
+                </h6>
 
                 <p className="text-muted mb-2">
                     @{event.location}
                 </p>
-
-                <p className="mb-1 fs-14">
+                <p className="mb-1">
                     📅 <strong>Start:</strong> {event.date_from?.local}
                 </p>
 
-                <p className="mb-2 fs-14">
+                <p className="mb-2">
                     📅 <strong>End:</strong> {event.date_to?.local}
                 </p>
 
-                <span className="badge bg-danger px-3 py-2">
+                <span className="btn text-white btn-sm rounded-pill align-self-start px-3">
                     View Requests →
                 </span>
             </div>
         </div>
+
+    </div>
+</div>
+
     );
 };
 
@@ -122,7 +125,7 @@ export async function getServerSideProps(context) {
 }
 
 const CommitteePage = ({ counts, eventsList }) => {
-// console.log('eventsList :', eventsList);
+    // console.log('eventsList :', eventsList);
 
     const [activeTab, setMyActiveTab] = useState("ticket");
     const router = useRouter()
@@ -176,7 +179,7 @@ const CommitteePage = ({ counts, eventsList }) => {
                         {/* EVENTS GRID (6-6) */}
                         <div className="row mt-4">
                             {eventsList.map((event) => (
-                                <div key={event.id} className="col-md-6 mb-4">
+                                <div key={event.id} className="col-md-6 mb-3">
                                     <CommitteeEventCard event={event} />
                                 </div>
                             ))}

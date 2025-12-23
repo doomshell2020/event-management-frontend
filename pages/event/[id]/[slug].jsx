@@ -619,4 +619,6 @@ const EventDetailPage = ({ event, slug }) => {
   );
 };
 
+
+
 export default EventDetailPage;
