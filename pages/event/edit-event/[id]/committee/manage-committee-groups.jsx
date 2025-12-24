@@ -7,7 +7,6 @@ import FrontendFooter from "@/shared/layout-components/frontelements/frontendfoo
 import EventSidebar from "@/pages/components/Event/EventSidebar";
 import EventHeaderSection from "@/pages/components/Event/EventProgressBar";
 import { Form, Button, Modal } from "react-bootstrap";
-import { Dropdown } from "react-bootstrap";
 
 import api from "@/utils/api";
 
@@ -190,12 +189,12 @@ const CommitteeTicketsPage = () => {
                                 />
 
                                 <h4 className="text-24">
-                                    Committee Ticket Distribution
+                                    Committee Groups Distribution
                                 </h4>
                                 <hr className="custom-hr" />
 
                                 <p className="text-14 text-dark">
-                                   You can add users to manage your events here. 'Add' adds the number to the total ticket count for the user. 'Replace' replaces the amount of tickets the user has available for purchase and will not affect tickets sold so far.
+                                    Committee groups persist across events. This is a convenient way to manage different lists of committee members for different events or the even same event.
                                 </p>
 
                                 {/* TABS */}
@@ -246,166 +245,28 @@ const CommitteeTicketsPage = () => {
 
 
                                         <div className="card">
-                                            <div className="table-container-box shadow-sm mb-4 p-3">
-                                                {/* first table start*/}
-                                                <div className="card-header card-header fw-bold px-0 fs-6 pt-1 text-dark">
-                                                    Total Tickets Alotted
-                                                </div>
-
-                                                <div className="d-flex justify-content-between align-items-center my-2 ">
-                                                    <div className="d-flex align-items-center gap-2 w-25">
-                                                        <span>Show</span>
-                                                        <select className="form-select form-select-sm py-1">
-                                                            <option value="10">10</option>
-                                                            <option value="25">25</option>
-                                                            <option value="50">50</option>
-                                                        </select>
-                                                        <span>entries</span>
-                                                    </div>
-
-                                                    <div className="d-flex align-items-center gap-2">
-                                                        <label className="mb-0">Search:</label>
-                                                        <input
-                                                            type="text"
-                                                            className="form-control form-control-sm w-auto"
-                                                        />
-                                                    </div>
-                                                </div>
-
-                                                {/* TABLE */}
-                                                <div className="table-responsive">
-                                                    <table className="table table-bordered text-center align-middle mb-2 table-border-dark-soft">
-                                                        <thead className="table-primary">
-                                                            <tr>
-                                                                <th>Comps ($0.00)</th>
-                                                                <th>Test Ticket ($120.00)</th>
-                                                                <th>Total</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr>
-                                                                <td>3</td>
-                                                                <td>5</td>
-                                                                <td>8</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-
-                                                {/* FOOTER */}
-                                                <div className="d-flex justify-content-between align-items-center">
-
-                                                    <div className="fw-medium text-secondary" style={{ fontSize: "13px" }}>
-                                                        Showing 1 to 1 of 1 entries
-                                                    </div>
-
-                                                    <div className="d-flex align-items-center gap-2">
-                                                        <button className="btn btn-outline-secondary btn-sm" disabled>
-                                                            Previous
-                                                        </button>
-
-                                                        <button className="btn btn-danger btn-sm text-white">
-                                                            1
-                                                        </button>
-
-                                                        <button className="btn btn-primary btn-sm">
-                                                            Next
-                                                        </button>
-                                                    </div>
-
-                                                </div>
-
-                                                {/* first table and*/}
-                                            </div>
-
                                             <div className="table-container-box shadow-sm p-3">
-                                                <div className="card-header fw-semibold fw-bold  fs-6 text-dark px-0 pt-0 mb-3">
-                                                    Ungrouped
+                                                <h6>Add New Groups</h6>
+                                                <div className="d-flex justify-content-between align-items-center my-2">
+                                                    <input
+                                                        type="text"
+                                                        className="form-control me-2"
+                                                        placeholder="Enter group name"
+                                                        style={{ flex: 1 }}
+                                                    />
+                                                    <button className="btn save next primery-button fw-normal">Add</button>
                                                 </div>
-
-                                                <div className="table-responsive">
-                                                    <table className="table table-bordered mb-0">
-                                                        <thead className="table-primary">
-                                                            <tr>
-                                                                <th>Sr.no</th>
-                                                                <th>Action</th>
-                                                                <th>User</th>
-
-                                                                {ticketTypes.map((t) => (
-                                                                    <th key={t.id} className="text-center">
-                                                                        {t.title}
-                                                                        <br />
-                                                                        <small>(₹{t.price})</small>
-                                                                    </th>
-                                                                ))}
-                                                            </tr>
-                                                        </thead>
-
-
-                                                        <tbody>
-                                                            {groupedData.map((row, idx) => (
-                                                                <tr key={idx}>
-                                                                    <td className="text-center">{idx + 1}</td>
-
-                                                                    {/* ACTION DROPDOWN */}
-                                                                    <td className="text-center">
-                                                                        <Dropdown align="end">
-                                                                            <Dropdown.Toggle
-                                                                                variant="danger"
-                                                                                size="sm"
-                                                                                id={`dropdown-${row.id}`}
-                                                                            >
-                                                                                ⚙
-                                                                            </Dropdown.Toggle>
-
-                                                                            <Dropdown.Menu>
-                                                                                <Dropdown.Item onClick={() => openEditModal(row)}>
-                                                                                    ✏ Edit
-                                                                                </Dropdown.Item>
-
-                                                                                <Dropdown.Divider className="m-0" />
-
-                                                                                <Dropdown.Item>
-                                                                                    👁 Hide
-                                                                                </Dropdown.Item>
-
-                                                                                <Dropdown.Divider className="m-0" />
-
-                                                                                <Dropdown.Item>
-                                                                                    📊 Sale Summary
-                                                                                </Dropdown.Item>
-                                                                            </Dropdown.Menu>
-                                                                        </Dropdown>
-                                                                    </td>
-
-
-
-
-                                                                    {/* USER INFO */}
-                                                                    <td>
-                                                                        <div className="fw-semibold">
-                                                                            {row.user.first_name} {row.user.last_name}
-                                                                        </div>
-                                                                        <div className="text-muted text-12">
-                                                                            {row.user.email}
-                                                                        </div>
-                                                                        <div className="text-muted text-12">
-                                                                            {row.user.mobile || "N/A"}
-                                                                        </div>
-                                                                    </td>
-
-                                                                    {ticketTypes.map((t) => (
-                                                                        <td key={t.id} className="text-center fw-semibold">
-                                                                            {row.tickets[t.id] || 0}
-                                                                        </td>
-                                                                    ))}
-                                                                </tr>
-                                                            ))}
-                                                        </tbody>
-
-                                                    </table>
-                                                </div>
+                                                <h6 className="mt-4">Add New Groups</h6>
                                             </div>
+
+                                            <div className="d-flex justify-content-between align-items-center my-3">
+                                                <button className="btn primery-button fw-normal text-14">Previous</button>
+                                                <button className="btn btn save next primery-button fw-normal text-14">Next</button>
+                                            </div>
+
+
+
+
                                         </div>
 
                                     )}

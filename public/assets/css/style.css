@@ -1348,6 +1348,13 @@ footer .footer-policybox li a:hover {
 }
 
 /* committee-event detail page css end */
+
+.table-bordered th, .table-bordered td {
+    border: 1px solid #ebebeb;
+}
+
+.table-container-box .table thead tr{background-color: #3d6db5;}
+.table-container-box .table thead tr th{background-color: transparent; color: white;font-size: 13px;}
 /* cart page start */
 #cart {
   margin: 35px 0px 50px;
@@ -2582,14 +2589,13 @@ cubic-bezier(0.4, 0, 0.2, 1);
 /* manage ticket pg end */
 /* manage committee page start*/
 #myevent-deshbord .Committee {
-  background: #f1f1f1;
-  padding: 10px 20px;
+  padding: 0px 0px;
 }
 
 .import_committee h6,
 .Committee h6 {
-  font-size: 18px;
-  margin-bottom: 20px;
+  font-size: 15px;
+  margin-bottom: 15px;
   margin-top: 15px;
 }
 
@@ -2608,9 +2614,9 @@ cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 #myevent-deshbord .Committee input {
-  border: 1px solid #ced4da !important;
+    border: 1px solid #ced4da !important;
+    padding: 9px;
 }
-
 .input-group-text {
   color: black;
 }
@@ -2643,18 +2649,24 @@ cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .Committee table .table-detail tr th {
-  background-color: transparent;
+    padding: 9px 7px;
+    background-color: transparent;
+    font-size: 12px;
 }
+
 
 .Committee table tbody tr td {
   border-bottom: transparent;
-  font-size: 14px;
+  font-size: 12px;
   color: #000;
+  
 }
 
 .import_committee {
-  background: #e4f1fb;
-  padding: 10px 20px;
+    background: #e4f1fb;
+    padding: 10px 20px;
+    border-radius: 9px;
+    border-top: 4px solid #3d6db5;
 }
 
 /* add ticket and complimentry model start*/
