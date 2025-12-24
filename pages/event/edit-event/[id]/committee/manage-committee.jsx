@@ -184,7 +184,11 @@ const MyEventsPage = () => {
                                 <ul className="tabes d-flex ps-0">
                                     <li><Link href={`/event/edit-event/${id}/committee/manage-committee`} className="active text-16">Manage</Link></li>
                                     <li><Link href={`/event/edit-event/${id}/committee/manage-committee-tickets`} className="text-16">Tickets</Link></li>
-                                    <li><Link href="/" className="text-16">Groups</Link></li>
+                                    <li>
+                                        <Link href={`/event/edit-event/${id}/committee/manage-committee-groups`} className="text-16">
+                                            Groups
+                                        </Link>
+                                    </li>
                                 </ul>
 
                                 <div className="contant_bg">

@@ -217,7 +217,7 @@ const CommitteeTicketsPage = () => {
                                         </Link>
                                     </li>
                                     <li>
-                                        <Link href="/" className="text-16">
+                                        <Link href={`/event/edit-event/${id}/committee/manage-committee-groups`} className="text-16">
                                             Groups
                                         </Link>
                                     </li>
