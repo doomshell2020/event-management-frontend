@@ -605,6 +605,104 @@ export default function CartModal({ show, handleClose, eventId }) {
         }
     };
 
+    const increasePackage = async (pkg) => {
+        const packageId = pkg?.id;
+        if (!packageId) return;
+
+        try {
+            setLoadingId(`package-${packageId}`);
+
+            const existing = cart.find(
+                item => item.item_type == "package" && item.uniqueId == packageId
+            );
+
+            const currentCount = existing?.count || 0;
+            const maxLimit = pkg?.limit || pkg?.max_quantity;
+
+            // 🚫 Limit validation
+            if (maxLimit && currentCount >= maxLimit) {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Limit Reached",
+                    text: `Maximum ${maxLimit} packages allowed.`
+                });
+                return;
+            }
+
+            if (existing) {
+                await increaseCart(existing.id);
+            } else {
+                await addToCart({
+                    event_id: eventId,
+                    item_type: "package",
+                    package_id: packageId,
+                    count: 1
+                });
+            }
+
+            await refreshCart(eventId);
+
+        } catch (err) {
+
+            if (err?.response?.status == 409) {
+                const result = await Swal.fire({
+                    title: "Items from another event found!",
+                    text: err?.response?.data?.message || "Clear cart to continue?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, Clear Cart",
+                    reverseButtons: true
+                });
+
+                if (!result.isConfirmed) return;
+
+                Swal.fire({ title: "Clearing Cart...", didOpen: () => Swal.showLoading() });
+                await clearCart();
+                Swal.close();
+
+                await addToCart({
+                    event_id: eventId,
+                    item_type: "package",
+                    package_id: packageId,
+                    count: 1
+                });
+
+                await refreshCart(eventId);
+            }
+
+        } finally {
+            setLoadingId(null);
+        }
+    };
+
+    const decreasePackage = async (pkg) => {
+        const packageId = pkg?.id;
+        if (!packageId) return;
+
+        try {
+            setLoadingId(`package-${packageId}`);
+
+            const existing = cart.find(
+                item => item.item_type == "package" && item.uniqueId == packageId
+            );
+
+            if (!existing) return;
+
+            if (existing.count > 1) {
+                await decreaseCart(existing.id);
+            } else {
+                await deleteCart(existing.id);
+            }
+
+            await refreshCart(eventId);
+
+        } catch (err) {
+            console.log("Decrease package error:", err);
+        } finally {
+            setLoadingId(null);
+        }
+    };
+
     // Calculate Totals
     const totalTickets = cart.reduce((n, item) => n + item.count, 0);
     const sub_total = cart.reduce(
@@ -753,7 +851,7 @@ export default function CartModal({ show, handleClose, eventId }) {
     // Store selected committee member per ticket
     const [selectedMembers, setSelectedMembers] = useState({});
 
-    const requestCommitteeTicket = async (ticket, selectedMember) => {  
+    const requestCommitteeTicket = async (ticket, selectedMember) => {
 
         // 1️⃣ Prepare question answers
         const questionAnswers = buildQuestionAnswers(ticket.id);
@@ -836,7 +934,6 @@ export default function CartModal({ show, handleClose, eventId }) {
             };
         });
     };
-
 
     const validateTicketQuestions = (ticketId, ticketQuestions) => {
 
@@ -943,6 +1040,115 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                             <div className="ticket-section">
                                                                 <h5 className="mb-3">Available Tickets</h5>
 
+                                                                {/* 📦 PACKAGES */}
+                                                                {eventData.package
+                                                                    ?.filter(pkg => pkg.hidden != "Y" && pkg.status == "Y")
+                                                                    .map((pkg, i) => (
+                                                                        <div
+                                                                            key={`package-${i}`}
+                                                                            className="ticket-item only-ticket package-box"
+                                                                            style={{
+                                                                                border: "1px solid #e6e6e6",
+                                                                                borderRadius: "8px",
+                                                                                padding: "14px 16px",
+                                                                                marginBottom: "12px",
+                                                                                background: "#fafafa"
+                                                                            }}
+                                                                        >
+                                                                            {/* HEADER */}
+                                                                            <div className="d-flex justify-content-between align-items-center mb-2">
+                                                                                <div>
+                                                                                    <strong style={{ fontSize: "16px" }}>
+                                                                                        {pkg.name}
+                                                                                        <span
+                                                                                            style={{
+                                                                                                marginLeft: 8,
+                                                                                                fontSize: 11,
+                                                                                                padding: "2px 8px",
+                                                                                                background: "#6f42c1",
+                                                                                                color: "#fff",
+                                                                                                borderRadius: 12
+                                                                                            }}
+                                                                                        >
+                                                                                            PACKAGE
+                                                                                        </span>
+                                                                                    </strong>
+
+                                                                                    {/* <div className="text-muted text-13 mt-1">
+                                                                                        Limit: {pkg.package_limit}
+                                                                                    </div> */}
+                                                                                </div>
+
+                                                                                <div className="text-end">
+                                                                                    <div style={{ fontSize: 14 }}>
+                                                                                        Total: <strong>{currencySymbol}{formatPrice(pkg.total)}</strong>
+                                                                                    </div>
+
+                                                                                    {pkg.discount_amt > 0 && (
+                                                                                        <div className="text-success text-13">
+                                                                                            Discount: −{currencySymbol}{formatPrice(pkg.discount_amt)}
+                                                                                        </div>
+                                                                                    )}
+
+                                                                                    <div style={{ fontSize: 15, fontWeight: 600 }}>
+                                                                                        Pay: {currencySymbol}{formatPrice(pkg.grandtotal)}
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+
+                                                                            {/* PACKAGE ITEMS */}
+                                                                            <div className="mt-2">
+                                                                                {pkg.details.map((item, idx) => (
+                                                                                    <div
+                                                                                        key={idx}
+                                                                                        className="d-flex justify-content-between align-items-center py-1"
+                                                                                        style={{ fontSize: 14 }}
+                                                                                    >
+                                                                                        <div>
+                                                                                            {item.ticketType && (
+                                                                                                <>
+                                                                                                    🎟️ {item.ticketType.title}
+                                                                                                    <span className="text-muted"> × {item.qty}</span>
+                                                                                                </>
+                                                                                            )}
+
+                                                                                            {item.addonType && (
+                                                                                                <>
+                                                                                                    ➕ {item.addonType.name}
+                                                                                                    <span className="text-muted"> × {item.qty}</span>
+                                                                                                </>
+                                                                                            )}
+                                                                                        </div>
+
+                                                                                        <div className="text-muted">
+                                                                                            {currencySymbol}
+                                                                                            {formatPrice(
+                                                                                                (item.ticketType?.price || item.addonType?.price || 0) * item.qty
+                                                                                            )}
+                                                                                        </div>
+                                                                                    </div>
+                                                                                ))}
+                                                                            </div>
+
+                                                                            {/* ACTION */}
+                                                                            <div className="text-end mt-3 d-flex justify-content-end">
+
+                                                                                <Counter
+                                                                                    count={
+                                                                                        cart.find(
+                                                                                            item => item.item_type == "package" && item.uniqueId == pkg.id
+                                                                                        )?.count || 0
+                                                                                    }
+                                                                                    loading={loadingId == `package-${pkg.id}`}
+                                                                                    onInc={() => increasePackage(pkg)}
+                                                                                    onDec={() => decreasePackage(pkg)}
+                                                                                />
+                                                                            </div>
+
+                                                                        </div>
+                                                                    ))}
+
+
                                                                 {/* 🎟️ TICKETS */}
                                                                 {eventData.tickets
                                                                     ?.filter(ticket => ticket.hidden !== "Y")
@@ -1030,7 +1236,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                                         ) : (
                                                                                             selectedMembers[ticket.id] && (
                                                                                                 <button
-                                                                                                    className="btn btn-sm request-committee-btn"
+                                                                                                    className="btn btn-sm primery-button"
                                                                                                     onClick={() => {
                                                                                                         const ticketQuestions = eventData.questions?.filter(q =>
                                                                                                             q.ticket_type_id
@@ -1057,6 +1263,8 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                                                 >
                                                                                                     Request
                                                                                                 </button>
+
+
                                                                                             )
                                                                                         )
                                                                                     ) : (
@@ -1130,7 +1338,6 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                             </div>
                                                                         );
                                                                     })}
-
 
                                                                 {/* ➕ ADDONS */}
                                                                 {eventData.addons
