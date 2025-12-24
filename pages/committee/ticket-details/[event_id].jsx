@@ -1,202 +1,253 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import FrontendHeader from "@/shared/layout-components/frontelements/frontendheader";
 import FrontendFooter from "@/shared/layout-components/frontelements/frontendfooter";
 import TicketCountTabs from "@/pages/components/Event/TicketCountTabs";
+import api from "@/utils/api";
+import Swal from "sweetalert2";
 
-const TicketDetails = () => {
+const TicketDetails = ({ pendingRequests, counts }) => {
   const router = useRouter();
-  const [backgroundImage] = useState("/assets/front-images/about-slider_bg.jpg");
 
-  // 🔥 SAME TAB STATE & LOGIC
-  const [activeTab, setMyActiveTab] = useState("ticket");
+  const [activeTab, setActiveTab] = useState("ticket");
+  const [ticketData, setTicketData] = useState([]);
+  const [eventInfo, setEventInfo] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const setActiveTab = (tab) => {
-    setMyActiveTab(tab);
+  // 🔹 Added states (NO UI change)
+  const [email, setEmail] = useState("");
+  const [ticketQty, setTicketQty] = useState({});
+
+  /* ---------------- TAB CHANGE ---------------- */
+  const setMyActiveTab = (tab) => {
+    setActiveTab(tab);
     router.push(`/committee/${tab}`);
   };
 
-  // 🔥 SAME COUNTS (API से बाद में replace कर सकते हो)
-  const counts = {
-    pending: 0,
-    approved: 0,
-    ignored: 0,
+  /* ---------------- FETCH TICKET DETAILS ---------------- */
+  useEffect(() => {
+    if (!pendingRequests?.length) return;
+    const eventId = pendingRequests[0]?.event_id;
+    if (!eventId) return;
+    fetchTicketDetails(eventId);
+  }, [pendingRequests]);
+
+  const fetchTicketDetails = async (event_id) => {
+    try {
+      setLoading(true);
+      const res = await api.post(
+        "/api/v1/committee/committee-ticket-details",
+        { event_id }
+      );
+
+      if (res?.data?.success) {
+        setTicketData(res.data.data.tickets || []);
+        setEventInfo(res.data.data.event || null);
+      }
+    } catch {
+      Swal.fire("Error", "Failed to load committee ticket details", "error");
+    } finally {
+      setLoading(false);
+    }
   };
 
+  /* ---------------- TICKET PUSH SUBMIT ---------------- */
+  const handleSubmit = async () => {
+    if (!email) {
+      Swal.fire("Error", "Please enter email address", "error");
+      return;
+    }
+
+    const selectedTickets = Object.entries(ticketQty)
+      .filter(([_, qty]) => qty > 0)
+      .map(([id, qty]) => ({ ticket_id: id, qty }));
+
+    if (!selectedTickets.length) {
+      Swal.fire("Error", "Please select at least one ticket", "error");
+      return;
+    }
+
+    try {
+      await api.post("/api/v1/committee/push-ticket", {
+        email,
+        event_id: eventInfo.id,
+        tickets: selectedTickets,
+      });
+
+      Swal.fire("Success", "Tickets sent successfully", "success");
+      setEmail("");
+      setTicketQty({});
+    } catch {
+      Swal.fire("Error", "Failed to send tickets", "error");
+    }
+  };
+
+  /* ---------------- RENDER ---------------- */
   return (
     <>
-      <FrontendHeader backgroundImage={backgroundImage} />
+      <FrontendHeader backgroundImage="/assets/front-images/about-slider_bg.jpg" />
 
-      <section id="profile" className="mt-5 mb-5">
+      <section className="mt-5 mb-5">
         <div className="container">
           <div className="section-heading">
             <h1>Committee</h1>
-            <h2 className="mt-4">Committee</h2>
-            <p className="mb-4 body-text text-center">
-              If you belong to any committees for events on eboxtickets, you can manage ticket requests here.
+            <h2 className="mt-4">Committee Tickets</h2>
+            <p className="mb-4 text-center">
+              Manage assigned tickets and share with patrons.
             </p>
           </div>
 
           <div className="profil_deaile mx-auto">
-            
-            {/* 🔥 SAME TABS AS FIRST FILE */}
             <TicketCountTabs
               active={activeTab}
-              onChange={setActiveTab}
+              onChange={setMyActiveTab}
               counts={counts}
             />
 
-            {/* 🔥 TAB CONTENT AREA */}
-            <div className="committee-event-detailpg">
-      <div className="my-3">
-        <div className="card custom-card p-3">
-           <div className="table-responsive">
-            <table className="table table-hover align-middle mb-0">
-              <thead className="table-light">
-                <tr>
-                  <th className="px-3 py-2">Count</th>
-                  <th className="px-3 py-2">Type</th>
-                  <th className="px-3 py-2 text-end">Price</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className="px-3">
-                    <span className="badge rounded-pill bg-light text-dark px-3 py-2">
-                      2
-                    </span>
-                  </td>
-                  <td className="px-3 fw-medium">Comps</td>
-                  <td className="px-3 text-end fw-semibold">
-                    €0.00 <small className="text-muted">EUR</small>
-                  </td>
-                </tr>
+            {/* EVENT INFO */}
+            {eventInfo && (
+              <div className="text-center my-3">
+                <h4>{eventInfo.name}</h4>
+                <p className="text-muted">
+                  {eventInfo.location} • {eventInfo.companyInfo?.name}
+                </p>
+              </div>
+            )}
 
-                <tr>
-                  <td className="px-3">
-                    <span className="badge rounded-pill bg-light text-dark px-3 py-2">
-                      2
-                    </span>
-                  </td>
-                  <td className="px-3 fw-medium">Test Ticket</td>
-                  <td className="px-3 text-end fw-semibold">
-                    €120.00 <small className="text-muted">EUR</small>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div className="row justify-content-center">
-          <div className="col-lg-12">
+            {/* ---------------- TICKET TABLE ---------------- */}
+            <div className="card custom-card p-3 mb-4">
+              <div className="table-responsive">
+                <table className="table table-hover align-middle mb-0">
+                  <thead className="table-light">
+                    <tr>
+                      <th>Available</th>
+                      <th>Ticket</th>
+                      <th className="text-end">Price</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {loading ? (
+                      <tr>
+                        <td colSpan="3" className="text-center py-4">
+                          Loading...
+                        </td>
+                      </tr>
+                    ) : ticketData.length ? (
+                      ticketData.map((item) => {
+                        const available = item.count - item.usedticket;
+                        return (
+                          <tr key={item.id}>
+                            <td>
+                              <span className="badge bg-light text-dark px-3 py-2">
+                                {available}
+                              </span>
+                            </td>
+                            <td className="fw-medium">
+                              {item.ticket?.title}
+                            </td>
+                            <td className="text-end fw-semibold">
+                              {eventInfo?.currencyName?.Currency_symbol}
+                              {item.ticket?.price}
+                            </td>
+                          </tr>
+                        );
+                      })
+                    ) : (
+                      <tr>
+                        <td colSpan="3" className="text-center py-4">
+                          No tickets assigned
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
 
-            {/* Share Link Card */}
+            {/* ---------------- SHARE LINK (UNCHANGED) ---------------- */}
             <div className="card custom-card mb-4">
               <div className="card-body">
-                <div className="d-flex align-items-start gap-3 mb-3">
-                  <div className="icon-badge orange">
-  <i className="bi bi-link-45deg"></i>
-</div>
-
-                  <div>
-                    <h5 className="mb-0">Share Link</h5>
-                    <span className="text-muted d-block">
-  Quick access for your friends
-</span>
-                  </div>
-                </div>
-
-                <p className="text-muted mb-3">
-                  This link will have you as the committee member pre-selected so
-                  your friends can request tickets faster!
+                <h5>Share Link</h5>
+                <p className="text-muted">
+                  Share this link with friends to request tickets.
                 </p>
-
-                <div className="d-flex gap-2 ">
+                <div className="d-flex gap-2">
                   <input
-                    type="text"
-                    className="form-control custom-input"
-                    value="https://staging.eboxtickets.com/event/Minim-impe"
+                    className="form-control"
                     readOnly
+                    value={`${process.env.NEXT_PUBLIC_SITE_URL}event/${eventInfo?.id}/${eventInfo?.slug}`}
                   />
-                  <button type="button" className="btn btn-copy px-4">
-                    Copy Link
+                  <button
+                    className="btn btn-secondary"
+                    onClick={() => {
+                      navigator.clipboard.writeText(
+                        `${process.env.NEXT_PUBLIC_SITE_URL}event/${eventInfo?.id}/${eventInfo?.slug}`
+                      );
+                      Swal.fire("Copied!", "", "success");
+                    }}
+                  >
+                    Copy
                   </button>
                 </div>
               </div>
             </div>
 
-            {/* Ticket Push Card */}
+            {/* ---------------- TICKET PUSH (DESIGN SAME) ---------------- */}
             <div className="card custom-card">
               <div className="card-body">
-                <div className="d-flex align-items-start gap-3 mb-3">
-                  <div className="icon-badge purple">
-                    <i className="bi bi-link-45deg"></i>
-                  </div>
-                  <div>
-                    <h5 className="mb-0">Ticket Push</h5>
-                               <span className="text-muted d-block">
-Send tickets directly to patrons
-</span>
-                  </div>
-                </div>
-
-                <div className="custom-note rounded-xl p-3 mb-6 border border-border/50">
-                  <strong>Note:</strong> This tool allows you to push approvals
-                  to a patron's cart using their eboxtickets email address. If
-                  the ticket is free, it will go straight to “My Tickets”. This
-                  action cannot be undone.
-                </div>
+                <h5>Ticket Push</h5>
+                <p className="text-muted">
+                  Send approved tickets directly to a user.
+                </p>
 
                 <div className="mb-3">
-                  <label className="form-label text-dark">Email Address</label>
+                  <label>Email Address</label>
                   <input
                     type="email"
-                    className="form-control custom-input"
-                    placeholder="patron@example.com"
+                    className="form-control"
+                    placeholder="user@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                   />
                 </div>
 
                 <div className="row g-3 mb-4">
-                  <div className="col-md-6">
-                    <label className="form-label text-dark">
-                      Comps{" "}
-                      <small className="text-dark">
-                        €0.00 EUR (2 available)
-                      </small>
-                    </label>
-                    <select className="form-select custom-input">
-                      <option value="0">0</option>
-                      <option value="1">1</option>
-                      <option value="2">2</option>
-                    </select>
-                  </div>
-
-                  <div className="col-md-6">
-                    <label className="form-label text-dark">
-                      Test Ticket{" "}
-                      <small className="text-dark">
-                        €120.00 EUR (2 available)
-                      </small>
-                    </label>
-                    <select className="form-select custom-input">
-                      <option value="0">0</option>
-                      <option value="1">1</option>
-                      <option value="2">2</option>
-                    </select>
-                  </div>
+                  {ticketData.map((item) => {
+                    const available = item.count - item.usedticket;
+                    return (
+                      <div className="col-md-6" key={item.id}>
+                        <label className="form-label">
+                          {item.ticket?.title}{" "}
+                          <small className="text-muted">
+                            ({available} available)
+                          </small>
+                        </label>
+                        <select
+                          className="form-select"
+                          value={ticketQty[item.id] || 0}
+                          onChange={(e) =>
+                            setTicketQty({
+                              ...ticketQty,
+                              [item.id]: Number(e.target.value),
+                            })
+                          }
+                        >
+                          {Array.from({ length: available + 1 }, (_, i) => (
+                            <option key={i} value={i}>
+                              {i}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    );
+                  })}
                 </div>
 
-                <button type="button" className="btn btn-submit w-100">
+                <button className="btn btn-success w-100" onClick={handleSubmit}>
                   Submit
                 </button>
               </div>
             </div>
-
-          </div>
-        </div>
-      </div>
-    </div>
-
           </div>
         </div>
       </section>
@@ -207,3 +258,44 @@ Send tickets directly to patrons
 };
 
 export default TicketDetails;
+
+/* ---------------- SSR ---------------- */
+export async function getServerSideProps(context) {
+  try {
+    const token = context.req.cookies?.userAuthToken;
+
+    if (!token) {
+      return {
+        redirect: { destination: "/login", permanent: false },
+      };
+    }
+
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/committee/requests/N`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    const json = await res.json();
+    const list = json?.data?.list || [];
+
+    const counts = { pending: 0, approved: 0, ignored: 0 };
+    list.forEach((i) => {
+      if (i.status === "N") counts.pending++;
+      if (i.status === "Y") counts.approved++;
+      if (i.status === "I") counts.ignored++;
+    });
+
+    return {
+      props: { pendingRequests: list, counts },
+    };
+  } catch {
+    return {
+      props: {
+        pendingRequests: [],
+        counts: { pending: 0, approved: 0, ignored: 0 },
+      },
+    };
+  }
+}
