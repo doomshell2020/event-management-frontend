@@ -210,7 +210,7 @@ const CommitteeTicketsPage = () => {
                                     <li>
                                         <Link
                                             href={`/event/edit-event/${id}/committee/manage-committee-tickets`}
-                                            className="active text-16"
+                                            className=" text-16"
                                         >
                                             Tickets
                                         </Link>
@@ -244,7 +244,7 @@ const CommitteeTicketsPage = () => {
 
 
 
-                                        <div className="card">
+                                        <div className="card px-3">
                                             <div className="table-container-box shadow-sm p-3">
                                                 <h6>Add New Groups</h6>
                                                 <div className="d-flex justify-content-between align-items-center my-2">

@@ -186,7 +186,7 @@ const MyEventsPage = () => {
                                     <li><Link href={`/event/edit-event/${id}/committee/manage-committee-tickets`} className="text-16">Tickets</Link></li>
                                     <li><Link
                                         href={`/event/edit-event/${id}/committee/manage-committee-groups`}
-                                        className="active text-16"
+                                        className=" text-16"
                                     >
                                         Groups
                                     </Link></li>
