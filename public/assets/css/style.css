@@ -1359,6 +1359,21 @@ ease;
 
 .table-container-box .table thead tr{background-color: #3d6db5;}
 .table-container-box .table thead tr th{background-color: transparent; color: white;font-size: 13px;}
+
+/* analitics page css start */
+span.ticket-icon-circle {
+    width: 36px;
+    height: 36px;
+    background: #eef2ff;
+    color: #4f46e5;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* analitics page css start */
+
 /* cart page start */
 #cart {
   margin: 35px 0px 50px;
