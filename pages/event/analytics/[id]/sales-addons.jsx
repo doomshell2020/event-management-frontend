@@ -188,7 +188,7 @@ const CommitteeTicketsPage = () => {
 
                                 </div>
                                 <h4 className="text-24">
-                                    Dashboard
+                                    Sales
                                 </h4>
                                 <hr className="custom-hr" />
                                 <div className="d-flex align-items-end justify-content-between ">
@@ -220,7 +220,10 @@ const CommitteeTicketsPage = () => {
                                         </li>
                                     </ul>
                                     <div className="h-100" style={{ minWidth: "150px" }}>
-                                        <button className="d-flex align-items-center gap-2 bg-dark text-white px-4 py-2 rounded text-sm fw-medium">
+                                        <button
+                                            className="d-flex align-items-center gap-2 text-white px-3 py-2 rounded text-sm fw-medium border-0"
+                                            style={{ backgroundColor: "#3d6db5" }}
+                                        >
                                             <svg
                                                 xmlns="http://www.w3.org/2000/svg"
                                                 width="18"
@@ -245,155 +248,7 @@ const CommitteeTicketsPage = () => {
                                 </div>
 
                                 <div className="contant_bg">
-                                    <div className="card p-2">
-                                        <div className="d-flex align-items-center gap-2 pb-3 border-bottom ">
-                                            <span className="ticket-icon-circle">
-                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" > <path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4V7z" /> <line x1="12" y1="5" x2="12" y2="19" strokeDasharray="2 2" /> </svg>
-                                            </span>
-                                            <h5 className="mb-0 fw-semibold body-text fw-bold">Sales by Ticket</h5>
-                                        </div>
-
-                                        {/* Table */}
-                                        <div className="table-responsive">
-                                            <table className="table align-middle mb-0">
-                                                <thead className="table-light small text-uppercase">
-                                                    <tr>
-                                                        <th>Ticket Type</th>
-                                                        <th className="text-end">Price</th>
-                                                        <th className="text-end">Count</th>
-                                                        <th className="text-end">Total</th>
-                                                    </tr>
-                                                </thead>
-
-                                                <tbody>
-                                                    <tr>
-                                                        <td className="fw-medium">Comps</td>
-                                                        <td className="text-end">€0.00</td>
-                                                        <td className="text-end">1</td>
-                                                        <td className="text-end">€0.00</td>
-                                                    </tr>
-
-                                                    {/* Total Row */}
-                                                    <tr className="total-row">
-                                                        <td className="fw-semibold">Total</td>
-                                                        <td></td>
-                                                        <td className="text-end fw-semibold">1</td>
-                                                        <td className="text-end fw-semibold">€0.00</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                    <div className="card p-2">
-                                        <div className="d-flex align-items-center gap-2 pb-3 border-bottom ">
-                                            <span className="ticket-icon-circle">
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    width="18"
-                                                    height="18"
-                                                    viewBox="0 0 24 24"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    strokeWidth="2"
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    className="lucide lucide-credit-card h-4 w-4 text-accent-foreground"
-                                                >
-                                                    <rect width="20" height="14" x="2" y="5" rx="2"></rect>
-                                                    <line x1="2" x2="22" y1="10" y2="10"></line>
-                                                </svg>
-
-
-                                            </span>
-                                            <h5 className="mb-0 fw-semibold body-text fw-bold">Sales by Method</h5>
-                                        </div>
-
-                                        {/* Table */}
-                                        <div className="table-responsive">
-                                            <table className="table align-middle mb-0">
-                                                <thead className="table-light small text-uppercase">
-                                                    <tr>
-                                                        <th>Ticket Type</th>
-                                                        <th className="text-end">Price</th>
-                                                        <th className="text-end">Count</th>
-                                                        <th className="text-end">Total</th>
-                                                    </tr>
-                                                </thead>
-
-                                                <tbody>
-                                                    <tr>
-                                                        <td className="fw-medium">Comps</td>
-                                                        <td className="text-end">€0.00</td>
-                                                        <td className="text-end">1</td>
-                                                        <td className="text-end">€0.00</td>
-                                                    </tr>
-
-                                                    {/* Total Row */}
-                                                    <tr className="total-row">
-                                                        <td className="fw-semibold">Total</td>
-                                                        <td></td>
-                                                        <td className="text-end fw-semibold">1</td>
-                                                        <td className="text-end fw-semibold">€0.00</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                    <div className="card p-2">
-                                        <div className="d-flex align-items-center gap-2 pb-3 border-bottom ">
-                                            <span className="ticket-icon-circle">
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    width="18"
-                                                    height="18"
-                                                    viewBox="0 0 24 24"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    strokeWidth="2"
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    className="lucide lucide-globe h-4 w-4 text-accent-foreground"
-                                                >
-                                                    <circle cx="12" cy="12" r="10"></circle>
-                                                    <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
-                                                    <path d="M2 12h20"></path>
-                                                </svg>
-                                            </span>
-                                            <h5 className="mb-0 fw-semibold body-text fw-bold">Online Payment Breakdown</h5>
-                                        </div>
-
-                                        {/* Table */}
-                                        <div className="table-responsive">
-                                            <table className="table align-middle mb-0">
-                                                <thead className="table-light small text-uppercase">
-                                                    <tr>
-                                                        <th>Ticket Type</th>
-                                                        <th className="text-end">Price</th>
-                                                        <th className="text-end">Count</th>
-                                                        <th className="text-end">Total</th>
-                                                    </tr>
-                                                </thead>
-
-                                                <tbody>
-                                                    <tr>
-                                                        <td className="fw-medium">Comps</td>
-                                                        <td className="text-end">€0.00</td>
-                                                        <td className="text-end">1</td>
-                                                        <td className="text-end">€0.00</td>
-                                                    </tr>
-
-                                                    {/* Total Row */}
-                                                    <tr className="total-row">
-                                                        <td className="fw-semibold">Total</td>
-                                                        <td></td>
-                                                        <td className="text-end fw-semibold">1</td>
-                                                        <td className="text-end fw-semibold">€0.00</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-
+                                    
                                     <div className="card p-2">
                                         <div className="d-flex align-items-center gap-2 pb-3 border-bottom ">
                                             <span className="ticket-icon-circle">

@@ -188,7 +188,7 @@ const CommitteeTicketsPage = () => {
 
                                 </div>
                                 <h4 className="text-24">
-                                    Dashboard
+                                    Sales
                                 </h4>
                                 <hr className="custom-hr" />
                                 <div className="d-flex align-items-end justify-content-between ">
