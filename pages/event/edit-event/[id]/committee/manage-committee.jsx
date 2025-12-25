@@ -192,7 +192,7 @@ const MyEventsPage = () => {
                                 </ul>
 
                                 <div className="contant_bg">
-                                    <div className="row g-3">
+                                    <div className="row ">
                                         {/* Committee Section */}
                                         <div className="col-lg-8 col-md-12">
                                             <div className="Committee">
@@ -213,6 +213,7 @@ const MyEventsPage = () => {
                                                                     onChange={(e) => setSearchText(e.target.value)}
                                                                     autoComplete="off"
                                                                 />
+
                                                             </div>
 
                                                             {/* SEARCH SUGGESTIONS */}
@@ -249,7 +250,7 @@ const MyEventsPage = () => {
                                                                                         </div>
                                                                                         {!alreadyAdded && (
                                                                                             <button
-                                                                                                className="btn btn-sm btn-primary"
+                                                                                                className="btn btn-sm text-14 btn-primary"
                                                                                                 onClick={() => addMember(user.id, `${user.first_name} ${user.last_name}`)}
                                                                                             >
                                                                                                 Add
@@ -264,6 +265,12 @@ const MyEventsPage = () => {
                                                             )}
                                                         </div>
                                                     </div>
+                                                    <div className="col-md-2 col-sm-8 col-8">
+                                                        <button
+                                                            className="btn next primery-button h-100 text-14">
+                                                            Add
+                                                        </button>
+                                                    </div>
                                                 </div>
 
                                                 <hr className="custom-hr" />
@@ -273,12 +280,12 @@ const MyEventsPage = () => {
 
                                                         <thead className="text-white table-detail">
                                                             <tr>
-                                                                <th style={{ width: "5%" }}>S.No.</th>
-                                                                <th style={{ width: "35%" }}>Name</th>
-                                                                <th style={{ width: "25%" }}>Email</th>
-                                                                <th style={{ width: "15%" }} className="text-center">Mobile</th>
-                                                                <th style={{ width: "10%" }} className="text-center">Status</th>
-                                                                <th style={{ width: "10%" }} className="text-center">Remove</th>
+                                                                <th >S.No.</th>
+                                                                <th >Name</th>
+                                                                <th >Email</th>
+                                                                <th className="text-center">Mobile</th>
+                                                                <th className="text-center">Status</th>
+                                                                <th className="text-center">Remove</th>
                                                             </tr>
                                                         </thead>
 
@@ -321,10 +328,11 @@ const MyEventsPage = () => {
                                                                         </td>
 
                                                                         <td className="text-center">
-                                                                            <div className="form-check form-switch d-flex justify-content-center align-items-center">
+                                                                            <div className="form-check form-switch p-0 text-center m-0 d-flex justify-content-center">
                                                                                 <input
-                                                                                    className="form-check-input"
+                                                                                    className="form-check-input m-0"
                                                                                     type="checkbox"
+                                                                                    style={{ minWidth: "40px" }}
                                                                                     id={`statusSwitch-${member.id}`}
                                                                                     checked={member.status === "Y"}
                                                                                     onChange={async () => {
@@ -340,10 +348,7 @@ const MyEventsPage = () => {
                                                                                             const res = await api.put(
                                                                                                 `/api/v1/committee/member/status/${member.id}`,
                                                                                                 {
-                                                                                                    status:
-                                                                                                        member.status === "Y"
-                                                                                                            ? "N"
-                                                                                                            : "Y",
+                                                                                                    status: member.status === "Y" ? "N" : "Y",
                                                                                                 }
                                                                                             );
 
@@ -355,10 +360,7 @@ const MyEventsPage = () => {
                                                                                                         m.id === member.id
                                                                                                             ? {
                                                                                                                 ...m,
-                                                                                                                status:
-                                                                                                                    m.status === "Y"
-                                                                                                                        ? "N"
-                                                                                                                        : "Y",
+                                                                                                                status: m.status === "Y" ? "N" : "Y",
                                                                                                             }
                                                                                                             : m
                                                                                                     )
@@ -381,6 +383,7 @@ const MyEventsPage = () => {
                                                                                         }
                                                                                     }}
                                                                                 />
+
                                                                             </div>
                                                                         </td>
 
@@ -406,7 +409,7 @@ const MyEventsPage = () => {
                                         {/* Import Committee Section */}
                                         <div className="col-lg-4 col-md-12">
                                             <div className="import_committee">
-                                                <h6>Import Committee</h6>
+                                                <h6 className="mt-1">Import Committee</h6>
                                                 <form className="row g-3 align-items-center">
                                                     <div className="col-12">
                                                         <div className="input-group">
@@ -415,7 +418,7 @@ const MyEventsPage = () => {
                                                             </div>
                                                             <input
                                                                 type="text"
-                                                                className="form-control me-2 eventserach"
+                                                                className="form-control eventserach"
                                                                 placeholder="Search Events"
                                                                 required
                                                             />
@@ -423,7 +426,7 @@ const MyEventsPage = () => {
                                                     </div>
 
                                                     <div className="col-12">
-                                                        <button type="submit" className="btn save next primery-button fw-normal">
+                                                        <button type="submit" className="btn save next primery-button fw-normal w-100">
                                                             Import
                                                         </button>
                                                     </div>

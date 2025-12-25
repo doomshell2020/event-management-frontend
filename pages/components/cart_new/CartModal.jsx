@@ -1029,12 +1029,21 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                 {eventData.location}
                                                             </strong>
 
-                                                            <p style={{ color: "#555" }}>
+                                                            <p
+                                                                className="badge rounded-pill border text-wrap px-3 py-2 mt-1"
+                                                                style={{
+                                                                    backgroundColor: "#fdf7ff",
+                                                                    color: "black",
+                                                                    borderColor: "rgba(96,14,125,.25)",
+                                                                    boxShadow: "0px 6px 7px -8px #000"
+                                                                }}
+                                                            >
                                                                 {formatEventDateRange(
                                                                     eventData.date_from?.local,
                                                                     eventData.date_to?.local
                                                                 )}
                                                             </p>
+
                                                         </div>
                                                     </Col>
 
@@ -1188,7 +1197,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                             <div
                                                                                 key={`ticket-${i}`}
                                                                                 className={`ticket-item only-ticket ${isCommittee ? "committee-ticket" : ""}`}
-                                                                                style={{ display: "flex", flexDirection: "column", gap: "10px", padding: "10px 15px", borderBottom: "1px solid #eee" }}
+                                                                                style={{ display: "flex", flexDirection: "column", gap: "10px", padding: "10px 15px" }}
                                                                             >
                                                                                 <div className="d-flex justify-content-between align-items-center ticket-infobox">
                                                                                     {/* LEFT INFO */}
@@ -1197,11 +1206,12 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                                             {ticket.title}
                                                                                             {isCommittee && <span className="ticket-type-badge committee">COMMITTEE</span>}
                                                                                         </strong>
-                                                                                        <p className="mt-1">Base Price: {currencySymbol}{formatPrice(ticket.price)}</p>
+                                                                                        <p className="mt-1 mb-0">Base Price: {currencySymbol}{formatPrice(ticket.price)}</p>
 
                                                                                         {isCommittee && committeeStatus == null && (
                                                                                             <select
                                                                                                 className="form-select"
+                                                                                                style={{ height: "auto", borderRadius: "5px" }}
                                                                                                 value={selectedMembers[ticket.id]?.id || ""}
                                                                                                 onChange={(e) => {
                                                                                                     const member = committeeMembers.find(m => m.id == e.target.value);
@@ -1352,7 +1362,7 @@ export default function CartModal({ show, handleClose, eventId }) {
 
                                                                         return (
                                                                             <div key={`addon-${i}`} className="ticket-item only-ticket ticket-addon">
-                                                                                <div className="d-flex justify-content-between align-items-center ticket-infobox">
+                                                                                <div className="d-flex justify-content-between align-items-start ticket-infobox">
                                                                                     <div className="ticket-info">
                                                                                         <strong style={{ fontSize: "15px" }}>{addon.name} <span className="addon-badge">ADDON</span></strong>
                                                                                         <p className="mt-2">Price: {currencySymbol}{formatPrice(addon.price)}</p>
@@ -1383,7 +1393,7 @@ export default function CartModal({ show, handleClose, eventId }) {
 
                                                                         return (
                                                                             <div key={`slot-${i}`} className="ticket-item only-ticket">
-                                                                                <div className="d-flex justify-content-between align-items-center ticket-infobox">
+                                                                                <div className="d-flex justify-content-between align-items-start ticket-infobox">
                                                                                     <div className="ticket-info">
                                                                                         <strong>{slot.slot_name}</strong>
                                                                                         <p className="mt-2">{formatReadableDate(slot.slot_date)} | {slot.start_time} - {slot.end_time}</p>
@@ -1537,7 +1547,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                                             </div>
                                         ) : (
                                             <div className="chackout-box">
-                                                <h3 className="text-center mt-3">Cart is Empty</h3>
+                                                <h3 className="text-center mt-2">Cart is Empty</h3>
                                             </div>
                                         )}
                                     </Col>
