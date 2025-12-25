@@ -191,7 +191,7 @@ const CommitteeTicketsPage = () => {
                                     Sales
                                 </h4>
                                 <hr className="custom-hr" />
-                                <div className="d-flex align-items-end justify-content-between ">
+                                
                                     <ul className="tabes d-flex ps-0 flex-grow-1 mb-0">
                                         <li>
                                             <Link
@@ -219,33 +219,8 @@ const CommitteeTicketsPage = () => {
                                             </Link>
                                         </li>
                                     </ul>
-                                    <div className="h-100" style={{ minWidth: "150px" }}>
-                                        <button
-                                            className="d-flex align-items-center gap-2 text-white px-3 py-2 rounded text-sm fw-medium border-0"
-                                            style={{ backgroundColor: "#3d6db5" }}
-                                        >
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                width="18"
-                                                height="18"
-                                                viewBox="0 0 24 24"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                strokeWidth="2"
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                className="lucide lucide-file-down h-4 w-4"
-                                            >
-                                                <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
-                                                <path d="M14 2v4a2 2 0 0 0 2 2h4" />
-                                                <path d="M12 18v-6" />
-                                                <path d="m9 15 3 3 3-3" />
-                                            </svg>
-
-                                            Export Ticket
-                                        </button>
-                                    </div>
-                                </div>
+                                    
+                              
 
                                 <div className="contant_bg">
                                     
@@ -269,7 +244,7 @@ const CommitteeTicketsPage = () => {
                                                     <circle cx="12" cy="12" r="2"></circle>
                                                 </svg>
                                             </span>
-                                            <h5 className="mb-0 fw-semibold body-text fw-bold">Cash Sales Breakdown</h5>
+                                            <h5 className="mb-0 fw-semibold body-text fw-bold">Sales by Addons</h5>
                                         </div>
 
                                         {/* Table */}
