@@ -10,6 +10,11 @@ import { Form, Button, Modal } from "react-bootstrap";
 
 import api from "@/utils/api";
 
+// ApexCharts import
+import ApexCharts from "apexcharts";
+import dynamic from "next/dynamic";
+const ReactApexChart = dynamic(() => import("react-apexcharts"), { ssr: false });
+
 const CommitteeTicketsPage = () => {
     const router = useRouter();
     const { id } = router.query;
@@ -32,6 +37,32 @@ const CommitteeTicketsPage = () => {
 
     const [selectedUser, setSelectedUser] = useState(null);
     const [ticketCounts, setTicketCounts] = useState({});
+
+    /* ---------------- ApexCharts Data ---------------- */
+    const [chartOptions, setChartOptions] = useState({
+        chart: {
+            id: "line-chart",
+            type: "line",
+            height: 350
+        },
+        xaxis: {
+            categories: [] // months or dynamic categories
+        },
+        stroke: {
+            curve: 'smooth'
+        },
+        markers: {
+            size: 5
+        },
+        colors: ['#600e7d']
+    });
+
+    const [chartSeries, setChartSeries] = useState([
+        {
+            name: "Sales",
+            data: [] // dynamic data
+        }
+    ]);
 
     /* ---------------- FETCH EVENT ---------------- */
     const fetchEventDetails = async (eventId) => {
@@ -90,6 +121,8 @@ const CommitteeTicketsPage = () => {
         if (!ticketsList.length || !assignedList.length) {
             setTicketTypes([]);
             setGroupedData([]);
+            setChartSeries([{ name: "Sales", data: [] }]);
+            setChartOptions(prev => ({ ...prev, xaxis: { categories: [] } }));
             return;
         }
 
@@ -97,7 +130,7 @@ const CommitteeTicketsPage = () => {
 
         // Only committee sales tickets
         const committeeTickets = ticketsList.filter(
-            (t) => t.type == "committee_sales"
+            (t) => t.type === "committee_sales"
         );
         setTicketTypes(committeeTickets);
 
@@ -111,9 +144,22 @@ const CommitteeTicketsPage = () => {
                 tickets: ticketsMap
             };
         });
-        // console.log('formattedData :', formattedData);
 
         setGroupedData(formattedData);
+
+        // Prepare chart data
+        const categories = committeeTickets.map(t => t.name); // x-axis
+        const data = committeeTickets.map(t => {
+            let total = 0;
+            formattedData.forEach(user => {
+                total += user.tickets[t.id] || 0;
+            });
+            return total;
+        });
+
+        setChartOptions(prev => ({ ...prev, xaxis: { categories } }));
+        setChartSeries([{ name: "Tickets Sold", data }]);
+
         setProcessing(false);
     }, [ticketsList, assignedList]);
 
@@ -173,6 +219,7 @@ const CommitteeTicketsPage = () => {
 
     const showLoader = loading || processing;
 
+
     return (
         <>
             <FrontendHeader backgroundImage={backgroundImage} />
@@ -185,45 +232,90 @@ const CommitteeTicketsPage = () => {
                             <section id="post-eventpg">
                                 <div>
                                     <EventHeaderSection eventDetails={eventDetails} isProgressBarShow={false} />
-
                                 </div>
                                 <h4 className="text-24">
                                     Dashboard
                                 </h4>
                                 <hr className="custom-hr" />
-                               
-                                    <ul className="tabes d-flex ps-0 flex-grow-1 mb-0">
-                                        <li>
-                                            <Link
-                                                href={`/event/analytics/${id}/index`}
-                                                className="active text-16"
-                                            >
-                                                Dashboard
-                                            </Link>
-                                        </li>
-                                        <li>
-                                            <Link
-                                                href={`/event/analytics/${id}/sales`}
-                                                className=" text-16"
-                                            >
-                                                Sales
 
-                                            </Link>
-                                        </li>
-                                        <li>
-                                            <Link
-                                                href={`/event/analytics/${id}/sales-addons`}
-                                                className=" text-16"
-                                            >
-                                                Addons
-                                            </Link>
-                                        </li>
-                                    </ul>
-                                   
-                              
+                                <ul className="tabes d-flex ps-0 flex-grow-1 mb-0">
+                                    <li>
+                                        <Link
+                                            href={`/event/analytics/${id}/index`}
+                                            className="active text-16"
+                                        >
+                                            Dashboard
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link
+                                            href={`/event/analytics/${id}/sales`}
+                                            className=" text-16"
+                                        >
+                                            Sales
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link
+                                            href={`/event/analytics/${id}/sales-addons`}
+                                            className=" text-16"
+                                        >
+                                            Addons
+                                        </Link>
+                                    </li>
+                                </ul>
 
                                 <div className="contant_bg">
-                                    h6
+                                    {/* ApexCharts Line Chart */}
+
+                                    {/* ---------------- ApexCharts Section ---------------- */}
+                                    <div className="container-fluid">
+                                        <div className="row">
+                                            <div className="col-md-12 mb-3">
+                                                 <h6>
+                                        Sales Chart
+                                    </h6>
+                                    <p>
+                                    Total Sales: $ 0.00 TTD Total Earning: $ 0.00 TTD
+                                    </p>
+                                                <div className="lineChart">
+                                                    <ReactApexChart
+                                                        options={chartOptions}
+                                                        series={chartSeries}
+                                                        type="line"
+                                                        height={350}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="col-md-6">
+                                                         <h6>
+                                        Total Ticket Sales
+                                    </h6>
+                                                <div className="lineChart">
+                                                    <ReactApexChart
+                                                        options={chartOptions}
+                                                        series={chartSeries}
+                                                        type="line"
+                                                        height={350}
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div className="col-md-6">
+                                                               <h6>
+                                        Payment Method
+                                    </h6>
+                                                <div className="lineChart">
+                                                    <ReactApexChart
+                                                        options={chartOptions}
+                                                        series={chartSeries}
+                                                        type="line"
+                                                        height={350}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </section>
                         </div>
@@ -232,10 +324,6 @@ const CommitteeTicketsPage = () => {
             </section>
 
             <FrontendFooter />
-
-
-
-
         </>
     );
 };
