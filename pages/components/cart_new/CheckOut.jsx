@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 import CheckoutForm from "./CheckoutForm";
 import api from "@/utils/api";
 import { useCart } from "@/shared/layout-components/layout/CartContext";
+import { useAuth } from "@/shared/layout-components/layout/AuthContext";
 
 /* Stripe Init */
 const stripePromise = loadStripe(
@@ -24,54 +25,36 @@ export default function CheckOutComponents({
   grand_total,
   sub_total,
 }) {
-  const { cart, eventData } = useCart();
-  console.log('cart :', cart);
-  const router = useRouter();
+  const { cart, eventData, loginUserId } = useCart();
 
+  const router = useRouter();
   const [clientSecret, setClientSecret] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
   const intentCreatedRef = useRef(false);
 
   /* Event & Currency */
   const currencySymbol = eventData?.currencyName?.Currency_symbol || "₹";
-  const currencyName =
-    (eventData?.currencyName?.Currency || "INR").toLowerCase();
+  const currencyName = (eventData?.currencyName?.Currency || "INR").toLowerCase();
   const eventName = eventData?.name || "Unknown Event";
   const eventImage = eventData?.feat_image || "";
 
   /* Cart Data */
   const cartData = useMemo(() => {
-    return cart.map((item) => {
-      const idMap = {
-        id: item.id,
-        ticket: item.ticket_id,
-        addon: item.addon_id,
-        package: item.package_id,
-      };
-
-      return {
-        id: item.id,
-        ticketType: item.item_type,
-        ticketId: idMap[item.item_type] || item.id,
-        quantity: item.count || 1,
-        price: roundAmount(item.ticket_price),
-      };
-    });
+    return cart.map((item) => ({
+      id: item.id,                 // cart row id
+      uniqueId: item.uniqueId,     // actual ticket/package/addon id
+      ticketType: item.item_type,  // ticket | addon | package
+      ticketId: item.uniqueId,     // backend expects this as real item id
+      quantity: item.count || 1,
+      price: roundAmount(item.ticket_price),
+    }));
   }, [cart]);
+
 
   /* Fetch User */
   const fetchMemberProfile = useCallback(async () => {
     const token = Cookies.get("userAuthToken");
-    if (!token) {
-      router.push("/login");
-      return null;
-    }
-
-    try {
-      const { data } = await api.get("/api/v1/auth/me");
-      return data?.success ? data.data : null;
-    } catch {
+    if (!token || !loginUserId) {
       router.push("/login");
       return null;
     }
@@ -93,11 +76,11 @@ export default function CheckOutComponents({
         setIsLoading(true);
         intentCreatedRef.current = true;
 
-        const user = await fetchMemberProfile();
-        if (!user?.id) throw new Error("User not found");
+        await fetchMemberProfile();
+        if (!loginUserId) throw new Error("User not found");
 
         await api.post("/api/v1/payment/create-payment-intent", {
-          user_id: user.id,
+          user_id: loginUserId,
           event_id: eventId,
           sub_total: roundAmount(sub_total),
           tax_total: roundAmount(tax_total),

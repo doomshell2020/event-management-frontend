@@ -43,6 +43,9 @@ export default function CartModal({ show, handleClose, eventId }) {
     const { cart, refreshCart, eventData, normalCart, addonCart, slotCart, loadingCart, setEventId } = useCart();
     // console.log('eventData :', eventData);
 
+    if(eventData) 
+        eventId = eventData.id;
+    
     const [isLoading, setIsLoading] = useState(true);
     const [cartLoading, setCartLoading] = useState(false);
     const [loadingId, setLoadingId] = useState(null); // track which pricing ID is loading
@@ -58,8 +61,8 @@ export default function CartModal({ show, handleClose, eventId }) {
 
     useEffect(() => {
         if (eventId) {
-            setEventId(eventId);   // store eventId globally
-            refreshCart(eventId);  // load cart for that event
+            setEventId(eventId);
+            refreshCart(eventId);
         }
     }, []);
 

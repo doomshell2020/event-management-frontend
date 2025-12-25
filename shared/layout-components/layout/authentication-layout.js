@@ -4,8 +4,6 @@ import Head from 'next/head';
 import favicon from "../../../public/assets/img/brand/favicon.png"
 // const Customswitcher = dynamic(() => import("../../../shared/layout-components/switcher/Customswitcher"), {ssr: false,});
 
-
-
 const Authenticationlayout = ({ children }) => {
   useEffect(() => {
     if (document.body) {

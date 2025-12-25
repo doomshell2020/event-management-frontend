@@ -12,6 +12,8 @@ export const CartProvider = ({ children }) => {
     const [normalCart, setNormalCart] = useState([]);
     const [addonCart, setAddonCart] = useState([]);
     const [eventId, setEventId] = useState(null); // ✔ store eventId globally
+    const [loginUserId, setLoginUserId] = useState(null); // ✔ store eventId globally
+    // console.log('eventId :', eventId);
 
     // 🟢 MAIN CART LOADER (Uses internal eventId when nothing passed)
     const fetchCart = async (passedEventId = null) => {
@@ -27,12 +29,13 @@ export const CartProvider = ({ children }) => {
 
             const finalEventId = passedEventId ?? eventId;
             const query = finalEventId ? `?event_id=${finalEventId}` : "";
-
             const res = await api.get(`/api/v1/cart/list${query}`);
-            // console.log('res :', res);
             const data = res?.data?.data || {};
+            const userInfoId = data?.user_id;
             const event = data.event || null;
             const cartItems = data.cart || [];
+
+            setLoginUserId(userInfoId);
 
             // Save event + items
             setEventData(event);
@@ -94,6 +97,7 @@ export const CartProvider = ({ children }) => {
                 normalCart,
                 addonCart,
                 eventId,
+                loginUserId,
                 refreshCart: fetchCart, // refreshCart(eventId)
                 setCart,
                 setCartCount,
