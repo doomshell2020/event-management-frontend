@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import ApexCharts from "apexcharts";
+import dynamic from "next/dynamic";
+const ReactApexChart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 import FrontendHeader from "@/shared/layout-components/frontelements/frontendheader";
 import FrontendFooter from "@/shared/layout-components/frontelements/frontendfooter";
@@ -11,9 +14,6 @@ import { Form, Button, Modal } from "react-bootstrap";
 import api from "@/utils/api";
 
 // ApexCharts import
-import ApexCharts from "apexcharts";
-import dynamic from "next/dynamic";
-const ReactApexChart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 const CommitteeTicketsPage = () => {
     const router = useRouter();
