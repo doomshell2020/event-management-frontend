@@ -127,12 +127,10 @@ const ManageTicketPricing = () => {
         const day = String(d.getUTCDate()).padStart(2, "0");
         return `${year}-${month}-${day}`;
     }
-
     const normalize = (d) => {
         const dt = new Date(d);
         return new Date(dt.getFullYear(), dt.getMonth(), dt.getDate());
     };
-
     const handleFormSubmit = async (e) => {
         e.preventDefault();
         const form = e.currentTarget;
@@ -212,8 +210,6 @@ const ManageTicketPricing = () => {
             Swal.fire("Error", "Something went wrong", "error");
         }
     };
-
-
     const [backgroundImage] = useState("/assets/front-images/about-slider_bg.jpg");
 
     return (
@@ -350,7 +346,7 @@ const ManageTicketPricing = () => {
                                 {/* PRICING LIST TABLE */}
                                 <div className="card p-3 mt-4 shadow-sm">
                                     <h5 className="fw-bold mb-3">Existing Ticket Pricing</h5>
-                                    {pricingList.length === 0 ? (
+                                    {pricingList.length == 0 ? (
                                         <p className="text-muted">No pricing added yet.</p>
                                     ) : (
                                         <div className="table-responsive">
@@ -367,7 +363,7 @@ const ManageTicketPricing = () => {
                                                     {pricingList.map((row, index) => (
                                                         <tr key={index}>
                                                             <td>{row?.ticket?.title || "-"}</td>
-                                                            <td>{row.currency === "INR" ? "₹" : "$"}{row.price}</td>
+                                                            <td>{row.currency == "INR" ? "₹" : "$"}{row.price}</td>
                                                             <td>{row.date || "-"}</td>
                                                             <td>{row.slot ? `${row.slot.slot_name} (${row.slot.start_time.slice(0, 5)} - ${row.slot.end_time.slice(0, 5)})` : "-"}</td>
                                                         </tr>

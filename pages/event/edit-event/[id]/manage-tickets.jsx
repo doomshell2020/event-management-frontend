@@ -246,55 +246,100 @@ const ManageTickets = () => {
                                     ) : ticketsList.length == 0 ? (
                                         <p className="text-muted">No tickets found for this event.</p>
                                     ) : (ticketsList.map((ticket) => (
-                                        <div key={ticket.id} className="row item_bg m-0 p-2 mb-2 align-items-center manage-ticket-type">
+                                        <div
+                                            key={ticket.id}
+                                            className="row item_bg m-0 p-2 mb-2 align-items-center manage-ticket-type"
+                                        >
+                                            {/* LEFT CONTENT */}
                                             <div className="col-sm-9">
                                                 <p className="body-text mb-1">
                                                     <strong>{ticket.title}</strong> (₹{ticket.price})
-                                                    <br /> Sold: {ticket.sold_count || 0} / {ticket.count}
+                                                    <br />
+                                                    Sold: {ticket.sold_count || 0} / {ticket.count}
                                                 </p>
+
                                                 <div className="row">
+                                                    {/* TYPE */}
                                                     <div className="col-md-3">
                                                         <p className="body-text mb-0 d-flex align-items-center">
                                                             <Ticket size={16} className="me-2 text-primary" />
-                                                            {ticket.type == "open_sales" ? "Open Sale" : "Committee Sales"}
+                                                            {ticket.type === "open_sales"
+                                                                ? "Open Sale"
+                                                                : ticket.type === "committee_sales"
+                                                                    ? "Committee Sales"
+                                                                    : "Complimentary"}
                                                         </p>
                                                     </div>
+
+                                                    {/* ACCESS TYPE */}
                                                     <div className="col-md-3">
                                                         <p className="body-text mb-0 d-flex align-items-center">
                                                             {ticket.access_type}
                                                         </p>
                                                     </div>
-                                                    <div className="col-md-3">
-                                                        <p className="body-text mb-0 d-flex align-items-center">
-                                                            {ticket.hidden == "Y" ? (
-                                                                <>
-                                                                    <EyeOff size={16} className="me-2 text-danger" /> Hidden
-                                                                </>
-                                                            ) : (
-                                                                <>
-                                                                    <Eye size={16} className="me-2 text-success" /> Visible
-                                                                </>
-                                                            )}
-                                                        </p>
-                                                    </div>
-                                                    <div className="col-md-3">
-                                                        <p className="body-text mb-0 d-flex align-items-center">
-                                                            {ticket.sold_out == "Y" ? (
-                                                                <>
-                                                                    <XCircle size={16} className="me-2 text-danger" /> Sold Out
-                                                                </>
-                                                            ) : (
-                                                                <>
-                                                                    <CheckCircle size={16} className="me-2 text-success" /> On Sale
-                                                                </>
-                                                            )}
-                                                        </p>
-                                                    </div>
+
+                                                    {/* NON-COMPS STATUS */}
+                                                    {ticket.type !== "comps" ? (
+                                                        <>
+                                                            <div className="col-md-3">
+                                                                <p className="body-text mb-0 d-flex align-items-center">
+                                                                    {ticket.hidden === "Y" ? (
+                                                                        <>
+                                                                            <EyeOff
+                                                                                size={16}
+                                                                                className="me-2 text-danger"
+                                                                            />
+                                                                            Hidden
+                                                                        </>
+                                                                    ) : (
+                                                                        <>
+                                                                            <Eye
+                                                                                size={16}
+                                                                                className="me-2 text-success"
+                                                                            />
+                                                                            Visible
+                                                                        </>
+                                                                    )}
+                                                                </p>
+                                                            </div>
+
+                                                            <div className="col-md-3">
+                                                                <p className="body-text mb-0 d-flex align-items-center">
+                                                                    {ticket.sold_out === "Y" ? (
+                                                                        <>
+                                                                            <XCircle
+                                                                                size={16}
+                                                                                className="me-2 text-danger"
+                                                                            />
+                                                                            Sold Out
+                                                                        </>
+                                                                    ) : (
+                                                                        <>
+                                                                            <CheckCircle
+                                                                                size={16}
+                                                                                className="me-2 text-success"
+                                                                            />
+                                                                            On Sale
+                                                                        </>
+                                                                    )}
+                                                                </p>
+                                                            </div>
+                                                        </>
+                                                    ) : (
+                                                        /* COMPS ONLY */
+                                                        <div className="col-md-6">
+                                                            <p className="body-text mb-0 d-flex align-items-center text-success fw-semibold">
+                                                                🎁 Complimentary Ticket
+                                                            </p>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
 
+                                            {/* RIGHT ACTIONS */}
                                             <div className="col-sm-3 text-end">
-                                                {ticket.type == "committee_sales" && (
+                                                {/* Committee badge */}
+                                                {ticket.type === "committee_sales" && (
                                                     <button
                                                         className="btn btn-warning btn-sm rounded-pill fw-bold px-3 me-2"
                                                         style={{ backgroundColor: "#ff9800", color: "#fff" }}
@@ -303,167 +348,140 @@ const ManageTickets = () => {
                                                     </button>
                                                 )}
 
-                                                <div className="dropdown d-inline position-relative">
-                                                    <button
-                                                        className="btn btn-primary btn-sm"
-                                                        type="button"
-                                                        onClick={() => setOpenDropdown(openDropdown == ticket.id ? null : ticket.id)}
-                                                    >
-                                                        <Settings size={16} />
-                                                    </button>
-
-                                                    {openDropdown == ticket.id && (
-                                                        <ul
-                                                            className="dropdown-menu show position-absolute"
-                                                            style={{
-                                                                display: "block",
-                                                                zIndex: 999,
-                                                                left: "-120px",top:"24px"
-                                                            }}
+                                                {/* ACTIONS ONLY FOR NON-COMPS */}
+                                                {ticket.type !== "comps" && (
+                                                    <div className="dropdown d-inline position-relative">
+                                                        <button
+                                                            className="btn btn-primary btn-sm"
+                                                            type="button"
+                                                            onClick={() =>
+                                                                setOpenDropdown(
+                                                                    openDropdown === ticket.id
+                                                                        ? null
+                                                                        : ticket.id
+                                                                )
+                                                            }
                                                         >
-                                                            {/* Edit */}
-                                                            <li>
-                                                                <button
-                                                                    className="dropdown-item"
-                                                                    onClick={() => {
-                                                                        setTicketId(ticket.id);
-                                                                        setTicketForm({
-                                                                            title: ticket.title,
-                                                                            type: ticket.type,
-                                                                            price: ticket.price,
-                                                                            count: ticket.count,
-                                                                            hidden: ticket.hidden,
-                                                                            access_type: ticket.access_type,
-                                                                            ticketImage: null,
-                                                                        });
-                                                                        setShow(true);
-                                                                        setOpenDropdown(null);
-                                                                    }}
-                                                                >
-                                                                    Edit
-                                                                </button>
-                                                            </li>
+                                                            <Settings size={16} />
+                                                        </button>
 
-                                                            {/* Hide / Show */}
-                                                            <li>
-                                                                <button
-                                                                    className="dropdown-item"
-                                                                    onClick={() => {
-                                                                        const newHidden = ticket.hidden == "Y" ? "N" : "Y";
-                                                                        api.put(`/api/v1/tickets/update/${ticket.id}`, {
-                                                                            hidden: newHidden,
-                                                                        })
-                                                                            .then(() => {
-                                                                                Swal.fire({
-                                                                                    icon: "success",
-                                                                                    title: newHidden === "Y" ? "Ticket Hidden" : "Ticket Visible",
-                                                                                    timer: 1200,
-                                                                                    showConfirmButton: false,
-                                                                                });
-                                                                                handleGetTicketsList();
-                                                                            })
-                                                                            .catch(() => Swal.fire("Error", "Failed to update ticket.", "error"));
-                                                                        setOpenDropdown(null);
-                                                                    }}
-                                                                >
-                                                                    {ticket.hidden === "Y" ? "Show Ticket" : "Hide Ticket"}
-                                                                </button>
-                                                            </li>
+                                                        {openDropdown === ticket.id && (
+                                                            <ul
+                                                                className="dropdown-menu show position-absolute"
+                                                                style={{
+                                                                    display: "block",
+                                                                    zIndex: 999,
+                                                                    left: "-120px",
+                                                                    top: "24px",
+                                                                }}
+                                                            >
+                                                                {/* Edit */}
+                                                                <li>
+                                                                    <button
+                                                                        className="dropdown-item"
+                                                                        onClick={() => {
+                                                                            setTicketId(ticket.id);
+                                                                            setTicketForm({
+                                                                                title: ticket.title,
+                                                                                type: ticket.type,
+                                                                                price: ticket.price,
+                                                                                count: ticket.count,
+                                                                                hidden: ticket.hidden,
+                                                                                access_type: ticket.access_type,
+                                                                                ticketImage: null,
+                                                                            });
+                                                                            setShow(true);
+                                                                            setOpenDropdown(null);
+                                                                        }}
+                                                                    >
+                                                                        Edit
+                                                                    </button>
+                                                                </li>
 
-                                                            {/* Sold Out / On Sale */}
-                                                            <li>
-                                                                <button
-                                                                    className="dropdown-item"
-                                                                    onClick={() => {
-                                                                        const newStatus = ticket.sold_out == "Y" ? "N" : "Y";
+                                                                {/* Hide / Show */}
+                                                                <li>
+                                                                    <button
+                                                                        className="dropdown-item"
+                                                                        onClick={() => {
+                                                                            const newHidden =
+                                                                                ticket.hidden === "Y" ? "N" : "Y";
+                                                                            api
+                                                                                .put(
+                                                                                    `/api/v1/tickets/update/${ticket.id}`,
+                                                                                    { hidden: newHidden }
+                                                                                )
+                                                                                .then(handleGetTicketsList);
+                                                                            setOpenDropdown(null);
+                                                                        }}
+                                                                    >
+                                                                        {ticket.hidden === "Y"
+                                                                            ? "Show Ticket"
+                                                                            : "Hide Ticket"}
+                                                                    </button>
+                                                                </li>
 
-                                                                        api.put(`/api/v1/tickets/update/${ticket.id}`, {
-                                                                            sold_out: newStatus,
-                                                                        })
-                                                                            .then(() => {
-                                                                                Swal.fire({
-                                                                                    icon: "success",
-                                                                                    title:
-                                                                                        newStatus == "Y"
-                                                                                            ? "Marked as Sold Out"
-                                                                                            : "Marked as On Sale",
-                                                                                    timer: 1200,
-                                                                                    showConfirmButton: false,
-                                                                                });
-                                                                                handleGetTicketsList();
-                                                                            })
-                                                                            .catch(() =>
-                                                                                Swal.fire("Error", "Failed to update ticket status.", "error")
-                                                                            );
+                                                                {/* Sold Out / On Sale */}
+                                                                <li>
+                                                                    <button
+                                                                        className="dropdown-item"
+                                                                        onClick={() => {
+                                                                            const newStatus =
+                                                                                ticket.sold_out === "Y"
+                                                                                    ? "N"
+                                                                                    : "Y";
+                                                                            api
+                                                                                .put(
+                                                                                    `/api/v1/tickets/update/${ticket.id}`,
+                                                                                    { sold_out: newStatus }
+                                                                                )
+                                                                                .then(handleGetTicketsList);
+                                                                            setOpenDropdown(null);
+                                                                        }}
+                                                                    >
+                                                                        {ticket.sold_out === "Y"
+                                                                            ? "Mark as On Sale"
+                                                                            : "Mark as Sold Out"}
+                                                                    </button>
+                                                                </li>
 
-                                                                        setOpenDropdown(null);
-                                                                    }}
-                                                                >
-                                                                    {ticket.sold_out === "Y" ? "Mark as On Sale" : "Mark as Sold Out"}
-                                                                </button>
-                                                            </li>
-
-                                                            {/* Delete */}
-                                                            <li>
-                                                                <button
-                                                                    className="dropdown-item text-danger"
-                                                                    onClick={() => {
-                                                                        Swal.fire({
-                                                                            icon: "warning",
-                                                                            title: "Are you sure?",
-                                                                            text: "This ticket will be deleted.",
-                                                                            showCancelButton: true,
-                                                                            confirmButtonColor: "#e62d56",
-                                                                            confirmButtonText: "Delete",
-                                                                        }).then((result) => {
-                                                                            if (result.isConfirmed) {
-                                                                                api.delete(`/api/v1/tickets/delete/${ticket.id}`)
-                                                                                    .then(() => {
-                                                                                        Swal.fire({
-                                                                                            icon: "success",
-                                                                                            title: "Ticket Deleted",
-                                                                                            timer: 1000,
-                                                                                            showConfirmButton: false,
-                                                                                        });
-                                                                                        handleGetTicketsList();
-                                                                                    })
-                                                                                    .catch(() =>
-                                                                                        Swal.fire("Error", "Failed to delete ticket.", "error")
-                                                                                    );
-                                                                            }
-                                                                        });
-                                                                        setOpenDropdown(null);
-                                                                    }}
-                                                                >
-                                                                    Delete
-                                                                </button>
-                                                            </li>
-                                                        </ul>
-                                                    )}
-                                                </div>
-
-
-
+                                                                {/* Delete */}
+                                                                <li>
+                                                                    <button
+                                                                        className="dropdown-item text-danger"
+                                                                        onClick={() => {
+                                                                            Swal.fire({
+                                                                                icon: "warning",
+                                                                                title: "Are you sure?",
+                                                                                text: "This ticket will be deleted.",
+                                                                                showCancelButton: true,
+                                                                                confirmButtonColor: "#e62d56",
+                                                                                confirmButtonText: "Delete",
+                                                                            }).then((result) => {
+                                                                                if (result.isConfirmed) {
+                                                                                    api
+                                                                                        .delete(
+                                                                                            `/api/v1/tickets/delete/${ticket.id}`
+                                                                                        )
+                                                                                        .then(handleGetTicketsList);
+                                                                                }
+                                                                            });
+                                                                            setOpenDropdown(null);
+                                                                        }}
+                                                                    >
+                                                                        Delete
+                                                                    </button>
+                                                                </li>
+                                                            </ul>
+                                                        )}
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     ))
 
+
                                     )}
 
-                                    {/* <div className="next_prew_btn d-flex justify-content-between mt-4">
-                                        <a
-                                            className="prew primery-button fw-normal"
-                                            href="https://eboxtickets.com/event/settings/287"
-                                        >
-                                            Previous
-                                        </a>
-                                        <a
-                                            className="next primery-button fw-normal"
-                                            href="https://eboxtickets.com/event/committee/287"
-                                        >
-                                            Next
-                                        </a>
-                                    </div> */}
                                 </div>
                             </section>
                         </div>

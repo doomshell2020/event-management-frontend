@@ -92,6 +92,9 @@ const MyEventsPage = () => {
     }, [searchText]);
 
     const addMember = async (userId, userName) => {
+        // console.log('>>>>>>>>>>>>',id);
+        // return false
+        
         try {
             const result = await Swal.fire({
                 title: `Add ${userName} to the committee?`,
@@ -161,6 +164,111 @@ const MyEventsPage = () => {
     };
 
     const [backgroundImage, setIsMobile] = useState('/assets/front-images/about-slider_bg.jpg');
+
+    const [eventSearchText, setEventSearchText] = useState("");
+    const [eventSearchResults, setEventSearchResults] = useState([]);
+    const [loadingEventSearch, setLoadingEventSearch] = useState(false);
+    const [selectedImportEvent, setSelectedImportEvent] = useState(null);
+    const [isEventSelected, setIsEventSelected] = useState(false);
+
+    useEffect(() => {
+        if (
+            !eventSearchText ||
+            eventSearchText.length < 2 ||
+            isEventSelected
+        ) {
+            setEventSearchResults([]);
+            return;
+        }
+
+        const timer = setTimeout(async () => {
+            try {
+                setLoadingEventSearch(true);
+                const res = await api.get(
+                    `/api/v1/events/search?keyword=${eventSearchText}`
+                );
+
+                if (res.data.success) {
+                    setEventSearchResults(res.data.data.events);
+                }
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setLoadingEventSearch(false);
+            }
+        }, 400);
+
+        return () => clearTimeout(timer);
+    }, [eventSearchText, isEventSelected]);
+
+    const handleImportCommittee = async (e) => {
+        e.preventDefault();
+
+        if (!selectedImportEvent) {
+            Swal.fire({
+                icon: "warning",
+                title: "Select Event",
+                text: "Please select an event to import committee members from"
+            });
+            return;
+        }
+
+        try {
+            // 🔄 Show loading swal
+            Swal.fire({
+                title: "Importing committee members...",
+                text: "Please wait",
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            const payload = {
+                from_event_id: selectedImportEvent.id,
+                to_event_id: id // 🔥 current event id
+            };
+
+            const res = await api.post(
+                "/api/v1/committee/import-committee-members",
+                payload
+            );
+
+            Swal.close();
+
+            if (res.data.success) {
+                await fetchMembers(id);
+                Swal.fire({
+                    icon: "success",
+                    title: "Imported Successfully",
+                    text: `${res.data.data.imported} committee members imported`
+                });
+
+                // Optional: reset state
+                setEventSearchText("");
+                setSelectedImportEvent(null);
+                setIsEventSelected(false);
+
+            } else {
+                Swal.fire({
+                    icon: "info",
+                    title: "No Changes",
+                    text: res.data.message || "Nothing to import"
+                });
+            }
+
+        } catch (error) {
+            Swal.close();
+            console.error(error);
+
+            Swal.fire({
+                icon: "error",
+                title: "Import Failed",
+                text: "Something went wrong while importing committee members"
+            });
+        }
+    };
 
     return (
         <>
@@ -334,7 +442,7 @@ const MyEventsPage = () => {
                                                                                     type="checkbox"
                                                                                     style={{ minWidth: "40px" }}
                                                                                     id={`statusSwitch-${member.id}`}
-                                                                                    checked={member.status === "Y"}
+                                                                                    checked={member.status == "Y"}
                                                                                     onChange={async () => {
                                                                                         try {
                                                                                             Swal.fire({
@@ -348,7 +456,7 @@ const MyEventsPage = () => {
                                                                                             const res = await api.put(
                                                                                                 `/api/v1/committee/member/status/${member.id}`,
                                                                                                 {
-                                                                                                    status: member.status === "Y" ? "N" : "Y",
+                                                                                                    status: member.status == "Y" ? "N" : "Y",
                                                                                                 }
                                                                                             );
 
@@ -357,10 +465,10 @@ const MyEventsPage = () => {
                                                                                             if (res.data.success) {
                                                                                                 setMembers((prev) =>
                                                                                                     prev.map((m) =>
-                                                                                                        m.id === member.id
+                                                                                                        m.id == member.id
                                                                                                             ? {
                                                                                                                 ...m,
-                                                                                                                status: m.status === "Y" ? "N" : "Y",
+                                                                                                                status: m.status == "Y" ? "N" : "Y",
                                                                                                             }
                                                                                                             : m
                                                                                                     )
@@ -410,18 +518,65 @@ const MyEventsPage = () => {
                                         <div className="col-lg-4 col-md-12">
                                             <div className="import_committee">
                                                 <h6 className="mt-1">Import Committee</h6>
-                                                <form className="row g-3 align-items-center">
+                                                <form className="row g-3 align-items-center" onSubmit={handleImportCommittee} >
+
                                                     <div className="col-12">
                                                         <div className="input-group">
+
                                                             <div className="input-group-text">
                                                                 <i className="bi bi-search"></i>
                                                             </div>
-                                                            <input
-                                                                type="text"
-                                                                className="form-control eventserach"
-                                                                placeholder="Search Events"
-                                                                required
-                                                            />
+
+                                                            <div className="position-relative">
+                                                                <input
+                                                                    type="search"
+                                                                    placeholder="Search Events by name"
+                                                                    className="form-control eventserach"
+                                                                    value={eventSearchText}
+                                                                    onChange={(e) => {
+                                                                        setEventSearchText(e.target.value);
+                                                                        setIsEventSelected(false); // reset when user types
+                                                                    }}
+                                                                    autoComplete="off"
+                                                                />
+
+                                                                {/* EVENT SEARCH DROPDOWN */}
+                                                                {eventSearchText.length > 1 && !isEventSelected && (
+                                                                    <div
+                                                                        className="position-absolute w-100 bg-white border rounded shadow-sm mt-1"
+                                                                        style={{ zIndex: 999, maxHeight: "260px", overflowY: "auto" }}
+                                                                    >
+                                                                        {loadingEventSearch ? (
+                                                                            <div className="text-center p-2">Loading...</div>
+                                                                        ) : eventSearchResults.length == 0 ? (
+                                                                            <div className="text-center p-2 text-muted">
+                                                                                No events found
+                                                                            </div>
+                                                                        ) : (
+                                                                            eventSearchResults.map((event) => (
+                                                                                <div
+                                                                                    key={event.id}
+                                                                                    className="px-3 py-2 hover-bg"
+                                                                                    style={{ cursor: "pointer" }}
+                                                                                    onClick={() => {
+                                                                                        setSelectedImportEvent(event);
+                                                                                        setEventSearchText(event.name);
+                                                                                        setEventSearchResults([]);
+                                                                                        setIsEventSelected(true); // ✅ STOP SEARCH
+                                                                                    }}
+                                                                                >
+                                                                                    <div className="fw-semibold">{event.name}</div>
+                                                                                    <small className="text-muted">
+                                                                                        {event.location} • {moment(event.date_from).format("DD MMM YYYY")}
+                                                                                    </small>
+                                                                                </div>
+                                                                            ))
+                                                                        )}
+                                                                    </div>
+                                                                )}
+                                                            </div>
+
+
                                                         </div>
                                                     </div>
 

@@ -34,6 +34,35 @@ const CommitteeTicketsPage = () => {
     const [selectedUser, setSelectedUser] = useState(null);
     const [ticketCounts, setTicketCounts] = useState({});
 
+    const [totalAssigned, setTotalAssigned] = useState({});
+
+    useEffect(() => {
+        if (!ticketTypes.length || !groupedData.length) {
+            setTotalAssigned({});
+            return;
+        }
+
+        const totals = {};
+        let grandTotal = 0;
+
+        ticketTypes.forEach((t) => {
+            totals[t.id] = 0;
+        });
+
+        groupedData.forEach((row) => {
+            ticketTypes.forEach((t) => {
+                const count = row.tickets[t.id] || 0;
+                totals[t.id] += count;
+                grandTotal += count;
+            });
+        });
+
+        totals.grandTotal = grandTotal;
+
+        setTotalAssigned(totals);
+    }, [ticketTypes, groupedData]);
+
+
     /* ---------------- FETCH EVENT ---------------- */
     const fetchEventDetails = async (eventId) => {
         try {
@@ -96,10 +125,13 @@ const CommitteeTicketsPage = () => {
 
         setProcessing(true);
 
-        // Only committee sales tickets
+        // ✅ Allow committee_sales & comps tickets
+        const allowedTypes = ["committee_sales", "comps"];
+
         const committeeTickets = ticketsList.filter(
-            (t) => t.type == "committee_sales"
+            (t) => allowedTypes.includes(t.type)
         );
+
         setTicketTypes(committeeTickets);
 
         const formattedData = assignedList.map((item) => {
@@ -107,16 +139,17 @@ const CommitteeTicketsPage = () => {
             item.assignedTickets.forEach((t) => {
                 ticketsMap[t.ticket_id] = t.count;
             });
+
             return {
                 user: item.user,
                 tickets: ticketsMap
             };
         });
-        // console.log('formattedData :', formattedData);
 
         setGroupedData(formattedData);
         setProcessing(false);
     }, [ticketsList, assignedList]);
+
 
     /* ---------------- INITIAL LOAD ---------------- */
     useEffect(() => {
@@ -195,7 +228,7 @@ const CommitteeTicketsPage = () => {
                                 <hr className="custom-hr" />
 
                                 <p className="text-14 text-dark">
-                                   You can add users to manage your events here. 'Add' adds the number to the total ticket count for the user. 'Replace' replaces the amount of tickets the user has available for purchase and will not affect tickets sold so far.
+                                    You can add users to manage your events here. 'Add' adds the number to the total ticket count for the user. 'Replace' replaces the amount of tickets the user has available for purchase and will not affect tickets sold so far.
                                 </p>
 
                                 {/* TABS */}
@@ -243,76 +276,40 @@ const CommitteeTicketsPage = () => {
 
 
                                         <div className="card">
-                                            <div className="table-container-box shadow-sm mb-4 p-3">
+                                            <div className="table-container-box shadow-sm mb-2 p-3">
                                                 {/* first table start*/}
                                                 <div className="card-header card-header fw-bold px-0 fs-6 pt-1 text-dark">
                                                     Total Tickets Alotted
                                                 </div>
-
-                                                <div className="d-flex justify-content-between align-items-center my-2 ">
-                                                    <div className="d-flex align-items-center gap-2 w-25">
-                                                        <span>Show</span>
-                                                        <select className="form-select form-select-sm py-1">
-                                                            <option value="10">10</option>
-                                                            <option value="25">25</option>
-                                                            <option value="50">50</option>
-                                                        </select>
-                                                        <span>entries</span>
-                                                    </div>
-
-                                                    <div className="d-flex align-items-center gap-2">
-                                                        <label className="mb-0">Search:</label>
-                                                        <input
-                                                            type="text"
-                                                            className="form-control form-control-sm w-auto"
-                                                        />
-                                                    </div>
-                                                </div>
-
                                                 {/* TABLE */}
                                                 <div className="table-responsive">
                                                     <table className="table table-bordered text-center align-middle mb-2 table-border-dark-soft">
                                                         <thead className="table-primary">
                                                             <tr>
-                                                                <th>Comps ($0.00)</th>
-                                                                <th>Test Ticket ($120.00)</th>
+                                                                {ticketTypes.map((t) => (
+                                                                    <th key={t.id}>
+                                                                        {t.title} (₹{t.price})
+                                                                    </th>
+                                                                ))}
                                                                 <th>Total</th>
                                                             </tr>
                                                         </thead>
+
                                                         <tbody>
                                                             <tr>
-                                                                <td>3</td>
-                                                                <td>5</td>
-                                                                <td>8</td>
+                                                                {ticketTypes.map((t) => (
+                                                                    <td key={t.id}>
+                                                                        {totalAssigned[t.id] || 0}
+                                                                    </td>
+                                                                ))}
+                                                                <td className="fw-bold">
+                                                                    {totalAssigned.grandTotal || 0}
+                                                                </td>
                                                             </tr>
                                                         </tbody>
                                                     </table>
                                                 </div>
 
-                                                {/* FOOTER */}
-                                                <div className="d-flex justify-content-between align-items-center">
-
-                                                    <div className="fw-medium text-secondary" style={{ fontSize: "13px" }}>
-                                                        Showing 1 to 1 of 1 entries
-                                                    </div>
-
-                                                    <div className="d-flex align-items-center gap-2">
-                                                        <button className="btn btn-outline-secondary btn-sm" disabled>
-                                                            Previous
-                                                        </button>
-
-                                                        <button className="btn btn-danger btn-sm text-white">
-                                                            1
-                                                        </button>
-
-                                                        <button className="btn btn-primary btn-sm">
-                                                            Next
-                                                        </button>
-                                                    </div>
-
-                                                </div>
-
-                                                {/* first table and*/}
                                             </div>
 
                                             <div className="table-container-box shadow-sm p-3">

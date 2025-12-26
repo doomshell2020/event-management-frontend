@@ -6,7 +6,8 @@ import TicketCountTabs from "@/pages/components/Event/TicketCountTabs";
 import api from "@/utils/api";
 import Swal from "sweetalert2";
 
-const TicketDetails = ({ pendingRequests, counts }) => {
+const TicketDetails = ({ pendingRequests, counts, event_id }) => {
+  
   const router = useRouter();
 
   const [activeTab, setActiveTab] = useState("ticket");
@@ -17,17 +18,15 @@ const TicketDetails = ({ pendingRequests, counts }) => {
 
   /* ---------------- TAB CHANGE ---------------- */
   const setMyActiveTab = (tab) => {
-  // console.log('tab :', tab);
+    // console.log('tab :', tab);
     setActiveTab(tab);
     router.push(`/committee/${tab}`);
   };
 
   /* ---------------- FETCH TICKET DETAILS ---------------- */
   useEffect(() => {
-    if (!pendingRequests?.length) return;
-    const eventId = pendingRequests[0]?.event_id;
-    if (!eventId) return;
-    fetchTicketDetails(eventId);
+    if (!event_id) return;
+    fetchTicketDetails(event_id);
   }, [pendingRequests]);
 
   const fetchTicketDetails = async (event_id) => {
@@ -311,7 +310,7 @@ const TicketDetails = ({ pendingRequests, counts }) => {
                             >
                               {loadingSearch ? (
                                 <div className="text-center p-3">Searching...</div>
-                              ) : searchResults.length === 0 ? (
+                              ) : searchResults.length == 0 ? (
                                 <div className="text-center p-3 text-muted">
                                   No users found
                                 </div>
@@ -443,9 +442,9 @@ const TicketDetails = ({ pendingRequests, counts }) => {
 
 export default TicketDetails;
 
-/* ---------------- SSR ---------------- */
 export async function getServerSideProps(context) {
   try {
+    const { event_id } = context.params;   // ✅ EVENT ID FROM URL
     const token = context.req.cookies?.userAuthToken;
 
     if (!token) {
@@ -454,30 +453,40 @@ export async function getServerSideProps(context) {
       };
     }
 
+    // ✅ SEND EVENT ID TO BACKEND
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/committee/requests/N`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/committee/requests/N?event_id=${event_id}`,
       {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       }
     );
 
     const json = await res.json();
     const list = json?.data?.list || [];
+    console.log(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/committee/requests/N?event_id=${event_id}`);
 
     const counts = { pending: 0, approved: 0, ignored: 0 };
     list.forEach((i) => {
-      if (i.status === "N") counts.pending++;
-      if (i.status === "Y") counts.approved++;
-      if (i.status === "I") counts.ignored++;
+      if (i.status == "N") counts.pending++;
+      if (i.status == "Y") counts.approved++;
+      if (i.status == "I") counts.ignored++;
     });
 
     return {
-      props: { pendingRequests: list, counts },
+      props: {
+        pendingRequests: list,
+        counts,
+        event_id, // ✅ PASS TO COMPONENT ALSO
+      },
     };
-  } catch {
+  } catch (err) {
+    console.error(err);
     return {
       props: {
         pendingRequests: [],
+        event_id: null,
         counts: { pending: 0, approved: 0, ignored: 0 },
       },
     };
