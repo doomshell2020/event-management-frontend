@@ -546,17 +546,27 @@ const EventDetailPage = ({ event, slug }) => {
                                       className="btn mt-3 w-100"
                                       disabled={selectedCount === 0}
                                       style={{
-                                        background: selectedCount > 0 ? "#21a67a" : "#9fd6c5",
+                                        background: "linear-gradient(135deg, #af46e5 0%, #7263f1 50%, #e62d56 100%)",
                                         color: "#fff",
                                         borderRadius: "50px",
-                                        padding: "10px 30px",
+                                        padding: "10px 25px",
                                         letterSpacing: ".5px",
+                                        opacity: selectedCount === 0 ? 0.45 : 1,
+                                        cursor: selectedCount === 0 ? "not-allowed" : "pointer",
+                                        filter: selectedCount === 0 ? "grayscale(30%)" : "none",
+                                        boxShadow:
+                                          selectedCount > 0
+                                            ? "0 7px 15px rgba(79, 70, 229, 0.5), inset 0 0 0 0px rgba(255, 255, 255, 0.15)"
+                                            : "none",
+                                        transition: "all 0.3s ease"
                                       }}
                                       onClick={() => handleOpenAppointmentCart(w, selectedForThis)}
                                     >
                                       Book Appointment
                                     </button>
                                   </div>
+
+
                                 )}
                               </>
                             );

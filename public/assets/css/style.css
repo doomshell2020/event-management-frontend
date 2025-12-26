@@ -1856,7 +1856,7 @@ section#request-demo {
 #myevent-deshbord .event-sidebar ul li button {
   padding: 10px 10px 10px 10px;
   color: #fff;
-  font-size: 16px;
+  font-size: 15px;
   display: flex;
   align-items: center;
 }
@@ -1868,7 +1868,7 @@ color: #ffffff !important;
 
 #myevent-deshbord .event-sidebar ul.components2 li a {
   border-radius: 4px;
-  font-size: 18px;
+  font-size: 16px;
   transition: all 0.5s 0s ease;
   justify-content: center;
   line-height: normal;
@@ -2189,7 +2189,7 @@ cubic-bezier(0.4, 0, 0.2, 1);
 }
 .careyes-chekout-new .cart-mdl-only .ticket-item.only-ticket {
     border-left-width: 4px;
-       border-color: hsl(174 62% 44% / 1);
+       border-color: hsl(174 62% 44% / 1);background: linear-gradient(135deg, #fffbfb, #efe9dd);
 }
 
 
@@ -2254,7 +2254,7 @@ cubic-bezier(0.4, 0, 0.2, 1);
     margin-top: 0px !important;
 }
 .careyes-chekout-new .cart-mdl-only .chackout-box {
-    background-color: #ede9e0;
+    background-color: #ede9e0 !important;
     padding: 20px;
     border-radius: 19px;
 }
