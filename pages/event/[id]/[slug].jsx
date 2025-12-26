@@ -132,6 +132,17 @@ const EventDetailPage = ({ event, slug }) => {
 
   // appointment cart...
   const handleOpenAppointmentCart = (slots, selectedSlots) => {
+    if (!token) {
+      Swal.fire({
+        icon: "warning",
+        title: "Login Required",
+        text: "Please log in to view your cart.",
+        confirmButtonText: "Login Now"
+      }).then(() => {
+        router.push("/login");
+      });
+      return;
+    }
     // Extract only IDs
     const selectedIds = selectedSlots.map(s => s.id);
     setSlotIds(selectedIds)
@@ -420,168 +431,168 @@ const EventDetailPage = ({ event, slug }) => {
 
 
 
-  {event.status == "Y" && (
-      <section className="py-4">
-        <div className="container">
-          {appointmentData?.length > 0 && (
-            <>
-              <h5 className="mb-3">Available Appointments</h5>
-              <div className="row g-4">
-                {appointmentData.map((w) => (
-                  <div className="col-md-6" key={w.id}>
-                    <div className="card shadow-sm border-0 h-100">
+      {event.status == "Y" && (
+        <section className="py-4">
+          <div className="container">
+            {appointmentData?.length > 0 && (
+              <>
+                <h5 className="mb-3">Available Appointments</h5>
+                <div className="row g-4">
+                  {appointmentData.map((w) => (
+                    <div className="col-md-6" key={w.id}>
+                      <div className="card shadow-sm border-0 h-100">
 
-                      {/* Image */}
-                      <img
-                        src={w.Image}
-                        className="card-img-top"
-                        style={{ height: "130px", objectFit: "cover" }}
-                        alt={w.name}
-                      />
-
-                      <div className="card-body py-3">
-
-                        {/* Title */}
-                        <h6 className="fw-bold mb-1 text-uppercase" style={{ fontSize: "15px" }}>
-                          {w.name}
-                        </h6>
-
-                        {/* Location */}
-                        <p className="text-muted mb-2" style={{ fontSize: "13px" }}>
-                          <i className="bi bi-geo-alt-fill me-1"></i> {w.location}
-                        </p>
-
-                        {/* Description */}
-                        <div
-                          className="text-muted mb-3"
-                          style={{ fontSize: "13px", height: "40px", overflow: "hidden" }}
-                          dangerouslySetInnerHTML={{ __html: w.description }}
+                        {/* Image */}
+                        <img
+                          src={w.Image}
+                          className="card-img-top"
+                          style={{ height: "130px", objectFit: "cover" }}
+                          alt={w.name}
                         />
 
-                        {/* Slots Section */}
-                        {w.wellnessSlots?.length > 0 && (
-                          <p className="fw-bold mb-2 text-dark">Select Slot:</p>
-                        )}
+                        <div className="card-body py-3">
 
-                        {/* WRAP EVERYTHING IN IIFE */}
-                        {(() => {
-                          // per card selection values 
-                          const selectedForThis = selectedSlots[w.id] || [];
-                          const selectedCount = selectedForThis.length;
-                          const totalPrice = (selectedSlots[w.id] || []).reduce((sum, s) => sum + Number(s.price), 0);
-                          return (
-                            <>
-                              {/* SLOT LIST */}
-                              {w.wellnessSlots?.map((slot) => {
-                                // const isSelected = selectedForThis.includes(slot.id);
-                                const isSelected = (selectedSlots[w.id] || []).some((s) => s.id === slot.id);
-                                return (
-                                  <div
-                                    key={slot.id}
-                                    onClick={() => toggleSlotSelection(w.id, slot)}
-                                    style={{
-                                      border: isSelected ? "2px solid #21a67a" : "1px solid #ddd",
-                                      padding: "12px",
-                                      borderRadius: "6px",
-                                      marginBottom: "10px",
-                                      cursor: "pointer",
-                                      backgroundColor: isSelected ? "#eefcf4" : "#fff",
-                                      display: "flex",
-                                      justifyContent: "space-between",
-                                      alignItems: "center",
-                                      transition: "0.3s",
-                                    }}
-                                  >
-                                    {/* Checkbox */}
-                                    <input
-                                      type="checkbox"
-                                      className="form-check-input me-3"
-                                      checked={isSelected}
-                                      onChange={(e) => {
-                                        e.stopPropagation();
-                                        toggleSlotSelection(w.id, slot);
+                          {/* Title */}
+                          <h6 className="fw-bold mb-1 text-uppercase" style={{ fontSize: "15px" }}>
+                            {w.name}
+                          </h6>
+
+                          {/* Location */}
+                          <p className="text-muted mb-2" style={{ fontSize: "13px" }}>
+                            <i className="bi bi-geo-alt-fill me-1"></i> {w.location}
+                          </p>
+
+                          {/* Description */}
+                          <div
+                            className="text-muted mb-3"
+                            style={{ fontSize: "13px", height: "40px", overflow: "hidden" }}
+                            dangerouslySetInnerHTML={{ __html: w.description }}
+                          />
+
+                          {/* Slots Section */}
+                          {w.wellnessSlots?.length > 0 && (
+                            <p className="fw-bold mb-2 text-dark">Select Slot:</p>
+                          )}
+
+                          {/* WRAP EVERYTHING IN IIFE */}
+                          {(() => {
+                            // per card selection values 
+                            const selectedForThis = selectedSlots[w.id] || [];
+                            const selectedCount = selectedForThis.length;
+                            const totalPrice = (selectedSlots[w.id] || []).reduce((sum, s) => sum + Number(s.price), 0);
+                            return (
+                              <>
+                                {/* SLOT LIST */}
+                                {w.wellnessSlots?.map((slot) => {
+                                  // const isSelected = selectedForThis.includes(slot.id);
+                                  const isSelected = (selectedSlots[w.id] || []).some((s) => s.id === slot.id);
+                                  return (
+                                    <div
+                                      key={slot.id}
+                                      onClick={() => toggleSlotSelection(w.id, slot)}
+                                      style={{
+                                        border: isSelected ? "2px solid #21a67a" : "1px solid #ddd",
+                                        padding: "12px",
+                                        borderRadius: "6px",
+                                        marginBottom: "10px",
+                                        cursor: "pointer",
+                                        backgroundColor: isSelected ? "#eefcf4" : "#fff",
+                                        display: "flex",
+                                        justifyContent: "space-between",
+                                        alignItems: "center",
+                                        transition: "0.3s",
                                       }}
-                                    />
+                                    >
+                                      {/* Checkbox */}
+                                      <input
+                                        type="checkbox"
+                                        className="form-check-input me-3"
+                                        checked={isSelected}
+                                        onChange={(e) => {
+                                          e.stopPropagation();
+                                          toggleSlotSelection(w.id, slot);
+                                        }}
+                                      />
 
-                                    {/* DATE + TIME */}
-                                    <div style={{ fontSize: "14px" }}>
-                                      <div className="d-flex align-items-center gap-3">
+                                      {/* DATE + TIME */}
+                                      <div style={{ fontSize: "14px" }}>
+                                        <div className="d-flex align-items-center gap-3">
 
-                                        <span className="d-flex align-items-center">
-                                          <i className="bi bi-calendar me-1"></i>
-                                          <strong>{formatReadableDate(slot.date)}</strong>
-                                        </span>
+                                          <span className="d-flex align-items-center">
+                                            <i className="bi bi-calendar me-1"></i>
+                                            <strong>{formatReadableDate(slot.date)}</strong>
+                                          </span>
 
-                                        <span className="d-flex align-items-center">
-                                          <i className="bi bi-clock me-1"></i>
-                                          {formatTime(slot.slot_start_time)} - {formatTime(slot.slot_end_time)}
-                                        </span>
+                                          <span className="d-flex align-items-center">
+                                            <i className="bi bi-clock me-1"></i>
+                                            {formatTime(slot.slot_start_time)} - {formatTime(slot.slot_end_time)}
+                                          </span>
 
+                                        </div>
+                                      </div>
+
+                                      {/* PRICE */}
+                                      <div style={{ fontWeight: "bold", color: "#0c0c0c", fontSize: "16px" }}>
+                                        {w?.currencyName?.Currency_symbol}{" "}{slot.price}
                                       </div>
                                     </div>
+                                  );
+                                })}
 
-                                    {/* PRICE */}
-                                    <div style={{ fontWeight: "bold", color: "#0c0c0c", fontSize: "16px" }}>
-                                      {w?.currencyName?.Currency_symbol}{" "}{slot.price}
+                                {/* SUMMARY BOX */}
+                                {selectedCount > 0 && (
+                                  <div
+                                    style={{
+                                      padding: "12px",
+                                      background: "#f8fdfb",
+                                      border: "1px solid #d7f2ea",
+                                      borderRadius: "8px",
+                                      marginTop: "10px",
+                                      marginBottom: "15px",
+                                      fontSize: "14px",
+                                      display: "flex",
+                                      justifyContent: "space-between",
+                                    }}
+                                  >
+                                    <div>{selectedCount} slots selected</div>
+                                    <div style={{ fontWeight: "bold" }}>
+                                      Total: {w?.currencyName?.Currency_symbol}{" "}{totalPrice}
                                     </div>
                                   </div>
-                                );
-                              })}
+                                )}
 
-                              {/* SUMMARY BOX */}
-                              {selectedCount > 0 && (
-                                <div
-                                  style={{
-                                    padding: "12px",
-                                    background: "#f8fdfb",
-                                    border: "1px solid #d7f2ea",
-                                    borderRadius: "8px",
-                                    marginTop: "10px",
-                                    marginBottom: "15px",
-                                    fontSize: "14px",
-                                    display: "flex",
-                                    justifyContent: "space-between",
-                                  }}
-                                >
-                                  <div>{selectedCount} slots selected</div>
-                                  <div style={{ fontWeight: "bold" }}>
-                                    Total: {w?.currencyName?.Currency_symbol}{" "}{totalPrice}
+                                {/* BOOK BUTTON */}
+                                {w.wellnessSlots?.length > 0 && (
+                                  <div className="text-center">
+                                    <button
+                                      className="btn mt-3"
+                                      disabled={selectedCount === 0}
+                                      style={{
+                                        background: selectedCount > 0 ? "#21a67a" : "#9fd6c5",
+                                        color: "#fff",
+                                        borderRadius: "50px",
+                                        padding: "10px 30px",
+                                      }}
+                                      onClick={() => handleOpenAppointmentCart(w, selectedForThis)}
+                                    >
+                                      Book Appointment
+                                    </button>
                                   </div>
-                                </div>
-                              )}
+                                )}
+                              </>
+                            );
+                          })()}
 
-                              {/* BOOK BUTTON */}
-                              {w.wellnessSlots?.length > 0 && (
-                                <div className="text-center">
-                                  <button
-                                    className="btn mt-3"
-                                    disabled={selectedCount === 0}
-                                    style={{
-                                      background: selectedCount > 0 ? "#21a67a" : "#9fd6c5",
-                                      color: "#fff",
-                                      borderRadius: "50px",
-                                      padding: "10px 30px",
-                                    }}
-                                    onClick={() => handleOpenAppointmentCart(w, selectedForThis)}
-                                  >
-                                    Book Appointment
-                                  </button>
-                                </div>
-                              )}
-                            </>
-                          );
-                        })()}
-
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
-        </div>
-      </section>
-  )}
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* ✅ Cart Modal */}
       {

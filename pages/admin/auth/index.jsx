@@ -1,60 +1,40 @@
 import Head from 'next/head'
 import React from 'react'
-import { Inter } from 'next/font/google'
-import { Alert, Button, Col, Form, Row, Tab, Tabs, FormGroup, InputGroup, Toast, Tooltip, Modal, Container, Spinner } from 'react-bootstrap';
-import Link from "next/link";
+import { Alert, Button, Col, Form, Row, FormGroup, Modal, Spinner } from 'react-bootstrap';
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import Seo from '@/shared/layout-components/seo/seo'
 // import { auth } from "../shared/firebase/firebase"
 import axios from "axios";
-import { toast, Slide, Flip } from "react-toastify";
-import { ToastContainer } from "react-toastify";
-import Image from "next/image";
+import toast, { Toaster } from 'react-hot-toast';
 import Cookies from "js-cookie";
-
+import api from "@/utils/api";
+import { useAuth, login } from "@/shared/layout-components/layout/AuthContext";
 
 export default function Login() {
-
     // Firebase
-    const [err, setError] = useState("");
-    const [Email, setEmail] = useState("");
-    const [Password, setPassword] = useState("");
+      const router = useRouter();
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
     const [data, setData] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [validatedCustom, setValidatedCustom] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [responseMessage, setResponseMessage] = useState("");
 
-
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
-
-    let navigate = useRouter();
-    const routeChange = () => {
-        let path = `/admin/index/`;
-        navigate.push(path);
-    }
-
-    const routeFinance = () => {
-        let path = `/admin/finance/`;
-        navigate.push(path);
-    }
-
     const [rememberMe, setRememberMe] = useState(false);
-
     useEffect(() => {
         const savedEmail = Cookies.get("rememberEmail");
         const savedPassword = Cookies.get("rememberPassword");
-
         if (savedEmail && savedPassword) {
             setEmail(savedEmail);
             setPassword(atob(savedPassword)); // decode Base64
             setRememberMe(true);
         }
     }, []);
-
     useEffect(() => {
         if (document.body) {
             document.querySelector("body").classList.add("ltr", "error-page1", "bg-primary")
@@ -64,51 +44,35 @@ export default function Login() {
         }
     }, [])
 
+    const { adminLogin } = useAuth(); // get login function from context
 
-    const ReactLogin = async (event) => {
-        event.preventDefault();
+    const handleSubmit = async (e) => {
+        e.preventDefault();
         setIsLoading(true);
-        const apiUrl = '/api/v1/users/';
-        const body = new FormData();
-        body.append("Email", Email);
-        body.append("Password", Password);
-        body.append("key", "login");
         try {
-            const { data: resData } = await axios.post(apiUrl, body);
-            const { message, data, statusCode } = resData;
-
-            if (statusCode !== '200') {
-                // Successful login: store token + navigate
-                localStorage.setItem('accessToken_', data.token);
-                localStorage.setItem('UserID_', data.user.id);
-
-                // ✅ Set admin token cookie for middleware
-                // Cookies.set('adminAuthToken', data.token, { expires: 7 });
-                // Remember email & password if checked
-                if (rememberMe) {
-                    Cookies.set("rememberEmail", Email, { expires: 30 });
-                    Cookies.set("rememberPassword", btoa(Password), { expires: 30 }); // Base64 encode
-                } else {
-                    Cookies.remove("rememberEmail");
-                    Cookies.remove("rememberPassword");
-                }
-
-
-                if (data?.user.id == 12492) {
-                    routeFinance();
-                } else {
-                    routeChange();
-                }
-
-            } else {
-                // Handle error case clearly
-                setError(message || 'Login failed');
+            const payload = { email, password };
+            const res = await api.post("/api/v1/admin/auth/login", payload);
+            if (!res.data?.success) {
+                const msg =
+                    res.data?.error?.message ||
+                    res.data?.message ||
+                    "Invalid credentials, please try again.";
+                throw new Error(msg);
             }
 
+            const { token, admin } = res.data.data;
+            adminLogin(admin, token);
+            toast.success("Login successful!");
+            router.push("/admin/index");
         } catch (err) {
-            const errorMsg = err?.response?.data?.message || 'Something went wrong';
-            setError(errorMsg);
-            console.error("Login error:", errorMsg);
+            console.error("Login error:", err);
+
+            const apiErrorMsg =
+                err.response?.data?.error?.message ||
+                err.response?.data?.message ||
+                err.message ||
+                "Something went wrong. Please try again.";
+                toast.error(apiErrorMsg);
         } finally {
             setIsLoading(false);
         }
@@ -169,7 +133,6 @@ export default function Login() {
                     setIsLoading(false);
                     const message = err.response.data.message
                     console.log("message", message)
-                    // setError(message);
                 });
 
         }
@@ -186,7 +149,7 @@ export default function Login() {
             <Seo title={"Login"} />
             <div className="square-box"></div>
             <div className="page">
-                <ToastContainer />
+                <Toaster />
                 <div
                     className="page-single">
                     <div className="container">
@@ -218,8 +181,8 @@ export default function Login() {
                                                     <div className="panel panel-primary">
                                                         <div className="tab-menu-heading mb-2 border-bottom-0">
                                                             <div className="tabs-menu1">
-                                                                {err && <Alert variant="danger">{err}</Alert>}
-                                                                <Form action="#" onSubmit={ReactLogin} >
+                                                                {/* {err && <Alert variant="danger">{err}</Alert>} */}
+                                                                <Form action="#" onSubmit={handleSubmit} >
                                                                     <Form.Group className="form-group">
                                                                         <Form.Label>User Name</Form.Label>{" "}
                                                                         <Form.Control
@@ -227,7 +190,7 @@ export default function Login() {
                                                                             placeholder="Enter your user name"
                                                                             type="email"
                                                                             name='email'
-                                                                            value={Email}
+                                                                            value={email}
                                                                             required
                                                                             // onChange={changeHandler}
                                                                             onChange={(e) => {
@@ -252,7 +215,7 @@ export default function Login() {
                                                                             placeholder="Enter your password"
                                                                             type={showPassword ? 'text' : 'password'} // Toggle between text and password type
                                                                             name='password'
-                                                                            value={Password}
+                                                                            value={password}
                                                                             // onChange={changeHandler}
                                                                             onCopy={handleCopy}
                                                                             onChange={(e) => {
@@ -318,13 +281,7 @@ export default function Login() {
                                                                 </Form>
                                                             </div>
                                                         </div>
-
-                                                        {/* <div className="panel-body tabs-menu-body border-0 p-3">
-                                                            <div className="tab-content"></div>
-                                                        </div> */}
                                                     </div>
-
-
 
                                                     <Modal show={show} onHide={handleClose}>
                                                         <Modal.Header>
@@ -344,7 +301,7 @@ export default function Login() {
                                                                     <Form.Label>Email:</Form.Label>
                                                                     <Form.Control type="email"
                                                                         required
-                                                                        value={Email}
+                                                                        value={email}
                                                                         onChange={(e) => {
                                                                             setEmail(e.target.value);
                                                                         }}
