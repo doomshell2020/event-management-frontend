@@ -11,18 +11,13 @@ const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
     const [loading, setLoading] = useState(false);
     const showProgress = isProgressBarShow !== false;
 
-    // ================================
-    // Fetch Event List (ORIGINAL)
-    // ================================
+    // Fetch Event List
     const fetchEvents = async () => {
         setLoading(true);
         try {
             const res = await api.post(`/api/v1/events/event-list`);
-            if (res.data.success) {
-                setEventData(res.data.data.events || []);
-            } else {
-                setEventData([]);
-            }
+            if (res.data.success) setEventData(res.data.data.events || []);
+            else setEventData([]);
         } catch (error) {
             console.error("Error fetching events:", error);
             setEventData([]);
@@ -35,93 +30,47 @@ const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
         fetchEvents();
     }, []);
 
-    // ================================
-    // STATIC MENU ORDER (ORIGINAL)
-    // ================================
-    let steps = [];
+    // 🔹 Only define steps when eventDetails exists
+    const steps = React.useMemo(() => {
+        if (!eventDetails) return [];
+        if (eventDetails.entry_type && eventDetails.entry_type !== "event") {
+            return [
+                { serial: 1, label: "Manage Event", path: `/event/edit-event/${eventDetails.id}` },
+                { serial: 2, label: "Manage Tickets", path: `/event/edit-event/${eventDetails.id}/manage-tickets` },
+                { serial: 3, label: "Manage Date & Time", path: `/event/edit-event/${eventDetails.id}/manage-date-time` },
+                { serial: 4, label: "Ticket Pricing", path: `/event/edit-event/${eventDetails.id}/ticket-pricing` },
+                { serial: 5, label: "Publish Event", path: `/event/edit-event/${eventDetails.id}/publish-event` },
+            ];
+        } else {
+            return [
+                { serial: 1, label: "Manage Event", path: `/event/edit-event/${eventDetails.id}` },
+                { serial: 2, label: "Manage Tickets", path: `/event/edit-event/${eventDetails.id}/manage-tickets` },
+                { serial: 3, label: "Manage Committee", path: `/event/edit-event/${eventDetails.id}/committee/manage-committee` },
+                { serial: 4, label: "Publish Event", path: `/event/edit-event/${eventDetails.id}/publish-event` },
+            ];
+        }
+    }, [eventDetails]);
 
-    if (eventDetails?.entry_type && eventDetails.entry_type !== "event") {
-        steps = [
-            {
-                serial: 1,
-                label: "Manage Event",
-                path: `/event/edit-event/${eventDetails?.id}`,
-            },
-            {
-                serial: 2,
-                label: "Manage Tickets",
-                path: `/event/edit-event/${eventDetails?.id}/manage-tickets`,
-            },
-            {
-                serial: 3,
-                label: "Manage Date & Time",
-                path: `/event/edit-event/${eventDetails?.id}/manage-date-time`,
-            },
-            {
-                serial: 4,
-                label: "Ticket Pricing",
-                path: `/event/edit-event/${eventDetails?.id}/ticket-pricing`,
-            },
-            {
-                serial: 5,
-                label: "Publish Event",
-                path: `/event/edit-event/${eventDetails?.id}/publish-event`,
-            },
-        ];
-    } else {
-        steps = [
-            {
-                serial: 1,
-                label: "Manage Event",
-                path: `/event/edit-event/${eventDetails?.id}`,
-            },
-            {
-                serial: 2,
-                label: "Manage Tickets",
-                path: `/event/edit-event/${eventDetails?.id}/manage-tickets`,
-            },
-            {
-                serial: 3,
-                label: "Manage Committee",
-                path: `/event/edit-event/${eventDetails?.id}/committee/manage-committee`,
-            },
-            {
-                serial: 4,
-                label: "Publish Event",
-                path: `/event/edit-event/${eventDetails?.id}/publish-event`,
-            },
-        ];
-    }
+    // 🔹 ACTIVE STEP LOGIC
+    const normalizePath = (path) => path?.replace(/\/$/, "");
 
-    // ================================
-    // 🔥 ACTIVE STEP LOGIC (FIXED + SSR SAFE)
-    // ================================
-    const getActiveStepIndex = () => {
-        if (pathname?.includes("manage-committee")) return 2;
+    const activeIndex = React.useMemo(() => {
+        if (!pathname || steps.length == 0) return 0;
 
-        if (
-            pathname?.includes("manage-tickets") ||
-            pathname?.includes("manage-addons") ||
-            pathname?.includes("manage-questions") ||
-            pathname?.includes("manage-package")
-        ) return 1;
+        const currentPath = normalizePath(pathname);
 
-        if (pathname?.includes("publish-event")) return 3;
+        const index = steps.findIndex(step => normalizePath(step.path) == currentPath);
+        return index >= 0 ? index : 0;
+    }, [pathname, steps]);
 
-        return 0; // Manage Event
-    };
-
-    const activeIndex = getActiveStepIndex();
 
     return (
         <>
-            {/* ===== Event Name + Dropdown + View Button (ORIGINAL) ===== */}
             <div className="event_names d-flex justify-content-between align-items-center p-2 px-3 mb-3">
                 {/* Dropdown */}
                 <div className="dropdown">
                     <button
                         className="btn rounded-md text-sm text-white dropdown-toggle"
-                        id="eventDropdownMenu"
                         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                         style={{ backgroundColor: "#e62d56" }}
                     >
@@ -129,20 +78,18 @@ const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
                     </button>
 
                     {isDropdownOpen && (
-                        <ul className="dropdown-menu show" aria-labelledby="eventDropdownMenu">
+                        <ul className="dropdown-menu show">
                             {loading && (
                                 <li className="dropdown-item text-center">
                                     <div className="spinner-border spinner-border-sm text-primary me-2" />
                                     Loading events...
                                 </li>
                             )}
-
                             {!loading && eventData.length == 0 && (
                                 <li className="dropdown-item text-muted text-center">
                                     No events found
                                 </li>
                             )}
-
                             {!loading &&
                                 eventData.map((item, index) => (
                                     <li key={index}>
@@ -155,7 +102,6 @@ const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
                                         </Link>
                                     </li>
                                 ))}
-
                             <li>
                                 <Link
                                     className="dropdown-item browseall_event text-primary fw-semibold"
@@ -171,9 +117,7 @@ const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
 
                 {/* Title */}
                 <div className="text-center">
-                    <h6 className="event_Heading mb-0 fs-5 fw-bold">
-                        {eventDetails?.name || ""}
-                    </h6>
+                    <h6 className="event_Heading mb-0 fs-5 fw-bold">{eventDetails?.name || ""}</h6>
                 </div>
 
                 {/* View Event */}
@@ -190,17 +134,14 @@ const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
                 </div>
             </div>
 
-            {/* ===== Progress Bar (ORIGINAL MARKUP + FIXED LOGIC) ===== */}
-            {showProgress && (
+            {/* Progress Bar */}
+            {showProgress && steps.length > 0 && (
                 <div className="prosection">
                     <div className="table-responsive">
                         <div className="scroll_tab w-auto px-2">
                             <ul id="progressbar">
                                 {steps.map((step, index) => (
-                                    <li
-                                        key={index}
-                                        className={index <= activeIndex ? "active" : ""}
-                                    >
+                                    <li key={index} className={index <= activeIndex ? "active" : ""}>
                                         <Link className="fw-semibold" href={step.path}>
                                             {step.label}
                                         </Link>

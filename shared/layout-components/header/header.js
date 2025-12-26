@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Delete } from "../../redux/actions/action";
 import { useRouter } from "next/router";
 import Image from "next/image";
-
+import { handleAdminLogout } from "@/utils/logout";
 export default function Header() {
   const router = useRouter();
   const dispatch = useDispatch();
@@ -21,57 +21,30 @@ export default function Header() {
   const open = Boolean(anchorEl);
   const [Data, setData] = useState([]);
   const [profile, setProfile] = useState({});
-
-  // -------------------------
-  // Navigation
-  // -------------------------
-  const routeChange = (path = "/login") => router.push(path);
-
-  // -------------------------
-  // Logout
-  // -------------------------
-  const handleLogout = async () => {
-    try {
-      localStorage.removeItem("userAuthToken");
-      localStorage.removeItem("user");
-      sessionStorage.clear();
-
-      await fetch("/api/logout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ role: "admin" }),
-      });
-
-      routeChange("/admin");
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
-  };
-
   // -------------------------
   // Fetch Admin Profile
   // -------------------------
-  useEffect(() => {
-    const fetchProfile = async () => {
-      const token = localStorage.getItem("accessToken_");
-      if (!token) return routeChange("/admin");
+  // useEffect(() => {
+  //   const fetchProfile = async () => {
+  //     const token = localStorage.getItem("accessToken_");
+  //     if (!token) return routeChange("/admin");
 
-      try {
-        const response = await fetch("/api/v1/users", {
-          headers: { Authorization: token },
-        });
+  //     try {
+  //       const response = await fetch("/api/v1/users", {
+  //         headers: { Authorization: token },
+  //       });
 
-        const data = await response.json();
-        if (data.success && data.data) setProfile(data.data);
-        else routeChange("/admin");
-      } catch (error) {
-        console.error("Fetch profile error:", error.message);
-        routeChange("/admin");
-      }
-    };
+  //       const data = await response.json();
+  //       if (data.success && data.data) setProfile(data.data);
+  //       else routeChange("/admin");
+  //     } catch (error) {
+  //       console.error("Fetch profile error:", error.message);
+  //       routeChange("/admin");
+  //     }
+  //   };
 
-    fetchProfile();
-  }, []);
+  //   fetchProfile();
+  // }, []);
 
   // -------------------------
   // Cart Total
@@ -298,7 +271,9 @@ export default function Header() {
                     <Link
                       href="#"
                       className="dropdown-item"
-                      onClick={handleLogout}
+                      onClick={() => {
+                        handleAdminLogout(router);
+                      }}
                     >
                       <i className="far fa-arrow-alt-circle-left"></i> Sign Out
                     </Link>

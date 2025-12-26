@@ -56,7 +56,8 @@ api.interceptors.response.use(
       }
       console.warn("⚠️ Unauthorized: Token expired or invalid");
       // Optionally redirect if needed:
-      window.location.href = "/login";
+      // window.location.href = "/login";
+      window.location.href = "/admin/auth";
     }
 
     return Promise.reject(error);

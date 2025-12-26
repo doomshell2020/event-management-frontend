@@ -41,7 +41,6 @@ const LoadingComponent = ({ isActive }) => {
 
 export default function CartModal({ show, handleClose, eventId }) {
     const { cart, refreshCart, eventData, normalCart, addonCart, slotCart, loadingCart, setEventId } = useCart();
-    // console.log('eventData :', eventData);
 
     if (eventData)
         eventId = eventData.id;
@@ -54,6 +53,7 @@ export default function CartModal({ show, handleClose, eventId }) {
 
     const currencySymbol = eventData?.currencyName?.Currency_symbol || "₹";
     const currencyName = (eventData?.currencyName?.Currency || "INR").toLowerCase();
+    const ticket_limit = (eventData?.ticket_limit || 0);
 
     useEffect(() => {
         setIsLoading(loadingCart);
@@ -75,6 +75,32 @@ export default function CartModal({ show, handleClose, eventId }) {
         package_id: null,       // not needed for slot
     });
 
+    const getTotalTicketCountInCart = () => {
+        return cart.reduce((total, item) => {
+            if (item.item_type === "ticket") {
+                return total + (item.count || 0);
+            }
+            return total;
+        }, 0);
+    };
+
+    const checkTicketLimit = () => {
+        if (!ticket_limit || ticket_limit <= 0) return true; // no limit
+
+        const totalTicketsInCart = getTotalTicketCountInCart();
+
+        if (totalTicketsInCart >= ticket_limit) {
+            Swal.fire({
+                icon: "warning",
+                title: "Ticket Limit Reached",
+                text: `You can add maximum ${ticket_limit} tickets for this event.`,
+                confirmButtonText: "OK"
+            });
+            return false;
+        }
+
+        return true;
+    };
 
     const increaseCart = async (cartId) => {
         return await api.put(`/api/v1/cart/increase/${cartId}`);
@@ -266,6 +292,8 @@ export default function CartModal({ show, handleClose, eventId }) {
 
     const increaseTicket = async (ticket) => {
         const ticketId = ticket?.id;
+        // 🚫 TICKET LIMIT VALIDATION
+        if (!checkTicketLimit()) return;
 
         try {
             setLoadingId(ticketId);
@@ -368,6 +396,9 @@ export default function CartModal({ show, handleClose, eventId }) {
 
     const decreaseTicket = async (ticket) => {
         const ticketId = ticket?.id;
+
+        // 🚫 TICKET LIMIT VALIDATION
+        // if (!checkTicketLimit()) return;
 
         try {
             setLoadingId(ticketId);
@@ -612,6 +643,10 @@ export default function CartModal({ show, handleClose, eventId }) {
         const packageId = pkg?.id;
         if (!packageId) return;
 
+        // 🚫 TICKET LIMIT VALIDATION
+        if (!checkTicketLimit()) return;
+
+
         try {
             setLoadingId(`package-${packageId}`);
 
@@ -681,6 +716,8 @@ export default function CartModal({ show, handleClose, eventId }) {
     const decreasePackage = async (pkg) => {
         const packageId = pkg?.id;
         if (!packageId) return;
+        // 🚫 TICKET LIMIT VALIDATION
+        if (!checkTicketLimit()) return;
 
         try {
             setLoadingId(`package-${packageId}`);
@@ -973,7 +1010,6 @@ export default function CartModal({ show, handleClose, eventId }) {
             answer: answer
         }));
     };
-
 
     return (
         <Modal

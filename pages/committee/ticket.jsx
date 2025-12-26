@@ -73,7 +73,6 @@ const CommitteeEventCard = ({ event, assets }) => {
     );
 };
 
-
 export async function getServerSideProps(context) {
     try {
         const token = context.req.cookies?.userAuthToken || null;
@@ -131,6 +130,7 @@ export async function getServerSideProps(context) {
 }
 
 const CommitteePage = ({ counts, eventsList, assets }) => {
+console.log('eventsList :', eventsList);
 
     const [activeTab, setMyActiveTab] = useState("ticket");
     const router = useRouter()
