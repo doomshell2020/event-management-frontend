@@ -11,7 +11,8 @@ import Image from "next/image";
 import api from "@/utils/api";
 import Swal from "sweetalert2";
 import { useCart } from "@/shared/layout-components/layout/CartContext";
-
+import CheckoutForm from "@/pages/components/cart_new/CheckOut";
+import { formatPrice } from "@/utils/commonFunction";
 
 // Loader Component
 const LoadingComponent = ({ isActive }) => {
@@ -39,14 +40,20 @@ const LoadingComponent = ({ isActive }) => {
 };
 
 export default function CartModal({ show, handleClose, eventId }) {
+    const { cart, refreshCart, eventData, normalCart, addonCart, slotCart, loadingCart, setEventId } = useCart();
 
-    const { cart, refreshCart, eventData, normalCart, slotCart, loadingCart, setEventId } = useCart();
+    if (eventData)
+        eventId = eventData.id;
 
     const [isLoading, setIsLoading] = useState(true);
     const [cartLoading, setCartLoading] = useState(false);
     const [loadingId, setLoadingId] = useState(null); // track which pricing ID is loading
     const [adminFees, setAdminFees] = useState(8);
-    const [eventDetails, setEventDetails] = useState(null);
+    const [showNextStep, setShowNextStep] = useState(false);
+
+    const currencySymbol = eventData?.currencyName?.Currency_symbol || "₹";
+    const currencyName = (eventData?.currencyName?.Currency || "INR").toLowerCase();
+    const ticket_limit = (eventData?.ticket_limit || 0);
 
     useEffect(() => {
         setIsLoading(loadingCart);
@@ -54,8 +61,8 @@ export default function CartModal({ show, handleClose, eventId }) {
 
     useEffect(() => {
         if (eventId) {
-            setEventId(eventId);   // store eventId globally
-            refreshCart(eventId);  // load cart for that event
+            setEventId(eventId);
+            refreshCart(eventId);
         }
     }, []);
 
@@ -67,6 +74,33 @@ export default function CartModal({ show, handleClose, eventId }) {
         ticket_price_id: null,  // not needed for slot
         package_id: null,       // not needed for slot
     });
+
+    const getTotalTicketCountInCart = () => {
+        return cart.reduce((total, item) => {
+            if (item.item_type === "ticket") {
+                return total + (item.count || 0);
+            }
+            return total;
+        }, 0);
+    };
+
+    const checkTicketLimit = () => {
+        if (!ticket_limit || ticket_limit <= 0) return true; // no limit
+
+        const totalTicketsInCart = getTotalTicketCountInCart();
+
+        if (totalTicketsInCart >= ticket_limit) {
+            Swal.fire({
+                icon: "warning",
+                title: "Ticket Limit Reached",
+                text: `You can add maximum ${ticket_limit} tickets for this event.`,
+                confirmButtonText: "OK"
+            });
+            return false;
+        }
+
+        return true;
+    };
 
     const increaseCart = async (cartId) => {
         return await api.put(`/api/v1/cart/increase/${cartId}`);
@@ -258,14 +292,13 @@ export default function CartModal({ show, handleClose, eventId }) {
 
     const increaseTicket = async (ticket) => {
         const ticketId = ticket?.id;
+        // 🚫 TICKET LIMIT VALIDATION
+        if (!checkTicketLimit()) return;
 
         try {
             setLoadingId(ticketId);
 
             const existing = normalCart.find(item => item.uniqueId == ticketId);
-            // console.log('normalCart :', normalCart);
-            // console.log('existing :', existing);
-            // return false
 
             if (existing) {
                 await increaseCart(existing.cartId);
@@ -364,6 +397,9 @@ export default function CartModal({ show, handleClose, eventId }) {
     const decreaseTicket = async (ticket) => {
         const ticketId = ticket?.id;
 
+        // 🚫 TICKET LIMIT VALIDATION
+        // if (!checkTicketLimit()) return;
+
         try {
             setLoadingId(ticketId);
 
@@ -430,14 +466,291 @@ export default function CartModal({ show, handleClose, eventId }) {
         }
     };
 
+    const increaseAddon = async (addon) => {
+        const addonId = addon?.id;
+        try {
+            setLoadingId(addonId);
+
+            const existing = addonCart.find(
+                item => item.uniqueId == addonId
+            );
+
+            if (existing) {
+                await increaseCart(existing.cartId);
+            } else {
+                await addToCart({
+                    event_id: eventId,
+                    item_type: "addon",
+                    addons_id: addonId,
+                    count: 1
+                });
+            }
+
+            await refreshCart(eventId);
+
+        } catch (err) {
+
+            if (err?.response?.status == 409) {
+
+                const result = await Swal.fire({
+                    title: "Items from another event found!",
+                    text:
+                        err?.response?.data?.message ||
+                        "Your cart has products from another event. Clear it?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, Clear Cart",
+                    cancelButtonText: "No",
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    reverseButtons: true
+                });
+
+                if (!result.isConfirmed) {
+                    setLoadingId(null);
+                    return;
+                }
+
+                // Loader
+                Swal.fire({
+                    title: "Clearing Cart...",
+                    text: "Please wait",
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    didOpen: () => Swal.showLoading()
+                });
+
+                await clearCart();
+
+                Swal.fire({
+                    title: "Cart Cleared",
+                    text: "You can add items now.",
+                    icon: "success",
+                    timer: 1200,
+                    showConfirmButton: false
+                });
+
+                // Retry add addon
+                try {
+                    await addToCart({
+                        event_id: eventId,
+                        item_type: "addon",
+                        addon_id: addonId,
+                        count: 1
+                    });
+
+                    await refreshCart(eventId);
+
+                    Swal.fire({
+                        icon: "success",
+                        title: "Added Successfully",
+                        timer: 1200,
+                        showConfirmButton: false
+                    });
+
+                } catch (retryError) {
+                    console.log("Retry addon error:", retryError);
+                    Swal.fire({
+                        icon: "error",
+                        title: "Failed",
+                        text: "Could not add the addon after clearing cart."
+                    });
+                }
+
+                setLoadingId(null);
+                return;
+            }
+
+            console.log("Increase addon error:", err);
+
+        } finally {
+            setLoadingId(null);
+        }
+    };
+
+    const decreaseAddon = async (addon) => {
+        const addonId = addon?.id;
+
+        try {
+            setLoadingId(addonId);
+
+            const existing = addonCart.find(
+                item => item.uniqueId == addonId
+            );
+
+            if (!existing) return;
+
+            if (existing.count > 1) {
+                await decreaseCart(existing.cartId);
+            } else {
+                await deleteCart(existing.cartId);
+            }
+
+            await refreshCart(eventId);
+
+        } catch (err) {
+
+            if (err?.response?.status == 409) {
+
+                const result = await Swal.fire({
+                    title: "Items from another event found!",
+                    text:
+                        err?.response?.data?.message ||
+                        "Your cart belongs to another event. Clear it?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, Clear Cart",
+                    cancelButtonText: "No",
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    reverseButtons: true
+                });
+
+                if (!result.isConfirmed) {
+                    setLoadingId(null);
+                    return;
+                }
+
+                Swal.fire({
+                    title: "Clearing...",
+                    text: "Please wait...",
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    didOpen: () => Swal.showLoading()
+                });
+
+                await clearCart();
+
+                Swal.close();
+
+                Swal.fire({
+                    title: "Cart Cleared",
+                    text: "You can continue now.",
+                    icon: "success",
+                    timer: 1200,
+                    showConfirmButton: false
+                });
+            }
+
+            console.log("Decrease addon error:", err);
+
+        } finally {
+            setLoadingId(null);
+        }
+    };
+
+    const increasePackage = async (pkg) => {
+        const packageId = pkg?.id;
+        if (!packageId) return;
+
+        // 🚫 TICKET LIMIT VALIDATION
+        if (!checkTicketLimit()) return;
+
+
+        try {
+            setLoadingId(`package-${packageId}`);
+
+            const existing = cart.find(
+                item => item.item_type == "package" && item.uniqueId == packageId
+            );
+
+            const currentCount = existing?.count || 0;
+            const maxLimit = pkg?.limit || pkg?.max_quantity;
+
+            // 🚫 Limit validation
+            if (maxLimit && currentCount >= maxLimit) {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Limit Reached",
+                    text: `Maximum ${maxLimit} packages allowed.`
+                });
+                return;
+            }
+
+            if (existing) {
+                await increaseCart(existing.id);
+            } else {
+                await addToCart({
+                    event_id: eventId,
+                    item_type: "package",
+                    package_id: packageId,
+                    count: 1
+                });
+            }
+
+            await refreshCart(eventId);
+
+        } catch (err) {
+
+            if (err?.response?.status == 409) {
+                const result = await Swal.fire({
+                    title: "Items from another event found!",
+                    text: err?.response?.data?.message || "Clear cart to continue?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, Clear Cart",
+                    reverseButtons: true
+                });
+
+                if (!result.isConfirmed) return;
+
+                Swal.fire({ title: "Clearing Cart...", didOpen: () => Swal.showLoading() });
+                await clearCart();
+                Swal.close();
+
+                await addToCart({
+                    event_id: eventId,
+                    item_type: "package",
+                    package_id: packageId,
+                    count: 1
+                });
+
+                await refreshCart(eventId);
+            }
+
+        } finally {
+            setLoadingId(null);
+        }
+    };
+
+    const decreasePackage = async (pkg) => {
+        const packageId = pkg?.id;
+        if (!packageId) return;
+        // 🚫 TICKET LIMIT VALIDATION
+        if (!checkTicketLimit()) return;
+
+        try {
+            setLoadingId(`package-${packageId}`);
+
+            const existing = cart.find(
+                item => item.item_type == "package" && item.uniqueId == packageId
+            );
+
+            if (!existing) return;
+
+            if (existing.count > 1) {
+                await decreaseCart(existing.id);
+            } else {
+                await deleteCart(existing.id);
+            }
+
+            await refreshCart(eventId);
+
+        } catch (err) {
+            console.log("Decrease package error:", err);
+        } finally {
+            setLoadingId(null);
+        }
+    };
+
     // Calculate Totals
     const totalTickets = cart.reduce((n, item) => n + item.count, 0);
-    const priceTotal = cart.reduce(
+    const sub_total = cart.reduce(
         (n, item) => n + item.count * item.ticket_price,
         0
     );
-    const feeTotal = (priceTotal * adminFees) / 100;
-    const finalTotal = priceTotal + feeTotal;
+    const tax_total = (sub_total * adminFees) / 100;
+    const grand_total = sub_total + tax_total;
 
     const formatEventDateRange = (start, end) => {
         if (!start || !end) return "";
@@ -461,26 +774,28 @@ export default function CartModal({ show, handleClose, eventId }) {
 
     const handlePayNow = async () => {
         if (payLoading) return; // Prevent double click
-        setPayLoading(true);
+        // setPayLoading(true);
+        setShowNextStep(true);
+        return
         try {
-            const res = await api.post("/api/v1/orders/create", {
-                event_id: eventId,
-                total_amount: finalTotal,
-                payment_method: "Online"
-            });
+            // const res = await api.post("/api/v1/orders/create", {
+            //     event_id: eventId,
+            //     total_amount: grand_total,
+            //     payment_method: "Online"
+            // });
             handleClose(false)
 
             // SUCCESS POPUP
-            Swal.fire({
-                icon: "success",
-                title: "Order Created!",
-                text: res?.data?.message || "Your order has been created successfully.",
-                confirmButtonText: "OK",
-            });
+            // Swal.fire({
+            //     icon: "success",
+            //     title: "Order Created!",
+            //     text: res?.data?.message || "Your order has been created successfully.",
+            //     confirmButtonText: "OK",
+            // });
 
             // console.log("Order created:", res.data);
 
-            await refreshCart(eventId || undefined);
+            // await refreshCart(eventId || undefined);
 
             // OPTIONAL: redirect to payment page
             // navigate("/payment");
@@ -540,370 +855,758 @@ export default function CartModal({ show, handleClose, eventId }) {
         });
     };
 
+    const [isBtnLoading, setIsBtnLoading] = useState(false);
+
+    const handlePurchase = async (event) => {
+        event.preventDefault();
+        setIsBtnLoading(true);
+        setTimeout(() => {
+            setShowNextStep(true);
+            setIsBtnLoading(false);
+        }, 1000);
+    };
+
+    const Counter = ({ count = 0, onInc, onDec, loading }) => {
+        if (loading) return <Spinner size="sm" />;
+
+        return (
+            <div className="d-flex align-items-center counter-btn">
+                <button className="btn btn-sm text-white" onClick={onDec}>–</button>
+
+                <span className="mx-2 text-white" style={{
+                    fontSize: "11px",
+                    width: "20px",
+                    textAlign: "center",
+                    display: "flex",
+                    justifyContent: "center",
+                }}>
+                    {count}
+                </span>
+
+                <button className="btn btn-sm text-white" onClick={onInc}>+</button>
+            </div>
+        );
+    };
+
+    // Store selected committee member per ticket
+    const [selectedMembers, setSelectedMembers] = useState({});
+
+    const requestCommitteeTicket = async (ticket, selectedMember) => {
+
+        // 1️⃣ Prepare question answers
+        const questionAnswers = buildQuestionAnswers(ticket.id);
+
+        try {
+            Swal.fire({
+                title: "Requesting ticket...",
+                text: "Please wait",
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            const cartData = {
+                event_id: eventId,
+                item_type: "committesale",
+                ticket_id: ticket.id,
+                count: 1,
+                committee_member_id: selectedMember.id,
+                questionAnswers
+            };
+            const response = await api.post("/api/v1/cart/add", cartData);
+            Swal.close();
+            if (response?.data?.success) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Request Sent",
+                    text: "Committee ticket request sent successfully"
+                });
+            }
+        } catch (error) {
+            Swal.close();
+            const errorMessage =
+                error?.response?.data?.error?.message ||
+                "Something went wrong";
+            Swal.fire({
+                icon: "error",
+                title: "Request Failed",
+                text: errorMessage
+            });
+
+            console.log("Committee Request Error:", error);
+            return false;
+        }
+    };
+
+    const [ticketAnswers, setTicketAnswers] = useState({});
+
+    const handleQuestionChange = (ticketId, questionId, value) => {
+        setTicketAnswers(prev => {
+            const tId = String(ticketId);
+            const qId = String(questionId);
+
+            // If empty → remove question answer
+            if (typeof value == "string" && value.trim() == "") {
+                const updatedTicket = { ...(prev[tId] || {}) };
+                delete updatedTicket[qId];
+
+                // If no questions left → remove ticket object
+                if (Object.keys(updatedTicket).length == 0) {
+                    const updatedState = { ...prev };
+                    delete updatedState[tId];
+                    return updatedState;
+                }
+
+                return {
+                    ...prev,
+                    [tId]: updatedTicket
+                };
+            }
+
+            // Normal set
+            return {
+                ...prev,
+                [tId]: {
+                    ...prev[tId],
+                    [qId]: value
+                }
+            };
+        });
+    };
+
+    const validateTicketQuestions = (ticketId, ticketQuestions) => {
+
+        const missingQuestions = [];
+
+        for (let q of ticketQuestions) {
+            const answer =
+                ticketAnswers?.[String(ticketId)]?.[String(q.id)];
+
+            if (
+                answer == undefined ||
+                answer == null ||
+                (typeof answer == "string" && answer.trim() == "")
+            ) {
+                missingQuestions.push(q.question);
+            }
+        }
+
+        if (missingQuestions.length > 0) {
+            return {
+                valid: false,
+                message: `Please answer the following questions:\n\n• ${missingQuestions.join("\n• ")}`
+            };
+        }
+
+        return { valid: true };
+    };
+
+    const buildQuestionAnswers = (ticketId) => {
+        const answersObj = ticketAnswers?.[String(ticketId)] || {};
+
+        return Object.entries(answersObj).map(([questionId, answer]) => ({
+            question_id: Number(questionId),
+            answer: answer
+        }));
+    };
+
     return (
         <Modal
             show={show}
             onHide={handleClose}
             backdrop="static"
             keyboard={true}
-            dialogClassName="cart-modal-size"
+            dialogClassName="cart-modal-size cart-mdl-only"
             className="careyes-chekout-new oxmonten2025EvntSec"
         >
-            <Modal.Header>
-                <Button onClick={handleClose} className="btn-close ms-auto">
-                    ×
-                </Button>
-            </Modal.Header>
+            {!showNextStep ? (
+                <>
+                    <Modal.Header>
+                        <Button onClick={handleClose} className="btn-close ms-auto">
+                            ×
+                        </Button>
+                    </Modal.Header>
 
-            <Modal.Body className="px-3 care-new-check">
-                <LoadingComponent isActive={isLoading} />
+                    <Modal.Body className="px-3 care-new-check">
+                        <LoadingComponent isActive={isLoading} />
+                        {eventData && (
+                            <div className="checkout-innr">
+                                <Row>
+                                    {/* LEFT SIDE */}
+                                    <Col lg={8}>
+                                        <div className="model-left-content">
 
-                {!isLoading && eventData && (
-                    <div className="checkout-innr">
-                        <Row className="gy-4">
-                            {/* LEFT SIDE */}
-                            <Col lg={8}>
-                                <div className="checkot-lft">
-                                    <h2 className="ck-mn-hd">{eventData.name}</h2>
+                                            <div className="cart-mdl-innercontent">
+                                                <Row className="align-items-start">
 
-                                    <div className="ck-event-dtl">
-                                        <div className="eventsBxSec">
-                                            <Row className="gy-3 align-items-start">
+                                                    {/* EVENT IMAGE BIG SIZE */}
+                                                    <Col md={5}>
+                                                        <h2 className="cart-mdl-title">{eventData.name}</h2>
+                                                        <div className="cartmdl-left-img" style={{ textAlign: "center" }}>
+                                                            <Image
+                                                                src={eventData.feat_image}
+                                                                alt={eventData.name}
+                                                                width={380}
+                                                                height={380}
+                                                                className="firstDayEvent"
+                                                                style={{
+                                                                    borderRadius: "12px",
+                                                                    width: "100%",
+                                                                    height: "100%",
+                                                                    objectFit: "cover"
+                                                                }}
+                                                            />
 
-                                                {/* EVENT IMAGE BIG SIZE */}
-                                                <Col md={5}>
-                                                    <div className="evt-innr-dtl" style={{ textAlign: "center" }}>
-                                                        <Image
-                                                            src={eventData.feat_image}
-                                                            alt={eventData.name}
-                                                            width={380}
-                                                            height={380}
-                                                            className="firstDayEvent"
-                                                            style={{
-                                                                borderRadius: "12px",
-                                                                width: "100%",
-                                                                height: "auto",
-                                                                objectFit: "cover"
-                                                            }}
-                                                        />
 
-                                                        <div className="monte-evntcnts mt-3">
-                                                            <strong style={{ fontSize: "18px" }}>
+                                                        </div>
+                                                        <div className="event-crt-deta mt-2 text-center">
+                                                            <strong className="mdl-event-name">
                                                                 {eventData.location}
                                                             </strong>
 
-                                                            <p style={{ marginTop: "6px", fontSize: "15px", color: "#555" }}>
+                                                            <p
+                                                                className="badge rounded-pill border text-wrap px-3 py-2 mt-1"
+                                                                style={{
+                                                                    backgroundColor: "#fdf7ff",
+                                                                    color: "black",
+                                                                    borderColor: "rgba(96,14,125,.25)",
+                                                                    boxShadow: "0px 6px 7px -8px #000"
+                                                                }}
+                                                            >
                                                                 {formatEventDateRange(
                                                                     eventData.date_from?.local,
                                                                     eventData.date_to?.local
                                                                 )}
                                                             </p>
+
                                                         </div>
-                                                    </div>
-                                                </Col>
+                                                    </Col>
 
-                                                {/* DESCRIPTION WITH SHOW MORE/LESS */}
-                                                <Col md={7}>
-                                                    <div className="event-description mt-2">
-                                                        <div
-                                                            style={{
-                                                                maxHeight: showFullDesc ? "none" : "90px",
-                                                                overflow: "hidden",
-                                                                position: "relative",
-                                                                fontSize: "15px",
-                                                                lineHeight: "22px"
-                                                            }}
-                                                            dangerouslySetInnerHTML={{
-                                                                __html: eventData.desp,
-                                                            }}
-                                                        />
+                                                    <Col md={7}>
+                                                        {(eventData.tickets?.length > 0 || eventData.addons?.length > 0 || eventData.slots?.length > 0) && (
+                                                            <div className="ticket-section">
+                                                                <h5 className="mb-3">Available Tickets</h5>
 
-                                                        {/* SHOW MORE / LESS BUTTON */}
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => setShowFullDesc(!showFullDesc)}
-                                                            style={{
-                                                                marginTop: "10px",
-                                                                background: "none",
-                                                                border: "none",
-                                                                color: "#007bff",
-                                                                cursor: "pointer",
-                                                                fontWeight: "600",
-                                                                padding: 0
-                                                            }}
-                                                        >
-                                                            {showFullDesc ? "Show Less ▲" : "Show More ▼"}
-                                                        </button>
-                                                    </div>
-                                                </Col>
-                                            </Row>
-                                        </div>
-                                    </div>
+                                                                {/* 📦 PACKAGES */}
+                                                                {eventData.package
+                                                                    ?.filter(pkg => pkg.hidden != "Y" && pkg.status == "Y")
+                                                                    .map((pkg, i) => (
+                                                                        <div
+                                                                            key={`package-${i}`}
+                                                                            className="ticket-item only-ticket package-box"
+                                                                            style={{
+                                                                                border: "1px solid #e6e6e6",
+                                                                                borderRadius: "8px",
+                                                                                padding: "14px 16px",
+                                                                                marginBottom: "12px",
+                                                                                background: "#fafafa"
+                                                                            }}
+                                                                        >
+                                                                            {/* HEADER */}
+                                                                            <div className="d-flex justify-content-between align-items-center mb-2">
+                                                                                <div>
+                                                                                    <strong style={{ fontSize: "16px" }}>
+                                                                                        {pkg.name}
+                                                                                        <span
+                                                                                            style={{
+                                                                                                marginLeft: 8,
+                                                                                                fontSize: 11,
+                                                                                                padding: "2px 8px",
+                                                                                                background: "#6f42c1",
+                                                                                                color: "#fff",
+                                                                                                borderRadius: 12
+                                                                                            }}
+                                                                                        >
+                                                                                            PACKAGE
+                                                                                        </span>
+                                                                                    </strong>
 
-                                    {/* AVAILABLE TICKETS */}
-                                    {eventData.tickets?.length > 0 && (
-                                        <div className="ticket-section mt-4">
-                                            <h5 className="mb-3">Available Tickets</h5>
+                                                                                    {/* <div className="text-muted text-13 mt-1">
+                                                                                        Limit: {pkg.package_limit}
+                                                                                    </div> */}
+                                                                                </div>
 
-                                            {eventData.tickets.map((ticket, i) => {
-                                                const pricingId = ticket?.id;
-                                                const cartItem = normalCart.find(item => item.uniqueId == pricingId);
-                                                const isLoading = loadingId == pricingId;
-                                                return (
-                                                    <div key={i} className="ticket-box mb-3 p-3 border rounded shadow-sm">
+                                                                                <div className="text-end">
+                                                                                    <div style={{ fontSize: 14 }}>
+                                                                                        Total: <strong>{currencySymbol}{formatPrice(pkg.total)}</strong>
+                                                                                    </div>
 
-                                                        <div className="d-flex justify-content-between align-items-center">
-                                                            <strong style={{ fontSize: "17px" }}>{ticket.title}</strong>
+                                                                                    {pkg.discount_amt > 0 && (
+                                                                                        <div className="text-success text-13">
+                                                                                            Discount: −{currencySymbol}{formatPrice(pkg.discount_amt)}
+                                                                                        </div>
+                                                                                    )}
 
-                                                            {/* Counter */}
-                                                            {isLoading ? (
-                                                                <Spinner size="sm" />
-                                                            ) : (
-                                                                <div className="d-flex align-items-center">
+                                                                                    <div style={{ fontSize: 15, fontWeight: 600 }}>
+                                                                                        Pay: {currencySymbol}{formatPrice(pkg.grandtotal)}
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
 
-                                                                    {/* Decrease */}
-                                                                    <button
-                                                                        className="btn btn-sm btn-outline-secondary"
-                                                                        onClick={() => decreaseTicket(ticket)}
-                                                                        disabled={isLoading}
-                                                                    >
-                                                                        –
-                                                                    </button>
+                                                                            {/* PACKAGE ITEMS */}
+                                                                            <div className="mt-2">
+                                                                                {pkg.details.map((item, idx) => (
+                                                                                    <div
+                                                                                        key={idx}
+                                                                                        className="d-flex justify-content-between align-items-center py-1"
+                                                                                        style={{ fontSize: 14 }}
+                                                                                    >
+                                                                                        <div>
+                                                                                            {item.ticketType && (
+                                                                                                <>
+                                                                                                    🎟️ {item.ticketType.title}
+                                                                                                    <span className="text-muted"> × {item.qty}</span>
+                                                                                                </>
+                                                                                            )}
 
-                                                                    {/* Count */}
-                                                                    <span
-                                                                        className="mx-2"
-                                                                        style={{
-                                                                            fontSize: "16px",
-                                                                            width: "25px",
-                                                                            textAlign: "center",
-                                                                            display: "flex",
-                                                                            justifyContent: "center"
-                                                                        }}
-                                                                    >
-                                                                        {cartItem?.count || 0}
-                                                                    </span>
+                                                                                            {item.addonType && (
+                                                                                                <>
+                                                                                                    ➕ {item.addonType.name}
+                                                                                                    <span className="text-muted"> × {item.qty}</span>
+                                                                                                </>
+                                                                                            )}
+                                                                                        </div>
 
-                                                                    {/* Increase */}
-                                                                    <button
-                                                                        className="btn btn-sm btn-outline-primary"
-                                                                        onClick={() => increaseTicket(ticket)}
-                                                                        disabled={isLoading}
-                                                                    >
-                                                                        +
-                                                                    </button>
+                                                                                        <div className="text-muted">
+                                                                                            {currencySymbol}
+                                                                                            {formatPrice(
+                                                                                                (item.ticketType?.price || item.addonType?.price || 0) * item.qty
+                                                                                            )}
+                                                                                        </div>
+                                                                                    </div>
+                                                                                ))}
+                                                                            </div>
 
-                                                                </div>
-                                                            )}
-                                                        </div>
+                                                                            {/* ACTION */}
+                                                                            <div className="text-end mt-3 d-flex justify-content-end">
 
-                                                        {/* Pricing Display */}
-                                                        <p className="mt-2">Base Price: ₹{ticket.price}</p>
+                                                                                <Counter
+                                                                                    count={
+                                                                                        cart.find(
+                                                                                            item => item.item_type == "package" && item.uniqueId == pkg.id
+                                                                                        )?.count || 0
+                                                                                    }
+                                                                                    loading={loadingId == `package-${pkg.id}`}
+                                                                                    onInc={() => increasePackage(pkg)}
+                                                                                    onDec={() => decreasePackage(pkg)}
+                                                                                />
+                                                                            </div>
 
-                                                        {ticket.pricings?.length > 0 && (
-                                                            <div className="pricing-tier mt-2">
-                                                                {ticket.pricings.map((p, idx) => (
-                                                                    <div key={idx} className="d-flex justify-content-between">
-                                                                        <span>{p.date}</span>
-                                                                        <span>₹{p.price}</span>
-                                                                    </div>
-                                                                ))}
+                                                                        </div>
+                                                                    ))}
+
+
+                                                                {/* 🎟️ TICKETS */}
+                                                                {eventData.tickets
+                                                                    ?.filter(ticket => ticket.hidden !== "Y")
+                                                                    .map((ticket, i) => {
+                                                                        const cartItem = normalCart.find(item => item.uniqueId == ticket.id);
+                                                                        const isLoading = loadingId == ticket.id;
+                                                                        const isSoldOut = ticket.sold_out == "Y";
+                                                                        const isCommittee = ticket.type == "committee_sales";
+                                                                        const committeeStatus = ticket.committee_status || null;
+
+                                                                        const committeeMembers = isCommittee
+                                                                            ? ticket.committeeAssignedTickets
+                                                                                ?.filter(ct =>
+                                                                                    ct.status == "Y" &&
+                                                                                    ct.committeeMember?.status == "Y" &&
+                                                                                    ct.committeeMember?.user
+                                                                                )
+                                                                                ?.map(ct => ({
+                                                                                    id: ct.committeeMember.user.id,
+                                                                                    name: `${ct.committeeMember.user.first_name} ${ct.committeeMember.user.last_name}`.trim(),
+                                                                                    email: ct.committeeMember.user.email
+                                                                                })) || []
+                                                                            : [];
+
+                                                                        // ✅ Filter questions that belong to this ticket
+                                                                        const ticketQuestions = eventData.questions?.filter(q =>
+                                                                            q.ticket_type_id
+                                                                                .split(",")
+                                                                                .map(id => id.trim())
+                                                                                .includes(ticket.id.toString())
+                                                                        ) || [];
+
+                                                                        return (
+                                                                            <div
+                                                                                key={`ticket-${i}`}
+                                                                                className={`ticket-item only-ticket ${isCommittee ? "committee-ticket" : ""}`}
+                                                                                style={{ display: "flex", flexDirection: "column", gap: "10px", padding: "10px 15px" }}
+                                                                            >
+                                                                                <div className="d-flex justify-content-between align-items-center ticket-infobox">
+                                                                                    {/* LEFT INFO */}
+                                                                                    <div className="ticket-info" style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                                                                                        <strong style={{ fontSize: "15px" }}>
+                                                                                            {ticket.title}
+                                                                                            {isCommittee && <span className="ticket-type-badge committee">COMMITTEE</span>}
+                                                                                        </strong>
+                                                                                        <p className="mt-1 mb-0">Base Price: {currencySymbol}{formatPrice(ticket.price)}</p>
+
+                                                                                        {isCommittee && committeeStatus == null && (
+                                                                                            <select
+                                                                                                className="form-select"
+                                                                                                style={{ height: "auto", borderRadius: "5px" }}
+                                                                                                value={selectedMembers[ticket.id]?.id || ""}
+                                                                                                onChange={(e) => {
+                                                                                                    const member = committeeMembers.find(m => m.id == e.target.value);
+                                                                                                    setSelectedMembers(prev => ({
+                                                                                                        ...prev,
+                                                                                                        [ticket.id]: member
+                                                                                                    }));
+                                                                                                }}
+                                                                                            >
+                                                                                                <option value="">Select Member</option>
+                                                                                                {committeeMembers.map(member => (
+                                                                                                    <option key={member.id} value={member.id}>
+                                                                                                        {member.name}
+                                                                                                    </option>
+                                                                                                ))}
+                                                                                            </select>
+                                                                                        )}
+                                                                                    </div>
+
+                                                                                    {/* RIGHT ACTION */}
+                                                                                    {isSoldOut ? (
+                                                                                        <div className="sold-out-box">Sold Out</div>
+                                                                                    ) : isCommittee ? (
+                                                                                        committeeStatus == "approved" ? (
+                                                                                            <Counter
+                                                                                                count={cartItem?.count || 0}
+                                                                                                loading={isLoading}
+                                                                                                onInc={() => increaseTicket(ticket)}
+                                                                                                onDec={() => decreaseTicket(ticket)}
+                                                                                            />
+                                                                                        ) : committeeStatus == "pending" ? (
+                                                                                            <div className="committee-status pending">Request Sent</div>
+                                                                                        ) : committeeStatus == "rejected" ? (
+                                                                                            <div className="committee-status rejected">Rejected</div>
+                                                                                        ) : (
+                                                                                            selectedMembers[ticket.id] && (
+                                                                                                <button
+                                                                                                    className="btn btn-sm primery-button"
+                                                                                                    onClick={() => {
+                                                                                                        const ticketQuestions = eventData.questions?.filter(q =>
+                                                                                                            q.ticket_type_id
+                                                                                                                .split(",")
+                                                                                                                .map(id => id.trim())
+                                                                                                                .includes(ticket.id.toString())
+                                                                                                        ) || [];
+
+                                                                                                        const validation = validateTicketQuestions(ticket.id, ticketQuestions);
+                                                                                                        console.log('validation :', validation);
+
+                                                                                                        if (!validation.valid) {
+                                                                                                            Swal.fire({
+                                                                                                                icon: "warning",
+                                                                                                                title: "Incomplete Information",
+                                                                                                                text: validation.message
+                                                                                                            });
+                                                                                                            return;
+                                                                                                        }
+
+                                                                                                        requestCommitteeTicket(ticket, selectedMembers[ticket.id]);
+                                                                                                    }}
+
+                                                                                                >
+                                                                                                    Request
+                                                                                                </button>
+
+
+                                                                                            )
+                                                                                        )
+                                                                                    ) : (
+                                                                                        <Counter
+                                                                                            count={cartItem?.count || 0}
+                                                                                            loading={isLoading}
+                                                                                            onInc={() => increaseTicket(ticket)}
+                                                                                            onDec={() => decreaseTicket(ticket)}
+                                                                                        />
+                                                                                    )}
+                                                                                </div>
+
+                                                                                {/* 🎯 Questions for this ticket only */}
+                                                                                {ticketQuestions.map(q => (
+                                                                                    <div key={q.id} className="ticket-question" style={{ marginTop: "10px" }}>
+                                                                                        {/* ✅ Question Label */}
+                                                                                        <label style={{ fontWeight: 500 }}>{q.question}</label>
+
+                                                                                        {/* 🎯 Agree → Yes / No */}
+                                                                                        {q.type == "Agree" && (
+                                                                                            <div>
+                                                                                                <label style={{ marginRight: "10px" }}>
+                                                                                                    <input
+                                                                                                        type="radio"
+                                                                                                        name={`q_${ticket.id}_${q.id}`}
+                                                                                                        value="Y"
+                                                                                                        checked={ticketAnswers?.[ticket.id]?.[q.id] == "Y"}
+                                                                                                        onChange={(e) => handleQuestionChange(ticket.id, q.id, e.target.value)}
+                                                                                                    /> Yes
+                                                                                                </label>
+                                                                                                <label>
+                                                                                                    <input
+                                                                                                        type="radio"
+                                                                                                        name={`q_${ticket.id}_${q.id}`}
+                                                                                                        value="N"
+                                                                                                        checked={ticketAnswers?.[ticket.id]?.[q.id] == "N"}
+                                                                                                        onChange={(e) => handleQuestionChange(ticket.id, q.id, e.target.value)}
+                                                                                                    /> No
+                                                                                                </label>
+                                                                                            </div>
+                                                                                        )}
+
+                                                                                        {/* 🎯 Select → Dropdown */}
+                                                                                        {q.type == "Select" && (
+                                                                                            <select
+                                                                                                className="form-select"
+                                                                                                value={ticketAnswers?.[ticket.id]?.[q.id] || ""}
+                                                                                                onChange={(e) => handleQuestionChange(ticket.id, q.id, e.target.value)}
+                                                                                            >
+                                                                                                <option value="">Select</option>
+                                                                                                {q.questionItems.map(item => (
+                                                                                                    <option key={item.id} value={item.items}>
+                                                                                                        {item.items}
+                                                                                                    </option>
+                                                                                                ))}
+                                                                                            </select>
+                                                                                        )}
+
+                                                                                        {/* 🎯 Text → Input */}
+                                                                                        {q.type == "Text" && (
+                                                                                            <input
+                                                                                                type="text"
+                                                                                                className="form-control"
+                                                                                                placeholder={q.question}
+                                                                                                value={ticketAnswers?.[ticket.id]?.[q.id] || ""}
+                                                                                                onChange={(e) => handleQuestionChange(ticket.id, q.id, e.target.value)}
+                                                                                            />
+                                                                                        )}
+                                                                                    </div>
+                                                                                ))}
+                                                                            </div>
+                                                                        );
+                                                                    })}
+
+                                                                {/* ➕ ADDONS */}
+                                                                {eventData.addons
+                                                                    ?.filter(addon => addon.hidden !== "Y")
+                                                                    .map((addon, i) => {
+                                                                        const cartItem = addonCart.find(item => item.uniqueId == addon.id);
+                                                                        const isLoading = loadingId == addon.id;
+                                                                        const isSoldOut = addon.sold_out == "Y";
+
+                                                                        return (
+                                                                            <div key={`addon-${i}`} className="ticket-item only-ticket ticket-addon">
+                                                                                <div className="d-flex justify-content-between align-items-start ticket-infobox">
+                                                                                    <div className="ticket-info">
+                                                                                        <strong style={{ fontSize: "15px" }}>{addon.name} <span className="addon-badge">ADDON</span></strong>
+                                                                                        <p className="mt-2">Price: {currencySymbol}{formatPrice(addon.price)}</p>
+                                                                                    </div>
+                                                                                    {isSoldOut ? (
+                                                                                        <div className="sold-out-box">Sold Out</div>
+                                                                                    ) : (
+                                                                                        <Counter
+                                                                                            count={cartItem?.count || 0}
+                                                                                            loading={isLoading}
+                                                                                            onInc={() => increaseAddon(addon)}
+                                                                                            onDec={() => decreaseAddon(addon)}
+                                                                                        />
+                                                                                    )}
+                                                                                </div>
+                                                                            </div>
+                                                                        );
+                                                                    })}
+
+                                                                {/* ⏰ SLOTS */}
+                                                                {eventData.slots
+                                                                    ?.filter(slot => slot.hidden !== "Y")
+                                                                    .map((slot, i) => {
+                                                                        const pricingId = slot.pricings?.[0]?.id;
+                                                                        const cartItem = slotCart.find(item => item.uniqueId == pricingId);
+                                                                        const isLoading = loadingId == pricingId;
+                                                                        const isSoldOut = slot.sold_out == "Y";
+
+                                                                        return (
+                                                                            <div key={`slot-${i}`} className="ticket-item only-ticket">
+                                                                                <div className="d-flex justify-content-between align-items-start ticket-infobox">
+                                                                                    <div className="ticket-info">
+                                                                                        <strong>{slot.slot_name}</strong>
+                                                                                        <p className="mt-2">{formatReadableDate(slot.slot_date)} | {slot.start_time} - {slot.end_time}</p>
+                                                                                    </div>
+                                                                                    {isSoldOut ? (
+                                                                                        <div className="sold-out-box">Sold Out</div>
+                                                                                    ) : (
+                                                                                        <Counter
+                                                                                            count={cartItem?.count || 0}
+                                                                                            loading={isLoading}
+                                                                                            onInc={() => increaseSlot(slot)}
+                                                                                            onDec={() => decreaseSlot(slot)}
+                                                                                        />
+                                                                                    )}
+                                                                                </div>
+                                                                            </div>
+                                                                        );
+                                                                    })}
+
                                                             </div>
+
                                                         )}
+                                                    </Col>
+                                                </Row>
+                                            </div>
 
-                                                    </div>
-                                                );
-                                            })}
                                         </div>
-                                    )}
+                                    </Col>
 
+                                    {/* RIGHT SIDE (CART SUMMARY) */}
 
-                                    {/* AVAILABLE SLOTS */}
-                                    {eventData.slots?.length > 0 && (
-                                        <div className="slot-section mt-4">
-                                            <h5 className="mb-3">Event Slots</h5>
+                                    <Col lg={4}>
+                                        {cart?.length > 0 ? (
+                                            <div className="chackout-box">
+                                                <h2>Checkout</h2>
+                                                <div className="monte25-tct-purcs">
+                                                    <h6>YOUR TICKETS</h6>
 
-                                            {eventData.slots.map((slot) => {
-                                                const pricingId = slot.pricings?.[0]?.id;
+                                                    {cart.map((item) => {
+                                                        const itemPrice = Number(item.ticket_price || 0);
+                                                        const itemTotal = item.count * itemPrice;
 
-                                                // Find matching slot count from cart
-                                                const cartItem = slotCart.find(item => item.uniqueId == pricingId);
+                                                        return (
+                                                            <div key={item.id} className="chackout-detabox mb-3">
+                                                                <div className="d-flex justify-content-between align-items-center mb-2">
+                                                                    <strong>{item.display_name}</strong>
 
-                                                const isLoading = loadingId == pricingId;
-
-                                                return (
-                                                    <div key={slot.id} className="slot-box p-3 border rounded mb-3 shadow-sm">
-
-                                                        <div className="d-flex justify-content-between align-items-center">
-                                                            <strong style={{ fontSize: "17px" }}>
-                                                                {slot.slot_name}
-                                                            </strong>
-
-                                                            {/* Counter */}
-                                                            {isLoading ? <Spinner size="sm" /> :
-                                                                <div className="d-flex align-items-center">
-
-                                                                    {/* Decrease */}
                                                                     <button
-                                                                        className="btn btn-sm btn-outline-secondary"
-                                                                        onClick={() => decreaseSlot(slot)}
-                                                                        disabled={isLoading}
+                                                                        className="btn btn-sm delete-btn"
+                                                                        onClick={() => handleDeleteItem(item.id)}
                                                                     >
-                                                                        –
+                                                                        <i className="bi bi-trash"></i>
                                                                     </button>
-
-                                                                    {/* Count / Loading */}
-                                                                    <span
-                                                                        className="mx-2"
-                                                                        style={{
-                                                                            fontSize: "16px",
-                                                                            width: "25px",
-                                                                            textAlign: "center",
-                                                                            display: "flex",
-                                                                            justifyContent: "center"
-                                                                        }}
-                                                                    >
-                                                                        {cartItem?.count || 0}
-                                                                    </span>
-
-                                                                    {/* Increase */}
-                                                                    <button
-                                                                        className="btn btn-sm btn-outline-primary"
-                                                                        onClick={() => increaseSlot(slot)}
-                                                                        disabled={isLoading}
-                                                                    >
-                                                                        +
-                                                                    </button>
-
                                                                 </div>
-                                                            }
 
-                                                        </div>
+                                                                <div className="d-flex justify-content-between">
+                                                                    <p className="mb-0">
+                                                                        {item.count} × {currencySymbol} {formatPrice(itemPrice)}
+                                                                    </p>
 
-                                                        {/* Slot Time */}
-                                                        <p className="mt-2">
-                                                            {formatReadableDate(slot.slot_date)} — {slot.start_time} to {slot.end_time}
-                                                        </p>
-
-                                                        <p className="text-muted">{slot.description}</p>
-
-                                                        {/* Pricing List */}
-                                                        {slot.pricings?.length > 0 && (
-                                                            <div className="pricing-tier">
-                                                                {slot.pricings.map((p, idx) => (
-                                                                    <div key={idx} className="d-flex justify-content-between">
-                                                                        <span>{p.date}</span>
-                                                                        <span>₹{p.price}</span>
-                                                                    </div>
-                                                                ))}
+                                                                    <p className="mb-0">{currencySymbol} {formatPrice(itemTotal)}</p>
+                                                                </div>
                                                             </div>
-                                                        )}
+                                                        );
+                                                    })}
+
+
+                                                    <h6 className="mt-4">
+                                                        TOTAL {totalTickets} ITEM{totalTickets > 1 ? "S" : ""}
+                                                    </h6>
+
+                                                    <div className="apply-cd my-3">
+                                                        <InputGroup>
+                                                            <input
+                                                                type="text"
+                                                                placeholder="Promo code"
+                                                                className="form-control"
+                                                            />
+                                                        </InputGroup>
                                                     </div>
-                                                );
-                                            })}
 
-                                        </div>
-                                    )}
-
-
-                                </div>
-                            </Col>
-
-
-                            {/* RIGHT SIDE (CART SUMMARY) */}
-                            <Col lg={4}>
-                                <div className="checkot-rgt">
-                                    <h2>Checkout</h2>
-
-                                    {cart?.length > 0 ? (
-                                        <div className="monte25-tct-purcs">
-                                            <h6>YOUR TICKETS</h6>
-
-                                            {cart.map((item) => {
-                                                const itemPrice = Number(item.ticket_price || 0);
-                                                const itemTotal = item.count * itemPrice;
-
-                                                return (
-                                                    <div key={item.id} className="ticket-item mb-3">
-                                                        <div className="d-flex justify-content-between align-items-center">
-                                                            <strong>{item.display_name}</strong>
-
-                                                            <button
-                                                                className="btn btn-sm btn-outline-danger"
-                                                                onClick={() => handleDeleteItem(item.id)}
-                                                            >
-                                                                <i className="bi bi-trash"></i>
-                                                            </button>
+                                                    <div className="tickt-ttl-prs">
+                                                        <div className="d-flex justify-content-between">
+                                                            <p>PRICE</p>
+                                                            <span>{currencySymbol}{formatPrice(sub_total)}</span>
                                                         </div>
 
                                                         <div className="d-flex justify-content-between">
-                                                            <p className="mb-0">
-                                                                {item.count} × ${itemPrice.toFixed(2)}
-                                                            </p>
+                                                            <p>FEES ({adminFees}%)</p>
+                                                            <span>{currencySymbol}{formatPrice(tax_total)}</span>
+                                                        </div>
 
-                                                            <p className="mb-0">${itemTotal.toFixed(2)}</p>
+                                                        <div className="d-flex justify-content-between total">
+                                                            <p>TOTAL</p>
+                                                            <p>{currencySymbol}{formatPrice(grand_total)}</p>
                                                         </div>
                                                     </div>
-                                                );
-                                            })}
 
+                                                    {/* PAY NOW BUTTON */}
 
-                                            <h6 className="mt-4">
-                                                TOTAL {totalTickets} ITEM{totalTickets > 1 ? "S" : ""}
-                                            </h6>
+                                                    {grand_total > 0 && (
+                                                        <div className="by-nw-btn accomofl-ck-bt">
+                                                            <Button
+                                                                variant=""
+                                                                className="btn"
+                                                                type="submit"
+                                                                disabled={isBtnLoading}
+                                                                style={{
+                                                                    backgroundColor: "#fca3bb",
+                                                                    color: "white",
+                                                                    borderRadius: "30px",
+                                                                    padding: "10px 24px",
+                                                                    fontWeight: "600",
+                                                                    border: "none",
+                                                                    width: "50%",
+                                                                    display: "block",
+                                                                    margin: "20px auto 0",
+                                                                    opacity: isBtnLoading ? 0.7 : 1,
+                                                                    cursor: isBtnLoading ? "not-allowed" : "pointer"
+                                                                }}
+                                                                onClick={(e) => {
+                                                                    if (isBtnLoading) return;
 
-                                            <div className="apply-cd my-3">
-                                                <InputGroup>
-                                                    <input
-                                                        type="text"
-                                                        placeholder="Promo code"
-                                                        className="form-control"
-                                                    />
-                                                </InputGroup>
+                                                                    if (grand_total == 0) {
+                                                                        e.preventDefault();
+                                                                        handleFreeTicket();
+                                                                    } else {
+                                                                        handlePurchase(e);
+                                                                    }
+                                                                }}
+                                                            >
+                                                                {isBtnLoading ? (
+                                                                    <>
+                                                                        <span
+                                                                            className="spinner-border spinner-border-sm me-2"
+                                                                            role="status"
+                                                                            aria-hidden="true"
+                                                                        />
+                                                                        Processing...
+                                                                    </>
+                                                                ) : grand_total == 0 ? (
+                                                                    "FREE TICKET"
+                                                                ) : (
+                                                                    "PURCHASE"
+                                                                )}
+                                                            </Button>
+                                                        </div>
+                                                    )}
+
+                                                </div>
                                             </div>
-
-                                            <div className="tickt-ttl-prs">
-                                                <div className="d-flex justify-content-between">
-                                                    <p>PRICE</p>
-                                                    <span>${priceTotal.toFixed(2)}</span>
-                                                </div>
-
-                                                <div className="d-flex justify-content-between">
-                                                    <p>FEES ({adminFees}%)</p>
-                                                    <span>${feeTotal.toFixed(2)}</span>
-                                                </div>
-
-                                                <div className="d-flex justify-content-between total">
-                                                    <p>TOTAL</p>
-                                                    <p>${finalTotal.toFixed(2)}</p>
-                                                </div>
+                                        ) : (
+                                            <div className="chackout-box">
+                                                <h3 className="text-center mt-2">Cart is Empty</h3>
                                             </div>
+                                        )}
+                                    </Col>
 
-                                            {/* PAY NOW BUTTON */}
-                                            <Button
-                                                variant="primary"
-                                                className="w-100 py-2"
-                                                style={{ fontSize: "18px", fontWeight: "600" }}
-                                                onClick={handlePayNow}
-                                                disabled={payLoading}
-                                            >
-                                                {payLoading ? "Processing..." : "PAY NOW"}
-                                            </Button>
+                                </Row>
+                            </div>
+                        )}
+                    </Modal.Body>
+                </>
+            ) : (
+                <CheckoutForm
+                    eventId={eventId}
+                    handleModalClose={handleClose}
+                    showNextStep={setShowNextStep}
+                    adminFees={adminFees}
+                    couponDetails={null}
+                    sub_total={sub_total}
+                    tax_total={tax_total}
+                    grand_total={grand_total}
+                />
+            )
+            }
 
-
-
-                                        </div>
-                                    ) : (
-                                        <h3 className="text-center mt-5">Cart is Empty</h3>
-                                    )}
-                                </div>
-                            </Col>
-
-
-                        </Row>
-                    </div>
-                )}
-            </Modal.Body>
-        </Modal>
+        </Modal >
     );
 }

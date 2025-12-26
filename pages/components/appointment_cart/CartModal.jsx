@@ -79,10 +79,8 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
         return await api.delete(`/api/v1/cart/clear`);
     };
 
-
-
-
     const [slotCart, setSlotCart] = useState({});
+    
     useEffect(() => {
         if (!show) return;
 
@@ -172,7 +170,6 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
 
     const finalTotal = priceTotal + feeTotal;
 
-    const [showFullDesc, setShowFullDesc] = useState(false);
 
     const formatReadableDate = (dateStr) => {
         if (!dateStr) return "";
@@ -183,171 +180,7 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
             year: "numeric",
         });
     };
-    const increaseSlot = async (slot) => {
-        try {
-            setIncreaseLoadingId(slot.id);
-            // Check existing slot cart
-            const existing = slotCart[slot.id];
-            if (existing) {
-                // Already in cart → increase
-                await increaseCart(existing.cartId);
-                // Fetch updated cart
-                // Load cart
-                const cartRes = await fetchCart(eventId);
-                const list = cartRes?.data?.data || [];
-                setCart(list);
-                let map = {};
-                list.forEach((c) => {
-                    if (c.item_type === "appointment") {
-                        map[c.raw?.appointment_id] = {
-                            cartId: c.id,
-                            count: c.count
-                        };
-                    }
-                });
-                setSlotCart(map);
-            } else {
-                // First time add
-                await addToCart({
-                    event_id: eventId,
-                    item_type: "appointment",
-                    appointment_id: slot.id,
-                    count: 1
-                });
-            }
-            // Fetch updated cart
-            const cartRes = await fetchCart(eventId);
-            const list = cartRes.data.data || [];
-            setCart(list);
-            // Build slot cart map
-            let map = {};
-            list.forEach((c) => {
-                if (c.item_type === "appointment") {
-                    map[c.raw?.appointment_id] = {
-                        cartId: c.id,
-                        count: c.count
-                    };
-                }
-            });
-            setSlotCart(map);
-
-        } catch (err) {
-            if (err?.response?.status == 409) {
-                const result = await Swal.fire({
-                    title: "Appointment Conflict!",
-                    text: err?.response?.data?.message ||
-                        "You have already selected appointments from another event. Do you want to clear them and continue?",
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonText: "Yes, Clear Cart",
-                    cancelButtonText: "No",
-                    allowOutsideClick: false,
-                    allowEscapeKey: false,
-                    reverseButtons: true
-                });
-
-                if (!result.isConfirmed) {
-                    setIncreaseLoadingId(null);
-                    return;
-                }
-
-                // ➋ SHOW LOADER
-                Swal.fire({
-                    title: "Clearing Cart...",
-                    text: "Please wait",
-                    allowOutsideClick: false,
-                    allowEscapeKey: false,
-                    didOpen: () => Swal.showLoading()
-                });
-
-                // ➌ CLEAR CART
-                await clearCart();
-                // await refreshCart();
-
-                Swal.fire({
-                    title: "Cart Cleared",
-                    text: "You can add items now.",
-                    icon: "success",
-                    timer: 1200,
-                    showConfirmButton: false
-                });
-                // ➍ RETRY ADDING ITEM AUTOMATICALLY
-                try {
-                    await addToCart({
-                        event_id: eventId,
-                        item_type: "appointment",
-                        appointment_id: slot.id,
-                        count: 1
-                    });
-
-                    // Fetch updated cart
-                    const cartRes = await fetchCart(eventId);
-                    const list = cartRes.data.data || [];
-                    setCart(list);
-                    // Build slot cart map
-                    let map = {};
-                    list.forEach((c) => {
-                        if (c.item_type === "appointment") {
-                            map[c.raw?.appointment_id] = {
-                                cartId: c.id,
-                                count: c.count
-                            };
-                        }
-                    });
-                    setSlotCart(map);
-
-                    Swal.fire({
-                        icon: "success",
-                        title: "Added Successfully",
-                        timer: 1200,
-                        showConfirmButton: false
-                    });
-
-                } catch (retryError) {
-                    console.log("Retry error:", retryError);
-                    Swal.fire({
-                        icon: "error",
-                        title: "Failed",
-                        text: "Could not add the ticket after clearing cart."
-                    });
-                }
-
-                setIncreaseLoadingId(null);
-                return;
-            }
-            console.log("Increase slot error:", err);
-        }
-
-        setIncreaseLoadingId(null);
-    };
-
-    // const decreaseSlot = async (slot) => {
-    //     try {
-    //         const existing = slotCart[slot.id];
-    //         if (!existing) return;
-    //         setDecreaseLoadingId(slot.id);
-    //         await decreaseCart(existing.cartId);
-    //         // Fetch updated cart
-    //         const cartRes = await fetchCart(eventId);
-    //         const list = cartRes.data.data || [];
-    //         setCart(list);
-    //         // Build slot cart map again
-    //         let map = {};
-    //         list.forEach((c) => {
-    //             if (c.item_type === "appointment") {
-    //                 map[c.raw?.appointment_id] = {
-    //                     cartId: c.id,
-    //                     count: c.count
-    //                 };
-    //             }
-    //         });
-    //         setSlotCart(map);
-    //     } catch (e) {
-    //         console.log("Decrease slot error:", e);
-    //     }
-    //     setDecreaseLoadingId(null);
-    // };
-
+   
 
     const formatTime = (timeString) => {
         if (!timeString) return "";
@@ -445,54 +278,8 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
             setIsBtnLoading(false);
         }, 1000);
     };
-    // const handlePurchase = async () => {
-    //     return false
-    //     try {
-    //         setIsBtnLoading(true);  // 🔥 START LOADER
-    //         const data = {
-    //             event_id: eventId,
-    //             payment_method: "Online",
-    //             total_amount: finalTotal
-    //         };
-    //         handleClose();
-    //         Swal.fire({
-    //             title: "Booking Appointment...",
-    //             text: "Please wait while we confirm your appointment.",
-    //             icon: "info",
-    //             allowOutsideClick: false,
-    //             allowEscapeKey: false,
-    //             didOpen: () => Swal.showLoading()
-    //         });
-    //         const response = await api.post(`/api/v1/orders/create-appointment`, data);
-    //         if (response.data.success) {
-    //             Swal.fire({
-    //                 title: "Appointment Confirmed!",
-    //                 text: "Your appointment has been successfully booked.",
-    //                 icon: "success",
-    //                 confirmButtonText: "Okay",
-    //             }).then(() => {
-    //                 handleClose();
-    //                 setIsBtnLoading(false); // 🔥 STOP LOADER
-    //             });
 
-    //         } else {
-    //             setIsBtnLoading(false);
-    //             Swal.fire({
-    //                 title: "Error!",
-    //                 text: response.data.message || "Unable to book your appointment.",
-    //                 icon: "error"
-    //             });
-    //         }
-    //     } catch (error) {
-    //         setIsBtnLoading(false); // 🔥 STOP LOADER
-    //         Swal.fire({
-    //             title: "Error!",
-    //             text: error.message || "An unexpected error occurred!",
-    //             icon: "error"
-    //         });
-    //     }
-    // };
-
+    
     return (
         <Modal
             show={show}

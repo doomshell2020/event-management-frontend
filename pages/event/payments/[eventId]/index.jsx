@@ -92,7 +92,7 @@ const ManagePayments = () => {
                     <div className="event-righcontent">
                         <div className="dsa_contant">
 
-                            <section id="post-eventpg edit-event-page">
+                            <section id="post-eventpg">
                                 <EventHeaderSection eventDetails={eventDetails} isProgressBarShow={false} />
 
                                 <h4 className="text-24">Payments</h4>
@@ -128,7 +128,7 @@ const ManagePayments = () => {
                                                             <p className="mt-3 text-muted">Loading Payments...</p>
                                                         </td>
                                                     </tr>
-                                                ) : orderData.length === 0 ? (
+                                                ) : orderData.length == 0 ? (
                                                     <tr>
                                                         <td colSpan="6" className="text-center py-4 text-muted">
                                                             No payment records found.
@@ -136,7 +136,9 @@ const ManagePayments = () => {
                                                     </tr>
                                                 ) : (
                                                     orderData.map((item, index) => {
+                                                    // console.log('item :', item);
                                                         const srNo = index + 1 + (currentPage - 1) * limit;
+                                                        const currencyName = item?.event?.currencyName?.Currency_symbol || '₹'
 
                                                         return (
                                                             <tr key={index}>
@@ -156,11 +158,11 @@ const ManagePayments = () => {
                                                                 <td className="fw-bold">{item.orderItems.length}</td>
 
                                                                 {/* Amount */}
-                                                                <td className="fw-bold">${item.total_amount}</td>
+                                                                <td className="fw-bold">{currencyName} {item.grand_total}</td>
 
                                                                 {/* Paid/Unpaid */}
                                                                 <td>
-                                                                    {item.status === "Y" ? (
+                                                                    {item.status == "Y" ? (
                                                                         <span className="badge bg-success">Paid</span>
                                                                     ) : (
                                                                         <span className="badge bg-secondary">Unpaid</span>

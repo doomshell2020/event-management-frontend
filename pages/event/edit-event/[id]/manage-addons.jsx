@@ -171,7 +171,7 @@ const ManageAddons = () => {
                     <div className="event-righcontent">
                         <div className="dsa_contant">
                             <section id="post-eventpg edit-event-page">
-                                
+
                                 <EventHeaderSection eventDetails={eventDetails} />
 
                                 <h4 className="text-24">Manage Tickets</h4>
@@ -280,8 +280,12 @@ const ManageAddons = () => {
 
                                                     {openDropdown === addon.id && (
                                                         <ul
-                                                            className="dropdown-menu show position-absolute end-0"
-                                                            style={{ display: "block", zIndex: 999 }}
+                                                            className="dropdown-menu show position-absolute"
+                                                            style={{
+                                                                display: "block",
+                                                                zIndex: 999,
+                                                                left: "-120px", top: "24px"
+                                                            }}
                                                         >
                                                             {/* Edit */}
                                                             <li>
@@ -536,7 +540,6 @@ const ManageAddons = () => {
                     </Form>
                 </Modal.Body>
             </Modal>
-
 
         </>
     );

@@ -4,9 +4,9 @@ import { useRouter } from "next/router";
 import { handleLogout } from "@/utils/logout";
 import Cookies from "js-cookie";
 import { isTokenValid } from "@/utils/checkAuth";
-import CartModal from "@/pages/components/cart_new/CartModal";
 import { useCart } from "@/shared/layout-components/layout/CartContext";
 import { useAuth } from "../layout/AuthContext";
+import CartModal from "@/pages/components/cart_new/CartModal";
 
 const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
 
@@ -14,10 +14,8 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
     backgroundImage ?? "/assets/front-images/slider_bg9.jpg"
   );
 
-  const { cartCount } = useCart();
-  const { loadingAuth,user } = useAuth();
-  // console.log('cartCount :', cartCount);
-
+  const { cartCount, eventId } = useCart();
+  const { loadingAuth, user } = useAuth();
 
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -29,8 +27,6 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
     if (cartCount == 0) return;  // stop if cart is empty
     setShowCart(true);
   };
-
-
 
   useEffect(() => {
     const checkLoginStatus = () => {
@@ -89,11 +85,11 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
 
                 {isLoggedIn && (
                   <>
-                    <Link href="/tickets/my-tickets" className="navLink">
+                    <Link href="/orders" className="navLink">
                       My Tickets
                     </Link>
 
-                    {/* ✅ Cart button (not link) but keeps your class */}
+                    {/* Cart button (not link) but keeps your class */}
                     <a
                       href="#"
                       className="navLink position-relative"
@@ -110,6 +106,18 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
                         </span>
                       )}
                     </a>
+
+                    {user?.committeeAssigned && (
+                      <Link href="/committee/ticket" className="navLink position-relative">
+                        Committee
+
+                        {user?.committeePendingCount > 0 && (
+                          <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            {user.committeePendingCount}
+                          </span>
+                        )}
+                      </Link>
+                    )}
 
                   </>
                 )}
@@ -233,13 +241,14 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
       {/* ✅ Cart Modal */}
       {
         showCart && (
+
           <CartModal
             show={showCart}
             handleClose={() => setShowCart(false)}
+            eventId={eventId}
           />
         )
       }
-
 
     </>
   );

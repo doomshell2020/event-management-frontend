@@ -10,7 +10,10 @@ export const CartProvider = ({ children }) => {
     const [loadingCart, setLoadingCart] = useState(true);
     const [slotCart, setSlotCart] = useState([]);
     const [normalCart, setNormalCart] = useState([]);
+    const [addonCart, setAddonCart] = useState([]);
     const [eventId, setEventId] = useState(null); // ✔ store eventId globally
+    const [loginUserId, setLoginUserId] = useState(null); // ✔ store eventId globally
+    // console.log('eventId :', eventId);
 
     // 🟢 MAIN CART LOADER (Uses internal eventId when nothing passed)
     const fetchCart = async (passedEventId = null) => {
@@ -26,13 +29,13 @@ export const CartProvider = ({ children }) => {
 
             const finalEventId = passedEventId ?? eventId;
             const query = finalEventId ? `?event_id=${finalEventId}` : "";
-            // console.log('query :', query);
-
             const res = await api.get(`/api/v1/cart/list${query}`);
             const data = res?.data?.data || {};
+            const userInfoId = data?.user_id;
             const event = data.event || null;
             const cartItems = data.cart || [];
-            // console.log('cartItems :', cartItems);
+
+            setLoginUserId(userInfoId);
 
             // Save event + items
             setEventData(event);
@@ -60,6 +63,17 @@ export const CartProvider = ({ children }) => {
                         count: c.count,
                     }))
             );
+
+            // Normal Tickets
+            setAddonCart(
+                cartItems
+                    .filter(c => c.item_type == "addon")
+                    .map(c => ({
+                        cartId: c.id,
+                        uniqueId: c.uniqueId,
+                        count: c.count,
+                    }))
+            );
         } catch (error) {
             console.log("Cart Error:", error);
         } finally {
@@ -81,7 +95,9 @@ export const CartProvider = ({ children }) => {
                 loadingCart,
                 slotCart,
                 normalCart,
+                addonCart,
                 eventId,
+                loginUserId,
                 refreshCart: fetchCart, // refreshCart(eventId)
                 setCart,
                 setCartCount,

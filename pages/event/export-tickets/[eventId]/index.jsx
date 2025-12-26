@@ -4,10 +4,27 @@ import { useRouter } from "next/router";
 import Swal from "sweetalert2";
 import api from "@/utils/api";
 
+import ExcelJS from "exceljs";
+import { saveAs } from "file-saver";
+import moment from "moment";
+
+
 import FrontendHeader from "@/shared/layout-components/frontelements/frontendheader";
 import FrontendFooter from "@/shared/layout-components/frontelements/frontendfooter";
 import EventHeaderSection from "@/pages/components/Event/EventProgressBar";
 import EventSidebar from "@/pages/components/Event/EventSidebar";
+
+import {
+    Row,
+    Button,
+    Col,
+    Card,
+    Tabs,
+    Tab,
+    Table,
+    Spinner,
+    Form,
+} from "react-bootstrap";
 
 const ExportTickets = () => {
     const router = useRouter();
@@ -22,6 +39,7 @@ const ExportTickets = () => {
     const [limit] = useState(5);
     const [loading, setLoading] = useState(true);
     const [backgroundImage] = useState("/assets/front-images/about-slider_bg.jpg");
+    const [excelLoading, setExcelLoading] = useState(false);
 
     // Fetch Event Details
     const fetchEventDetails = async (eventId) => {
@@ -64,7 +82,6 @@ const ExportTickets = () => {
         }
     };
 
-
     // ✅ Fetch Event Details ONLY once when eventId becomes available
     useEffect(() => {
         if (!eventId) return;
@@ -75,13 +92,116 @@ const ExportTickets = () => {
     useEffect(() => {
         if (!eventId) return;
         fetchTickets(eventId, currentPage);  // ✔ runs every time page changes
-    }, [currentPage]);  // ❗ remove eventId to avoid re-calling event details
+    }, [currentPage]);  // remove eventId to avoid re-calling event details
 
 
     // Pagination Button Handler
     const goToPage = (page) => {
         if (page >= 1 && page <= totalPages) {
             setCurrentPage(page);
+        }
+    };
+
+    const fetchImageAsBuffer = async (url) => {
+        const res = await fetch(url);
+        const blob = await res.blob();
+        return await blob.arrayBuffer();
+    };
+
+
+    const handleDownloadOrdersExcel = async () => {
+        if (!eventDetails?.id) return;
+
+        setExcelLoading(true);
+
+        try {
+            const response = await api.get(
+                `/api/v1/orders/organizer/ticket-exports?eventId=${eventDetails.id}&page=1&limit=100000`
+            );
+
+            const { records, qr_base_path } = response.data.data;
+
+            if (!records.length) {
+                Swal.fire("Info", "No ticket records found", "info");
+                return;
+            }
+
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet("Ticket Exports");
+
+            worksheet.columns = [
+                { header: "Sr No", key: "srNo", width: 8 },
+                { header: "QR Code", key: "qr", width: 20 },
+                { header: "Customer Name", key: "name", width: 25 },
+                { header: "Email", key: "email", width: 30 },
+                { header: "Type", key: "type", width: 18 },
+                { header: "Amount", key: "amount", width: 12 },
+                { header: "Purchased Date", key: "date", width: 18 },
+            ];
+
+            // Header styling
+            worksheet.getRow(1).eachCell((cell) => {
+                cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
+                cell.fill = {
+                    type: "pattern",
+                    pattern: "solid",
+                    fgColor: { argb: "FF000000" },
+                };
+                cell.alignment = { vertical: "middle", horizontal: "center" };
+            });
+
+            // Freeze header
+            worksheet.views = [{ state: "frozen", ySplit: 1 }];
+
+            let rowIndex = 2;
+
+            for (let i = 0; i < records.length; i++) {
+                const item = records[i];
+
+                // Add row data (leave QR cell empty)
+                worksheet.addRow({
+                    srNo: i + 1,
+                    qr: "",
+                    name: `${item.order?.user?.first_name || ""} ${item.order?.user?.last_name || ""}`.trim(),
+                    email: item.order?.user?.email || "-",
+                    type: item.type,
+                    amount: item.price,
+                    date: moment(item.createdAt).format("DD-MM-YYYY"),
+                });
+
+                // QR Image
+                if (item.qr_image) {
+                    const qrUrl = `${qr_base_path}${item.qr_image}`;
+                    const imageBuffer = await fetchImageAsBuffer(qrUrl);
+
+                    const imageId = workbook.addImage({
+                        buffer: imageBuffer,
+                        extension: "png",
+                    });
+
+                    worksheet.addImage(imageId, {
+                        tl: { col: 1.2, row: rowIndex - 1 },
+                        ext: { width: 80, height: 80 },
+                    });
+
+                    worksheet.getRow(rowIndex).height = 65;
+                }
+
+                rowIndex++;
+            }
+
+            const buffer = await workbook.xlsx.writeBuffer();
+
+            saveAs(
+                new Blob([buffer]),
+                `Ticket_QR_Export_${eventDetails.name}_${moment().format("YYYYMMDD_HHmmss")}.xlsx`
+            );
+
+        } catch (error) {
+            console.error("Excel download failed:", error);
+            Swal.fire("Error", "Failed to download Excel", "error");
+        } finally {
+            setExcelLoading(false);
         }
     };
 
@@ -98,12 +218,32 @@ const ExportTickets = () => {
                     <div className="event-righcontent">
                         <div className="dsa_contant">
 
-                            <section id="post-eventpg edit-event-page">
+                            <section id="post-eventpg">
 
                                 <EventHeaderSection eventDetails={eventDetails} isProgressBarShow={false} />
 
                                 <h4 className="text-24">Payments</h4>
                                 <hr className="custom-hr" />
+
+                                <Button
+                                    variant="success"
+                                    className="btn-sm d-flex align-items-center"
+                                    onClick={handleDownloadOrdersExcel}
+                                    disabled={excelLoading}
+                                >
+                                    {excelLoading ? (
+                                        <>
+                                            <span className="spinner-border spinner-border-sm me-2" />
+                                            Downloading...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <i className="bi bi-file-earmark-excel-fill me-2"></i>
+                                            Download Orders
+                                        </>
+                                    )}
+                                </Button>
+
 
                                 <div className="stripe-table mt-4">
 
@@ -144,6 +284,7 @@ const ExportTickets = () => {
                                                 ) : (
                                                     ticketData.map((item, index) => {
                                                         const srNo = index + 1 + (currentPage - 1) * limit;
+                                                        const currencyName = item?.event?.currencyName?.Currency_symbol || '₹'
 
                                                         return (
                                                             <tr key={index}>
@@ -176,7 +317,7 @@ const ExportTickets = () => {
 
                                                                 {/* Amount */}
                                                                 <td className="fw-bold text-success">
-                                                                    ${item?.order?.total_amount}
+                                                                    {currencyName}{item?.price}
                                                                 </td>
 
                                                                 {/* Paid/Unpaid */}
