@@ -1374,6 +1374,145 @@ span.ticket-icon-circle {
 
 /* analitics page css start */
 
+
+/* event calender page css start */
+.calendar-wrapper {
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 20px;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.calendar-icon {
+  width: 44px;
+  height: 44px;
+  background: #eaf2ff;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.header-left h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.header-left span {
+  font-size: 14px;
+  color: #7b8ca8;
+}
+
+.header-right {
+  display: flex;
+  gap: 10px;
+}
+
+.header-right button {
+  background: #f4f7fb;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.header-right button:hover {
+  background: #e6ecf5;
+}
+
+.rbc-month-view,
+.rbc-month-row,
+.rbc-row-bg,
+.rbc-day-bg {
+  border: none;
+  background: transparent;
+}
+
+.rbc-header {
+  font-weight: 600;
+  color: #7b8ca8;
+  padding: 12px 0;
+}
+
+.rbc-row-content {
+  gap: 10px;
+  padding: 0 !important;
+}
+
+.rbc-month-row {
+  min-height: 55px !important;
+}
+
+.rbc-date-cell {
+  padding: 0;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rbc-date-cell .rbc-button-link {
+  width: 100%;
+  height: 100%;
+  background: #ffffff;
+  border-radius: 6px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 500;
+  color: #000000;
+}
+
+.rbc-off-range-bg {
+  background: transparent !important;
+}
+
+.rbc-off-range {
+  color: #b5b5b5;
+}
+
+.rbc-now .rbc-button-link {
+  background: #eef9ff;
+  border: 1px solid #4aa3df;
+  color: #ff3b3b;
+  box-shadow: 0 3px 10px rgba(74, 163, 223, 0.25);
+}
+
+.rbc-today {
+  background: transparent !important;
+}
+
+.rbc-event {
+  background: #1e73be;
+  color: #ffffff;
+  border-radius: 6px;
+  padding: 4px 6px;
+  font-size: 11px;
+  border: none;
+}
+
+.rbc-row-segment {
+  padding: 2px 0;
+}
+/* event calender page css end */
+
 /* cart page start */
 #cart {
   margin: 35px 0px 50px;
