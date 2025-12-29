@@ -123,19 +123,6 @@ const LoginPage = () => {
                       />
                     </div>
 
-                    {/* <div>
-                      <input
-                        id="password"
-                        type="password"
-                        name="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder=" password"
-                        className="form-control"
-                        required
-                      />
-                    </div> */}
-
                     <div style={{ position: 'relative' }}>
                       <input
                         id="password"
@@ -181,9 +168,9 @@ const LoginPage = () => {
                       </div>
 
                       <div className="col-6 text-end">
-                        <a href="/forgot-password" className="for_pass fw-bold">
+                        <Link href="/forgot-password" className="for_pass fw-bold">
                           Forgot your password?
-                        </a>
+                        </Link>
                       </div>
                     </div>
 

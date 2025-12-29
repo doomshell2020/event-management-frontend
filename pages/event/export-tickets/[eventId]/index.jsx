@@ -108,6 +108,35 @@ const ExportTickets = () => {
         return await blob.arrayBuffer();
     };
 
+    const formatQuestionAnswerText = (questionsBook = []) => {
+        if (!questionsBook.length) return "-";
+
+        return questionsBook
+            .map(qb => {
+                const questionText = qb.question?.question || "";
+                const type = qb.question?.type?.toLowerCase();
+                const answer = qb.user_reply;
+
+                if (!questionText || !answer) return null;
+
+                let formattedAnswer = answer;
+
+                if (type == "agree") {
+                    formattedAnswer = answer == "Y" ? "Yes" : "No";
+                }
+
+                if (type == "select") {
+                    const option = qb.question?.questionItems?.find(
+                        opt => opt.items?.toLowerCase() == answer?.toLowerCase()
+                    );
+                    formattedAnswer = option ? option.items : answer;
+                }
+
+                return `${questionText} : ${formattedAnswer}`;
+            })
+            .filter(Boolean)
+            .join("\n"); // 👈 NEW LINE
+    };
 
     const handleDownloadOrdersExcel = async () => {
         if (!eventDetails?.id) return;
@@ -131,26 +160,31 @@ const ExportTickets = () => {
 
             worksheet.columns = [
                 { header: "Sr No", key: "srNo", width: 8 },
+                { header: "Order UID", key: "order_uid", width: 22 },
                 { header: "QR Code", key: "qr", width: 20 },
                 { header: "Customer Name", key: "name", width: 25 },
                 { header: "Email", key: "email", width: 30 },
-                { header: "Type", key: "type", width: 18 },
+                { header: "Type", key: "type", width: 15 },
                 { header: "Amount", key: "amount", width: 12 },
                 { header: "Purchased Date", key: "date", width: 18 },
+                { header: "Question & Answer", key: "qa", width: 45 }
             ];
 
             // Header styling
-            worksheet.getRow(1).eachCell((cell) => {
+            worksheet.getRow(1).eachCell(cell => {
                 cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
                 cell.fill = {
                     type: "pattern",
                     pattern: "solid",
-                    fgColor: { argb: "FF000000" },
+                    fgColor: { argb: "FF000000" }
                 };
-                cell.alignment = { vertical: "middle", horizontal: "center" };
+                cell.alignment = {
+                    vertical: "middle",
+                    horizontal: "center",
+                    wrapText: true
+                };
             });
 
-            // Freeze header
             worksheet.views = [{ state: "frozen", ySplit: 1 }];
 
             let rowIndex = 2;
@@ -158,30 +192,34 @@ const ExportTickets = () => {
             for (let i = 0; i < records.length; i++) {
                 const item = records[i];
 
-                // Add row data (leave QR cell empty)
                 worksheet.addRow({
                     srNo: i + 1,
+                    order_uid: item.order?.order_uid || "-",
                     qr: "",
                     name: `${item.order?.user?.first_name || ""} ${item.order?.user?.last_name || ""}`.trim(),
                     email: item.order?.user?.email || "-",
                     type: item.type,
                     amount: item.price,
                     date: moment(item.createdAt).format("DD-MM-YYYY"),
+                    qa: formatQuestionAnswerText(item.questionsBook)
                 });
 
-                // QR Image
+                // ✅ Correct QA column (I)
+                worksheet.getCell(`I${rowIndex}`).alignment = { wrapText: true };
+
+                // QR image
                 if (item.qr_image) {
                     const qrUrl = `${qr_base_path}${item.qr_image}`;
                     const imageBuffer = await fetchImageAsBuffer(qrUrl);
 
                     const imageId = workbook.addImage({
                         buffer: imageBuffer,
-                        extension: "png",
+                        extension: "png"
                     });
 
                     worksheet.addImage(imageId, {
-                        tl: { col: 1.2, row: rowIndex - 1 },
-                        ext: { width: 80, height: 80 },
+                        tl: { col: 2, row: rowIndex - 1 }, // QR column
+                        ext: { width: 80, height: 80 }
                     });
 
                     worksheet.getRow(rowIndex).height = 65;
@@ -204,6 +242,7 @@ const ExportTickets = () => {
             setExcelLoading(false);
         }
     };
+
 
     return (
         <>
