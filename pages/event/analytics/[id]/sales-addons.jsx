@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import { Spinner } from "react-bootstrap";
 
 import FrontendHeader from "@/shared/layout-components/frontelements/frontendheader";
 import FrontendFooter from "@/shared/layout-components/frontelements/frontendfooter";
 import EventSidebar from "@/pages/components/Event/EventSidebar";
 import EventHeaderSection from "@/pages/components/Event/EventProgressBar";
-import { Form, Button, Modal } from "react-bootstrap";
-
 import api from "@/utils/api";
 
-const CommitteeTicketsPage = () => {
+const SalesAddonsPage = () => {
     const router = useRouter();
     const { id } = router.query;
 
@@ -18,28 +17,22 @@ const CommitteeTicketsPage = () => {
 
     /* ---------------- STATES ---------------- */
     const [eventDetails, setEventDetails] = useState(null);
-    const [ticketsList, setTicketList] = useState([]);
-    const [assignedList, setAssignedList] = useState([]);
-
-    const [ticketTypes, setTicketTypes] = useState([]);
-    const [groupedData, setGroupedData] = useState([]);
-
+    const [addonsSales, setAddonsSales] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [processing, setProcessing] = useState(false);
-    const [show, setShow] = useState(false);
-    const [validateDefault, setValidateDefault] = useState(false);
-    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const [selectedUser, setSelectedUser] = useState(null);
-    const [ticketCounts, setTicketCounts] = useState({});
+    /* ---------------- HELPERS ---------------- */
+    const formatCurrency = (currency, value) => {
+        const number = Number(value || 0);
+        return currency + (Number.isInteger(number) ? number : number.toFixed(2));
+    };
+
+    const sumByKey = (arr, key) =>
+        arr.reduce((sum, item) => sum + Number(item[key] || 0), 0);
 
     /* ---------------- FETCH EVENT ---------------- */
     const fetchEventDetails = async (eventId) => {
         try {
-            const res = await api.post(`/api/v1/events/event-list`, {
-                id: eventId
-            });
-
+            const res = await api.post(`/api/v1/events/event-list`, { id: eventId });
             if (res.data.success && res.data.data.events.length > 0) {
                 setEventDetails(res.data.data.events[0]);
             }
@@ -48,130 +41,33 @@ const CommitteeTicketsPage = () => {
         }
     };
 
-    /* ---------------- FETCH ALL TICKETS ---------------- */
-    const fetchTickets = async () => {
+    /* ---------------- FETCH ADDON SALES ---------------- */
+    const fetchAddonSales = async (eventId) => {
         try {
             setLoading(true);
-            const res = await api.get(`/api/v1/tickets/list/${id}`);
+            const res = await api.get(`/api/v1/orders/sales-addons`, {
+                params: { event_id: eventId }
+            });
 
             if (res.data.success) {
-                setTicketList(res.data.data || []);
-            } else {
-                setTicketList([]);
+                setAddonsSales(res.data.data.sales_by_addon || []);
             }
         } catch (err) {
-            console.error("Tickets fetch error", err);
-            setTicketList([]);
+            console.error("Addon sales fetch error", err);
         } finally {
             setLoading(false);
         }
     };
 
-    /* ---------------- FETCH ASSIGNED COMMITTEE TICKETS ---------------- */
-    const fetchAssignedTickets = async () => {
-        try {
-            const res = await api.get(
-                `/api/v1/committee/ticket/assign-list/${id}`
-            );
-
-            if (res.data.success) {
-                setAssignedList(res.data.data || []);
-            } else {
-                setAssignedList([]);
-            }
-        } catch (err) {
-            console.error("Assigned ticket error", err);
-            setAssignedList([]);
-        }
-    };
-
-    /* ---------------- PROCESS DATA ---------------- */
-    useEffect(() => {
-        if (!ticketsList.length || !assignedList.length) {
-            setTicketTypes([]);
-            setGroupedData([]);
-            return;
-        }
-
-        setProcessing(true);
-
-        // Only committee sales tickets
-        const committeeTickets = ticketsList.filter(
-            (t) => t.type == "committee_sales"
-        );
-        setTicketTypes(committeeTickets);
-
-        const formattedData = assignedList.map((item) => {
-            const ticketsMap = {};
-            item.assignedTickets.forEach((t) => {
-                ticketsMap[t.ticket_id] = t.count;
-            });
-            return {
-                user: item.user,
-                tickets: ticketsMap
-            };
-        });
-        // console.log('formattedData :', formattedData);
-
-        setGroupedData(formattedData);
-        setProcessing(false);
-    }, [ticketsList, assignedList]);
-
     /* ---------------- INITIAL LOAD ---------------- */
     useEffect(() => {
         if (id) {
             fetchEventDetails(id);
-            fetchTickets();
-            fetchAssignedTickets();
+            fetchAddonSales(id);
         }
     }, [id]);
 
-    // create / update addon
-    const handleUpdateTicketSubmit = async () => {
-        if (isSubmitting) return;
-
-        try {
-            setIsSubmitting(true);
-
-            await api.post("/api/v1/committee/ticket/update", {
-                event_id: id,
-                user_id: selectedUser.user.id,
-                tickets: ticketCounts
-            });
-
-            setShow(false);              // close modal
-            fetchAssignedTickets();      // refresh table
-        } catch (err) {
-            console.error("Ticket update failed", err);
-        } finally {
-            setIsSubmitting(false);      // stop loader
-        }
-    };
-
-
-    const openEditModal = (row) => {
-        const counts = {};
-
-        ticketTypes.forEach((t) => {
-            counts[t.id] = row.tickets[t.id] || 0;
-        });
-
-        setSelectedUser(row);
-        setTicketCounts(counts);
-        setShow(true);
-    };
-
-    const changeCount = (ticketId, type) => {
-        setTicketCounts((prev) => ({
-            ...prev,
-            [ticketId]:
-                type === "inc"
-                    ? prev[ticketId] + 1
-                    : Math.max(0, prev[ticketId] - 1)
-        }));
-    };
-
-    const showLoader = loading || processing;
+    const currency = addonsSales?.[0]?.currency || "€";
 
     return (
         <>
@@ -180,104 +76,111 @@ const CommitteeTicketsPage = () => {
             <section id="myevent-deshbord">
                 <div className="d-flex">
                     <EventSidebar eventId={id} />
+
                     <div className="event-righcontent">
                         <div className="dsa_contant">
                             <section id="post-eventpg">
-                                <div>
-                                    <EventHeaderSection eventDetails={eventDetails} isProgressBarShow={false} />
+                                <EventHeaderSection
+                                    eventDetails={eventDetails}
+                                    isProgressBarShow={false}
+                                />
 
-                                </div>
-                                <h4 className="text-24">
-                                    Sales
-                                </h4>
+                                <h4 className="text-24">Sales</h4>
                                 <hr className="custom-hr" />
-                                
-                                    <ul className="tabes d-flex ps-0 flex-grow-1 mb-0">
-                                        <li>
-                                            <Link
-                                                href={`/event/analytics/${id}/index`}
-                                                className=" text-16"
-                                            >
-                                                Dashboard
-                                            </Link>
-                                        </li>
-                                        <li>
-                                            <Link
-                                                href={`/event/analytics/${id}/sales`}
-                                                className=" text-16"
-                                            >
-                                                Sales
 
-                                            </Link>
-                                        </li>
-                                        <li>
-                                            <Link
-                                                href={`/event/analytics/${id}/sales-addons`}
-                                                className="active text-16"
-                                            >
-                                                Addons
-                                            </Link>
-                                        </li>
-                                    </ul>
-                                    
-                              
+                                {/* Tabs */}
+                                <ul className="tabes d-flex ps-0 flex-grow-1 mb-3">
+                                    <li>
+                                        <Link href={`/event/analytics/${id}`} className="text-16">
+                                            Dashboard
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link href={`/event/analytics/${id}/sales`} className="text-16">
+                                            Sales
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link
+                                            href={`/event/analytics/${id}/sales-addons`}
+                                            className="active text-16"
+                                        >
+                                            Addons
+                                        </Link>
+                                    </li>
+                                </ul>
 
                                 <div className="contant_bg">
-                                    
-                                    <div className="card p-2">
-                                        <div className="d-flex align-items-center gap-2 pb-3 border-bottom ">
-                                            <span className="ticket-icon-circle">
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    width="20"
-                                                    height="20"
-                                                    viewBox="0 0 24 24"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    strokeWidth="2"
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    className="h-5 w-5 text-accent-foreground"
-                                                >
-                                                    <rect x="2" y="6" width="20" height="12" rx="2" ry="2"></rect>
-                                                    <line x1="2" y1="10" x2="22" y2="10"></line>
-                                                    <circle cx="12" cy="12" r="2"></circle>
-                                                </svg>
-                                            </span>
-                                            <h5 className="mb-0 fw-semibold body-text fw-bold">Sales by Addons</h5>
+                                    {loading ? (
+                                        <div className="text-center my-5">
+                                            <Spinner animation="border" variant="primary" />
+                                            <p className="mt-2">Loading addon sales...</p>
                                         </div>
+                                    ) : (
+                                        <div className="card p-2">
+                                            <div className="d-flex align-items-center gap-2 pb-3 border-bottom">
+                                                <span className="ticket-icon-circle">➕</span>
+                                                <h5 className="mb-0 fw-bold">
+                                                    Sales by Addons
+                                                </h5>
+                                            </div>
 
-                                        {/* Table */}
-                                        <div className="table-responsive">
-                                            <table className="table align-middle mb-0">
-                                                <thead className="table-light small text-uppercase">
-                                                    <tr>
-                                                        <th>Ticket Type</th>
-                                                        <th className="text-end">Price</th>
-                                                        <th className="text-end">Count</th>
-                                                        <th className="text-end">Total</th>
-                                                    </tr>
-                                                </thead>
+                                            <div className="table-responsive">
+                                                <table className="table align-middle mb-0">
+                                                    <thead className="table-light small text-uppercase">
+                                                        <tr>
+                                                            <th>Addon Type</th>
+                                                            <th className="text-end">Count</th>
+                                                            <th className="text-end">Total</th>
+                                                        </tr>
+                                                    </thead>
 
-                                                <tbody>
-                                                    <tr>
-                                                        <td className="fw-medium">Comps</td>
-                                                        <td className="text-end">€0.00</td>
-                                                        <td className="text-end">1</td>
-                                                        <td className="text-end">€0.00</td>
-                                                    </tr>
+                                                    <tbody>
+                                                        {addonsSales.length > 0 ? (
+                                                            addonsSales.map((addon, index) => (
+                                                                <tr key={index}>
+                                                                    <td className="fw-medium">
+                                                                        {addon.addon_name}
+                                                                    </td>
+                                                                    <td className="text-end">
+                                                                        {addon.sold}
+                                                                    </td>
+                                                                    <td className="text-end">
+                                                                        {formatCurrency(
+                                                                            addon.currency,
+                                                                            addon.revenue
+                                                                        )}
+                                                                    </td>
+                                                                </tr>
+                                                            ))
+                                                        ) : (
+                                                            <tr>
+                                                                <td colSpan="3" className="text-center py-4">
+                                                                    No addon sales found
+                                                                </td>
+                                                            </tr>
+                                                        )}
 
-                                                    {/* Total Row */}
-                                                    <tr className="total-row">
-                                                        <td className="fw-semibold">Total</td>
-                                                        <td></td>
-                                                        <td className="text-end fw-semibold">1</td>
-                                                        <td className="text-end fw-semibold">€0.00</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
+                                                        {/* Total Row */}
+                                                        {addonsSales.length > 0 && (
+                                                            <tr className="total-row">
+                                                                <td className="fw-semibold">Total</td>
+                                                                <td className="text-end fw-semibold">
+                                                                    {sumByKey(addonsSales, "sold")}
+                                                                </td>
+                                                                <td className="text-end fw-semibold">
+                                                                    {formatCurrency(
+                                                                        currency,
+                                                                        sumByKey(addonsSales, "revenue")
+                                                                    )}
+                                                                </td>
+                                                            </tr>
+                                                        )}
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
-                                    </div>
+                                    )}
                                 </div>
                             </section>
                         </div>
@@ -286,12 +189,8 @@ const CommitteeTicketsPage = () => {
             </section>
 
             <FrontendFooter />
-
-
-
-
         </>
     );
 };
 
-export default CommitteeTicketsPage;
+export default SalesAddonsPage;
