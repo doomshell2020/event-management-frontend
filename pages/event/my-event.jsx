@@ -27,6 +27,7 @@ export default function OrganizerEvents({ userId }) {
     const [isLeftRight, setIsLeftRight] = useState(false);
     const [backgroundImage, setIsMobile] = useState('/assets/front-images/about-slider_bg.jpg');
     const [loading, setLoading] = useState(true); // ✅ Added loading state
+    // console.log('eventData :', eventData);
 
     // ✅ Fetch events by organizer
     const fetchEvents = async () => {
@@ -178,6 +179,31 @@ export default function OrganizerEvents({ userId }) {
     };
 
 
+    const [searchText, setSearchText] = useState("");
+    const filteredEvents = useMemo(() => {
+        if (!searchText) return eventData;
+
+        const text = searchText.toLowerCase();
+
+        return eventData.filter(event => {
+            const name = event?.name?.toLowerCase() || "";
+            const location = event?.location?.toLowerCase() || "";
+            const type = event?.entry_type?.toLowerCase() || "";
+            const freePaid =
+                event?.is_free == "Y" ? "free" :
+                    event?.is_free == "N" ? "paid" : "";
+
+            return (
+                name.includes(text) ||
+                location.includes(text) ||
+                type.includes(text) ||
+                freePaid.includes(text)
+            );
+        });
+    }, [searchText, eventData]);
+
+
+
     return (
         <>
             <FrontendHeader backgroundImage={backgroundImage} />
@@ -198,14 +224,22 @@ export default function OrganizerEvents({ userId }) {
                         />
 
                         <div className="search_sec">
-                            <form className="d-flex align-items-center">
+                            <form
+                                className="d-flex align-items-center"
+                                onSubmit={(e) => e.preventDefault()}
+                            >
                                 <input
+                                    name="search"
+                                    autoComplete="off"
                                     className="form-control me-2 text-14"
                                     style={{ height: "34px" }}
                                     type="text"
-                                    placeholder="Search My Events"
-                                    aria-label="Search"
+                                    placeholder="Search by name, location, type, free/paid"
+                                    value={searchText}
+                                    onChange={(e) => setSearchText(e.target.value)}
                                 />
+
+
                                 <svg
                                     width="24"
                                     height="24"
@@ -228,14 +262,16 @@ export default function OrganizerEvents({ userId }) {
                                             <thead className="table-dark table_bg">
                                                 <tr>
                                                     <th style={{ width: "2%" }} scope="col">#</th>
-                                                    <th style={{ width: "14%" }} scope="col">Name</th>
+                                                    <th style={{ width: "14%" }} scope="col">Event</th>
+                                                    <th style={{ width: "8%" }} scope="col">Details</th>
                                                     {/* <th style={{ width: "17%" }} scope="col">Date and Time</th> */}
-                                                    <th style={{ width: "8%" }} scope="col">Venue</th>
-                                                    <th style={{ width: "18%" }} scope="col">Ticket Sale</th>
+                                                    {/* <th style={{ width: "8%" }} scope="col">Venue</th> */}
+                                                    <th style={{ width: "18%" }} scope="col">Events Dates</th>
                                                     {/* <th style={{ width: "16%" }} scope="col">Ticket Types</th> */}
                                                     <th style={{ width: "15%" }} scope="col">Action</th>
                                                 </tr>
                                             </thead>
+
                                             <tbody>
                                                 {/* ✅ Show Loader when fetching */}
                                                 {loading ? (
@@ -247,8 +283,8 @@ export default function OrganizerEvents({ userId }) {
                                                             <div className="mt-2">Loading events...</div>
                                                         </td>
                                                     </tr>
-                                                ) : eventData && eventData.length > 0 ? (
-                                                    eventData.map((event, index) => {
+                                                ) : filteredEvents && filteredEvents.length > 0 ? (
+                                                    filteredEvents.map((event, index) => {
                                                         const startDate = event?.date_from?.local
                                                             ? new Date(event.date_from.local.replace(" ", "T"))
                                                             : new Date(event?.date_from?.utc);
@@ -268,45 +304,50 @@ export default function OrganizerEvents({ userId }) {
                                                                 <th scope="row">{index + 1}</th>
                                                                 <td>
                                                                     <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                                                                        <img
-                                                                            src={imgUrl}
-                                                                            alt="Event"
-                                                                            style={{
-                                                                                objectFit: "cover",
-                                                                                borderRadius: "8px",
-                                                                                border: "1px solid #ddd",
-                                                                                width: "70px",
-                                                                                height: "70px",
-                                                                            }}
-                                                                        />
+                                                                        <td>
+                                                                            <img
+                                                                                src={imgUrl}
+                                                                                alt="Event"
+                                                                                style={{
+                                                                                    objectFit: "cover",
+                                                                                    borderRadius: "8px",
+                                                                                    border: "1px solid #ddd",
+                                                                                    width: "70px",
+                                                                                    height: "70px",
+                                                                                }}
+                                                                            />
+                                                                        </td>
+
                                                                     </div>
                                                                 </td>
 
                                                                 {/* ✅ Venue + Location combined */}
                                                                 <td>
-                                                                    {event ? (
-                                                                        <>
-                                                                            <Link
-                                                                                href={`/event/${event.id}/${event.slug}`}
-                                                                                target="_blank"
-                                                                                rel="noopener noreferrer"
-                                                                                style={{
+                                                                    <Link
+                                                                        href={`/event/${event.id}/${event.slug}`}
+                                                                        target="_blank"
+                                                                        rel="noopener noreferrer"
+                                                                        style={{ fontWeight: "600", textDecoration: "none" }}
+                                                                    >
+                                                                        {event.name}
+                                                                    </Link>
 
-                                                                                    fontWeight: "600",
-                                                                                    textDecoration: "none",
-                                                                                }}
-                                                                            >
-                                                                                {event.name || "Untitled Event"}
-                                                                            </Link>
-                                                                            <br />
-                                                                            <span className="text-muted">
-                                                                                {event.location || "Location not added"}
-                                                                            </span>
-                                                                        </>
-                                                                    ) : (
-                                                                        "N/A"
-                                                                    )}
+                                                                    <br />
+
+                                                                    <span className="text-muted">
+                                                                        📍 {event.location || "Location not added"}
+                                                                    </span>
+
+                                                                    <br />
+
+                                                                    <small className="text-muted">
+                                                                        🧩 <b>{event.entry_type?.toUpperCase()}</b>
+                                                                        {" | "}
+                                                                        💰 <b>{event.is_free === "Y" ? "Free" : "Paid"}</b>
+                                                                    </small>
                                                                 </td>
+
+
 
                                                                 {/* ✅ Dates */}
                                                                 <td>
@@ -315,7 +356,12 @@ export default function OrganizerEvents({ userId }) {
                                                                     <br />
                                                                     <b>To:</b>{" "}
                                                                     {endDate ? format(endDate, "EEE, dd MMM yyyy") : "N/A"}
+                                                                    <br />
+                                                                    <small className="text-muted">
+                                                                        🌐 {event.event_timezone || "Local Time"}
+                                                                    </small>
                                                                 </td>
+
 
                                                                 {/* ✅ Ticket Types */}
                                                                 {/* <td className="ticket_types">
@@ -417,7 +463,7 @@ export default function OrganizerEvents({ userId }) {
                                                                     >
                                                                         <Link
                                                                             href="#"
-                                                                            className={`action_btn edit ${event.status == "Y" ? "disable_btn" : "enable_btn"
+                                                                            className={`action_btn edit ${event.status == "N" ? "disable_btn" : "enable_btn"
                                                                                 }`}
                                                                             onClick={(e) => {
                                                                                 e.preventDefault();
@@ -432,7 +478,7 @@ export default function OrganizerEvents({ userId }) {
                                                                                     : "Enable Event"
                                                                             }
                                                                         >
-                                                                            {event.status == "Y" ? (
+                                                                            {event.status == "N" ? (
                                                                                 <i className="bi bi-x-circle-fill"></i>
                                                                             ) : (
                                                                                 <i className="bi bi-check-circle-fill text-success"></i>
@@ -461,7 +507,9 @@ export default function OrganizerEvents({ userId }) {
                                                                 alt="No data"
                                                                 style={{ width: "120px", opacity: 0.6 }}
                                                             />
-                                                            <div className="mt-2 fw-bold text-muted">No Events Found</div>
+                                                            <div className="mt-2 fw-bold text-muted">
+                                                                {searchText ? "No matching events found" : "No Events Found"}
+                                                            </div>
                                                         </td>
                                                     </tr>
                                                 )}
@@ -470,28 +518,15 @@ export default function OrganizerEvents({ userId }) {
                                         </table>
                                     </div>
 
-                                    <div className="paginator col-sm-12">
-                                        {/* <ul className="pagination justify-content-center">
-                                            <li className="prev disabled">
-                                                <Link href="/"><i className="bi bi-chevron-left"></i> Previous</Link>
-                                            </li>
-                                            <li className="next disabled">
-                                                <Link href="/">Next <i className="bi bi-chevron-right"></i></Link>
-                                            </li>
-                                        </ul>
-                                        <div className="text-center">
-                                            <p className="paginate_p text-14">
-                                                Page 1 of 1, showing {eventData?.length || 0} record(s)
-                                            </p>
-                                        </div> */}
-                                    </div>
+                                    {/* <div className="paginator col-sm-12">
+                                        
+                                    </div> */}
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
-
             <FrontendFooter />
 
         </>

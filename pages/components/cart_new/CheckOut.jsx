@@ -10,7 +10,7 @@ import { useAuth } from "@/shared/layout-components/layout/AuthContext";
 
 /* Stripe Init */
 const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+  process.env.STRIPE_PUBLIC_KEY
 );
 
 /* Round Helper */

@@ -424,21 +424,24 @@ const MyEventsPage = () => {
                                                         </select>
                                                     </div>
 
-                                                    <div className="col-md-6">
-                                                        <label className="form-label">
-                                                            Currency <span className="text-danger">*</span>
-                                                        </label>
-                                                        <select
-                                                            className="form-select rounded-0"
-                                                            name="payment_currency"
-                                                            value={formData.payment_currency}
-                                                            onChange={handleChange}
-                                                        >
-                                                            <option value="">Payment Type</option>
-                                                            <option value="1">INR</option>
-                                                            <option value="2">USD</option>
-                                                        </select>
-                                                    </div>
+                                                    {!isFree && (
+                                                        <div className="col-md-6">
+                                                            <label className="form-label">
+                                                                Currency <span className="text-danger">*</span>
+                                                            </label>
+                                                            <select
+                                                                className="form-select rounded-0"
+                                                                name="payment_currency"
+                                                                value={formData.payment_currency}
+                                                                onChange={handleChange}
+                                                            >
+                                                                <option value="">Payment Type</option>
+                                                                <option value="1">INR</option>
+                                                                <option value="2">USD</option>
+                                                            </select>
+                                                        </div>
+
+                                                    )}
 
                                                     <div className="col-md-6">
                                                         <label className="form-label">
@@ -586,8 +589,10 @@ const MyEventsPage = () => {
 
                                                     <div className="col-md-6">
                                                         <label htmlFor="formFile" className="form-label">
-                                                            Update Image{" "}
-                                                            <small className="text-danger">(Size 550×550 JPG, JPEG, PNG Max 2MB)</small>
+                                                            Upload Image{" "}
+                                                            <small className="text-danger" style={{ fontSize: "11px" }}>
+                                                                (1200×800 min · 1920×800 max · JPG/PNG · ≤2MB)
+                                                            </small>
                                                             <span
                                                                 className="preview_img fw-normal text-primary ms-2"
                                                                 role="button"
@@ -601,30 +606,117 @@ const MyEventsPage = () => {
                                                         <input
                                                             type="file"
                                                             className="form-control rounded-0"
-                                                            accept=".jpg, .jpeg, .png" // ✅ HTML-level validation
+                                                            accept=".jpg,.jpeg,.png"
+                                                            // required
                                                             onChange={(e) => {
                                                                 const file = e.target.files[0];
                                                                 if (!file) return;
 
-                                                                // ✅ Allowed extensions
+                                                                // ================= FILE TYPE VALIDATION =================
                                                                 const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
                                                                 if (!allowedTypes.includes(file.type)) {
-                                                                    Swal.fire("Invalid File", "Only JPG, JPEG, and PNG files are allowed.", "error");
-                                                                    e.target.value = ""; // clear file input
-                                                                    return;
-                                                                }
-
-                                                                // ✅ Max size 2MB
-                                                                const maxSize = 2 * 1024 * 1024; // 2 MB
-                                                                if (file.size > maxSize) {
-                                                                    Swal.fire("File Too Large", "Maximum file size is 2 MB.", "warning");
+                                                                    Swal.fire({
+                                                                        icon: "error",
+                                                                        title: "Invalid File Format",
+                                                                        html: `
+                                                                            <p style="color:red;font-weight:600">
+                                                                                Only JPG, JPEG, and PNG images are allowed.
+                                                                            </p>
+                                                                        `
+                                                                    });
                                                                     e.target.value = "";
                                                                     return;
                                                                 }
 
-                                                                handleFileChange(e); // ✅ proceed with your handler
+                                                                // ================= FILE SIZE VALIDATION =================
+                                                                const maxSize = 2 * 1024 * 1024;
+                                                                if (file.size > maxSize) {
+                                                                    Swal.fire({
+                                                                        icon: "warning",
+                                                                        title: "File Size Exceeded",
+                                                                        html: `
+                                                                            <p style="color:red;font-weight:600">
+                                                                                Maximum allowed file size is 2 MB.
+                                                                            </p>
+                                                                            <p>Your file size: ${(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                                                                        `
+                                                                    });
+                                                                    e.target.value = "";
+                                                                    return;
+                                                                }
+
+                                                                // ================= IMAGE DIMENSION VALIDATION =================
+                                                                const img = new Image();
+                                                                const objectUrl = URL.createObjectURL(file);
+
+                                                                img.onload = () => {
+                                                                    const width = img.width;
+                                                                    const height = img.height;
+
+                                                                    URL.revokeObjectURL(objectUrl);
+
+                                                                    const minWidth = 1200;
+                                                                    const maxWidth = 1920;
+                                                                    const requiredHeight = 800;
+
+                                                                    if (
+                                                                        height !== requiredHeight ||
+                                                                        width < minWidth ||
+                                                                        width > maxWidth
+                                                                    ) {
+                                                                        Swal.fire({
+                                                                            icon: "error",
+                                                                            title: "Invalid Image Dimensions",
+                                                                            html: `
+                                                                                <div style="text-align:left">
+                                                                                    <p style="color:red;font-weight:700">
+                                                                                        Image size does not meet the required dimensions.
+                                                                                    </p>
+                                                                                    <p><b style="color:red">Recommended:</b> 1200 × 800 px</p>
+                                                                                    <p><b style="color:red">Maximum allowed:</b> 1920 × 800 px</p>
+                                                                                    <p><b>Your image:</b> ${width} × ${height} px</p>
+                                                                                </div>
+                                                                            `
+                                                                        });
+
+                                                                        e.target.value = "";
+                                                                        return;
+                                                                    }
+
+                                                                    // ✅ ALL VALIDATIONS PASSED
+                                                                    Swal.fire({
+                                                                        icon: "success",
+                                                                        title: "Image Valid",
+                                                                        html: `
+                                                                                <p style="color:green;font-weight:600">
+                                                                                    Image uploaded successfully!
+                                                                                </p>
+                                                                                <p>Your image size: ${width} × ${height} px</p>
+                                                                            `,
+                                                                        timer: 1500,
+                                                                        showConfirmButton: false
+                                                                    });
+
+                                                                    handleFileChange(e);
+                                                                };
+
+                                                                img.onerror = () => {
+                                                                    Swal.fire({
+                                                                        icon: "error",
+                                                                        title: "Invalid Image",
+                                                                        html: `
+                                                                            <p style="color:red;font-weight:600">
+                                                                                Unable to read the uploaded image file.
+                                                                            </p>
+                                                                        `
+                                                                    });
+                                                                    e.target.value = "";
+                                                                };
+
+                                                                img.src = objectUrl;
                                                             }}
                                                         />
+
                                                     </div>
 
                                                     <div className="col-md-12 mb-3">

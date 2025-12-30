@@ -65,7 +65,7 @@ const EventDetailsPage = () => {
     };
 
     const validateSlug = (slug) => {
-        if (!slug || slug.trim() === "") {
+        if (!slug || slug.trim() == "") {
             return "Slug is required";
         }
         if (!/^[a-z0-9-]+$/.test(slug)) {
@@ -149,8 +149,6 @@ const EventDetailsPage = () => {
         setLoading(true);
 
         try {
-
-
             const fd = new FormData();
             Object.entries(formData).forEach(([key, value]) => {
                 fd.append(key, value);
@@ -169,13 +167,11 @@ const EventDetailsPage = () => {
             });
 
             const resData = response.data;
-            // console.log('>>>>>>>>>', resData);
 
             if (resData?.success) {
                 Swal.fire("Success", resData?.message ?? "Event created successfully!", "success");
                 router.push(`/event/my-event/`)
             } else if (resData?.error?.details) {
-                // console.log('>>>>>>>>>>>>',resData?.error?.details);
                 // 🧩 handle backend validation errors
                 const errorList = resData.error.details
                     .map(
@@ -331,6 +327,7 @@ const EventDetailsPage = () => {
                                                         name="country_id"
                                                         onChange={handleChange}
                                                         value={formData.country_id}
+                                                        required
                                                     >
                                                         <option value="">Choose Country</option>
                                                         {countries.map((country) => (
@@ -353,6 +350,7 @@ const EventDetailsPage = () => {
                                                         value={formData.location}
                                                         onChange={handleChange}
                                                         placeholder="Location"
+                                                        required
                                                     />
                                                 </div>
 
@@ -360,36 +358,126 @@ const EventDetailsPage = () => {
                                                 <div className="col-lg-4 col-md-6 mb-3">
                                                     <label className="form-label">
                                                         Upload Image{" "}
-                                                        <small className="text-danger">(Size 550×550 JPG, JPEG, PNG Max 2MB)</small>
+                                                        <small className="text-danger" style={{ fontSize: "11px" }}>
+                                                            (1200×800 min · 1920×800 max · JPG/PNG · ≤2MB)
+                                                        </small>
                                                     </label>
+
                                                     <input
                                                         type="file"
                                                         className="form-control rounded-0"
-                                                        accept=".jpg, .jpeg, .png" // ✅ HTML-level validation
+                                                        accept=".jpg,.jpeg,.png"
+                                                        required
                                                         onChange={(e) => {
                                                             const file = e.target.files[0];
                                                             if (!file) return;
 
-                                                            // ✅ Allowed extensions
+                                                            // ================= FILE TYPE VALIDATION =================
                                                             const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
                                                             if (!allowedTypes.includes(file.type)) {
-                                                                Swal.fire("Invalid File", "Only JPG, JPEG, and PNG files are allowed.", "error");
-                                                                e.target.value = ""; // clear file input
-                                                                return;
-                                                            }
-
-                                                            // ✅ Max size 2MB
-                                                            const maxSize = 2 * 1024 * 1024; // 2 MB
-                                                            if (file.size > maxSize) {
-                                                                Swal.fire("File Too Large", "Maximum file size is 2 MB.", "warning");
+                                                                Swal.fire({
+                                                                    icon: "error",
+                                                                    title: "Invalid File Format",
+                                                                    html: `
+                                                                        <p style="color:red;font-weight:600">
+                                                                            Only JPG, JPEG, and PNG images are allowed.
+                                                                        </p>
+                                                                    `
+                                                                });
                                                                 e.target.value = "";
                                                                 return;
                                                             }
 
-                                                            handleFileChange(e); // ✅ proceed with your handler
+                                                            // ================= FILE SIZE VALIDATION =================
+                                                            const maxSize = 2 * 1024 * 1024;
+                                                            if (file.size > maxSize) {
+                                                                Swal.fire({
+                                                                    icon: "warning",
+                                                                    title: "File Size Exceeded",
+                                                                    html: `
+                                                                        <p style="color:red;font-weight:600">
+                                                                            Maximum allowed file size is 2 MB.
+                                                                        </p>
+                                                                        <p>Your file size: ${(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                                                                    `
+                                                                });
+                                                                e.target.value = "";
+                                                                return;
+                                                            }
+
+                                                            // ================= IMAGE DIMENSION VALIDATION =================
+                                                            const img = new Image();
+                                                            const objectUrl = URL.createObjectURL(file);
+
+                                                            img.onload = () => {
+                                                                const width = img.width;
+                                                                const height = img.height;
+
+                                                                URL.revokeObjectURL(objectUrl);
+
+                                                                const minWidth = 1200;
+                                                                const maxWidth = 1920;
+                                                                const requiredHeight = 800;
+
+                                                                if (
+                                                                    height !== requiredHeight ||
+                                                                    width < minWidth ||
+                                                                    width > maxWidth
+                                                                ) {
+                                                                    Swal.fire({
+                                                                        icon: "error",
+                                                                        title: "Invalid Image Dimensions",
+                                                                        html: `
+                                                                            <div style="text-align:left">
+                                                                                <p style="color:red;font-weight:700">
+                                                                                    Image size does not meet the required dimensions.
+                                                                                </p>
+                                                                                <p><b style="color:red">Recommended:</b> 1200 × 800 px</p>
+                                                                                <p><b style="color:red">Maximum allowed:</b> 1920 × 800 px</p>
+                                                                                <p><b>Your image:</b> ${width} × ${height} px</p>
+                                                                            </div>
+                                                                        `
+                                                                    });
+
+                                                                    e.target.value = "";
+                                                                    return;
+                                                                }
+
+                                                                // ✅ ALL VALIDATIONS PASSED
+                                                                Swal.fire({
+                                                                    icon: "success",
+                                                                    title: "Image Valid",
+                                                                    html: `
+                                                                        <p style="color:green;font-weight:600">
+                                                                            Image uploaded successfully!
+                                                                        </p>
+                                                                        <p>Your image size: ${width} × ${height} px</p>
+                                                                    `,
+                                                                    timer: 1500,
+                                                                    showConfirmButton: false
+                                                                });
+
+                                                                handleFileChange(e);
+                                                            };
+
+                                                            img.onerror = () => {
+                                                                Swal.fire({
+                                                                    icon: "error",
+                                                                    title: "Invalid Image",
+                                                                    html: `
+                                                                            <p style="color:red;font-weight:600">
+                                                                                Unable to read the uploaded image file.
+                                                                            </p>
+                                                                        `
+                                                                });
+                                                                e.target.value = "";
+                                                            };
+
+                                                            img.src = objectUrl;
                                                         }}
                                                     />
                                                 </div>
+
 
                                                 {/* Free and Register Checkboxes */}
                                                 <div className="col-lg-4 col-md-6 mb-3 d-flex align-items-end">
@@ -424,23 +512,33 @@ const EventDetailsPage = () => {
                                                     </div>
                                                 </div>
 
-                                                {/* Currency */}
-                                                <div className="col-lg-2 col-md-6 mb-3">
-                                                    <label className="form-label">Currency</label>
-                                                    <select
-                                                        className="form-select rounded-0"
-                                                        name="payment_currency"
-                                                        value={formData.payment_currency}
-                                                        onChange={handleChange}
-                                                    >
-                                                        <option value="">Payment Type</option>
-                                                        <option value="1">INR</option>
-                                                        <option value="2">USD</option>
-                                                    </select>
-                                                </div>
+                                                {formData.is_free != "Y" && (
+                                                    <>
+                                                        {/* Currency */}
+                                                        <div className="col-lg-2 col-md-6 mb-3">
+                                                            <label className="form-label">Currency <span className="text-danger">*</span></label>
+                                                            <select
+                                                                className="form-select rounded-0"
+                                                                name="payment_currency"
+                                                                value={formData.payment_currency}
+                                                                onChange={handleChange}
+                                                                required
+                                                            >
+                                                                <option value="">Payment Type</option>
+                                                                <option value="1">INR</option>
+                                                                <option value="2">USD</option>
+                                                            </select>
+                                                        </div>
+
+                                                    </>
+
+                                                )}
 
                                                 {/* Timezone */}
-                                                <div className="col-lg-2 col-md-6 mb-3">
+                                                <div
+                                                    className={`col-lg-${formData.is_free == "Y" ? 4 : 2} col-md-${formData.is_free == "Y" ? 6 : 4
+                                                        } mb-3`}
+                                                >
                                                     <label className="form-label">
                                                         Timezone <span className="text-danger">*</span>
                                                     </label>
@@ -471,6 +569,7 @@ const EventDetailsPage = () => {
                                                         name="date_from"
                                                         onChange={handleChange}
                                                         value={formData.date_from}
+                                                        required
                                                     />
                                                 </div>
 
@@ -484,6 +583,7 @@ const EventDetailsPage = () => {
                                                         name="date_to"
                                                         onChange={handleChange}
                                                         value={formData.date_to}
+                                                        required
                                                     />
                                                 </div>
 
@@ -518,6 +618,7 @@ const EventDetailsPage = () => {
                                                                 name="sale_start"
                                                                 onChange={handleChange}
                                                                 value={formData.sale_start}
+                                                                required
                                                             />
                                                         </div>
                                                         <div className="col-lg-4 col-md-6 mb-3">
@@ -530,21 +631,25 @@ const EventDetailsPage = () => {
                                                                 name="sale_end"
                                                                 onChange={handleChange}
                                                                 value={formData.sale_end}
+                                                                required
                                                             />
                                                         </div>
 
                                                         {/* Ticket Limit per Person */}
                                                         <div className="col-lg-4 col-md-6 mb-3">
-                                                            <label className="form-label">Ticket Limit per person</label>
+                                                            <label className="form-label">Ticket Limit per person <span className="text-danger">*</span></label>
                                                             <select
                                                                 className="form-select rounded-0"
                                                                 name="ticket_limit"
                                                                 onChange={handleChange}
+                                                                required
                                                             >
                                                                 <option value="">Choose Limit</option>
                                                                 <option value="1">1</option>
                                                                 <option value="2">2</option>
                                                                 <option value="5">5</option>
+                                                                <option value="7">7</option>
+                                                                <option value="10">10</option>
                                                             </select>
                                                         </div>
 
@@ -570,12 +675,13 @@ const EventDetailsPage = () => {
 
                                                 {/* URL Slug */}
                                                 <div className="col-lg-4 col-md-6 mb-3">
-                                                    <label className="form-label">URL Slug</label>
+                                                    <label className="form-label">URL Slug <span className="text-danger">*</span></label>
                                                     <input
                                                         type="text"
                                                         className="form-control rounded-0"
                                                         name="slug"
                                                         value={formData.slug}
+                                                        required
                                                         onChange={handleChange}
                                                         placeholder="Slug"
                                                     />
@@ -597,21 +703,47 @@ const EventDetailsPage = () => {
                                                     />
                                                 </div>
 
-                                                <div className="col-lg-4 col-md-6 mb-3">
-                                                    <label className="form-label">Type of Event</label>
-                                                    <select
-                                                        className="form-select rounded-0"
-                                                        name="access_type"
-                                                        onChange={handleChange}
-                                                        value={formData.access_type || ""}
-                                                    >
-                                                        <option value="">Choose Type</option>
-                                                        <option value="event">Event</option>
-                                                        <option value="multi">Multi</option>
-                                                        <option value="slot">Slot</option>
-                                                        <option value="single">Single</option>
-                                                    </select>
-                                                </div>
+
+                                                {!isFree && (
+                                                    <div className="col-lg-4 col-md-6 mb-3">
+                                                        <label className="form-label d-flex align-items-center gap-2">
+                                                            Type of Event
+
+                                                            <i
+                                                                className="bi bi-info-circle-fill text-primary"
+                                                                style={{ cursor: "pointer", fontSize: "14px" }}
+                                                                onClick={() => {
+                                                                    Swal.fire({
+                                                                        icon: "info",
+                                                                        title: "Event Type Guide",
+                                                                        html: `
+                                                                            <div style="text-align:left;font-size:14px">
+                                                                                <p><b>Event:</b> One-time entry for a single event.</p>
+                                                                                <p><b>Multi:</b> One ticket gives access to multiple events or days.</p>
+                                                                                <p><b>Slot:</b> Entry is allowed only for a specific time slot.</p>
+                                                                                <p><b>Single:</b> Ticket can be used only once.</p>
+                                                                            </div>
+                                                                        `
+                                                                    });
+                                                                }}
+                                                            ></i>
+                                                        </label>
+
+                                                        <select
+                                                            className="form-select rounded-0"
+                                                            name="access_type"
+                                                            onChange={handleChange}
+                                                            value={formData.access_type || ""}
+                                                        >
+                                                            <option value="">Choose Type</option>
+                                                            <option value="event">Event</option>
+                                                            <option value="multi">Multi</option>
+                                                            <option value="slot">Slot</option>
+                                                            <option value="single">Single</option>
+                                                        </select>
+                                                    </div>
+                                                )}
+
 
                                                 {/* Description */}
                                                 <div className="col-12">
