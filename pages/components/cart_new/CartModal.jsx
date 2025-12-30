@@ -1340,7 +1340,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                                                         ) || [];
 
                                                                                                         const validation = validateTicketQuestions(ticket.id, ticketQuestions);
-                                                                                                        console.log('validation :', validation);
+                                                                                                        // console.log('validation :', validation);
 
                                                                                                         if (!validation.valid) {
                                                                                                             Swal.fire({

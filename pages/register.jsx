@@ -1,36 +1,96 @@
 import React, { useState } from "react";
 import FrontendHeader from "@/shared/layout-components/frontelements/frontendheader";
 import FrontendFooter from "@/shared/layout-components/frontelements/frontendfooter";
-import styles from "@/styles/LoginPage.module.css";
 import api from "@/utils/api";
 import Swal from "sweetalert2";
 import Link from "next/link";
 
 const RegisterPage = () => {
+  
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
     password: "",
     gender: "",
-    dob: "",
+    dob: "2000-01-01"
   });
 
-  const [loading, setLoading] = useState(false);
-  const [backgroundImage] = useState("/assets/front-images/about-slider_bg.jpg");
 
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const backgroundImage = "/assets/front-images/about-slider_bg.jpg";
+
+  /* ---------------- HELPERS ---------------- */
+  const isValidEmail = (email) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  const isStrongPassword = (password) =>
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(password);
+
+  const isValidName = (name) =>
+    /^[A-Za-z\s]{2,}$/.test(name);
+
+  const isValidDOB = (dob) => {
+    const birthDate = new Date(dob);
+    const today = new Date();
+    const age =
+      today.getFullYear() -
+      birthDate.getFullYear() -
+      (today < new Date(today.getFullYear(), birthDate.getMonth(), birthDate.getDate()) ? 1 : 0);
+    return age >= 13;
+  };
+
+  /* ---------------- HANDLE CHANGE ---------------- */
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  /* ---------------- VALIDATION ---------------- */
+  const validateForm = () => {
+    if (!isValidName(formData.firstName)) {
+      Swal.fire("Invalid First Name", "First name must contain at least 2 letters.", "error");
+      return false;
+    }
+
+    if (!isValidName(formData.lastName)) {
+      Swal.fire("Invalid Last Name", "Last name must contain at least 2 letters.", "error");
+      return false;
+    }
+
+    if (!isValidEmail(formData.email)) {
+      Swal.fire("Invalid Email", "Please enter a valid email address.", "error");
+      return false;
+    }
+
+    if (!isStrongPassword(formData.password)) {
+      Swal.fire(
+        "Weak Password",
+        "Password must be at least 8 characters and include uppercase, lowercase, and a number.",
+        "error"
+      );
+      return false;
+    }
+
+    if (!formData.gender) {
+      Swal.fire("Missing Gender", "Please select your gender.", "error");
+      return false;
+    }
+
+    if (!isValidDOB(formData.dob)) {
+      Swal.fire("Invalid Date of Birth", "You must be at least 13 years old to register.", "error");
+      return false;
+    }
+
+    return true;
+  };
+
+  /* ---------------- SUBMIT ---------------- */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.gender) {
-      Swal.fire("Error", "Please select your gender.", "error");
-      return;
-    }
+    if (!validateForm()) return;
 
     setLoading(true);
     try {
@@ -49,7 +109,7 @@ const RegisterPage = () => {
           email: "",
           password: "",
           gender: "",
-          dob: "",
+          dob: ""
         });
       } else {
         Swal.fire("Error", response.data?.message || "Something went wrong!", "error");
@@ -58,7 +118,6 @@ const RegisterPage = () => {
       const apiErrorMsg =
         error.response?.data?.error?.message ||
         error.response?.data?.message ||
-        error.message ||
         "Registration failed. Try again later.";
 
       Swal.fire("Error", apiErrorMsg, "error");
@@ -84,7 +143,7 @@ const RegisterPage = () => {
           <div className="form-content">
             <div className="row">
               <div className="col-md-6 col-sm-12 sig_img">
-                <img src="/assets/front-images/sigin.png" alt="img" />
+                <img src="/assets/front-images/sigin.png" alt="Register" />
               </div>
 
               <div className="col-md-6 col-sm-12 sig_img">
@@ -93,49 +152,39 @@ const RegisterPage = () => {
                   <p className="body-text">Fill in the details below to register.</p>
 
                   <form className="signup-pageform" onSubmit={handleSubmit}>
-                    <div>
-                      <input
-                        id="firstName"
-                        type="text"
-                        name="firstName"
-                        value={formData.firstName}
-                        onChange={handleChange}
-                        placeholder="First Name"
-                        className="form-control"
-                        required
-                      />
-                    </div>
+                    <input
+                      type="text"
+                      name="firstName"
+                      value={formData.firstName}
+                      onChange={handleChange}
+                      placeholder="First Name"
+                      className="form-control"
+                      required
+                    />
 
-                    <div>
-                      <input
-                        id="lastName"
-                        type="text"
-                        name="lastName"
-                        value={formData.lastName}
-                        onChange={handleChange}
-                        placeholder="Last Name"
-                        className="form-control"
-                        required
-                      />
-                    </div>
+                    <input
+                      type="text"
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleChange}
+                      placeholder="Last Name"
+                      className="form-control"
+                      required
+                    />
 
-                    <div>
-                      <input
-                        id="email"
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        placeholder="Email"
-                        className="form-control"
-                        required
-                      />
-                    </div>
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      placeholder="Email"
+                      className="form-control"
+                      required
+                    />
 
-                    <div>
+                    <div style={{ position: "relative" }}>
                       <input
-                        id="password"
-                        type="password"
+                        type={showPassword ? "text" : "password"}
                         name="password"
                         value={formData.password}
                         onChange={handleChange}
@@ -143,30 +192,35 @@ const RegisterPage = () => {
                         className="form-control"
                         required
                       />
+
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        style={{
+                          position: "absolute",
+                          right: "12px",
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          background: "none",
+                          border: "none",
+                          cursor: "pointer",
+                          color: "#666"
+                        }}
+                        aria-label={showPassword ? "Hide password" : "Show password"}
+                      >
+                        {showPassword ? "🙈" : "👁️"}
+                      </button>
                     </div>
+
 
                     <div className="row align-items-center">
                       <label className="col-sm-3 col-form-label">Gender</label>
                       <div className="col-sm-9 d-flex">
-                        <input
-                          className="ms-1"
-                          type="radio"
-                          name="gender"
-                          value="Male"
-                          checked={formData.gender === "Male"}
-                          onChange={handleChange}
-                        />
-                        <label className="col-form-label ms-1">Male</label>
+                        <input type="radio" name="gender" value="Male" checked={formData.gender == "Male"} onChange={handleChange} />
+                        <label className="ms-1">Male</label>
 
-                        <input
-                          className="ms-3"
-                          type="radio"
-                          name="gender"
-                          value="Female"
-                          checked={formData.gender === "Female"}
-                          onChange={handleChange}
-                        />
-                        <label className="col-form-label ms-1">Female</label>
+                        <input className="ms-3" type="radio" name="gender" value="Female" checked={formData.gender == "Female"} onChange={handleChange} />
+                        <label className="ms-1">Female</label>
                       </div>
                     </div>
 
@@ -175,55 +229,29 @@ const RegisterPage = () => {
                       <div className="col-sm-9">
                         <input
                           type="date"
-                          className="form-control"
                           name="dob"
                           value={formData.dob}
                           onChange={handleChange}
+                          className="form-control"
                           required
+                          min="2000-01-01"
+                          max={new Date().toISOString().split("T")[0]}
                         />
+
                       </div>
                     </div>
 
-                    <div className="form_checkb gap-2 d-flex align-items-start">
-                      <input className="mt-1" type="checkbox" name="termscheck" required />
-                      <p className="chack_cont">
-                        By Creating An Account You Agree To Our{" "}
-                        <span>
-                          <a target="_blank" href="https://eboxtickets.com/pages/privacy-policy">
-                            Privacy Policy
-                          </a>
-                        </span>{" "}
-                        and Accept Our{" "}
-                        <span>
-                          <a
-                            target="_blank"
-                            href="https://eboxtickets.com/pages/terms-and-conditions"
-                          >
-                            Terms and Conditions
-                          </a>
-                        </span>
-                        .
-                      </p>
-                    </div>
-
-                    <button
-                      type="submit"
-                      className="primery-button w-100 text-14 mt-3"
-                      disabled={loading}
-                    >
+                    <button type="submit" className="primery-button w-100 mt-3" disabled={loading}>
                       {loading ? "Registering..." : "Register"}
                     </button>
                   </form>
 
-                  <hr style={{ borderColor: "currentColor" }} />
+                  <hr />
 
-                  {/* ✅ FIXED Link */}
-                  <div className="reg_btn text-center">
-                    <p className="text-14">
-                      Already have an account?
-                      <Link href="/login" className="rg fw-bold"> Log in</Link>
-                    </p>
-                  </div>
+                  <p className="text-center">
+                    Already have an account?
+                    <Link href="/login" className="fw-bold"> Log in</Link>
+                  </p>
                 </div>
               </div>
             </div>
