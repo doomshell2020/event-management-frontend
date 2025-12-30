@@ -93,8 +93,8 @@ const LoginPage = () => {
       <section id="sign-up">
         <div className="container">
           <div className="section-heading">
-            <h1>Login</h1>
-            <h2>Login</h2>
+            <h1 className="mb-3">Login</h1>
+            {/* <h2>Login</h2> */}
             <p className="text-center body-text">Existing users use the form below to sign in.</p>
           </div>
 
