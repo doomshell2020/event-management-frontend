@@ -91,12 +91,12 @@ const Home = ({ events }) => {
     <>
       <FrontendHeader isStripeShowing={true} />
 
-      <section className="home-events" id="events">
+      <section className="home-events ddd" id="events">
         <div className="container">
           {/* Section Heading */}
           <div className="section-heading">
-            <h1>Events</h1>
-            <h2>Upcoming Events</h2>
+            <h1 className="mb-5">Upcoming Events</h1>
+            {/* <h2></h2> */}
           </div>
 
           {/* Search Box */}

@@ -46,7 +46,7 @@ const MyEventsPage = () => {
                             <i className={`bi bi-arrow-${isLeftRight ? 'right' : 'left'}-short`} onClick={() => setIsLeftRight(!isLeftRight)}></i>
                         </div>
                         <ul className="listunstyl components2">
-                            <li className="mb-3">
+                            <li>
                                 <Link className="text-white fw-bold"
                                     href="/event/post-event"
                                     style={{ backgroundColor: "#ff9800" }}

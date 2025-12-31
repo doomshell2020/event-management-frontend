@@ -57,11 +57,11 @@ const ProfilePage = () => {
   return (
     <>
       <FrontendHeader backgroundImage={backgroundImage} />
-      <section id="profile" className="mt-5 mb-5">
+      <section id="profile" className="mt-4 mb-5">
         <div className="container">
           <div className="section-heading">
-            <h1>Profile</h1>
-            <h2 className="mt-4">My Profile</h2>
+            <h1 className="mb-3">My Profile</h1>
+            {/* <h2 className="mt-4"></h2> */}
             <p className="mb-4 body-text text-center">
               Your profile information is displayed below.
             </p>

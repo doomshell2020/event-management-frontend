@@ -52,7 +52,7 @@ ul li {
 }
 
 .section-heading h1 {
-    font-size: 70px;
+    font-size: 60px;
     color: #858585;
     text-align: center;
     font-weight: 700;
@@ -1400,17 +1400,21 @@ span.ticket-icon-circle {
 
 
 /* event calender page css start */
+/* ================= WRAPPER ================= */
 .calendar-wrapper {
-  background: #ffffff;
-  padding: 30px;
-  border-radius: 20px;
+    background: #ededed;
+    padding: 30px;
+    border-radius: 20px;
 }
-
+/* ================= HEADER ================= */
 .calendar-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+    background-color: white;
+    padding: 18px 16px;
+    border-radius: 10px;
 }
 
 .header-left {
@@ -1458,9 +1462,24 @@ span.ticket-icon-circle {
 .header-right button:hover {
   background: #e6ecf5;
 }
+.rbc-month-header {
+    background-color: white;
+}
 
+
+/* ================= MAIN HEIGHT FIX ================= */
+.rbc-month-view {
+  height: auto !important;
+}
+
+.rbc-month-row {
+  flex: 0 0 auto !important;
+  height: auto !important;
+  min-height: unset !important;
+}
+
+/* ================= GRID CLEAN ================= */
 .rbc-month-view,
-.rbc-month-row,
 .rbc-row-bg,
 .rbc-day-bg {
   border: none;
@@ -1470,21 +1489,21 @@ span.ticket-icon-circle {
 .rbc-header {
   font-weight: 600;
   color: #7b8ca8;
-  padding: 12px 0;
+  padding: 10px 0 !important;
 }
 
+/* ================= ROW SPACING FIX ================= */
 .rbc-row-content {
-  gap: 10px;
-  padding: 0 !important;
+  padding: 4px 0 !important;
+}
+.rbc-calendar {
+    background-color: white;
 }
 
-.rbc-month-row {
-  min-height: 55px !important;
-}
-
+/* ================= DATE CARD ================= */
 .rbc-date-cell {
+  height: 42px; /* 🔥 arrow wali extra height yahin se control hoti hai */
   padding: 0;
-  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1504,14 +1523,7 @@ span.ticket-icon-circle {
   color: #000000;
 }
 
-.rbc-off-range-bg {
-  background: transparent !important;
-}
-
-.rbc-off-range {
-  color: #b5b5b5;
-}
-
+/* ================= TODAY ================= */
 .rbc-now .rbc-button-link {
   background: #eef9ff;
   border: 1px solid #4aa3df;
@@ -1523,18 +1535,31 @@ span.ticket-icon-circle {
   background: transparent !important;
 }
 
+/* ================= OFF RANGE ================= */
+.rbc-off-range-bg {
+  background: transparent !important;
+}
+
+.rbc-off-range {
+  color: #b5b5b5;
+}
+
+/* ================= EVENTS ================= */
+.rbc-row-segment {
+  padding: 1px 0;
+}
+
 .rbc-event {
   background: #1e73be;
   color: #ffffff;
   border-radius: 6px;
   padding: 4px 6px;
   font-size: 11px;
+  line-height: 1.2;
+  margin: 2px 0;
   border: none;
 }
 
-.rbc-row-segment {
-  padding: 2px 0;
-}
 /* event calender page css end */
 
 /* cart page start */
@@ -2028,7 +2053,6 @@ section#request-demo {
 color: #ffffff !important;
     background: #275191 !important;
 }
-
 #myevent-deshbord .event-sidebar ul.components2 li a {
   border-radius: 4px;
   font-size: 16px;
@@ -3003,7 +3027,10 @@ cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 1;
   top: 0;
 }
-
+.profile-modal-close button.btn-close {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/%3e%3c/svg%3e") !important;
+  font-size: 15px;
+}
 .user-profile .avatar-edit label {
   display: inline-block;
   width: 34px;
@@ -5576,13 +5603,6 @@ input[type="date"] {
     width: 144px;
     font-size: 16px;
   }
-}
-
-
-
-#edit-profile .section-heading h1 {
-  font-size: 36px;
-  font-weight: bold;
 }
 
 .edit-box {

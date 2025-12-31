@@ -566,16 +566,24 @@ const EventDetailPage = ({ event, slug }) => {
                                   {w.wellnessSlots?.length > 0 && (
                                     <div className="text-center">
                                       <button
-                                        className="btn mt-3 w-100"
+                                        className="btn mt-3 w-100 fw-bold"
                                         disabled={selectedCount === 0}
                                         style={{
                                           background:
                                             selectedCount > 0
-                                              ? "#21a67a"
-                                              : "#9fd6c5",
+                                              ? "linear-gradient(135deg, #af46e5 0%, #7263f1 50%, #e62d56 100%)"
+                                              : "linear-gradient(135deg, #d6c7f7, #e9c3d2)",
+                                          boxShadow:
+                                            selectedCount > 0
+                                              ? "0 7px 15px rgba(79, 70, 229, 0.5), inset 0 0 0 0px rgba(255, 255, 255, 0.15)"
+                                              : "none",
                                           color: "#fff",
                                           borderRadius: "50px",
                                           padding: "10px 30px",
+                                          border: "none",
+                                           border: "none",
+                                          cursor: selectedCount > 0 ? "pointer" : "not-allowed",
+                                          transition: "all 0.3s ease",
                                         }}
                                         onClick={() =>
                                           handleOpenAppointmentCart(
@@ -586,6 +594,7 @@ const EventDetailPage = ({ event, slug }) => {
                                       >
                                         Book Appointment
                                       </button>
+
                                     </div>
                                   )}
                                 </>

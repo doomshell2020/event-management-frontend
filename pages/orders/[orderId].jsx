@@ -101,8 +101,8 @@ export default function MyOrdersDetails() {
             <section id="my-ticket-module">
                 <div className="container">
                     <div className="section-heading">
-                        <h1>Orders</h1>
-                        <h2 className="mt-4">Order Details</h2>
+                        <h1 className="mt-4 mb-3">Order Details</h1>
+                        {/* <h2 className="mt-4"></h2> */}
                     </div>
 
                     {/* LOADING */}

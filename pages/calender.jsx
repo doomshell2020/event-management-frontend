@@ -5,6 +5,7 @@ import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 
+
 const localizer = momentLocalizer(moment);
 
 /* ================= CUSTOM HEADER ================= */
@@ -28,7 +29,7 @@ const CustomCalendarHeader = ({ date, onNavigate }) => {
   );
 };
 
-const Calender = () => {
+const CalendarPage = () => {
   const [date, setDate] = useState(new Date());
 
   const events = [
@@ -69,9 +70,9 @@ const Calender = () => {
           onNavigate={setDate}
           views={["month"]}
           defaultView="month"
-          toolbar={false} 
+          toolbar={false}
           popup
-          style={{ minHeight: "600px" }}
+          style={{ height: "auto" }}   // 🔥 IMPORTANT
           messages={{ noEventsInRange: "No Events" }}
         />
       </div>
@@ -81,4 +82,4 @@ const Calender = () => {
   );
 };
 
-export default Calender;
+export default CalendarPage;

@@ -379,7 +379,7 @@ const ManagePackages = () => {
                                     ) : (
                                         <div className="row g-3">
                                             {packageList.map((pkg) => (
-                                                <div key={pkg.id} className="col-md-6 col-lg-4">
+                                                <div key={pkg.id} className="col-md-12">
                                                     <div className="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
                                                         <div className="card-body p-3">
 
@@ -412,7 +412,11 @@ const ManagePackages = () => {
                                                                         {openDropdown == pkg.id && (
                                                                             <ul
                                                                                 className="dropdown-menu show position-absolute end-0 mt-1 shadow-sm"
-                                                                                style={{ zIndex: 999 }}
+                                                                                style={{
+                                                                                    zIndex: 999,
+                                                                                    width: "max-content",
+                                                                                    left: "-129px",
+                                                                                }}
                                                                             >
                                                                                 <li>
                                                                                     <button
@@ -433,15 +437,17 @@ const ManagePackages = () => {
                                                                                         ✏️
                                                                                     </button>
                                                                                 </li>
+
                                                                                 <li>
                                                                                     <button
                                                                                         className="dropdown-item"
                                                                                         title={pkg.hidden == "Y" ? "👁 Show Package" : "🚫 Hide Package"}
                                                                                         onClick={() => {
                                                                                             const newHidden = pkg.hidden == "Y" ? "N" : "Y";
-                                                                                            api.put(`/api/v1/packages/update/${pkg.id}`, {
-                                                                                                hidden: newHidden,
-                                                                                            })
+                                                                                            api
+                                                                                                .put(`/api/v1/packages/update/${pkg.id}`, {
+                                                                                                    hidden: newHidden,
+                                                                                                })
                                                                                                 .then(() => {
                                                                                                     Swal.fire({
                                                                                                         icon: "success",
@@ -468,6 +474,7 @@ const ManagePackages = () => {
                                                                                     </button>
                                                                                 </li>
                                                                             </ul>
+
                                                                         )}
                                                                     </div>
                                                                 </div>

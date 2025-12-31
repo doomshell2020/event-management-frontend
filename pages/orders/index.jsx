@@ -38,9 +38,9 @@ export default function MyOrders({ userId }) {
             <section id="my-order-module">
                 <div className="container">
                     <div className="section-heading">
-                        <h1>Orders</h1>
-                        <h2 className="mt-4">My Orders</h2>
-                        <p className="text-center text-14">Here you can manage your Orders</p>
+                        <h1 className="my-3 mt-4">My Orders</h1>
+                        {/* <h2 className="mt-4"></h2> */}
+                        <p className="text-center text-14 mb-4">Here you can manage your Orders</p>
                     </div>
 
                     <div className="my-ticketcontainer">

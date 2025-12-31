@@ -79,8 +79,8 @@ const ForgotPasswordPage = () => {
       <section id="sign-up">
         <div className="container">
           <div className="section-heading">
-            <h1>Forgot Password</h1>
-            <h2>Reset your password</h2>
+            <h1 className="mb-0">Forgot Password</h1>
+            <h2 className="mt-3">Reset your password</h2>
             <p className="text-center body-text">
               Enter your email address below, and we'll send you instructions to reset your password.
             </p>

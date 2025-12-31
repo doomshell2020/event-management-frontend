@@ -183,12 +183,12 @@ const UpdateProfile = () => {
 
     return (
         <>
-            <FrontendHeader   backgroundImage={backgroundImage}/>
-            <section id="edit-profile">
+            <FrontendHeader backgroundImage={backgroundImage} />
+            <section id="edit-profile" className="mb-2">
                 <div className="container">
                     <div className="section-heading">
-                        <h1>Update profile</h1>
-                        <h2>Profile</h2>
+                        <h1 className="mb-3 mt-4">Update profile</h1>
+                        {/* <h2>Profile</h2> */}
                         <p className="text-center body-text">
                             Enter your information below to update your account
                         </p>
@@ -216,9 +216,15 @@ const UpdateProfile = () => {
                                         padding: "6px",
                                         cursor: "pointer",
                                         boxShadow: "0 0 5px rgba(0,0,0,0.3)",
-                                        zIndex: 10
+                                        zIndex: 10,
+                                        width: "40px",
+                                        height: "40px",
+                                        display: "flex",
+                                        justifyContent: "center",
+                                        alignItems: "center",
                                     }}
                                 >
+
                                     <i className="bi bi-pencil" style={{ fontSize: "16px", color: "#555" }}></i>
                                 </span>
 
@@ -408,9 +414,9 @@ const UpdateProfile = () => {
                 keyboard={false}
             >
                 <form onSubmit={handleUploadSubmit}>
-                    <Modal.Header closeButton>
-                        <Modal.Title>Upload Picture</Modal.Title>
-                    </Modal.Header>
+                    <Modal.Header closeButton className="profile-modal-close">
+  <Modal.Title>Upload Picture</Modal.Title>
+</Modal.Header>
 
                     <Modal.Body>
 

@@ -137,9 +137,9 @@ const TicketDetails = ({ pendingRequests, counts, event_id }) => {
 
         <div className="container">
           <div className="section-heading">
-            <h1>Committee</h1>
-            <h2 className="mt-4">Committee</h2>
-            <p className="mb-4 body-text text-center">
+            <h1 className="mb-2">Committee</h1>
+            {/* <h2 className="mt-4">Committee</h2> */}
+            <p className="mb-5 body-text text-center">
               If you belong to any committees for events on eboxtickets, you can manage ticket requests here.
             </p>
           </div>
