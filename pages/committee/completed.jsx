@@ -153,7 +153,7 @@ const CommitteeCompleted = ({ completedRequests, counts, assets }) => {
                                                     <td>
                                                         <div>{ticket.title}</div>
                                                         <div className="text-muted fs-13">
-                                                            ₹{ticket.price} × {item.no_tickets}
+                                                            {item?.events?.currencyName?.Currency_symbol}{ticket.price} × {item.no_tickets}
                                                         </div>
                                                     </td>
 

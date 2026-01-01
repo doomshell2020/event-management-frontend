@@ -283,7 +283,7 @@ const ManageTickets = () => {
                                                         <>
                                                             <div className="col-md-3">
                                                                 <p className="body-text mb-0 d-flex align-items-center">
-                                                                    {ticket.hidden === "Y" ? (
+                                                                    {ticket.hidden == "Y" ? (
                                                                         <>
                                                                             <EyeOff
                                                                                 size={16}
@@ -339,7 +339,7 @@ const ManageTickets = () => {
                                             {/* RIGHT ACTIONS */}
                                             <div className="col-sm-3 text-end">
                                                 {/* Committee badge */}
-                                                {ticket.type === "committee_sales" && (
+                                                {ticket.type == "committee_sales" && (
                                                     <button
                                                         className="btn btn-warning btn-sm rounded-pill fw-bold px-3 me-2"
                                                         style={{ backgroundColor: "#ff9800", color: "#fff" }}
@@ -356,7 +356,7 @@ const ManageTickets = () => {
                                                             type="button"
                                                             onClick={() =>
                                                                 setOpenDropdown(
-                                                                    openDropdown === ticket.id
+                                                                    openDropdown == ticket.id
                                                                         ? null
                                                                         : ticket.id
                                                                 )
@@ -365,7 +365,7 @@ const ManageTickets = () => {
                                                             <Settings size={16} />
                                                         </button>
 
-                                                        {openDropdown === ticket.id && (
+                                                        {openDropdown == ticket.id && (
                                                             <ul
                                                                 className="dropdown-menu show position-absolute"
                                                                 style={{
@@ -404,7 +404,7 @@ const ManageTickets = () => {
                                                                         className="dropdown-item"
                                                                         onClick={() => {
                                                                             const newHidden =
-                                                                                ticket.hidden === "Y" ? "N" : "Y";
+                                                                                ticket.hidden == "Y" ? "N" : "Y";
                                                                             api
                                                                                 .put(
                                                                                     `/api/v1/tickets/update/${ticket.id}`,
@@ -414,7 +414,7 @@ const ManageTickets = () => {
                                                                             setOpenDropdown(null);
                                                                         }}
                                                                     >
-                                                                        {ticket.hidden === "Y"
+                                                                        {ticket.hidden == "Y"
                                                                             ? "Show Ticket"
                                                                             : "Hide Ticket"}
                                                                     </button>
@@ -426,7 +426,7 @@ const ManageTickets = () => {
                                                                         className="dropdown-item"
                                                                         onClick={() => {
                                                                             const newStatus =
-                                                                                ticket.sold_out === "Y"
+                                                                                ticket.sold_out == "Y"
                                                                                     ? "N"
                                                                                     : "Y";
                                                                             api
@@ -438,7 +438,7 @@ const ManageTickets = () => {
                                                                             setOpenDropdown(null);
                                                                         }}
                                                                     >
-                                                                        {ticket.sold_out === "Y"
+                                                                        {ticket.sold_out == "Y"
                                                                             ? "Mark as On Sale"
                                                                             : "Mark as Sold Out"}
                                                                     </button>
@@ -458,15 +458,36 @@ const ManageTickets = () => {
                                                                                 confirmButtonText: "Delete",
                                                                             }).then((result) => {
                                                                                 if (result.isConfirmed) {
+                                                                                    // Show loading Swal
+                                                                                    Swal.fire({
+                                                                                        title: "Deleting ticket...",
+                                                                                        allowOutsideClick: false,
+                                                                                        didOpen: () => {
+                                                                                            Swal.showLoading();
+                                                                                        },
+                                                                                    });
+
                                                                                     api
-                                                                                        .delete(
-                                                                                            `/api/v1/tickets/delete/${ticket.id}`
-                                                                                        )
-                                                                                        .then(handleGetTicketsList);
+                                                                                        .delete(`/api/v1/tickets/delete/${ticket.id}`)
+                                                                                        .then((res) => {
+                                                                                            if (res.data.success) {
+                                                                                                Swal.fire("Deleted!", "Ticket has been deleted.", "success");
+                                                                                                handleGetTicketsList();
+                                                                                            } else {
+                                                                                                Swal.fire("Error", res.data.error?.message || "Failed to delete ticket", "error");
+                                                                                            }
+                                                                                        })
+                                                                                        .catch((err) => {
+                                                                                            console.error("Delete Ticket Error:", err);
+                                                                                            const errorMessage =
+                                                                                                err.response?.data?.error?.message || "Something went wrong while deleting the ticket.";
+                                                                                            Swal.fire("Error", errorMessage, "error");
+                                                                                        });
                                                                                 }
                                                                             });
                                                                             setOpenDropdown(null);
                                                                         }}
+
                                                                     >
                                                                         Delete
                                                                     </button>
@@ -543,7 +564,10 @@ const ManageTickets = () => {
                                     name="price"
                                     required
                                     value={ticketForm.price}
-                                    onChange={handleInputChange}
+                                    onChange={(e) => {
+                                        e.target.value = e.target.value.replace(/[^a-zA-Z0-9 ]/g, "");
+                                        handleInputChange(e);
+                                    }}
                                     placeholder="Price"
                                     className="form-control"
                                 />
@@ -559,8 +583,10 @@ const ManageTickets = () => {
                                     className="form-control"
                                     placeholder="Enter Count"
                                     value={ticketForm.count}
-                                    onChange={handleInputChange}
-                                />
+                                    onChange={(e) => {
+                                        e.target.value = e.target.value.replace(/[^a-zA-Z0-9 ]/g, "");
+                                        handleInputChange(e);
+                                    }} />
                                 <div className="invalid-feedback">Please enter count.</div>
                             </div>
 
@@ -592,8 +618,8 @@ const ManageTickets = () => {
                                     onChange={handleInputChange}
                                 >
                                     <option value="">Choose One</option>
-                                    <option value="Y">Visible</option>
-                                    <option value="N">Hidden</option>
+                                    <option value="N">Visible</option>
+                                    <option value="Y">Hidden</option>
                                 </select>
                                 <div className="invalid-feedback">Please select visibility.</div>
                             </div>

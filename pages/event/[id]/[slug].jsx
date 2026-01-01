@@ -110,6 +110,7 @@ const EventDetailPage = ({ event, slug }) => {
   const [selectedEventId, setSelectedEventId] = useState(eventId);
   const [slotIds, setSlotIds] = useState([]);
   // console.log("-----------slotIds",slotIds)
+  // console.log('selectedEventId :', selectedEventId);
 
   const handleOpenCart = () => {
     if (!token) {

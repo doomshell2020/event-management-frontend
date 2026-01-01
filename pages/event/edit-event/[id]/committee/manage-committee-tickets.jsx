@@ -19,11 +19,14 @@ const CommitteeTicketsPage = () => {
 
     /* ---------------- STATES ---------------- */
     const [eventDetails, setEventDetails] = useState(null);
+    // console.log('eventDetails :', eventDetails);
     const [ticketsList, setTicketList] = useState([]);
     const [assignedList, setAssignedList] = useState([]);
+    const [currencySymbol, setCurrencySymbol] = useState('$'); //Currency_symbol
 
     const [ticketTypes, setTicketTypes] = useState([]);
     const [groupedData, setGroupedData] = useState([]);
+    // console.log('groupedData :', groupedData);
 
     const [loading, setLoading] = useState(false);
     const [processing, setProcessing] = useState(false);
@@ -72,6 +75,7 @@ const CommitteeTicketsPage = () => {
 
             if (res.data.success && res.data.data.events.length > 0) {
                 setEventDetails(res.data.data.events[0]);
+                setCurrencySymbol(res.data.data.events[0]?.currencyName?.Currency_symbol)
             }
         } catch (err) {
             console.error("Event fetch error", err);
@@ -273,8 +277,6 @@ const CommitteeTicketsPage = () => {
                                     {/* TABLE */}
                                     {!showLoader && (
 
-
-
                                         <div className="card">
                                             <div className="table-container-box shadow-sm mb-2 p-3">
                                                 {/* first table start*/}
@@ -288,7 +290,7 @@ const CommitteeTicketsPage = () => {
                                                             <tr>
                                                                 {ticketTypes.map((t) => (
                                                                     <th key={t.id}>
-                                                                        {t.title} (₹{t.price})
+                                                                        {t.title} {currencySymbol}({t.price})
                                                                     </th>
                                                                 ))}
                                                                 <th>Total</th>
@@ -329,7 +331,7 @@ const CommitteeTicketsPage = () => {
                                                                     <th key={t.id} className="text-center">
                                                                         {t.title}
                                                                         <br />
-                                                                        <small>(₹{t.price})</small>
+                                                                        <small>({currencySymbol}{t.price})</small>
                                                                     </th>
                                                                 ))}
                                                             </tr>
@@ -354,19 +356,14 @@ const CommitteeTicketsPage = () => {
 
                                                                             <Dropdown.Menu>
                                                                                 <Dropdown.Item onClick={() => openEditModal(row)}>
-                                                                                    ✏ Edit
+                                                                                    Edit
                                                                                 </Dropdown.Item>
-
                                                                                 <Dropdown.Divider className="m-0" />
 
-                                                                                <Dropdown.Item>
-                                                                                    👁 Hide
-                                                                                </Dropdown.Item>
-
-                                                                                <Dropdown.Divider className="m-0" />
-
-                                                                                <Dropdown.Item>
-                                                                                    📊 Sale Summary
+                                                                                <Dropdown.Item
+                                                                                    onClick={() => router.push(`/event/analytics/${id}/sales/${row.user.id}`)}
+                                                                                >
+                                                                                    Sale Summary
                                                                                 </Dropdown.Item>
                                                                             </Dropdown.Menu>
                                                                         </Dropdown>
@@ -437,7 +434,7 @@ const CommitteeTicketsPage = () => {
                             <div>
                                 <div className="fw-semibold">{t.title}</div>
                                 <div className="text-muted text-12">
-                                    ₹{t.price}
+                                    {currencySymbol}{t.price}
                                 </div>
                             </div>
 
@@ -499,8 +496,6 @@ const CommitteeTicketsPage = () => {
 
                 </Modal.Footer>
             </Modal>
-
-
         </>
     );
 };

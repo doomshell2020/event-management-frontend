@@ -178,7 +178,7 @@ export default function MyOrders({ userId }) {
 
                         </div>
 
-                        <div className="paginator col-sm-12">
+                        {/* <div className="paginator col-sm-12">
                             <ul className="pagination justify-content-center">
                                 <li className="prev disabled">
                                     <Link href="/"><i className="bi bi-chevron-left"></i> Previous</Link>
@@ -192,7 +192,7 @@ export default function MyOrders({ userId }) {
                                     Page 1 of 1, showing 2 record(s) out of 2 total
                                 </p>
                             </div>
-                        </div>
+                        </div> */}
 
                     </div>
                 </div>

@@ -192,17 +192,18 @@ const MyEventsPage = () => {
             setIsFormSubmit(false);
             return;
         }
-
+        
+        // console.log('formData :', formData);
         try {
             const fd = new FormData();
 
             // ✅ Append only non-empty fields
             Object.entries(formData).forEach(([key, value]) => {
                 if (
-                    value !== null &&
-                    value !== undefined &&
-                    value !== "" &&
-                    !(typeof value === "object" && Object.keys(value).length === 0)
+                    value != null &&
+                    value != undefined &&
+                    value != "" &&
+                    !(typeof value == "object" && Object.keys(value).length == 0)
                 ) {
                     fd.append(key, value);
                 }
@@ -213,10 +214,11 @@ const MyEventsPage = () => {
             fd.append("desp", content.trim());
 
             const endpoint =
-                formData.is_free == "Y"
-                    ? `/api/v1/events/update/${id}`
-                    : `/api/v2/events/update/${id}`;
-
+            formData.is_free == "Y"
+            ? `/api/v1/events/update/${id}`
+            : `/api/v2/events/update/${id}`;
+            
+            console.log('endpoint :', endpoint);
             const response = await api.put(endpoint, fd, {
                 headers: { "Content-Type": "multipart/form-data" },
             });

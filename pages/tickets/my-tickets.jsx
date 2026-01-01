@@ -14,7 +14,7 @@ const MyTicket = () => {
                 <div className="container">
                     <div className="section-heading">
                         <h1>Tickets</h1>
-                        <h2 className="mt-4">My Tickets</h2>
+                        <h2 className="mt-4">My Orders</h2>
                         <p className="text-center text-14">Here you can manage your tickets</p>
                     </div>
                     <div className="my-ticketcontainer">

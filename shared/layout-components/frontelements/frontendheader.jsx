@@ -86,7 +86,7 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
                 {isLoggedIn && (
                   <>
                     <Link href="/orders" className="navLink">
-                      My Tickets
+                      My Orders
                     </Link>
 
                     {/* Cart button (not link) but keeps your class */}
@@ -160,7 +160,7 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
                             href="/tickets/my-tickets"
                             className="dropdownLink"
                           >
-                            <i className="fas fa-ticket-alt" /> My Tickets
+                            <i className="fas fa-ticket-alt" /> My Orders
                           </Link>
                         </li> */}
                         <li>

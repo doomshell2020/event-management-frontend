@@ -680,7 +680,7 @@ export async function changeTicketName(
         //        </tr>
 
         //        <tr>
-        //        <td style="font-size:30px;font-family:Arial,Helvetica,sans-serif;font-weight:bold;text-align:center">My Tickets</td>
+        //        <td style="font-size:30px;font-family:Arial,Helvetica,sans-serif;font-weight:bold;text-align:center">My Orders</td>
         //        </tr>
         //        <tr>
         //          <td style="height: 20px;"></td>
@@ -967,7 +967,7 @@ export async function changeTicketName(
         //    </tr>
 
         //     <tr>
-        //          <td style="font-size:30px;font-family:Arial,Helvetica,sans-serif;font-weight:bold;text-align:center">My Tickets</td>
+        //          <td style="font-size:30px;font-family:Arial,Helvetica,sans-serif;font-weight:bold;text-align:center">My Orders</td>
         //          </tr>
 
         //    <tr>

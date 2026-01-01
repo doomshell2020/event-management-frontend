@@ -40,10 +40,11 @@ const LoadingComponent = ({ isActive }) => {
 };
 
 export default function CartModal({ show, handleClose, eventId }) {
+
     const { cart, refreshCart, eventData, normalCart, addonCart, slotCart, loadingCart, setEventId } = useCart();
 
-    if (eventData)
-        eventId = eventData.id;
+    const finalEventId = eventId || eventData?.id;
+
 
     const [isLoading, setIsLoading] = useState(true);
     const [cartLoading, setCartLoading] = useState(false);
@@ -60,11 +61,12 @@ export default function CartModal({ show, handleClose, eventId }) {
     }, [loadingCart]);
 
     useEffect(() => {
-        if (eventId) {
-            setEventId(eventId);
-            refreshCart(eventId);
+        if (finalEventId) {
+            setEventId(finalEventId);
+            refreshCart(finalEventId);
         }
-    }, []);
+    }, [finalEventId]);
+
 
     const [addCartParams, setAddCartParams] = useState({
         event_id: eventId,
@@ -130,14 +132,14 @@ export default function CartModal({ show, handleClose, eventId }) {
                 await increaseCart(existing.cartId);
             } else {
                 await addToCart({
-                    event_id: eventId,
+                    event_id: finalEventId,
                     item_type: "ticket_price",
                     ticket_price_id: pricingId,
                     count: 1
                 });
             }
 
-            await refreshCart(eventId || undefined);
+            await refreshCart(finalEventId || undefined);
 
         } catch (err) {
 
@@ -146,7 +148,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                 const result = await Swal.fire({
                     title: "Items from another event found!",
                     text: err?.response?.data?.message ||
-                        "Your cart has products from another event. Clear it?",
+                        "Your cart has tickets or addons from another event. Clear it?",
                     icon: "warning",
                     showCancelButton: true,
                     confirmButtonText: "Yes, Clear Cart",
@@ -184,13 +186,13 @@ export default function CartModal({ show, handleClose, eventId }) {
                 // ➍ RETRY ADDING ITEM AUTOMATICALLY
                 try {
                     await addToCart({
-                        event_id: eventId,
+                        event_id: finalEventId,
                         item_type: "ticket_price",
                         ticket_price_id: pricingId,
                         count: 1
                     });
 
-                    await refreshCart(eventId || undefined);
+                    await refreshCart(finalEventId || undefined);
 
                     Swal.fire({
                         icon: "success",
@@ -234,7 +236,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                 await deleteCart(existing.cartId);
             }
 
-            await refreshCart(eventId || undefined);
+            await refreshCart(finalEventId || undefined);
 
         } catch (err) {
             if (err?.response?.status == 409) {
@@ -304,14 +306,14 @@ export default function CartModal({ show, handleClose, eventId }) {
                 await increaseCart(existing.cartId);
             } else {
                 await addToCart({
-                    event_id: eventId,
+                    event_id: finalEventId,
                     item_type: "ticket",
                     ticket_id: ticketId,
                     count: 1
                 });
             }
 
-            await refreshCart(eventId);
+            await refreshCart(finalEventId);
 
         } catch (err) {
 
@@ -320,7 +322,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                 const result = await Swal.fire({
                     title: "Items from another event found!",
                     text: err?.response?.data?.message ||
-                        "Your cart has products from another event. Clear it?",
+                        "Your cart has tickets or addons from another event. Clear it?",
                     icon: "warning",
                     showCancelButton: true,
                     confirmButtonText: "Yes, Clear Cart",
@@ -359,13 +361,13 @@ export default function CartModal({ show, handleClose, eventId }) {
                 // ➍ RETRY ADDING ITEM AUTOMATICALLY
                 try {
                     await addToCart({
-                        event_id: eventId,
+                        event_id: finalEventId,
                         item_type: "ticket",
                         ticket_id: ticketId,
                         count: 1
                     });
 
-                    await refreshCart(eventId);
+                    await refreshCart(finalEventId);
 
                     Swal.fire({
                         icon: "success",
@@ -411,7 +413,7 @@ export default function CartModal({ show, handleClose, eventId }) {
             else {
                 await deleteCart(existing.cartId);
             }
-            await refreshCart(eventId);
+            await refreshCart(finalEventId);
         } catch (err) {
             if (err?.response?.status == 409) {
 
@@ -456,7 +458,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                 });
                 await decreaseCart(existing.cartId);
                 // No retry for decrease (because item doesn't exist anymore)
-                // await refreshCart(eventId);
+                // await refreshCart(finalEventId);
             }
 
             console.log("Decrease error:", err);
@@ -479,14 +481,14 @@ export default function CartModal({ show, handleClose, eventId }) {
                 await increaseCart(existing.cartId);
             } else {
                 await addToCart({
-                    event_id: eventId,
+                    event_id: finalEventId,
                     item_type: "addon",
                     addons_id: addonId,
                     count: 1
                 });
             }
 
-            await refreshCart(eventId);
+            await refreshCart(finalEventId);
 
         } catch (err) {
 
@@ -496,7 +498,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                     title: "Items from another event found!",
                     text:
                         err?.response?.data?.message ||
-                        "Your cart has products from another event. Clear it?",
+                        "Your cart has tickets or addons from another event. Clear it?",
                     icon: "warning",
                     showCancelButton: true,
                     confirmButtonText: "Yes, Clear Cart",
@@ -533,13 +535,13 @@ export default function CartModal({ show, handleClose, eventId }) {
                 // Retry add addon
                 try {
                     await addToCart({
-                        event_id: eventId,
+                        event_id: finalEventId,
                         item_type: "addon",
                         addon_id: addonId,
                         count: 1
                     });
 
-                    await refreshCart(eventId);
+                    await refreshCart(finalEventId);
 
                     Swal.fire({
                         icon: "success",
@@ -586,7 +588,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                 await deleteCart(existing.cartId);
             }
 
-            await refreshCart(eventId);
+            await refreshCart(finalEventId);
 
         } catch (err) {
 
@@ -671,14 +673,14 @@ export default function CartModal({ show, handleClose, eventId }) {
                 await increaseCart(existing.id);
             } else {
                 await addToCart({
-                    event_id: eventId,
+                    event_id: finalEventId,
                     item_type: "package",
                     package_id: packageId,
                     count: 1
                 });
             }
 
-            await refreshCart(eventId);
+            await refreshCart(finalEventId);
 
         } catch (err) {
 
@@ -699,13 +701,13 @@ export default function CartModal({ show, handleClose, eventId }) {
                 Swal.close();
 
                 await addToCart({
-                    event_id: eventId,
+                    event_id: finalEventId,
                     item_type: "package",
                     package_id: packageId,
                     count: 1
                 });
 
-                await refreshCart(eventId);
+                await refreshCart(finalEventId);
             }
 
         } finally {
@@ -779,7 +781,7 @@ export default function CartModal({ show, handleClose, eventId }) {
         return
         try {
             // const res = await api.post("/api/v1/orders/create", {
-            //     event_id: eventId,
+            //     event_id: finalEventId,
             //     total_amount: grand_total,
             //     payment_method: "Online"
             // });
@@ -795,7 +797,7 @@ export default function CartModal({ show, handleClose, eventId }) {
 
             // console.log("Order created:", res.data);
 
-            // await refreshCart(eventId || undefined);
+            // await refreshCart(finalEventId || undefined);
 
             // OPTIONAL: redirect to payment page
             // navigate("/payment");
@@ -844,7 +846,7 @@ export default function CartModal({ show, handleClose, eventId }) {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 await deleteCart(id); // your API function
-                await refreshCart(eventId || undefined);
+                await refreshCart(finalEventId || undefined);
 
                 Swal.fire({
                     icon: "success",
@@ -907,7 +909,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                 }
             });
             const cartData = {
-                event_id: eventId,
+                event_id: finalEventId,
                 item_type: "committesale",
                 ticket_id: ticket.id,
                 count: 1,
@@ -1595,7 +1597,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                 </>
             ) : (
                 <CheckoutForm
-                    eventId={eventId}
+                    eventId={finalEventId}
                     handleModalClose={handleClose}
                     showNextStep={setShowNextStep}
                     adminFees={adminFees}

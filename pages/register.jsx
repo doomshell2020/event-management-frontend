@@ -6,7 +6,7 @@ import Swal from "sweetalert2";
 import Link from "next/link";
 
 const RegisterPage = () => {
-  
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -152,6 +152,10 @@ const RegisterPage = () => {
                   <p className="body-text">Fill in the details below to register.</p>
 
                   <form className="signup-pageform" onSubmit={handleSubmit}>
+
+                    <label className="form-label">
+                      First Name <span className="text-danger">*</span>
+                    </label>
                     <input
                       type="text"
                       name="firstName"
@@ -162,6 +166,9 @@ const RegisterPage = () => {
                       required
                     />
 
+                    <label className="form-label mt-2">
+                      Last Name <span className="text-danger">*</span>
+                    </label>
                     <input
                       type="text"
                       name="lastName"
@@ -172,6 +179,9 @@ const RegisterPage = () => {
                       required
                     />
 
+                    <label className="form-label mt-2">
+                      Email <span className="text-danger">*</span>
+                    </label>
                     <input
                       type="email"
                       name="email"
@@ -182,6 +192,9 @@ const RegisterPage = () => {
                       required
                     />
 
+                    <label className="form-label mt-2">
+                      Password <span className="text-danger">*</span>
+                    </label>
                     <div style={{ position: "relative" }}>
                       <input
                         type={showPassword ? "text" : "password"}
@@ -212,20 +225,38 @@ const RegisterPage = () => {
                       </button>
                     </div>
 
-
-                    <div className="row align-items-center">
-                      <label className="col-sm-3 col-form-label">Gender</label>
+                    <div className="row align-items-center mt-3">
+                      <label className="col-sm-3 col-form-label">
+                        Gender <span className="text-danger">*</span>
+                      </label>
                       <div className="col-sm-9 d-flex">
-                        <input type="radio" name="gender" value="Male" checked={formData.gender == "Male"} onChange={handleChange} />
+                        <input
+                          type="radio"
+                          name="gender"
+                          value="Male"
+                          checked={formData.gender === "Male"}
+                          onChange={handleChange}
+                          required
+                        />
                         <label className="ms-1">Male</label>
 
-                        <input className="ms-3" type="radio" name="gender" value="Female" checked={formData.gender == "Female"} onChange={handleChange} />
+                        <input
+                          className="ms-3"
+                          type="radio"
+                          name="gender"
+                          value="Female"
+                          checked={formData.gender === "Female"}
+                          onChange={handleChange}
+                          required
+                        />
                         <label className="ms-1">Female</label>
                       </div>
                     </div>
 
-                    <div className="row align-items-center">
-                      <label className="col-sm-3 col-form-label">Date of Birth</label>
+                    <div className="row align-items-center mt-3">
+                      <label className="col-sm-3 col-form-label">
+                        Date of Birth <span className="text-danger">*</span>
+                      </label>
                       <div className="col-sm-9">
                         <input
                           type="date"
@@ -237,14 +268,19 @@ const RegisterPage = () => {
                           min="2000-01-01"
                           max={new Date().toISOString().split("T")[0]}
                         />
-
                       </div>
                     </div>
 
-                    <button type="submit" className="primery-button w-100 mt-3" disabled={loading}>
+                    <button
+                      type="submit"
+                      className="primery-button w-100 mt-3"
+                      disabled={loading}
+                    >
                       {loading ? "Registering..." : "Register"}
                     </button>
+
                   </form>
+
 
                   <hr />
 

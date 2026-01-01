@@ -14,7 +14,7 @@ import { useAuth, login } from "@/shared/layout-components/layout/AuthContext";
 const LoginPage = () => {
   const router = useRouter();
   const [email, setEmail] = useState('rupam@doomshell.com');
-  const [password, setPassword] = useState('123456');
+  const [password, setPassword] = useState('Rupam@1234');
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");

@@ -284,7 +284,7 @@ const TicketDetails = ({ pendingRequests, counts, event_id }) => {
                         <div className="custom-note rounded-xl p-3 mb-4 border">
                           <strong>Note:</strong> This tool allows you to push approvals
                           to a patron's cart using their eboxtickets email address.
-                          If the ticket is free, it will go straight to “My Tickets”.
+                          If the ticket is free, it will go straight to “My Orders”.
                           This action cannot be undone.
                         </div>
 

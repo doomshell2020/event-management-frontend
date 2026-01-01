@@ -55,7 +55,7 @@ const TicketCountTabs = ({ active, onChange, counts }) => {
                 style={getStyle("ticket", 1)}
                 onClick={() => handleClick("ticket", 1)}
             >
-                Ticket Count
+                Tickets
             </li>
 
             <li
@@ -79,12 +79,12 @@ const TicketCountTabs = ({ active, onChange, counts }) => {
                 Ignored ({counts.ignored})
             </li>
 
-            <li
+            {/* <li
                 style={getStyle("completed", counts.completed)}
                 onClick={() => handleClick("completed", counts.completed)}
             >
                 Completed ({counts.completed})
-            </li>
+            </li> */}
         </ul>
     );
 };
