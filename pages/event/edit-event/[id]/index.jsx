@@ -457,7 +457,7 @@ const MyEventsPage = () => {
 
 
                                                     {/* Checkboxes */}
-                                                    <div className="col-md-3 d-flex align-items-end">
+                                                    <div className="col-md-3 d-flex align-items-end only-eventfree-check">
                                                         <CFormCheck
                                                             type="checkbox"
                                                             id="is_free"
@@ -468,7 +468,7 @@ const MyEventsPage = () => {
                                                         />
                                                     </div>
 
-                                                    <div className="col-md-3 d-flex align-items-end">
+                                                    <div className="col-md-3 d-flex align-items-end only-eventfree-check">
                                                         <CFormCheck
                                                             type="checkbox"
                                                             id="allow_register"

@@ -228,9 +228,9 @@ export default function OrganizerEvents({ userId }) {
                                             <thead className="table-dark table_bg">
                                                 <tr>
                                                     <th style={{ width: "2%" }} scope="col">#</th>
-                                                    <th style={{ width: "14%" }} scope="col">Name</th>
+                                                    <th style={{ width: "7%" }} scope="col">Name</th>
                                                     {/* <th style={{ width: "17%" }} scope="col">Date and Time</th> */}
-                                                    <th style={{ width: "8%" }} scope="col">Venue</th>
+                                                    <th style={{ width: "15%" }} scope="col">Venue</th>
                                                     <th style={{ width: "18%" }} scope="col">Ticket Sale</th>
                                                     {/* <th style={{ width: "16%" }} scope="col">Ticket Types</th> */}
                                                     <th style={{ width: "15%" }} scope="col">Action</th>
@@ -365,7 +365,7 @@ export default function OrganizerEvents({ userId }) {
                                                                 {/* ✅ Action Buttons */}
                                                                 <td className="Con_center">
                                                                     <div className="editIcos d-flex justify-content-between"
-                                                                        style={{ gap: "1px" }}
+                                                                        style={{ gap: "2px" }}
                                                                     >
                                                                         <Link
                                                                             className="edit viewIcos"
@@ -413,7 +413,7 @@ export default function OrganizerEvents({ userId }) {
 
 
                                                                     <div className="d-flex justify-content-between"
-                                                                        style={{ gap: "1px" }}
+                                                                        style={{ gap: "2px" }}
                                                                     >
                                                                         <Link
                                                                             href="#"
@@ -456,11 +456,11 @@ export default function OrganizerEvents({ userId }) {
                                                     // ✅ No Data Found
                                                     <tr>
                                                         <td colSpan="7" className="text-center py-4">
-                                                            <img
+                                                            {/* <img
                                                                 src="/assets/front-images/no-data.svg"
                                                                 alt="No data"
                                                                 style={{ width: "120px", opacity: 0.6 }}
-                                                            />
+                                                            /> */}
                                                             <div className="mt-2 fw-bold text-muted">No Events Found</div>
                                                         </td>
                                                     </tr>

@@ -422,6 +422,10 @@ const ManagePackages = () => {
                                                                                     <button
                                                                                         title="Edit"
                                                                                         className="dropdown-item"
+                                                                                        style={{
+
+                                                                                            borderBottom: "1px solid #bdbdbd"
+                                                                                        }}
                                                                                         onClick={() => {
                                                                                             setPackageId(pkg.id);
                                                                                             setPackageForm({
@@ -442,6 +446,10 @@ const ManagePackages = () => {
                                                                                     <button
                                                                                         className="dropdown-item"
                                                                                         title={pkg.hidden == "Y" ? "👁 Show Package" : "🚫 Hide Package"}
+                                                                                        style={{
+
+                                                                                            borderBottom: "1px solid #bdbdbd"
+                                                                                        }}
                                                                                         onClick={() => {
                                                                                             const newHidden = pkg.hidden == "Y" ? "N" : "Y";
                                                                                             api

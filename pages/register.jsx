@@ -215,12 +215,12 @@ const RegisterPage = () => {
 
                     <div className="row align-items-center">
                       <label className="col-sm-3 col-form-label">Gender</label>
-                      <div className="col-sm-9 d-flex">
+                      <div className="col-sm-9 d-flex align-items-center">
                         <input type="radio" name="gender" value="Male" checked={formData.gender == "Male"} onChange={handleChange} />
-                        <label className="ms-1">Male</label>
+                        <label className="ms-1 mb-0">Male</label>
 
                         <input className="ms-3" type="radio" name="gender" value="Female" checked={formData.gender == "Female"} onChange={handleChange} />
-                        <label className="ms-1">Female</label>
+                        <label className="ms-1 mb-0">Female</label>
                       </div>
                     </div>
 
