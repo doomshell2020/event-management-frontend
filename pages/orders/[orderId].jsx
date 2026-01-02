@@ -16,10 +16,8 @@ export default function MyOrdersDetails() {
 
     const [orderData, setOrderData] = useState(null);
     const [loading, setLoading] = useState(true);
+    // console.log('orderData :', orderData);
 
-    // ===============================
-    // FETCH ORDER DETAILS
-    // ===============================
     const fetchOrders = useCallback(async () => {
         if (!orderId) return;
 
@@ -41,11 +39,8 @@ export default function MyOrdersDetails() {
 
     useEffect(() => {
         fetchOrders();
-    }, [fetchOrders]);
+    }, [orderId]);
 
-    // ===============================
-    // CANCEL APPOINTMENT
-    // ===============================
     const handleCancelAppointment = async (order_item_id) => {
         const result = await Swal.fire({
             title: "Are you sure?",

@@ -79,7 +79,7 @@ export default function CartModal({ show, handleClose, eventId }) {
 
     const getTotalTicketCountInCart = () => {
         return cart.reduce((total, item) => {
-            if (item.item_type === "ticket") {
+            if (item.item_type == "ticket") {
                 return total + (item.count || 0);
             }
             return total;
@@ -643,6 +643,16 @@ export default function CartModal({ show, handleClose, eventId }) {
 
     const increasePackage = async (pkg) => {
         const packageId = pkg?.id;
+
+        // const inCart =  cart.reduce((total, item) => {
+        //     if (item.item_type == "package" && item.package_id == packageId) {
+        //         return total + (item.count || 0);
+        //     }
+        //     return total;
+        // }, 0);
+        // console.log('inCart :', inCart);
+        // return false
+        
         if (!packageId) return;
 
         // 🚫 TICKET LIMIT VALIDATION
@@ -716,6 +726,8 @@ export default function CartModal({ show, handleClose, eventId }) {
     };
 
     const decreasePackage = async (pkg) => {
+        // console.log('pkg :', pkg);
+        // return false
         const packageId = pkg?.id;
         if (!packageId) return;
         // 🚫 TICKET LIMIT VALIDATION

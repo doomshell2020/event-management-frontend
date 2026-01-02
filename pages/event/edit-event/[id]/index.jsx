@@ -61,6 +61,7 @@ const MyEventsPage = () => {
         desp: "",
         is_free: "",
         allow_register: "",
+        access_type: "multi"
     });
 
     const [image, setImage] = useState(null);
@@ -100,8 +101,10 @@ const MyEventsPage = () => {
                     approve_timer: event.approve_timer || "",
                     is_free: event.is_free == "Y" ? "Y" : "N",
                     allow_register: event.allow_register == "Y" ? "Y" : "N",
+                    access_type: event.entry_type
                 });
-
+                
+                // console.log('access_type :', formData);
                 setEditorData({ content: event.desp || "" });
                 // ✅ Set checkbox states if applicable
                 setIsFree(event.is_free == "Y");
@@ -192,7 +195,7 @@ const MyEventsPage = () => {
             setIsFormSubmit(false);
             return;
         }
-        
+
         // console.log('formData :', formData);
         try {
             const fd = new FormData();
@@ -214,10 +217,10 @@ const MyEventsPage = () => {
             fd.append("desp", content.trim());
 
             const endpoint =
-            formData.is_free == "Y"
-            ? `/api/v1/events/update/${id}`
-            : `/api/v2/events/update/${id}`;
-            
+                formData.is_free == "Y"
+                    ? `/api/v1/events/update/${id}`
+                    : `/api/v2/events/update/${id}`;
+
             console.log('endpoint :', endpoint);
             const response = await api.put(endpoint, fd, {
                 headers: { "Content-Type": "multipart/form-data" },
@@ -292,6 +295,8 @@ const MyEventsPage = () => {
     };
 
     const [backgroundImage, setIsMobile] = useState('/assets/front-images/about-slider_bg.jpg');
+
+    
 
     return (
         <>
@@ -720,6 +725,61 @@ const MyEventsPage = () => {
                                                         />
 
                                                     </div>
+
+                                                    {!isFree && (
+                                                        <div className="col-lg-6">
+                                                            <label className="form-label d-flex align-items-center gap-2">
+                                                                Type of Event
+
+                                                                <i
+                                                                    className="bi bi-info-circle-fill text-primary"
+                                                                    style={{ cursor: "pointer", fontSize: "14px" }}
+                                                                    onClick={() => {
+                                                                        Swal.fire({
+                                                                            icon: "info",
+                                                                            title: "Event Type Guide",
+                                                                            html: `
+                                                                            <div style="text-align:left;font-size:14px">
+                                                                                <p><b>Event:</b> One-time entry for a single event.</p>
+                                                                                <p><b>Multi:</b> One ticket gives access to multiple events or days.</p>
+                                                                                <p><b>Slot:</b> Entry is allowed only for a specific time slot.</p>
+                                                                                <p><b>Single:</b> Ticket can be used only once.</p>
+                                                                            </div>
+                                                                        `
+                                                                        });
+                                                                    }}
+                                                                ></i>
+                                                            </label>
+
+                                                            <select
+                                                                className="form-select rounded-0"
+                                                                name="access_type"
+                                                                value={formData.access_type || ""}
+                                                                onChange={handleChange}
+                                                            >
+                                                                <option value="">Choose Type</option>
+                                                                <option value="event">Event</option>
+                                                                <option value="multi">Multi</option>
+                                                                <option value="slot">Slot</option>
+                                                                <option value="single">Single</option>
+                                                            </select>
+
+                                                        </div>
+                                                    )}
+
+                                                    {/* Youtube URL */}
+                                                    <div className="col-lg-6">
+                                                        <label className="form-label">Youtube URL</label>
+                                                        <input
+                                                            type="text"
+                                                            className="form-control rounded-0"
+                                                            name="video_url"
+                                                            value={formData.video_url}
+                                                            onChange={handleChange}
+                                                            placeholder="Youtube URL"
+                                                        />
+                                                    </div>
+
 
                                                     <div className="col-md-12 mb-3">
                                                         <label className="form-label">

@@ -19,6 +19,7 @@ const ManageTickets = () => {
     const [show, setShow] = useState(false);
     const [complimentary, setComplimentary] = useState(false);
     const [openDropdown, setOpenDropdown] = useState(null);
+    const currencyName = eventDetails?.currencyName.Currency_symbol;
 
     // Ticket form state
     const [ticketForm, setTicketForm] = useState({
@@ -253,7 +254,7 @@ const ManageTickets = () => {
                                             {/* LEFT CONTENT */}
                                             <div className="col-sm-9">
                                                 <p className="body-text mb-1">
-                                                    <strong>{ticket.title}</strong> (₹{ticket.price})
+                                                    <strong>{ticket.title}</strong> ({currencyName}{ticket.price})
                                                     <br />
                                                     Sold: {ticket.sold_count || 0} / {ticket.count}
                                                 </p>
@@ -263,9 +264,9 @@ const ManageTickets = () => {
                                                     <div className="col-md-3">
                                                         <p className="body-text mb-0 d-flex align-items-center">
                                                             <Ticket size={16} className="me-2 text-primary" />
-                                                            {ticket.type === "open_sales"
+                                                            {ticket.type == "open_sales"
                                                                 ? "Open Sale"
-                                                                : ticket.type === "committee_sales"
+                                                                : ticket.type == "committee_sales"
                                                                     ? "Committee Sales"
                                                                     : "Complimentary"}
                                                         </p>

@@ -28,7 +28,10 @@ const ManagePackages = () => {
     const [ticketsList, setTicketList] = useState([]);
     const [addonsList, setAddonsList] = useState([]);
     const [packageList, setPackageList] = useState([]);
-    // console.log('>>>>>>',packageList);
+    // console.log('packageList :', packageList);
+
+    const currencyName = eventDetails?.currencyName.Currency_symbol;
+    // console.log('currencyName :', currencyName);
 
     // fetch addons list
     const handleGetPackagesList = async () => {
@@ -154,6 +157,7 @@ const ManagePackages = () => {
         ticketQty: {},
         addonQty: {},
         total: 0,
+        total_package: 0,
         discount_amt: 0,
         grandtotal: 0,
         visibility: "",
@@ -232,13 +236,13 @@ const ManagePackages = () => {
                 event_id: Number(id),
                 name: packageForm.name,
                 package_limit: Number(packageForm.limit),
+                total_package: Number(packageForm.total_package),
                 total: Number(packageForm.total) || 0,
                 discount_amt: Number(packageForm.discount_amt) || 0,
                 grandtotal: Number(packageForm.grandtotal) || 0,
                 hidden: packageForm.hidden || "N",
                 ticketType: ticketTypes,
             };
-            // console.log('?????????????',payload);return false
 
             const res = await api.post(`/api/v1/packages/create`, payload);
 
@@ -253,6 +257,7 @@ const ManagePackages = () => {
                     ticketQty: {},
                     addonQty: {},
                     total: 0,
+                    total_package: 0,
                     discount_amt: 0,
                     grandtotal: 0,
                     visibility: "",
@@ -272,35 +277,77 @@ const ManagePackages = () => {
 
     const handleUpdatePackage = async (e) => {
         e.preventDefault();
-        setValidateDefault(true); // ✅ ensures Bootstrap “was-validated” styling activates
+        e.stopPropagation();
 
-        if (!packageForm.name || !packageForm.limit || !packageForm.visibility) return;
+        setValidateDefault(true); // Bootstrap validation ON
+
+        // 🔴 Manual validations
+        if (
+            !packageForm.name?.trim() ||
+            !packageForm.limit ||
+            !packageForm.visibility ||
+            !packageForm.total_package ||
+            Number(packageForm.total_package) <= 0
+        ) {
+            return;
+        }
+
+        // 🔥 Swal Loader
+        Swal.fire({
+            title: "Updating Package...",
+            text: "Please wait",
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
 
         setIsSubmitting(true);
+
         try {
             const payload = {
-                name: packageForm.name,
+                name: packageForm.name.trim(),
                 package_limit: Number(packageForm.limit),
-                hidden: packageForm.visibility || "N",
+                hidden: packageForm.visibility, // Y / N
+                total_package: Number(packageForm.total_package),
             };
 
-            const res = await api.put(`/api/v1/packages/update/${packageId}`, payload);
+            const res = await api.put(
+                `/api/v1/packages/update/${packageId}`,
+                payload
+            );
 
-            if (res.data.success) {
-                Swal.fire("Updated!", "Package details updated successfully.", "success");
+            Swal.close();
+
+            if (res.data?.success) {
+                Swal.fire(
+                    "Updated!",
+                    "Package details updated successfully.",
+                    "success"
+                );
                 setShow2(false);
                 handleGetPackagesList();
             } else {
-                Swal.fire("Error", res.data.message || "Failed to update package.", "error");
+                Swal.fire(
+                    "Error",
+                    res.data?.message || "Failed to update package.",
+                    "error"
+                );
             }
         } catch (err) {
+            Swal.close();
             console.error("Error updating package:", err);
-            Swal.fire("Error", "Something went wrong!", "error");
+
+            Swal.fire(
+                "Error",
+                "Something went wrong while updating package!",
+                "error"
+            );
         } finally {
             setIsSubmitting(false);
         }
     };
-
 
     const [backgroundImage] = useState("/assets/front-images/about-slider_bg.jpg");
 
@@ -385,17 +432,38 @@ const ManagePackages = () => {
 
                                                             {/* ===== Header ===== */}
                                                             <div className="d-flex justify-content-between align-items-start">
+
+                                                                {/* Left */}
                                                                 <div>
-                                                                    <h5 className="fw-bold mb-1 text-primary">{pkg.name}</h5>
+                                                                    <h5 className="fw-bold mb-1 text-primary">
+                                                                        <i className="bi bi-box-seam me-1"></i>
+                                                                        {pkg.name}
+                                                                    </h5>
                                                                     <small className="text-muted">
+                                                                        <i className="bi bi-sliders me-1"></i>
                                                                         Limit: <strong>{pkg.package_limit}</strong>
                                                                     </small>
                                                                 </div>
+
+                                                                {/* Center */}
+                                                                <div className="text-center">
+                                                                    <small className="text-muted">
+                                                                        <i className="bi bi-stack me-1"></i>
+                                                                        Total: <strong>{pkg.total_package}</strong>
+                                                                    </small>
+                                                                </div>
+
+                                                                {/* Right */}
                                                                 <div className="text-end">
                                                                     <span
-                                                                        className={`badge ${pkg.hidden == "Y" ? "bg-danger" : "bg-success"} rounded-pill`}
+                                                                        className={`badge ${pkg.hidden === "Y" ? "bg-danger" : "bg-success"
+                                                                            } rounded-pill px-3`}
                                                                     >
-                                                                        {pkg.hidden == "Y" ? "Hidden" : "Visible"}
+                                                                        <i
+                                                                            className={`bi ${pkg.hidden === "Y" ? "bi-eye-slash" : "bi-eye"
+                                                                                } me-1`}
+                                                                        ></i>
+                                                                        {pkg.hidden === "Y" ? "Hidden" : "Visible"}
                                                                     </span>
 
                                                                     {/* Dropdown */}
@@ -406,18 +474,17 @@ const ManagePackages = () => {
                                                                                 setOpenDropdown(openDropdown === pkg.id ? null : pkg.id)
                                                                             }
                                                                         >
-                                                                            <Settings size={16} />
+                                                                            <i className="bi bi-gear"></i>
                                                                         </button>
 
-                                                                        {openDropdown == pkg.id && (
+                                                                        {openDropdown === pkg.id && (
                                                                             <ul
-                                                                                className="dropdown-menu show position-absolute end-0 mt-1 shadow-sm"
+                                                                                className="dropdown-menu show position-absolute end-0 mt-1 shadow-sm rounded-3"
                                                                                 style={{ zIndex: 999 }}
                                                                             >
                                                                                 <li>
                                                                                     <button
-                                                                                        title="Edit"
-                                                                                        className="dropdown-item"
+                                                                                        className="dropdown-item d-flex align-items-center gap-2"
                                                                                         onClick={() => {
                                                                                             setPackageId(pkg.id);
                                                                                             setPackageForm({
@@ -425,20 +492,24 @@ const ManagePackages = () => {
                                                                                                 name: pkg.name || "",
                                                                                                 limit: pkg.package_limit || "",
                                                                                                 visibility: pkg.hidden || "N",
+                                                                                                total_package: pkg.total_package || "",
                                                                                             });
                                                                                             setShow2(true);
                                                                                             setOpenDropdown(null);
                                                                                         }}
                                                                                     >
-                                                                                        ✏️
+                                                                                        <i className="bi bi-pencil-square text-primary"></i>
+                                                                                        Edit Package
                                                                                     </button>
                                                                                 </li>
+
                                                                                 <li>
                                                                                     <button
-                                                                                        className="dropdown-item"
-                                                                                        title={pkg.hidden == "Y" ? "👁 Show Package" : "🚫 Hide Package"}
+                                                                                        className="dropdown-item d-flex align-items-center gap-2"
                                                                                         onClick={() => {
-                                                                                            const newHidden = pkg.hidden == "Y" ? "N" : "Y";
+                                                                                            const newHidden =
+                                                                                                pkg.hidden === "Y" ? "N" : "Y";
+
                                                                                             api.put(`/api/v1/packages/update/${pkg.id}`, {
                                                                                                 hidden: newHidden,
                                                                                             })
@@ -446,7 +517,7 @@ const ManagePackages = () => {
                                                                                                     Swal.fire({
                                                                                                         icon: "success",
                                                                                                         title:
-                                                                                                            newHidden == "Y"
+                                                                                                            newHidden === "Y"
                                                                                                                 ? "Package Hidden"
                                                                                                                 : "Package Visible",
                                                                                                         timer: 1200,
@@ -461,10 +532,19 @@ const ManagePackages = () => {
                                                                                                         "error"
                                                                                                     )
                                                                                                 );
+
                                                                                             setOpenDropdown(null);
                                                                                         }}
                                                                                     >
-                                                                                        {pkg.hidden == "Y" ? "👁 Show Package" : "🚫 Hide Package"}
+                                                                                        <i
+                                                                                            className={`bi ${pkg.hidden === "Y"
+                                                                                                    ? "bi-eye"
+                                                                                                    : "bi-eye-slash"
+                                                                                                }`}
+                                                                                        ></i>
+                                                                                        {pkg.hidden === "Y"
+                                                                                            ? "Show Package"
+                                                                                            : "Hide Package"}
                                                                                     </button>
                                                                                 </li>
                                                                             </ul>
@@ -474,19 +554,27 @@ const ManagePackages = () => {
                                                             </div>
 
                                                             {/* ===== Totals Section ===== */}
-                                                            <div className="mt-2 small text-muted">
+                                                            <div className="mt-3 small text-muted d-flex justify-content-between">
                                                                 <div>
-                                                                    <strong>Discount:</strong> ₹{pkg.discount_amt || 0}
+                                                                    <i className="bi bi-percent me-1"></i>
+                                                                    <strong>Discount:</strong> {currencyName}{pkg.discount_amt || 0}
                                                                 </div>
                                                                 <div>
+                                                                    <i className="bi bi-cash-coin me-1"></i>
                                                                     <strong>Grand Total:</strong>{" "}
-                                                                    <span className="text-dark fw-bold">₹{pkg.grandtotal}</span>
+                                                                    <span className="text-dark fw-bold">
+                                                                        {currencyName}{pkg.grandtotal}
+                                                                    </span>
                                                                 </div>
                                                             </div>
 
-                                                            {/* ===== Tickets & Addons Table ===== */}
+                                                            {/* ===== Items Table ===== */}
                                                             <div className="mt-3 border-top pt-2">
-                                                                <h6 className="fw-semibold text-secondary mb-2">Items</h6>
+                                                                <h6 className="fw-semibold text-secondary mb-2">
+                                                                    <i className="bi bi-list-ul me-1"></i>
+                                                                    Items
+                                                                </h6>
+
                                                                 <div className="table-responsive">
                                                                     <table className="table table-sm align-middle mb-0">
                                                                         <thead className="table-light text-center small">
@@ -499,19 +587,31 @@ const ManagePackages = () => {
                                                                             </tr>
                                                                         </thead>
                                                                         <tbody className="text-center small">
-                                                                            {pkg.details && pkg.details.length > 0 ? (
+                                                                            {pkg.details?.length > 0 ? (
                                                                                 pkg.details.map((item, index) => {
                                                                                     const isTicket = !!item.ticketType;
-                                                                                    const data = isTicket ? item.ticketType : item.addonType;
+                                                                                    const data = isTicket
+                                                                                        ? item.ticketType
+                                                                                        : item.addonType;
+
                                                                                     return (
                                                                                         <tr key={item.id}>
                                                                                             <td>{index + 1}</td>
-                                                                                            <td>{isTicket ? "Ticket" : "Addon"}</td>
-                                                                                            <td className="text-truncate" style={{ maxWidth: "120px" }}>
+                                                                                            <td>
+                                                                                                <span className="badge bg-secondary-subtle text-dark">
+                                                                                                    {isTicket ? "Ticket" : "Addon"}
+                                                                                                </span>
+                                                                                            </td>
+                                                                                            <td
+                                                                                                className="text-truncate"
+                                                                                                style={{ maxWidth: "140px" }}
+                                                                                            >
                                                                                                 {data?.title || data?.name || "-"}
                                                                                             </td>
                                                                                             <td>{item.qty}</td>
-                                                                                            <td>₹{data?.price || 0}</td>
+                                                                                            <td>
+                                                                                                {currencyName}{data?.price || 0}
+                                                                                            </td>
                                                                                         </tr>
                                                                                     );
                                                                                 })
@@ -528,6 +628,7 @@ const ManagePackages = () => {
                                                             </div>
                                                         </div>
                                                     </div>
+
                                                 </div>
                                             ))}
                                         </div>
@@ -577,7 +678,7 @@ const ManagePackages = () => {
                                 </Form.Control.Feedback>
                             </div>
 
-                            <div className="col-md-3">
+                            <div className="col-md-2">
                                 <Form.Label>Package Limit:</Form.Label>
                                 <Form.Select
                                     required
@@ -597,8 +698,24 @@ const ManagePackages = () => {
                                     Please select a limit.
                                 </Form.Control.Feedback>
                             </div>
+                            <div className="col-md-2">
+                                <Form.Label>Total</Form.Label>
+                                <Form.Control
+                                    type="number"
+                                    required
+                                    placeholder="Total"
+                                    value={packageForm?.total_package || null}
+                                    onChange={(e) => {
+                                        e.target.value = e.target.value.replace(/[^a-zA-Z0-9 ]/g, "");
+                                        setPackageForm({ ...packageForm, total_package: e.target.value })
+                                    }}
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                    Please Enter a Total.
+                                </Form.Control.Feedback>
+                            </div>
 
-                            <div className="col-md-3">
+                            <div className="col-md-2">
                                 <Form.Label>Visibility:</Form.Label>
                                 <Form.Select
                                     required
@@ -821,11 +938,30 @@ const ManagePackages = () => {
                             <Form.Label>
                                 Package Limit: <span className="text-danger">*</span>
                             </Form.Label>
+                            <Form.Control
+                                type="number"
+                                required
+                                placeholder="Enter a Total Package"
+                                value={packageForm?.total_package || null}
+                                onChange={(e) => {
+                                    e.target.value = e.target.value.replace(/[^a-zA-Z0-9 ]/g, "");
+                                    setPackageForm((prev) => ({ ...prev, total_package: e.target.value }))
+                                }}
+                            />
+                            <Form.Control.Feedback type="invalid">
+                                Please Enter a Total.
+                            </Form.Control.Feedback>
+                        </div>
+
+                        <div className="mb-3">
+                            <Form.Label>
+                                Total Package:<span className="text-danger">*</span>
+                            </Form.Label>
                             <Form.Select
                                 required
-                                value={packageForm.limit || ""}
+                                value={packageForm?.limit || ""}
                                 onChange={(e) =>
-                                    setPackageForm((prev) => ({ ...prev, limit: e.target.value }))
+                                    setPackageForm({ ...packageForm, limit: e.target.value })
                                 }
                             >
                                 <option value="">--Select Limit--</option>
@@ -847,15 +983,22 @@ const ManagePackages = () => {
                             </Form.Label>
                             <Form.Select
                                 required
-                                value={packageForm.visibility || ""}
+                                value={packageForm?.visibility ?? ""}
                                 onChange={(e) =>
-                                    setPackageForm((prev) => ({ ...prev, visibility: e.target.value }))
+                                    setPackageForm((prev) => ({
+                                        ...prev,
+                                        visibility: e.target.value
+                                    }))
                                 }
                             >
                                 <option value="">Choose One</option>
-                                <option value="Y">Visible</option>
-                                <option value="N">Hidden</option>
+                                <option value="N">Visible</option>
+                                <option value="Y">Hidden</option>
                             </Form.Select>
+                            <Form.Control.Feedback type="invalid">
+                                Please select visibility.
+                            </Form.Control.Feedback>
+
                             <Form.Control.Feedback type="invalid">
                                 Please select visibility.
                             </Form.Control.Feedback>
@@ -876,7 +1019,7 @@ const ManagePackages = () => {
                         </Modal.Footer>
                     </Form>
                 </Modal.Body>
-            </Modal>
+            </Modal >
 
 
 

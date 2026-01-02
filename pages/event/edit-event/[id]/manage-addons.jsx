@@ -23,6 +23,9 @@ const ManageAddons = () => {
     const [isOpenWiggins, setIsOpenWiggins] = useState(false);
     const [eventDetails, setEventDetails] = useState(null);
 
+    const currencyName = eventDetails?.currencyName.Currency_symbol;
+    // console.log('currencyName :', currencyName);
+
     const [addonForm, setAddonForm] = useState({
         name: "",
         price: "",
@@ -246,12 +249,12 @@ const ManageAddons = () => {
                                                     <div className="col-md-4">
                                                         <p className="body-text mb-0 d-flex align-items-center">
                                                             <Package size={16} className="me-2 text-primary" />
-                                                            ₹{addon.price} / {addon.count} available
+                                                            {currencyName}{addon.price} / {addon.count} available
                                                         </p>
                                                     </div>
                                                     <div className="col-md-4">
                                                         <p className="body-text mb-0 d-flex align-items-center">
-                                                            {addon.hidden === "Y" ? (
+                                                            {addon.hidden == "Y" ? (
                                                                 <>
                                                                     <EyeOff size={16} className="me-2 text-danger" /> Hidden
                                                                 </>
@@ -272,13 +275,13 @@ const ManageAddons = () => {
                                                         className="btn btn-primary btn-sm rounded-pill"
                                                         type="button"
                                                         onClick={() =>
-                                                            setOpenDropdown(openDropdown === addon.id ? null : addon.id)
+                                                            setOpenDropdown(openDropdown == addon.id ? null : addon.id)
                                                         }
                                                     >
                                                         <Settings size={16} />
                                                     </button>
 
-                                                    {openDropdown === addon.id && (
+                                                    {openDropdown == addon.id && (
                                                         <ul
                                                             className="dropdown-menu show position-absolute"
                                                             style={{
@@ -313,7 +316,7 @@ const ManageAddons = () => {
                                                                 <button
                                                                     className="dropdown-item"
                                                                     onClick={() => {
-                                                                        const newHidden = addon.hidden === "Y" ? "N" : "Y";
+                                                                        const newHidden = addon.hidden == "Y" ? "N" : "Y";
                                                                         api
                                                                             .put(`/api/v1/addons/update/${addon.id}`, {
                                                                                 hidden: newHidden,

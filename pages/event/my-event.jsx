@@ -262,7 +262,7 @@ export default function OrganizerEvents({ userId }) {
                                             <thead className="table-dark table_bg">
                                                 <tr>
                                                     <th style={{ width: "2%" }} scope="col">#</th>
-                                                    <th style={{ width: "14%" }} scope="col">Event</th>
+                                                    <th style={{ width: "14%" }} scope="col">Image</th>
                                                     <th style={{ width: "8%" }} scope="col">Details</th>
                                                     {/* <th style={{ width: "17%" }} scope="col">Date and Time</th> */}
                                                     {/* <th style={{ width: "8%" }} scope="col">Venue</th> */}

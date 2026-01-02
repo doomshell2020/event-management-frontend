@@ -1,35 +1,65 @@
 import { formatPrice } from "@/utils/commonFunction";
 import { format } from "date-fns";
 
+const OrderItemCard = ({ currencyInfo, item, orderData, handleCancelAppointment }) => {
+    const isTicket = item.type == "ticket";
+    const isAppointment = item.type == "appointment";
+    const isAddon = item.type == "addon";
+    const isPackage = item.type == "package";
+    const isCommitteeSale = item.type == "committesale";
 
-const OrderItemCard = ({ item, orderData, handleCancelAppointment }) => {
-    const isTicket = item.type === "ticket";
-    const isAppointment = item.type === "appointment";
-    const isAddon = item.type === "addon";
 
-    const currency =
-        orderData?.event?.currencyName?.Currency_symbol || "";
+    const currency = orderData?.event?.currencyName?.Currency_symbol || "";
+    const currencySymbol = isAppointment
+        ? currency
+        : currencyInfo?.Currency_symbol || "";
 
-    const title = isTicket
-        ? "Ticket"
-        : isAppointment
-        ? "Appointment"
-        : "Addon";
+    // 🔹 Title
+    const title =
+        isTicket || isCommitteeSale
+            ? "Ticket"
+            : isAppointment
+                ? "Appointment"
+                : isAddon
+                    ? "Addon"
+                    : "Package";
+
+
+
+    // 🔹 Name mapping (CORRECT)
+    const itemName =
+        isTicket || isCommitteeSale
+            ? item.ticketType?.title
+            : isAddon
+                ? item.addonType?.name
+                : isPackage
+                    ? item.package?.name
+                    : isAppointment
+                        ? item.appointment?.wellnessList?.name
+                        : "";
+
 
     return (
         <div className="mb-3 p-3 border rounded bg-white">
 
             {/* HEADER */}
             <div className="d-flex justify-content-between mb-2">
-                <strong>{title}</strong>
+                <div>
+                    <strong>{title}</strong>
+                    {itemName && (
+                        <div className="text-muted text-14">
+                            {itemName}
+                        </div>
+                    )}
+                </div>
 
                 {isAppointment && (
                     <button
                         className="btn btn-danger btn-sm"
-                        disabled={item.cancel_status === "cancel"}
+                        disabled={item.cancel_status == "cancel"}
                         onClick={() => handleCancelAppointment(item.id)}
                     >
-                        {item.cancel_status === "cancel"
+                        {item.cancel_status == "cancel"
                             ? "Cancelled"
                             : "Cancel Appointment"}
                     </button>
@@ -40,9 +70,9 @@ const OrderItemCard = ({ item, orderData, handleCancelAppointment }) => {
 
                 {/* QR */}
                 <div className="col-md-3 text-center">
-                    {item.qr_image_url && (
+                    {item.qr_image && (
                         <img
-                            src={item.qr_image_url}
+                            src={item.qr_image}
                             alt="QR"
                             className="border rounded p-2"
                             style={{ width: "110px" }}
@@ -53,22 +83,17 @@ const OrderItemCard = ({ item, orderData, handleCancelAppointment }) => {
                 {/* DETAILS */}
                 <div className="col-md-9">
 
-                    {/* DATE & TIME (Appointment only) */}
-                    {isAppointment && (
+                    {/* DATE (Appointment only) */}
+                    {isAppointment && item.slot?.slot_date && (
                         <div className="mb-1">
                             <strong>Date & Time :</strong>{" "}
-                            {format(new Date(item.appointment?.date), "EEE, dd MMM yyyy")}
+                            {format(new Date(item.slot.slot_date), "EEE, dd MMM yyyy")}
                         </div>
                     )}
 
-                    {/* QUANTITY */}
-                    {/* <div className="mb-1">
-                        <strong>Quantity :</strong> {item.count}
-                    </div> */}
-
                     {/* PRICE */}
                     <div className="fw-bold text-success">
-                        Amount : {currency} {formatPrice(item.price)}
+                        Amount : {currencySymbol}{formatPrice(item.price)}
                     </div>
 
                 </div>

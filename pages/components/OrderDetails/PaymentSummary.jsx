@@ -2,7 +2,7 @@ import { formatPrice } from "@/utils/commonFunction";
 
 
 const PaymentSummary = ({ orderData }) => {
-console.log('orderData :', orderData);
+// console.log('orderData :', orderData);
     const currency =
         orderData?.event?.currencyName?.Currency_symbol || "";
 
@@ -12,24 +12,24 @@ console.log('orderData :', orderData);
 
             <div className="d-flex justify-content-between mb-2">
                 <span>Total Amount</span>
-                <span>{currency} {orderData.sub_total}</span>
+                <span>{currency}{orderData.sub_total}</span>
             </div>
 
             <div className="d-flex justify-content-between mb-2">
                 <span>Discount</span>
-                <span>{currency} {orderData.discount_amount}</span>
+                <span>{currency}{orderData.discount_amount}</span>
             </div>
 
             <div className="d-flex justify-content-between mb-2">
                 <span>Tax</span>
-                <span>{currency} {orderData.tax_total}</span>
+                <span>{currency}{orderData.tax_total}</span>
             </div>
 
             <hr />
 
             <div className="d-flex justify-content-between fw-bold text-success">
                 <span>Total Paid</span>
-                <span>{currency} {formatPrice(orderData.grand_total)}</span>
+                <span>{currency}{formatPrice(orderData.grand_total)}</span>
             </div>
         </div>
     );

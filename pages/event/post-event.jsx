@@ -30,11 +30,11 @@ const EventDetailsPage = () => {
         ticket_limit: "",
         slug: "",
         approve_timer: "",
-        video_url: "",
         is_free: "N",
         allow_register: "N",
         request_rsvp: "",
         event_timezone: "",
+        video_url: "",
         access_type: "multi"
     });
     const [image, setImage] = useState(null);

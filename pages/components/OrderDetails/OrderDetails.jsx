@@ -6,6 +6,7 @@ const OrderDetails = ({ orderData, handleCancelAppointment }) => {
     if (!orderData) return null;
 
     const { event, orderItems } = orderData;
+    const { currencyName } = event
 
     return (
         <div className="col-lg-8 col-md-7">
@@ -52,6 +53,7 @@ const OrderDetails = ({ orderData, handleCancelAppointment }) => {
                 {orderItems.map(item => (
                     <OrderItemCard
                         key={item.id}
+                        currencyInfo={currencyName}
                         item={item}
                         orderData={orderData}
                         handleCancelAppointment={handleCancelAppointment}

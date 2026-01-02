@@ -10,12 +10,15 @@ export default function MyOrders({ userId }) {
     const [backgroundImage, setIsMobile] = useState('/assets/front-images/about-slider_bg.jpg');
     const [orderData, setOrderData] = useState([]);
     const [loading, setLoading] = useState(true); // ✅ Added loading state
+    const [currencySymbol, setCurrencySymbol] = useState('₹');
+
     const fetchOrders = async () => {
         setLoading(true);
         try {
             const res = await api.get(`/api/v1/orders`);
             if (res.data.success) {
                 setOrderData(res.data.data || []);
+                setCurrencySymbol(res.data.data[0]?.event?.currencyName?.Currency_symbol);
             } else {
                 setOrderData([]);
             }
@@ -64,6 +67,9 @@ export default function MyOrders({ userId }) {
                                         0
                                     );
 
+                                    const eventCurrency = order.event?.currencyName?.Currency_symbol
+                                    // console.log('eventCurrency :', eventCurrency);
+
                                     const currencySymbol =
                                         order?.orderItems?.[0]?.appointment?.wellnessList?.currencyName?.Currency_symbol || "";
 
@@ -73,12 +79,11 @@ export default function MyOrders({ userId }) {
                                             {/* ✅ ONLY CHANGE IS HERE (class condition added) */}
                                             <div
                                                 className={`up_events position-relative 
-                                                ${order?.orderItems?.[0]?.type === "appointment"
+                                                ${order?.orderItems?.[0]?.type == "appointment"
                                                         ? "appointment-card"
                                                         : "ticket-card"
                                                     }`}
                                             >
-
 
                                                 <Link href={`/orders/${order.id}`}>
                                                     <div className="inner_box">
@@ -86,8 +91,8 @@ export default function MyOrders({ userId }) {
 
                                                             <div className="col-sm-5">
                                                                 <h3 className="title m-0 fw-bold">
-                                                                        {eventName}
-                                                                    </h3>
+                                                                    {eventName}
+                                                                </h3>
                                                                 <div
                                                                     className="image_br"
                                                                 >
@@ -129,8 +134,9 @@ export default function MyOrders({ userId }) {
 
                                                                         <p className="time m-0 p-0">
                                                                             <strong style={{ width: "70px", display: "inline-block" }}>Amount</strong>
-                                                                            <span style={{ width: "10px", display: "inline-block", fontWeight: "bold" }}>:</span>
-                                                                            {currencySymbol}{" "}{order.grand_total}
+                                                                            <span style={{ width: "10px", display: "inline-block", fontWeight: "bold" }}>:</span>{order?.orderItems?.[0]?.type == "appointment"
+                                                                                ? currencySymbol
+                                                                                : eventCurrency}{order.grand_total}
                                                                         </p>
                                                                     </div>
 
