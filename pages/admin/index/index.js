@@ -54,12 +54,6 @@ export const COLUMNS = [
 const Dashboard = () => {
   const [member, setMember] = useState([]);
   const [event, setEvent] = useState([]);
-  const [TicketSoldData, setTicketSoldData] = useState("");
-  const [addonSales, setAddonSale] = useState({});
-  const [ticketPerDay, setTicketPerDay] = useState([]);
-  // const [selectedEvent, setSelectedEvent] = useState('ONDALINDA x MONTENEGRO 2024');
-  // const [selectedEvent, setSelectedEvent] = useState("O xCAREYES");
-  // const [selectedEvent, setSelectedEvent] = useState("ONDALINDA x MONTENEGRO 2025");
   const [selectedEvent, setSelectedEvent] = useState("");
   const [DATATABLE, setDataTable] = useState([]);
   // const [eventId, setEventID] = useState(109);
@@ -274,51 +268,6 @@ const Dashboard = () => {
               DASHBOARD
             </span>
           </div>
-
-          {/* <Card className="card custom-card">
-            <div className="card-body  px-3 py-4 d-flex flex-column justify-content-center">
-              <div className="d-flex justify-content-center">
-                <div className="flex-fill">
-         
-                        
-                  <div className="dash-brd-drp">
-                    <ButtonGroup className="w-100">
-                      <Dropdown className="w-100">
-                        <Dropdown.Toggle
-                          variant=""
-                          aria-expanded="false"
-                          aria-haspopup="true"
-                          className="btn  ripple btn-primary w-100"
-                          data-bs-toggle="dropdown"
-                          id="dropdownMenuButton"
-                          type="button"
-                        >
-                          {selectedEvent}
-                        </Dropdown.Toggle>
-                        <Dropdown.Menu
-                          className="dropdown-menu tx-13 w-100"
-                          style={{ margin: "0px" }}
-                        >
-                          {event.map((value, index) => {
-                            return (
-                              <Dropdown.Item
-                                key={index}
-                                href="#"
-                                onClick={() => handleSelect(value && value.Name, value.id)}
-                              >
-                                {value && value.Name ? value.Name : '---'}
-                              </Dropdown.Item>
-                            )
-                          })}
-                        </Dropdown.Menu>
-                      </Dropdown>
-                    </ButtonGroup>
-                  </div>
-
-                </div>
-              </div>
-            </div>
-          </Card> */}
 
           <div className="justify-content-center mt-2">
             <div className="d-flex align-items-center">

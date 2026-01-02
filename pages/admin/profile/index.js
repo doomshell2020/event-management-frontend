@@ -3,117 +3,111 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Card, Col, Dropdown, Breadcrumb, Nav, Row, Tab, FormGroup, Form, Alert, Collapse, Spinner } from "react-bootstrap";
 import Link from "next/link";
 import ImageViewer from "react-simple-image-viewer";
-// import { images } from "../../../shared/data/pages/profile";
+import { useRouter } from "next/router";
 import axios from "axios";
 import Seo from "@/shared/layout-components/seo/seo";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Image from "next/image";
-
+import api from "@/utils/api";
+import Cookies from "js-cookie";
+import Swal from "sweetalert2";
 import { CCol, CForm, CButton, CFormLabel, CFormInput, CFormFeedback, } from "@coreui/react";
 
 const Profile = () => {
-  const [currentImage, setCurrentImage] = useState(0);
+  const router = useRouter();
+  const [id, setId] = useState('');
   const [profile, setProfile] = useState("")
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [Password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const openImageViewer = useCallback((index) => {
-    setCurrentImage(index);
-    setIsViewerOpen(true);
-  }, []);
-
-  const closeImageViewer = () => {
-    setCurrentImage(0);
-    setIsViewerOpen(false);
-  };
-
-  const [domLoaded, setDomLoaded] = useState(false);
-
-  const [openAlert, setOpenAlert] = useState(false);
-  const [staticAdded, setStaticAdded] = useState("");
-
-  var StaticMessage = '';
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      var StaticMessage = localStorage.getItem("staticAdded");
-      if (StaticMessage != null && StaticMessage !== "") {
-        setOpenAlert(true);
-        setStaticAdded(StaticMessage);
-        setTimeout(() => {
-          localStorage.setItem("staticAdded", "");
-          setOpenAlert(false);
-        }, 3000);
-      } else {
-        setOpenAlert(false);
-        setStaticAdded("");
+    const fetchUser = async () => {
+      try {
+        const token = Cookies.get("adminAuthToken");
+        if (!token) {
+          router.push("/login");
+          return;
+        }
+        // ✅ Fetch user details from API
+        const res = await api.get("/api/v1/admin/auth/me");
+        if (res.data?.success) {
+          setProfile(res.data.data);
+          setId(res.data?.data?.id);
+        } else {
+          router.push("/admin/auth");
+        }
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+        router.push("/admin/auth");
+      } finally {
+        setLoading(false);
       }
-    }
-  }, [StaticMessage]);
-
-
-
-  useEffect(() => {
-    setDomLoaded(true);
-    if (typeof window !== 'undefined') {
-      var storeToken = localStorage.getItem('accessToken_');
-      var option = {
-        headers: {
-          Authorization: storeToken,
-        },
-      };
-      const profileUrl = '/api/v1/users'
-      fetch(profileUrl, option)
-        .then((response) => response.json())
-        .then((value) => {
-          // console.log("value", value)
-          setProfile(value.data);
-        });
-    }
-    // console.log(item,'dddd'); 
-  }, []);
-
-
-  if (typeof window !== 'undefined') {
-    var storeToken = localStorage.getItem('accessToken_');
-    var options = {
-      headers: {
-        Authorization: storeToken,
-      },
     };
-  }
+    fetchUser();
+  }, [router]);
+
+
   // Change passwords
   const UpdatePassword = async (event) => {
-    setIsLoading(true);
-    const form = event.currentTarget;
     event.preventDefault();
-    const apiUrl = '/api/v1/front/users';
-    if (Password == confirmPassword) {
-      const body = new FormData();
-      body.append("Password", Password);
-      body.append("key", "changePassword");
-      await axios.put(apiUrl, body, options)
-        .then((res) => {
-          setIsLoading(false);
-          const msg = res.data.message;
-          toast.success(msg, {
-            position: toast.POSITION.TOP_RIGHT,
-          });
-          setPassword("");
-          setConfirmPassword("");
-        }).catch((err) => {
-          setIsLoading(false);
-          const message = err.response.data.message
-          console.log("message", message)
+    setIsLoading(true);
+
+    if (Password !== confirmPassword) {
+      Swal.fire({
+        icon: "error",
+        title: "Password Mismatch",
+        text: "Both password fields must match",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const payload = {
+        password: Password.trim(),
+      };
+
+      const res = await api.patch(
+        `/api/v1/admin/auth/${id}/update-password`,
+        payload
+      );
+
+      if (res.data?.success) {
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: "Password updated successfully!",
+          timer: 2000,
+          showConfirmButton: false,
         });
-    } else {
-      alert("Please ensure both fields contain the same password.");
+        setConfirmPassword("");
+        setPassword("");
+        setTimeout(() => {
+          router.push("/admin/profile");
+        }, 2000);
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Failed",
+          text: res.data?.message || "Something went wrong",
+        });
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Server error. Please try again.",
+      });
+    } finally {
       setIsLoading(false);
     }
-    // }
-    // setValidatedCustom(true);
-  }
+  };
+
 
   return (
     <div>
@@ -145,21 +139,14 @@ const Profile = () => {
         <Col lg={12} md={12}>
           <Card className="custom-card customs-cards">
             <ToastContainer />
-            {staticAdded != null && openAlert === true && (
-              <Collapse in={openAlert}>
-                <Alert aria-hidden={true} severity="success">
-                  {staticAdded}
-                </Alert>
-              </Collapse>
-            )}
             <Card.Body className=" d-md-flex  bg-white">
               <div className="">
                 <span className="profile-image pos-relative">
                   <Image
                     src={
-                      profile?.ImageURL
-                        ? `${process.env.NEXT_PUBLIC_S3_URL}/profiles/${profile.ImageURL}`
-                        : `${process.env.NEXT_PUBLIC_S3_URL}/profiles/dummy-user.png`
+                      profile?.profile_image
+                        ? profile.profile_image
+                        : "https://eboxtickets.com/images/admin.jpg"
                     }
                     alt="Profile"
                     width={100}
@@ -172,84 +159,29 @@ const Profile = () => {
 
               <div className="my-md-auto mt-4 prof-details">
                 <h4 className="font-weight-semibold ms-md-4 ms-0 mb-1 pb-0">
-                  {profile.FirstName ? (
-                    <span>{profile.FirstName}</span>
+                  {profile.first_name ? (
+                    <span>{profile.first_name}</span>
                   ) : (
                     <span>---</span>
-                  )} {profile.LastName ? (
-                    <span>{profile.LastName}</span>
+                  )} {profile.last_name ? (
+                    <span>{profile.last_name}</span>
                   ) : (
                     <span>---</span>
                   )}
                 </h4>
-                <p className="tx-13 text-muted ms-md-4 ms-0 mb-2 pb-2 ">
-                  <span className="me-3">
-                    <i className="far fa-address-card me-2"></i>{profile.CompanyName ? (
-                      <span>{profile.CompanyName}</span>
-                    ) : (
-                      <span>---</span>
-                    )}({profile.CompanyTitle ? (
-                      <span>{profile.CompanyTitle}</span>
-                    ) : (
-                      <span>---</span>
-                    )})
-                  </span>
-                  <span className="me-3">
-                    <i className="fa fa-building me-2"></i>
-                    {profile.country_group === 0 && (
-                      "N/A"
-                    )}
-                    {profile.country_group === 1 && (
-                      "Europe"
-                    )}
-                    {profile.country_group === 2 && (
-                      "Africa"
-                    )}
-                    {profile.country_group === 3 && (
-                      "Mexico"
-                    )}
-                    {profile.country_group === 4 && (
-                      "South America"
-                    )}
-                    {profile.country_group === 5 && (
-                      "USA"
-                    )}
-                    {profile.country_group === 6 && (
-                      "Australia"
-                    )}
-                  </span>
-                  {/* <span>
-                    <i className="far fa-flag me-2"></i>New Jersey
-                  </span> */}
-                </p>
                 <p className="text-muted ms-md-4 ms-0 mb-2">
                   <span>
                     <i className="fa fa-phone me-2"></i>
                   </span>
                   <span className="font-weight-semibold me-2">Phone:</span>
-                  <span>+{profile.PhoneNumber}</span>
+                  <span>+{profile.mobile}</span>
                 </p>
                 <p className="text-muted ms-md-4 ms-0 mb-2">
                   <span>
                     <i className="fa fa-envelope me-2"></i>
                   </span>
                   <span className="font-weight-semibold me-2">Email:</span>
-                  <span> {profile.Email}</span>
-                </p>
-                <p className="text-muted ms-md-4 ms-0 mb-2">
-                  <span>
-                    <i className="fa fa-map-marker me-2"></i>
-                  </span>
-                  {/* <span>MIG-1-11, Monroe Street, Georgetown, Mexico, USA,20071</span> */}
-                  <span> {profile && profile.AddressLine1 ? profile.AddressLine1 : '-'},{profile && profile.AddressLine2 ? profile.AddressLine2 : '-'},
-                    {profile.country_group === 0 && "N/A"}
-                    {profile.country_group === 1 && "Europe"}
-                    {profile.country_group === 2 && "Africa"}
-                    {profile.country_group === 3 && "Mexico"}
-                    {profile.country_group === 4 && "South America"}
-                    {profile.country_group === 5 && "USA"}
-                    {profile.country_group === 6 && "Australia"}
-                  </span>
+                  <span> {profile.email}</span>
                 </p>
               </div>
               <CCol md={6} className="d-flex justify-content-end">
@@ -281,104 +213,225 @@ const Profile = () => {
                             id="about"
                           >
                             <Card>
-                              <Card.Body className=" p-0 border-0 p-0 rounded-10">
+                              <Card.Body className="p-0 border-0 rounded-10">
                                 <div className="border-top"></div>
                                 <div className="border-top"></div>
+
                                 <div className="p-4">
                                   <label className="main-content-label tx-13 mg-b-20">
                                     Social Networks :
                                   </label>
-                                  <div className="d-lg-flex">
-                                    <div className="mg-md-r-20 mg-b-10">
-                                      <div className="main-profile-social-list">
-                                        <div className="media">
-                                          <div className="media-icon bg-primary-transparent text-primary">
-                                            <i className="icon ion-logo-instagram"></i>
-                                          </div>
-                                          <div className="media-body">
-                                            {" "}
-                                            <span>Instagram</span>{" "}
-                                            <Link href="https://www.instagram.com/ondalinda_/">instagram.com/ondalinda</Link>{" "}
+
+                                  <div className="flex-wrap d-flex" style={{ gap: "25px" }}>
+
+                                    {/* Instagram */}
+                                    <div className="mg-b-10">
+                                      <Link
+                                        href={profile?.instaurl || "#"}
+                                        target="_blank"
+                                        className="text-decoration-none"
+                                      >
+                                        <div className="main-profile-social-list">
+                                          <div className="media">
+                                            <div className="media-icon bg-danger-transparent text-danger">
+                                              <i className="icon ion-logo-instagram"></i>
+                                            </div>
+                                            <div className="media-body">
+                                              <span>Instagram</span>
+                                            </div>
                                           </div>
                                         </div>
-                                      </div>
+                                      </Link>
                                     </div>
-                                    <div className="mg-md-r-20 mg-b-10">
-                                      <div className="main-profile-social-list">
-                                        <div className="media">
-                                          <div className="media-icon bg-success-transparent text-success">
-                                            <i className="icon ion-logo-facebook"></i>
-                                          </div>
-                                          <div className="media-body">
-                                            {" "}
-                                            <span>Facebook</span>{" "}
-                                            <Link href="https://www.facebook.com/ondalindafestival/">
-                                              facebook.com/ondalindafestival
-                                            </Link>{" "}
+
+                                    {/* Facebook */}
+                                    <div className="mg-b-10">
+                                      <Link
+                                        href={profile?.fburl || "#"}
+                                        target="_blank"
+                                        className="text-decoration-none"
+                                      >
+                                        <div className="main-profile-social-list">
+                                          <div className="media">
+                                            <div className="media-icon bg-primary-transparent text-primary">
+                                              <i className="icon ion-logo-facebook"></i>
+                                            </div>
+                                            <div className="media-body">
+                                              <span>Facebook</span>
+                                            </div>
                                           </div>
                                         </div>
-                                      </div>
+                                      </Link>
+                                    </div>
+
+                                    {/* Twitter */}
+                                    <div className="mg-b-10">
+                                      <Link
+                                        href={profile?.Twitterurl || "#"}
+                                        target="_blank"
+                                        className="text-decoration-none"
+                                      >
+                                        <div className="main-profile-social-list">
+                                          <div className="media">
+                                            <div className="media-icon bg-info-transparent text-info">
+                                              <i className="icon ion-logo-twitter"></i>
+                                            </div>
+                                            <div className="media-body">
+                                              <span>Twitter</span>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </Link>
+                                    </div>
+
+                                    {/* Google Plus */}
+                                    <div className="mg-b-10">
+                                      <Link
+                                        href={profile?.googleplusurl || "#"}
+                                        target="_blank"
+                                        className="text-decoration-none"
+                                      >
+                                        <div className="main-profile-social-list">
+                                          <div className="media">
+                                            <div className="media-icon bg-danger-transparent text-danger">
+                                              <i className="icon ion-logo-google"></i>
+                                            </div>
+                                            <div className="media-body">
+                                              <span>Google Plus</span>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </Link>
+                                    </div>
+
+                                    {/* LinkedIn */}
+                                    <div className="mg-b-10">
+                                      <Link
+                                        href={profile?.linkdinurl || "#"}
+                                        target="_blank"
+                                        className="text-decoration-none"
+                                      >
+                                        <div className="main-profile-social-list">
+                                          <div className="media">
+                                            <div className="media-icon bg-primary-transparent text-primary">
+                                              <i className="icon ion-logo-linkedin"></i>
+                                            </div>
+                                            <div className="media-body">
+                                              <span>LinkedIn</span>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </Link>
+                                    </div>
+
+                                    {/* Google Play Store */}
+                                    <div className="mg-b-10">
+                                      <Link
+                                        href={profile?.googleplaystore || "#"}
+                                        target="_blank"
+                                        className="text-decoration-none"
+                                      >
+                                        <div className="main-profile-social-list">
+                                          <div className="media">
+                                            <div className="media-icon bg-success-transparent text-success">
+                                              <i className="icon ion-logo-android"></i>
+                                            </div>
+                                            <div className="media-body">
+                                              <span>Google Play Store</span>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </Link>
+                                    </div>
+
+                                    {/* Apple Store */}
+                                    <div className="mg-b-10">
+                                      <Link
+                                        href={profile?.applestore || "#"}
+                                        target="_blank"
+                                        className="text-decoration-none"
+                                      >
+                                        <div className="main-profile-social-list">
+                                          <div className="media">
+                                            <div className="media-icon text-dark" style={{ backgroundColor: "#d5d5d5" }}>
+                                              <i className="icon ion-logo-apple"></i>
+                                            </div>
+                                            <div className="media-body">
+                                              <span>Apple Store</span>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </Link>
                                     </div>
 
                                   </div>
                                 </div>
                               </Card.Body>
                             </Card>
+
+
                           </div>
                         </Tab.Pane>
                         <Card>
                           <Card.Header>
                             <h3 className="card-title">Change Password</h3>
                           </Card.Header>
+
                           <Card.Body>
-                            <CForm
-                              className="needs-validation"
-                              onSubmit={UpdatePassword}
-                            >
-                              <Row className="gy-2">
-                                <CCol md={6}>
-                                  <CFormLabel htmlFor="validationDefault01">Password</CFormLabel>
+                            <CForm className="needs-validation" onSubmit={UpdatePassword}>
+                              <Row className="align-items-end g-3">
+
+                                {/* New Password */}
+                                <CCol md={4}>
+                                  <CFormLabel>New Password</CFormLabel>
                                   <CFormInput
                                     type="password"
-                                    id="validationDefault01"
                                     required
-                                    minLength="5"
+                                    minLength={5}
                                     value={Password}
-                                    onChange={(e) => {
-                                      setPassword(e.target.value);
-                                    }}
+                                    onChange={(e) => setPassword(e.target.value)}
                                   />
-                                  <CFormFeedback valid>Looks good!</CFormFeedback>
                                 </CCol>
-                                <CCol md={6}>
-                                  <CFormLabel htmlFor="validationDefault02">Change Password </CFormLabel>
+
+                                {/* Confirm Password */}
+                                <CCol md={4}>
+                                  <CFormLabel>Confirm Password</CFormLabel>
                                   <CFormInput
                                     type="password"
-                                    id="validationDefault02"
                                     required
-                                    minLength="5"
+                                    minLength={5}
                                     value={confirmPassword}
-                                    onChange={(e) => {
-                                      setConfirmPassword(e.target.value);
-                                    }}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
                                   />
-                                  <CFormFeedback valid>Looks good!</CFormFeedback>
                                 </CCol>
-                                <CCol md={2} >
-                                  <CButton color="primary" type="submit" disabled={isLoading}>
+
+                                {/* Submit Button */}
+                                <CCol md={4} className="d-flex">
+                                  <CButton
+                                    color="primary"
+                                    type="submit"
+                                    disabled={isLoading}
+                                    className="mt-auto"
+                                  >
                                     {isLoading ? (
-                                      <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
+                                      <Spinner
+                                        as="span"
+                                        animation="border"
+                                        size="sm"
+                                        role="status"
+                                        aria-hidden="true"
+                                      />
                                     ) : (
-                                      'Submit'
+                                      "Submit"
                                     )}
                                   </CButton>
                                 </CCol>
+
                               </Row>
-
                             </CForm>
-
                           </Card.Body>
                         </Card>
+
                       </Tab.Content>
                     </div>
                   </Col>

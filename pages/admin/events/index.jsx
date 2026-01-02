@@ -36,11 +36,13 @@ export const Events = () => {
             Header: "S.No",
             accessor: (row, index) => index + 1,
             className: "borderrigth",
+            style: { width: "5%" },
         },
         {
             Header: "Organizer",
             accessor: "organizer",
             className: "borderrigth",
+            style: { width: "10%" },
             Cell: ({ row }) => {
                 const organizer = row?.original?.Organizer;
 
@@ -59,6 +61,7 @@ export const Events = () => {
             Header: "Event Name",
             accessor: "eventName",
             className: "borderrigth",
+            style: { width: "10%" },
             Cell: ({ row }) => {
                 const eventName = row.original.name || "---";
                 const eventUrl = `/event/${row.original.id}/${row.original.slug}`;
@@ -81,6 +84,7 @@ export const Events = () => {
             Header: "Date and Time",
             accessor: "DateAndTime",
             className: "borderrigth",
+            style: { width: "20%" },
             Cell: ({ row }) => {
                 const fromDate = row?.original?.date_from;
                 const toDate = row?.original?.date_to;
@@ -109,6 +113,7 @@ export const Events = () => {
             Header: "Venue",
             accessor: "venue",
             className: "borderrigth",
+            style: { width: "10%" },
             Cell: ({ row }) => (
                 <div>
                     {row.original.location ? row.original.location : "---"}
@@ -119,6 +124,7 @@ export const Events = () => {
             Header: "Ticket Types",
             accessor: "TicketTypes",
             className: "borderrigth",
+            style: { width: "10%" },
             Cell: ({ row }) => {
                 const tickets = row?.original?.tickets;
 
@@ -140,6 +146,7 @@ export const Events = () => {
             Header: "Total Sales",
             accessor: "total_sales",
             className: "borderrigth",
+            style: { width: "10%" },
             Cell: ({ row }) => {
                 const eventId = row?.original?.id;
                 const amount = formatAmount(row?.original, "total_sales");
@@ -162,6 +169,7 @@ export const Events = () => {
             Header: "Comm(8%)",
             accessor: "Comm",
             className: "borderrigth",
+            style: { width: "5%" },
             Cell: ({ row }) => (
                 <div>
                     {formatAmount(row?.original, "total_tax")}
@@ -172,6 +180,7 @@ export const Events = () => {
             Header: "Featured",
             accessor: "featured",
             className: "borderrigth",
+            style: { width: "5%" },
             Cell: ({ row }) => {
                 const { id, featured } = row.original;
                 const isFeatured = featured === "Y";
@@ -210,38 +219,77 @@ export const Events = () => {
             Header: "Action",
             accessor: "action",
             className: "borderrigth",
+            style: { width: "10%" },
             Cell: ({ row }) => {
                 const { id, status } = row.original;
+
                 return (
-                    <div className="form-check form-switch d-flex justify-content-center">
-                        <div className="form-check form-switch">
-                            <input
-                                className="form-check-input"
-                                type="checkbox"
-                                style={{ cursor: "pointer" }}
-                                checked={status === "Y"}
-                                onChange={() => handleStatusToggle(id, status)}
-                            /></div>
+                    <div className="d-flex flex-column align-items-center gap-1">
+                        {/* Top Row: Toggle + Delete */}
+                        <div className="d-flex align-items-center gap-2">
+                            <div className="form-check form-switch m-0">
+                                <input
+                                    className="form-check-input"
+                                    type="checkbox"
+                                    style={{ cursor: "pointer" }}
+                                    checked={status === "Y"}
+                                    onChange={() => handleStatusToggle(id, status)}
+                                />
+                            </div>
 
-                        <i
-                            className="bi bi-trash-fill text-danger"
-                            style={{ cursor: "pointer", fontSize: "16px" }}
-                            onClick={() => handleDeleteEvent(id)}
-                            title="Delete"
-                        ></i>
+                            <i
+                                className="bi bi-trash-fill text-danger"
+                                style={{ cursor: "pointer", fontSize: "16px" }}
+                                onClick={() => handleDeleteEvent(id)}
+                                title="Delete"
+                            ></i>
+                        </div>
 
-                        {/* Payment Report Button */}
+                        {/* Bottom Row: Payment Report Button */}
                         <button
                             className="btn btn-success btn-sm"
-                            // onClick={handlePaymentReport}
                             onClick={() => generatePaymentReport(id)}
-
                         >
                             Payment Report
                         </button>
                     </div>
                 );
             },
+
+
+
+            // Cell: ({ row }) => {
+            //     const { id, status } = row.original;
+            //     return (
+            //         <div className="form-check form-switch d-flex justify-content-center">
+            //             <div className="form-check form-switch">
+            //                 <input
+            //                     className="form-check-input"
+            //                     type="checkbox"
+            //                     style={{ cursor: "pointer" }}
+            //                     checked={status === "Y"}
+            //                     onChange={() => handleStatusToggle(id, status)}
+            //                 /></div>
+
+            //             <i
+            //                 className="bi bi-trash-fill text-danger"
+            //                 style={{ cursor: "pointer", fontSize: "16px" }}
+            //                 onClick={() => handleDeleteEvent(id)}
+            //                 title="Delete"
+            //             ></i>
+            //             <br />
+            //             {/* Payment Report Button */}
+            //             <button
+            //                 className="btn btn-success btn-sm"
+            //                 // onClick={handlePaymentReport}
+            //                 onClick={() => generatePaymentReport(id)}
+
+            //             >
+            //                 Payment Report
+            //             </button>
+            //         </div>
+            //     );
+            // },
         },
     ]);
 
@@ -962,6 +1010,7 @@ export const Events = () => {
                                                                 column.getSortByToggleProps()
                                                             )}
                                                             className={column.className}
+                                                            style={column.style}
                                                         >
                                                             <span className="tabletitle">
                                                                 {column.render("Header")}
@@ -979,7 +1028,6 @@ export const Events = () => {
                                                             </span>
                                                         </th>
                                                     ))}
-                                                    {/* <th>Actions</th> */}
                                                 </React.Fragment>
                                             ))}
                                         </tr>
@@ -987,8 +1035,6 @@ export const Events = () => {
                                     <tbody {...getTableBodyProps()}>
                                         {page.map((row) => {
                                             prepareRow(row);
-                                            const rowId = row.original.id; // Assuming `id` is present in row.original
-                                            const rowData = row.original; // Assuming `id` is present in row.original
                                             return (
                                                 <tr key={Math.random()} {...row.getRowProps()}>
 

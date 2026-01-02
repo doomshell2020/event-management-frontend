@@ -5272,9 +5272,11 @@ form[role="search"].active input {display: table-cell;
 .main-profile-social-list .media-icon {font-size: 34px;
   width: 30px;
   line-height: 0;}
-.main-profile-social-list .media-body {margin-left: 20px;}
+.main-profile-social-list .media-body {margin-left: 5px;}
 .main-profile-social-list .media-body span {display: block;
-  font-size: 12px;}
+  font-size: 12px;
+  line-height: normal;
+}
 .main-profile-social-list .media-body a {font-size: 13px;}
 .main-content-body-profile .nav {flex-direction: column;
   padding: 20px 20px 20px 15px;

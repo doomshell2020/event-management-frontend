@@ -472,7 +472,6 @@ const EventDetailPage = ({ event, slug }) => {
                                     const isSelected = selectedForThis.some(
                                       (s) => s.id === slot.id
                                     );
-
                                     return (
                                       <div
                                         key={slot.id}
@@ -501,10 +500,8 @@ const EventDetailPage = ({ event, slug }) => {
                                           type="checkbox"
                                           className="form-check-input me-3"
                                           checked={isSelected}
-                                          onChange={(e) => {
-                                            e.stopPropagation();
-                                            toggleSlotSelection(w.id, slot);
-                                          }}
+                                          readOnly
+                                          style={{cursor:"pointer"}}
                                         />
 
                                         {/* DATE & TIME */}
