@@ -294,8 +294,29 @@ export default function CartModal({ show, handleClose, eventId }) {
 
     const increaseTicket = async (ticket) => {
         const ticketId = ticket?.id;
-        // 🚫 TICKET LIMIT VALIDATION
-        if (!checkTicketLimit()) return;
+
+        if (!ticket_limit || ticket_limit <= 0 || !ticketId) return true; // no limit
+
+        const questionAnswers = buildQuestionAnswers(ticketId);
+
+        // TICKET LIMIT VALIDATION
+        const inCart = cart.reduce((total, item) => {
+            if (item.item_type == "ticket" && item.uniqueId == ticketId) {
+                return total + (item.count || 0);
+            }
+            return total;
+        }, 0);
+
+        // TICKET LIMIT VALIDATION
+        if (ticket_limit > 0 && inCart >= ticket_limit) {
+            Swal.fire({
+                icon: "warning",
+                title: "Ticket Limit Reached",
+                text: `You can add maximum ${ticket_limit} tickets for this event.`,
+                confirmButtonText: "OK"
+            });
+            return false;
+        }
 
         try {
             setLoadingId(ticketId);
@@ -309,7 +330,8 @@ export default function CartModal({ show, handleClose, eventId }) {
                     event_id: finalEventId,
                     item_type: "ticket",
                     ticket_id: ticketId,
-                    count: 1
+                    count: 1,
+                    questionAnswers
                 });
             }
 
@@ -643,20 +665,26 @@ export default function CartModal({ show, handleClose, eventId }) {
 
     const increasePackage = async (pkg) => {
         const packageId = pkg?.id;
-
-        // const inCart =  cart.reduce((total, item) => {
-        //     if (item.item_type == "package" && item.package_id == packageId) {
-        //         return total + (item.count || 0);
-        //     }
-        //     return total;
-        // }, 0);
-        // console.log('inCart :', inCart);
-        // return false
-        
         if (!packageId) return;
+        const packageLimit = pkg?.package_limit;
 
-        // 🚫 TICKET LIMIT VALIDATION
-        if (!checkTicketLimit()) return;
+        const inCart = cart.reduce((total, item) => {
+            if (item.item_type == "package" && item.uniqueId == packageId) {
+                return total + (item.count || 0);
+            }
+            return total;
+        }, 0);
+
+        // 🚫 PACKAGE LIMIT VALIDATION
+        if (packageLimit > 0 && inCart >= packageLimit) {
+            Swal.fire({
+                icon: "warning",
+                title: "Package limit reached",
+                text: `You can only purchase up to ${packageLimit} of this package.`,
+                confirmButtonText: "Okay",
+            });
+            return false; // stop further execution
+        }
 
 
         try {
@@ -726,12 +754,27 @@ export default function CartModal({ show, handleClose, eventId }) {
     };
 
     const decreasePackage = async (pkg) => {
-        // console.log('pkg :', pkg);
-        // return false
         const packageId = pkg?.id;
         if (!packageId) return;
-        // 🚫 TICKET LIMIT VALIDATION
-        if (!checkTicketLimit()) return;
+
+        // Count package in cart
+        const inCart = cart.reduce((total, item) => {
+            if (item.item_type == "package" && item.uniqueId == packageId) {
+                return total + (item.count || 0);
+            }
+            return total;
+        }, 0);
+
+        // NOTHING TO DECREASE
+        if (inCart <= 0) {
+            Swal.fire({
+                icon: "info",
+                title: "Nothing to remove",
+                text: "This package is not added to your cart yet.",
+                confirmButtonText: "Okay",
+            });
+            return false;
+        }
 
         try {
             setLoadingId(`package-${packageId}`);
@@ -1213,7 +1256,7 @@ export default function CartModal({ show, handleClose, eventId }) {
 
                                                                 {/* 🎟️ TICKETS */}
                                                                 {eventData.tickets
-                                                                    ?.filter(ticket => ticket.hidden !== "Y")
+                                                                    ?.filter(ticket => ticket.hidden != "Y")
                                                                     .map((ticket, i) => {
                                                                         const cartItem = normalCart.find(item => item.uniqueId == ticket.id);
                                                                         const isLoading = loadingId == ticket.id;
@@ -1301,15 +1344,8 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                                                 <button
                                                                                                     className="btn btn-sm primery-button"
                                                                                                     onClick={() => {
-                                                                                                        const ticketQuestions = eventData.questions?.filter(q =>
-                                                                                                            q.ticket_type_id
-                                                                                                                .split(",")
-                                                                                                                .map(id => id.trim())
-                                                                                                                .includes(ticket.id.toString())
-                                                                                                        ) || [];
 
                                                                                                         const validation = validateTicketQuestions(ticket.id, ticketQuestions);
-                                                                                                        // console.log('validation :', validation);
 
                                                                                                         if (!validation.valid) {
                                                                                                             Swal.fire({
@@ -1334,7 +1370,18 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                                         <Counter
                                                                                             count={cartItem?.count || 0}
                                                                                             loading={isLoading}
-                                                                                            onInc={() => increaseTicket(ticket)}
+                                                                                            onInc={() => {
+                                                                                                const validation = validateTicketQuestions(ticket.id, ticketQuestions);
+                                                                                                if (!validation.valid) {
+                                                                                                    Swal.fire({
+                                                                                                        icon: "warning",
+                                                                                                        title: "Incomplete Information",
+                                                                                                        text: validation.message,
+                                                                                                    });
+                                                                                                    return;
+                                                                                                }
+                                                                                                increaseTicket(ticket);
+                                                                                            }}
                                                                                             onDec={() => decreaseTicket(ticket)}
                                                                                         />
                                                                                     )}

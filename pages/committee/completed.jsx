@@ -31,16 +31,29 @@ export async function getServerSideProps(context) {
 
         const json = await res.json();
 
-        const list = json?.data?.list || [];
+        const list = Array.isArray(json?.data?.list) ? json.data.list : [];
+        const completedData = Array.isArray(json?.data?.completedData)
+            ? json.data.completedData
+            : [];
         const assets = json?.data?.assets || {};
 
-        const counts = { pending: 0, approved: 0, ignored: 0, completed: 0 };
+        const counts = {
+            pending: 0,
+            approved: 0,
+            ignored: 0,
+            completed: 0,
+        };
 
+        // ✅ Set completed count safely
+        counts.completed = completedData.length;
+
+        // ✅ Count statuses from list
         list.forEach(item => {
+            if (!item?.status) return;
+
             if (item.status == "N") counts.pending++;
-            if (item.status == "Y") counts.approved++;
-            if (item.status == "I") counts.ignored++;
-            if (item.status == "C") counts.completed++;
+            else if (item.status == "Y") counts.approved++;
+            else if (item.status == "I") counts.ignored++;
         });
 
         return {
@@ -48,8 +61,10 @@ export async function getServerSideProps(context) {
                 completedRequests: list,
                 counts,
                 assets,
+                completedData,
             },
         };
+
 
     } catch (error) {
         console.error("SSR Error:", error);
@@ -64,7 +79,7 @@ export async function getServerSideProps(context) {
     }
 }
 
-const CommitteeCompleted = ({ completedRequests, counts, assets }) => {
+const CommitteeCompleted = ({ counts, assets, completedData }) => {
 
     const [activeTab, setMyActiveTab] = useState("completed");
     const router = useRouter();
@@ -74,8 +89,6 @@ const CommitteeCompleted = ({ completedRequests, counts, assets }) => {
         router.push(`/committee/${tab}`);
     };
 
-    // ✅ filter once
-    const completedList = completedRequests.filter(item => item.status == "C");
 
     return (
         <>
@@ -111,17 +124,15 @@ const CommitteeCompleted = ({ completedRequests, counts, assets }) => {
                                 </thead>
 
                                 <tbody>
-                                    {completedList.length > 0 ? (
-                                        completedList.map((item, index) => {
-                                            const user = item.user || {};
-                                            const ticket = item.TicketType || {};
+                                    {completedData?.length > 0 ? (
+                                        completedData.map((item, index) => {
 
-                                            const profileImage = user.profile_image
-                                                ? `${assets.profile_image_path}/${user.profile_image}`
+                                            const profileImage = item["user.profile_image"]
+                                                ? `${assets.profile_image_path}/${item["user.profile_image"]}`
                                                 : "/assets/front-images/no-image.png";
 
                                             return (
-                                                <tr key={item.id}>
+                                                <tr key={item.order_id || index}>
                                                     <td>{index + 1}</td>
 
                                                     {/* IMAGE */}
@@ -142,18 +153,18 @@ const CommitteeCompleted = ({ completedRequests, counts, assets }) => {
                                                     {/* USER */}
                                                     <td>
                                                         <div style={{ fontWeight: 600 }}>
-                                                            {user.first_name} {user.last_name}
+                                                            {item["user.first_name"]} {item["user.last_name"]}
                                                         </div>
                                                         <div className="text-muted fs-13">
-                                                            {user.email}
+                                                            {item["user.email"]}
                                                         </div>
                                                     </td>
 
                                                     {/* TICKET */}
                                                     <td>
-                                                        <div>{ticket.title}</div>
+                                                        <div>{item["ticketType.title"]}</div>
                                                         <div className="text-muted fs-13">
-                                                            {item?.events?.currencyName?.Currency_symbol}{ticket.price} × {item.no_tickets}
+                                                            ₹{item["ticketType.price"]}
                                                         </div>
                                                     </td>
 
@@ -174,6 +185,7 @@ const CommitteeCompleted = ({ completedRequests, counts, assets }) => {
                                         </tr>
                                     )}
                                 </tbody>
+
                             </table>
                         </div>
                     </div>

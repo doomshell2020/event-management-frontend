@@ -219,7 +219,7 @@ const CommitteePending = ({ pendingRequests, counts, assets }) => {
                                                         </div>
                                                     </td>
                                                     <td className="text-center">
-                                                        
+
                                                         <span className="me-2">
                                                             {item.questionsList?.length > 0 ? (
                                                                 <i
@@ -296,9 +296,14 @@ export async function getServerSideProps(context) {
 
         const json = await res.json();
         const list = json?.data?.list || [];
+        const completedData = Array.isArray(json?.data?.completedData)
+            ? json.data.completedData
+            : [];
         const assets = json?.data?.assets || {};
 
         const counts = { pending: 0, approved: 0, ignored: 0 };
+        // ✅ Set completed count safely
+        counts.completed = completedData.length;
 
         list.forEach(item => {
             if (item.status == "N") counts.pending++;
@@ -320,7 +325,7 @@ export async function getServerSideProps(context) {
         return {
             props: {
                 pendingRequests: [],
-                counts: { pending: 0, approved: 0, ignored: 0 },
+                counts: { pending: 0, approved: 0, ignored: 0, completed: 0 },
                 assets: {},
             },
         };

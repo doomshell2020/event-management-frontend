@@ -7,6 +7,7 @@ import CheckoutForm from "./CheckoutForm";
 import api from "@/utils/api";
 import { useCart } from "@/shared/layout-components/layout/CartContext";
 import { useAuth } from "@/shared/layout-components/layout/AuthContext";
+import Swal from "sweetalert2";
 
 /* Stripe Init */
 const stripePromise = loadStripe(
@@ -93,6 +94,23 @@ export default function CheckOutComponents({
         });
       } catch (err) {
         intentCreatedRef.current = false;
+        // 🔥 Extract backend message safely
+        const errorMessage =
+          err?.response?.data?.error?.message ||
+          err?.message ||
+          "Something went wrong while creating payment";
+
+        Swal.fire({
+          icon: "error",
+          title: "Payment Failed",
+          text: errorMessage,
+        }).then((result) => {
+          if (result.isConfirmed) {
+            showNextStep(false);
+          }
+        });
+
+
         console.error("Payment intent error:", err);
       } finally {
         setIsLoading(false);

@@ -35,20 +35,31 @@ export async function getServerSideProps(context) {
 
         const list = json?.data?.list || [];
         const assets = json?.data?.assets || {};
+        const completedData = Array.isArray(json?.data?.completedData)
+            ? json.data.completedData
+            : [];
 
-        const counts = { pending: 0, approved: 0, ignored: 0 };
+        const counts = {
+            pending: 0,
+            approved: 0,
+            ignored: 0,
+            completed: 0,
+        };
+        // ✅ Set completed count safely
+        counts.completed = completedData.length;
 
         list.forEach(item => {
-            if (item.status === "N") counts.pending++;
-            if (item.status === "Y") counts.approved++;
-            if (item.status === "I") counts.ignored++;
+            if (item.status == "N") counts.pending++;
+            if (item.status == "Y") counts.approved++;
+            if (item.status == "I") counts.ignored++;
         });
 
         return {
             props: {
-                ignoredRequests: list,
+                completedRequests: list,
                 counts,
                 assets,
+                completedData,
             },
         };
 
