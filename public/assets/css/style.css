@@ -5625,6 +5625,19 @@ input[type="date"] {
   .acomo-flw-prpty-dtls {
     margin-top: 50px;
   }
+.my-staff-module .table-bordered thead th,
+.my-staff-module .table-bordered thead td {
+  border-top-width: 1px;
+  padding-top: 11px;
+  padding-bottom: 11px;
+  background-color: #fff;
+}
+
+/* dark header override */
+.my-staff-module .table-bordered thead.table-dark th {
+  background-color: #212529;
+  color: #fff;
+}
 
   .acomo-flw-prpty-dtls .whr-u-slp .pckg-boxs .pckgbx-inr {
     min-width: 160px;

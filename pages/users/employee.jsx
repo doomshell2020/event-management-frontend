@@ -57,13 +57,48 @@ const ProfilePage = () => {
   return (
     <>
       <FrontendHeader backgroundImage={backgroundImage} />
-          <div className="section-heading">
-            <h1 className="mb-3">My Staff</h1>
-            {/* <h2 className="mt-4"></h2> */}
-            <p className="mb-4 body-text text-center">
-              You can manage your Staff!
-            </p>
+      <section className="my-staff-module">
+        <div className="section-heading">
+          <h1 className="mb-3">My Staff</h1>
+          {/* <h2 className="mt-4"></h2> */}
+          <p className="mb-4 body-text text-center">
+            You can manage your Staff!
+          </p>
+        </div>
+        <div className="container">
+
+          <div className="d-flex justify-content-end mb-2">
+            <a href="#" className="btn btn-primary btn-sm">Add Staff</a>
           </div>
+
+          <div className="table-responsive">
+            <table className="table table-bordered align-middle">
+
+              <thead className="table-dark text-center">
+                <tr>
+                  <th>S.No</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Mobile</th>
+                  <th>Created</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr className="text-white">
+                  <td colSpan="6" className="text-center">
+                    No Records
+                  </td>
+                </tr>
+              </tbody>
+
+            </table>
+          </div>
+
+        </div>
+      </section>
+
       <FrontendFooter />
     </>
   );
