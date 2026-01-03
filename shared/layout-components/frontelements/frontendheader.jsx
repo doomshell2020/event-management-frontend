@@ -174,7 +174,7 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
                           </Link>
                         </li>
                         <li>
-                          <Link href="/users/employee" className="dropdownLink">
+                          <Link href="/users/my-staff" className="dropdownLink">
                             <i className="fas fa-users" /> My Staff
                           </Link>
                         </li>

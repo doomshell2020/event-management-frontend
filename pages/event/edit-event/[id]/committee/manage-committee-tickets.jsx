@@ -19,14 +19,12 @@ const CommitteeTicketsPage = () => {
 
     /* ---------------- STATES ---------------- */
     const [eventDetails, setEventDetails] = useState(null);
-    // console.log('eventDetails :', eventDetails);
     const [ticketsList, setTicketList] = useState([]);
     const [assignedList, setAssignedList] = useState([]);
     const [currencySymbol, setCurrencySymbol] = useState('$'); //Currency_symbol
 
     const [ticketTypes, setTicketTypes] = useState([]);
     const [groupedData, setGroupedData] = useState([]);
-    // console.log('groupedData :', groupedData);
 
     const [loading, setLoading] = useState(false);
     const [processing, setProcessing] = useState(false);
@@ -153,7 +151,6 @@ const CommitteeTicketsPage = () => {
         setGroupedData(formattedData);
         setProcessing(false);
     }, [ticketsList, assignedList]);
-
 
     /* ---------------- INITIAL LOAD ---------------- */
     useEffect(() => {
@@ -356,7 +353,7 @@ const CommitteeTicketsPage = () => {
 
                                                                             <Dropdown.Menu>
                                                                                 <Dropdown.Item onClick={() => openEditModal(row)}>
-                                                                                    Edit
+                                                                                    Assigned Tickets
                                                                                 </Dropdown.Item>
                                                                                 <Dropdown.Divider className="m-0" />
 

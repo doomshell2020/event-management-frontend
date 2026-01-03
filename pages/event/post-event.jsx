@@ -35,13 +35,14 @@ const EventDetailsPage = () => {
         request_rsvp: "",
         event_timezone: "",
         video_url: "",
-        access_type: "multi"
+        entry_type: "event"
     });
     const [image, setImage] = useState(null);
     const [loading, setLoading] = useState(false);
     const noteRef = useRef(null);
     const content = getHtmlEditorContent(noteRef);
     const [editorData, setEditorData] = useState({ content: "" });
+    const [errors, setErrors] = useState({});
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -62,6 +63,110 @@ const EventDetailsPage = () => {
         } else {
             setFormData({ ...formData, [name]: value });
         }
+    };
+
+    const handleEventDateChange = (e) => {
+        const { name, value } = e.target;
+
+        setFormData((prev) => ({
+            ...prev,
+            [name]: value
+        }));
+
+        // Only validate if the event is NOT free
+        if (!isFree) {
+            let startDate = name == "date_from" ? value : formData.date_from;
+            let endDate = name == "date_to" ? value : formData.date_to;
+
+            if (startDate && endDate && new Date(endDate) < new Date(startDate)) {
+                setErrors((prev) => ({
+                    ...prev,
+                    date_to: "Event End date must be after Event Start date"
+                }));
+            } else {
+                setErrors((prev) => ({
+                    ...prev,
+                    date_to: ""
+                }));
+            }
+        }
+    };
+
+    const handleSaleDateChange = (e) => {
+        const { name, value } = e.target;
+
+        setFormData((prev) => ({
+            ...prev,
+            [name]: value
+        }));
+
+        // Validation: Sale End must be after Sale Start
+        let saleStart = name == "sale_start" ? value : formData.sale_start;
+        let saleEnd = name == "sale_end" ? value : formData.sale_end;
+
+        if (saleStart && saleEnd && new Date(saleEnd) < new Date(saleStart)) {
+            setErrors((prev) => ({
+                ...prev,
+                sale_end: "Sale End date must be greater than Sale Start date"
+            }));
+        } else {
+            setErrors((prev) => ({
+                ...prev,
+                sale_end: ""
+            }));
+        }
+    };
+
+    const handlePaidDateChange = (e) => {
+        const { name, value } = e.target;
+
+        let updatedForm = { ...formData, [name]: value };
+        let newErrors = {};
+
+        if (!isFree) {
+            const { date_from, date_to, sale_start, sale_end } = updatedForm;
+
+            /* ================= EVENT DATE VALIDATION ================= */
+
+            // Event End >= Event Start
+            if (date_from && date_to && new Date(date_to) < new Date(date_from)) {
+                newErrors.date_to = "Event End must be after Event Start";
+            }
+
+            /* ================= RESET SALE DATES (ONLY WHEN EVENT CHANGES) ================= */
+
+            if (name === "date_from" || name === "date_to") {
+                // If sale dates exist but now invalid → reset them
+                if (
+                    (sale_start && date_from && new Date(sale_start) < new Date(date_from)) ||
+                    (sale_end && date_to && new Date(sale_end) > new Date(date_to))
+                ) {
+                    updatedForm.sale_start = "";
+                    updatedForm.sale_end = "";
+                }
+            }
+
+            /* ================= SALE DATE VALIDATION ================= */
+
+            // Sale End >= Sale Start
+            if (sale_start && sale_end && new Date(sale_end) < new Date(sale_start)) {
+                newErrors.sale_end = "Sale End must be after Sale Start";
+            }
+
+            // Sale Start <= Event Start
+            if (sale_start && date_from && new Date(sale_start) > new Date(date_from)) {
+                newErrors.sale_start = "Sale Start cannot be after Event Start";
+            }
+
+            // Sale End <= Event End
+            if (sale_end && date_to && new Date(sale_end) > new Date(date_to)) {
+                newErrors.sale_end = "Sale End cannot be after Event End";
+            }
+        }
+
+        // ✅ Update state once (important)
+        setFormData(updatedForm);
+        setErrors(newErrors);
     };
 
     const validateSlug = (slug) => {
@@ -144,8 +249,26 @@ const EventDetailsPage = () => {
         setImage(e.target.files[0]);
     };
 
+    const hasDateErrors = () => {
+        return Object.values(errors).some((err) => err && err.trim() !== "");
+    };
+
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+
+        /* ================= STOP SUBMIT IF DATE ERRORS ================= */
+        if (hasDateErrors()) {
+            Swal.fire({
+                icon: "error",
+                title: "Invalid Date Selection",
+                text: "Please fix date & time errors before submitting the form.",
+            });
+            return;
+        }
+
+
         setLoading(true);
 
         try {
@@ -478,7 +601,6 @@ const EventDetailsPage = () => {
                                                     />
                                                 </div>
 
-
                                                 {/* Free and Register Checkboxes */}
                                                 <div className="col-lg-4 col-md-6 mb-3 d-flex align-items-end">
                                                     <div className="d-flex align-items-center justify-content-between w-100">
@@ -495,7 +617,7 @@ const EventDetailsPage = () => {
                                                                 This Event is FREE
                                                             </label>
                                                         </div>
-                                                        {formData.is_free == "Y" && (<div className="btn freeEventCheck green d-flex align-items-center w-50">
+                                                        {/* {formData.is_free == "Y" && (<div className="btn freeEventCheck green d-flex align-items-center w-50">
                                                             <input
                                                                 type="checkbox"
                                                                 className="form-check-input me-2"
@@ -508,7 +630,7 @@ const EventDetailsPage = () => {
                                                             <label htmlFor="allow_register" className="mb-0 text-14 text-white">
                                                                 Allow Registration
                                                             </label>
-                                                        </div>)}
+                                                        </div>)} */}
                                                     </div>
                                                 </div>
 
@@ -558,34 +680,42 @@ const EventDetailsPage = () => {
                                                     </select>
                                                 </div>
 
-                                                {/* Event Dates */}
+                                                {/* ===== Event Start ===== */}
                                                 <div className="col-lg-4 col-md-6 mb-3">
                                                     <label className="form-label">
                                                         Event Start <span className="text-danger">*</span>
                                                     </label>
                                                     <input
                                                         type="datetime-local"
-                                                        className="form-control rounded-0"
+                                                        className={`form-control rounded-0 ${errors.date_from ? "is-invalid" : ""}`}
                                                         name="date_from"
-                                                        onChange={handleChange}
                                                         value={formData.date_from}
-                                                        required
+                                                        onChange={handlePaidDateChange}
+                                                        min={formData.sale_start || new Date().toISOString().slice(0, 16)}
+                                                        required={!isFree}
                                                     />
+                                                    {errors.date_from && <div className="invalid-feedback">{errors.date_from}</div>}
                                                 </div>
 
+
+                                                {/* ===== Event End ===== */}
                                                 <div className="col-lg-4 col-md-6 mb-3">
                                                     <label className="form-label">
                                                         Event End <span className="text-danger">*</span>
                                                     </label>
                                                     <input
                                                         type="datetime-local"
-                                                        className="form-control rounded-0"
+                                                        className={`form-control rounded-0 ${errors.date_to ? "is-invalid" : ""}`}
                                                         name="date_to"
-                                                        onChange={handleChange}
                                                         value={formData.date_to}
-                                                        required
+                                                        onChange={handlePaidDateChange}
+                                                        min={formData.date_from || formData.sale_end || new Date().toISOString().slice(0, 16)}
+                                                        required={!isFree}
                                                     />
+                                                    {errors.date_to && <div className="invalid-feedback">{errors.date_to}</div>}
                                                 </div>
+
+
 
                                                 {/* Conditional Fields */}
                                                 {isFree ? (
@@ -607,33 +737,42 @@ const EventDetailsPage = () => {
                                                     </>
                                                 ) : (
                                                     <>
-                                                        {/* Sale Start/End for Paid Events */}
+
+                                                        {/* ===== Sale Start ===== */}
                                                         <div className="col-lg-4 col-md-6 mb-3">
                                                             <label className="form-label">
                                                                 Sale Start <span className="text-danger">*</span>
                                                             </label>
                                                             <input
                                                                 type="datetime-local"
-                                                                className="form-control rounded-0"
+                                                                className={`form-control rounded-0 ${errors.sale_start ? "is-invalid" : ""}`}
                                                                 name="sale_start"
-                                                                onChange={handleChange}
                                                                 value={formData.sale_start}
-                                                                required
+                                                                onChange={handlePaidDateChange}
+                                                                min={new Date().toISOString().slice(0, 16)}
+                                                                required={!isFree}
                                                             />
+                                                            {errors.sale_start && <div className="invalid-feedback">{errors.sale_start}</div>}
                                                         </div>
+
+                                                        {/* ===== Sale End ===== */}
                                                         <div className="col-lg-4 col-md-6 mb-3">
                                                             <label className="form-label">
                                                                 Sale End <span className="text-danger">*</span>
                                                             </label>
                                                             <input
                                                                 type="datetime-local"
-                                                                className="form-control rounded-0"
+                                                                className={`form-control rounded-0 ${errors.sale_end ? "is-invalid" : ""}`}
                                                                 name="sale_end"
-                                                                onChange={handleChange}
                                                                 value={formData.sale_end}
-                                                                required
+                                                                onChange={handlePaidDateChange}
+                                                                min={formData.sale_start || new Date().toISOString().slice(0, 16)}
+                                                                max={formData.date_to || ""}
+                                                                required={!isFree}
                                                             />
+                                                            {errors.sale_end && <div className="invalid-feedback">{errors.sale_end}</div>}
                                                         </div>
+
 
                                                         {/* Ticket Limit per Person */}
                                                         <div className="col-lg-4 col-md-6 mb-3">
@@ -720,8 +859,6 @@ const EventDetailsPage = () => {
                                                                             <div style="text-align:left;font-size:14px">
                                                                                 <p><b>Event:</b> One-time entry for a single event.</p>
                                                                                 <p><b>Multi:</b> One ticket gives access to multiple events or days.</p>
-                                                                                <p><b>Slot:</b> Entry is allowed only for a specific time slot.</p>
-                                                                                <p><b>Single:</b> Ticket can be used only once.</p>
                                                                             </div>
                                                                         `
                                                                     });
@@ -731,15 +868,15 @@ const EventDetailsPage = () => {
 
                                                         <select
                                                             className="form-select rounded-0"
-                                                            name="access_type"
+                                                            name="entry_type"
                                                             onChange={handleChange}
-                                                            value={formData.access_type || ""}
+                                                            value={formData.entry_type || ""}
                                                         >
                                                             <option value="">Choose Type</option>
                                                             <option value="event">Event</option>
                                                             <option value="multi">Multi</option>
-                                                            <option value="slot">Slot</option>
-                                                            <option value="single">Single</option>
+                                                            {/* <option value="slot">Slot</option>
+                                                            <option value="single">Single</option> */}
                                                         </select>
                                                     </div>
                                                 )}

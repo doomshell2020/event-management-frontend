@@ -19,7 +19,7 @@ const ManageTickets = () => {
     const [show, setShow] = useState(false);
     const [complimentary, setComplimentary] = useState(false);
     const [openDropdown, setOpenDropdown] = useState(null);
-    const currencyName = eventDetails?.currencyName.Currency_symbol;
+    const currencyName = eventDetails?.currencyName?.Currency_symbol || null;
 
     // Ticket form state
     const [ticketForm, setTicketForm] = useState({
@@ -55,6 +55,7 @@ const ManageTickets = () => {
 
     const [ticketsList, setTicketList] = useState([]);
     const [loading, setLoading] = useState(false);
+    // console.log('ticketsList :', ticketsList);
 
     const handleGetTicketsList = async () => {
         try {
@@ -92,7 +93,6 @@ const ManageTickets = () => {
         if (id) fetchEventDetails(id);
     }, [id]);
 
-    // console.log('>>>>>>>', eventDetails?.entry_type);
 
     const [validateDefault, setValidateDefault] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false); // ✅ new state
@@ -167,6 +167,27 @@ const ManageTickets = () => {
 
     const [backgroundImage] = useState("/assets/front-images/about-slider_bg.jpg");
 
+    const [selectedTicket, setSelectedTicket] = useState(null);
+    const [ticketQty, setTicketQty] = useState("");
+    const [error, setError] = useState("");
+
+    const openComplimentaryModal = (tickets) => {
+        setTicketList(tickets);
+        setSelectedTicket(tickets[0] || null); // default select first
+        setTicketQty("");
+        setError("");
+        setComplimentary(true);
+    };
+
+    const handlePrintTickets = (ticketId) => {
+        window.open(
+            `/event/edit-event/${id}/print-tickets/${ticketId}`,
+            "_blank"
+        );
+    };
+
+
+
     return (
         <>
             <FrontendHeader backgroundImage={backgroundImage} />
@@ -195,32 +216,38 @@ const ManageTickets = () => {
                                                     Settings
                                                 </Link>
                                             </li>
-                                            <li>
-                                                <Link href={`/event/edit-event/${id}/manage-addons`} className="text-16">
-                                                    Addons
-                                                </Link>
-                                            </li>
-                                            <li>
-                                                <Link href={`/event/edit-event/${id}/manage-questions`} className="text-16">
-                                                    Questions
-                                                </Link>
-                                            </li>
-                                            <li>
-                                                <Link href={`/event/edit-event/${id}/manage-packages`} className="text-16">
-                                                    Package
-                                                </Link>
-                                            </li>
+                                            {eventDetails?.is_free == 'N' && (
+                                                <>
+                                                    <li>
+                                                        <Link href={`/event/edit-event/${id}/manage-addons`} className="text-16">
+                                                            Addons
+                                                        </Link>
+                                                    </li>
+                                                    <li>
+                                                        <Link href={`/event/edit-event/${id}/manage-questions`} className="text-16">
+                                                            Questions
+                                                        </Link>
+                                                    </li>
+                                                    <li>
+                                                        <Link href={`/event/edit-event/${id}/manage-packages`} className="text-16">
+                                                            Package
+                                                        </Link>
+                                                    </li>
+                                                </>
+                                            )}
                                         </ul>
                                     </div>
 
                                     <div className="col-md-5 text-end">
-                                        <button
-                                            className="primery-button fw-normal px-2 text-white"
-                                            style={{ backgroundColor: "#00ad00" }}
-                                            onClick={() => setShow(true)}
-                                        >
-                                            <i className="bi bi-plus"></i> Add Ticket
-                                        </button>
+                                        {eventDetails?.is_free == 'N' && (
+                                            <button
+                                                className="primery-button fw-normal px-2 text-white"
+                                                style={{ backgroundColor: "#00ad00" }}
+                                                onClick={() => setShow(true)}
+                                            >
+                                                <i className="bi bi-plus"></i> Add Ticket
+                                            </button>
+                                        )}
 
                                         <button
                                             className="primery-button fw-normal px-2 ms-1 text-white"
@@ -256,7 +283,11 @@ const ManageTickets = () => {
                                                 <p className="body-text mb-1">
                                                     <strong>{ticket.title}</strong> ({currencyName}{ticket.price})
                                                     <br />
-                                                    Sold: {ticket.sold_count || 0} / {ticket.count}
+                                                    {ticket.type !== "comps" ? (
+                                                        `Sold: ${ticket.sold_count || 0} / ${ticket.count}`
+                                                    ) : (
+                                                        `Generated: ${ticket.sold_count || 0}`
+                                                    )}
                                                 </p>
 
                                                 <div className="row">
@@ -306,7 +337,7 @@ const ManageTickets = () => {
 
                                                             <div className="col-md-3">
                                                                 <p className="body-text mb-0 d-flex align-items-center">
-                                                                    {ticket.sold_out === "Y" ? (
+                                                                    {ticket.sold_out == "Y" ? (
                                                                         <>
                                                                             <XCircle
                                                                                 size={16}
@@ -497,6 +528,18 @@ const ManageTickets = () => {
                                                         )}
                                                     </div>
                                                 )}
+
+                                                {ticket.type == "comps" && ticket.sold_count != 0 && (
+                                                    <div className="d-flex flex-column align-items-end gap-2">
+                                                        <button
+                                                            className="btn btn-outline-primary btn-sm"
+                                                            onClick={() => handlePrintTickets(ticket.id)}
+                                                        >
+                                                            🖨️ Print Tickets
+                                                        </button>
+                                                    </div>
+                                                )}
+
                                             </div>
                                         </div>
                                     ))
@@ -664,29 +707,133 @@ const ManageTickets = () => {
                 </Modal.Body>
             </Modal>
 
-            {/* Complimentary Ticket Modal */}
             <Modal
                 className="addticket"
                 show={complimentary}
                 onHide={() => setComplimentary(false)}
+                centered
             >
-                <Modal.Header closeButton>
-                    <Modal.Title className="text-dark">
-                        Generate Complimentary Ticket
-                    </Modal.Title>
+                <Modal.Header closeButton className="bg-dark text-white">
+                    <Modal.Title>Generate Ticket</Modal.Title>
                 </Modal.Header>
+
                 <Modal.Body>
-                    Woohoo, you are reading this text in a modal!
+                    {/* Ticket Selection */}
+                    <Form.Group className="mb-3">
+                        <Form.Label>Select Ticket Type</Form.Label>
+                        <Form.Select
+                            value={selectedTicket?.id || ""}
+                            onChange={(e) => {
+                                const ticket = ticketsList.find(t => t.id == e.target.value);
+                                setSelectedTicket(ticket);
+                                setTicketQty("");
+                                setError("");
+                            }}
+                        >
+                            {/* <option value="">Select Ticket</option> */}
+                            {ticketsList
+                                .filter(ticket => ticket.type == "comps")
+                                .map(ticket => (
+                                    <option key={ticket.id} value={ticket.id}>
+                                        {ticket.title} (Unlimited)
+                                    </option>
+                                ))}
+
+                        </Form.Select>
+                    </Form.Group>
+
+                    {/* Availability */}
+                    {selectedTicket && (
+                        <div className="mb-2">
+                            {selectedTicket.type == "comps" ? (
+                                <span className="badge bg-success">Unlimited Tickets</span>
+                            ) : (
+                                <span className="badge bg-warning text-dark">
+                                    Available: {selectedTicket.count - selectedTicket.sold_count}
+                                </span>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Quantity */}
+                    <Form.Group>
+                        <Form.Label>Number of Tickets (Max 50)</Form.Label>
+                        <Form.Control
+                            type="number"
+                            min="1"
+                            max={50}
+                            value={ticketQty}
+                            onChange={(e) => {
+                                setError("");
+                                setTicketQty(e.target.value.replace(/\D/g, ""));
+                            }}
+                        />
+                        {error && <small className="text-danger">{error}</small>}
+                    </Form.Group>
                 </Modal.Body>
+
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setComplimentary(false)}>
+                    <Button
+                        variant="secondary"
+                        onClick={() => setComplimentary(false)}
+                        disabled={loading}
+                    >
                         Close
                     </Button>
-                    <Button variant="primary" onClick={() => setComplimentary(false)}>
-                        Save Changes
+
+                    <Button
+                        variant="primary"
+                        disabled={loading}
+                        onClick={async () => {
+                            // console.log('selectedTicket :', selectedTicket);
+                            if (!selectedTicket) {
+                                setError("Please select ticket");
+                                return;
+                            }
+
+                            if (!ticketQty || Number(ticketQty) <= 0) {
+                                setError("Enter valid quantity");
+                                return;
+                            }
+
+                            // ❌ Limit validation (except complimentary)
+                            if (
+                                selectedTicket.type !== "comps" &&
+                                Number(ticketQty) >
+                                (selectedTicket.count - selectedTicket.sold_count)
+                            ) {
+                                setError("Quantity exceeds available tickets");
+                                return;
+                            }
+
+                            try {
+                                setLoading(true);
+
+                                await api.post("/api/v1/tickets/generate", {
+                                    ticket_id: selectedTicket.id,
+                                    quantity: Number(ticketQty),
+                                    event_id: Number(id)
+                                });
+
+                                Swal.fire("Success", "Tickets generated", "success");
+                                setComplimentary(false);
+                            } catch (err) {
+                                Swal.fire(
+                                    "Error",
+                                    err.response?.data?.message || "Failed to generate",
+                                    "error"
+                                );
+                            } finally {
+                                setLoading(false);
+                            }
+                        }}
+                    >
+                        {loading ? "Generating..." : "Generate"}
                     </Button>
                 </Modal.Footer>
             </Modal>
+
+
         </>
     );
 };

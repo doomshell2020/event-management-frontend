@@ -38,7 +38,6 @@ const MyEventsPage = () => {
     const [loading, setLoading] = useState(true);
 
     const noteRef = useRef(null);
-    const content = getHtmlEditorContent(noteRef);
     const [editorData, setEditorData] = useState({ content: "" });
 
     const [isFormSubmit, setIsFormSubmit] = useState(false);
@@ -61,13 +60,12 @@ const MyEventsPage = () => {
         desp: "",
         is_free: "",
         allow_register: "",
-        access_type: "multi"
+        entry_type: "multi"
     });
 
     const [image, setImage] = useState(null);
     const [isFree, setIsFree] = useState(false);
     const [slugError, setSlugError] = useState("");
-
 
     useEffect(() => {
         if (id) {
@@ -101,10 +99,10 @@ const MyEventsPage = () => {
                     approve_timer: event.approve_timer || "",
                     is_free: event.is_free == "Y" ? "Y" : "N",
                     allow_register: event.allow_register == "Y" ? "Y" : "N",
-                    access_type: event.entry_type
+                    entry_type: event.entry_type
                 });
-                
-                // console.log('access_type :', formData);
+
+                // console.log('entry_type :', formData);
                 setEditorData({ content: event.desp || "" });
                 // ✅ Set checkbox states if applicable
                 setIsFree(event.is_free == "Y");
@@ -211,17 +209,17 @@ const MyEventsPage = () => {
                     fd.append(key, value);
                 }
             });
-
+            const content = getHtmlEditorContent(noteRef).trim();
             // ✅ Append image only if present
             if (image) fd.append("feat_image", image);
-            fd.append("desp", content.trim());
+            fd.append("desp", content);
 
             const endpoint =
                 formData.is_free == "Y"
                     ? `/api/v1/events/update/${id}`
                     : `/api/v2/events/update/${id}`;
 
-            console.log('endpoint :', endpoint);
+            // console.log('endpoint :', endpoint);
             const response = await api.put(endpoint, fd, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
@@ -294,9 +292,65 @@ const MyEventsPage = () => {
         });
     };
 
-    const [backgroundImage, setIsMobile] = useState('/assets/front-images/about-slider_bg.jpg');
 
-    
+    const [backgroundImage, setIsMobile] = useState('/assets/front-images/about-slider_bg.jpg');
+    const [dateErrors, setDateErrors] = useState({});
+    const validatePaidEventDates = (data) => {
+        const errors = {};
+
+        const {
+            date_from,
+            date_to,
+            sale_start,
+            sale_end
+        } = data;
+
+        // Event Start < Event End
+        if (date_from && date_to && new Date(date_to) < new Date(date_from)) {
+            errors.date_to = "Event End must be after Event Start";
+        }
+
+        // Sale Start < Sale End
+        if (sale_start && sale_end && new Date(sale_end) < new Date(sale_start)) {
+            errors.sale_end = "Sale End must be after Sale Start";
+        }
+
+        // Sale Start <= Event Start
+        if (sale_start && date_from && new Date(date_from) < new Date(sale_start)) {
+            errors.date_from = "Event Start cannot be before Sale Start";
+        }
+
+        // Sale End <= Event End
+        if (sale_end && date_to && new Date(sale_end) > new Date(date_to)) {
+            errors.sale_end = "Sale End cannot be after Event End";
+        }
+
+        return errors;
+    };
+
+    const handleDateChange = (e) => {
+        const { name, value } = e.target;
+
+        let updatedForm = {
+            ...formData,
+            [name]: value
+        };
+
+        // 🔁 If Event dates change → reset Sale dates
+        if (name == "date_from" || name == "date_to") {
+            updatedForm.sale_start = "";
+            updatedForm.sale_end = "";
+        }
+
+        setFormData(updatedForm);
+
+        // ✅ Validate only for PAID events
+        if (!isFree) {
+            const errors = validatePaidEventDates(updatedForm);
+            setDateErrors(errors); // replaces old errors (no stuck red)
+        }
+    };
+
 
     return (
         <>
@@ -412,7 +466,7 @@ const MyEventsPage = () => {
                                                         </select>
                                                     </div>
 
-                                                    <div className="col-md-6">
+                                                    <div className="col-md-3">
                                                         <label className="form-label">
                                                             Country <span className="text-danger">*</span>
                                                         </label>
@@ -431,8 +485,31 @@ const MyEventsPage = () => {
                                                         </select>
                                                     </div>
 
+                                                    {/* Checkboxes */}
+                                                    <div className="col-md-3 d-flex align-items-center">
+                                                        <CFormCheck
+                                                            type="checkbox"
+                                                            id="is_free"
+                                                            name="is_free"
+                                                            checked={isFree}
+                                                            onChange={handleChange}
+                                                            label="This event is free"
+                                                        />
+                                                    </div>
+
+                                                    {/* <div className="col-md-3 d-flex align-items-center">
+                                                        <CFormCheck
+                                                            type="checkbox"
+                                                            id="allow_register"
+                                                            name="allow_register"
+                                                            checked={formData.allow_register == "Y"}
+                                                            onChange={handleChange}
+                                                            label="Allowed Registration"
+                                                        />
+                                                    </div> */}
+
                                                     {!isFree && (
-                                                        <div className="col-md-6">
+                                                        <div className="col-md-3">
                                                             <label className="form-label">
                                                                 Currency <span className="text-danger">*</span>
                                                             </label>
@@ -450,7 +527,7 @@ const MyEventsPage = () => {
 
                                                     )}
 
-                                                    <div className="col-md-6">
+                                                    <div className={`col-md-${!isFree ? 3 : 6}`}>
                                                         <label className="form-label">
                                                             URL Slug <span className="text-danger">*</span>
                                                         </label>
@@ -466,28 +543,7 @@ const MyEventsPage = () => {
                                                     </div>
 
 
-                                                    {/* Checkboxes */}
-                                                    <div className="col-md-3 d-flex align-items-center">
-                                                        <CFormCheck
-                                                            type="checkbox"
-                                                            id="is_free"
-                                                            name="is_free"
-                                                            checked={isFree}
-                                                            onChange={handleChange}
-                                                            label="This event is free"
-                                                        />
-                                                    </div>
 
-                                                    <div className="col-md-3 d-flex align-items-center">
-                                                        <CFormCheck
-                                                            type="checkbox"
-                                                            id="allow_register"
-                                                            name="allow_register"
-                                                            checked={formData.allow_register == "Y"}
-                                                            onChange={handleChange}
-                                                            label="Allowed Registration"
-                                                        />
-                                                    </div>
 
                                                     <div className="col-md-6">
                                                         <label className="form-label">
@@ -495,13 +551,24 @@ const MyEventsPage = () => {
                                                             {formatDateTimeShort(eventDetails?.date_from?.local)}
                                                             ) <span className="text-danger">*</span>
                                                         </label>
-                                                        <input
+                                                        {/* <input
                                                             type="datetime-local"
                                                             className="form-control rounded-0"
                                                             name="date_from"
                                                             onChange={handleChange}
                                                             value={formData.date_from}
+                                                        /> */}
+                                                        <input
+                                                            type="datetime-local"
+                                                            className={`form-control rounded-0 ${dateErrors.date_from ? "is-invalid" : ""}`}
+                                                            name="date_from"
+                                                            value={formData.date_from}
+                                                            onChange={handleDateChange}
                                                         />
+                                                        {dateErrors.date_from && (
+                                                            <div className="invalid-feedback">{dateErrors.date_from}</div>
+                                                        )}
+
                                                     </div>
 
                                                     <div className="col-md-6">
@@ -510,13 +577,26 @@ const MyEventsPage = () => {
                                                             {formatDateTimeShort(eventDetails?.date_to?.local)}
                                                             ) <span className="text-danger">*</span>
                                                         </label>
-                                                        <input
+                                                        {/* <input
                                                             type="datetime-local"
                                                             className="form-control rounded-0"
                                                             name="date_to"
                                                             onChange={handleChange}
                                                             value={formData.date_to}
+                                                        /> */}
+
+                                                        <input
+                                                            type="datetime-local"
+                                                            className={`form-control rounded-0 ${dateErrors.date_to ? "is-invalid" : ""}`}
+                                                            name="date_to"
+                                                            value={formData.date_to}
+                                                            onChange={handleDateChange}
+                                                            min={formData.date_from}
                                                         />
+                                                        {dateErrors.date_to && (
+                                                            <div className="invalid-feedback">{dateErrors.date_to}</div>
+                                                        )}
+
                                                     </div>
 
                                                     {!isFree && (
@@ -527,13 +607,26 @@ const MyEventsPage = () => {
                                                                     {formatDateTimeShort(eventDetails?.sale_start?.local)}
                                                                     ) <span className="text-danger">*</span>
                                                                 </label>
-                                                                <input
+                                                                {/* <input
                                                                     type="datetime-local"
                                                                     className="form-control rounded-0"
                                                                     name="sale_start"
                                                                     onChange={handleChange}
                                                                     value={formData.sale_start}
+                                                                /> */}
+
+                                                                <input
+                                                                    type="datetime-local"
+                                                                    className="form-control rounded-0"
+                                                                    name="sale_start"
+                                                                    value={formData.sale_start}
+                                                                    onChange={handleDateChange}
+                                                                    disabled={!formData.date_from || !formData.date_to}
                                                                 />
+
+
+
+
                                                             </div>
 
                                                             <div className="col-md-6">
@@ -542,13 +635,29 @@ const MyEventsPage = () => {
                                                                     {formatDateTimeShort(eventDetails?.sale_end?.local)}
                                                                     ) <span className="text-danger">*</span>
                                                                 </label>
-                                                                <input
+                                                                {/* <input
                                                                     type="datetime-local"
                                                                     className="form-control rounded-0"
                                                                     name="sale_end"
                                                                     onChange={handleChange}
                                                                     value={formData.sale_end}
+                                                                /> */}
+
+                                                                <input
+                                                                    type="datetime-local"
+                                                                    className={`form-control rounded-0 ${dateErrors.sale_end ? "is-invalid" : ""}`}
+                                                                    name="sale_end"
+                                                                    value={formData.sale_end}
+                                                                    onChange={handleDateChange}
+                                                                    min={formData.sale_start}
+                                                                    max={formData.date_to}
+                                                                    disabled={!formData.sale_start}
                                                                 />
+                                                                {dateErrors.sale_end && (
+                                                                    <div className="invalid-feedback">{dateErrors.sale_end}</div>
+                                                                )}
+
+
                                                             </div>
                                                         </>)}
 
@@ -742,8 +851,6 @@ const MyEventsPage = () => {
                                                                             <div style="text-align:left;font-size:14px">
                                                                                 <p><b>Event:</b> One-time entry for a single event.</p>
                                                                                 <p><b>Multi:</b> One ticket gives access to multiple events or days.</p>
-                                                                                <p><b>Slot:</b> Entry is allowed only for a specific time slot.</p>
-                                                                                <p><b>Single:</b> Ticket can be used only once.</p>
                                                                             </div>
                                                                         `
                                                                         });
@@ -753,15 +860,15 @@ const MyEventsPage = () => {
 
                                                             <select
                                                                 className="form-select rounded-0"
-                                                                name="access_type"
-                                                                value={formData.access_type || ""}
+                                                                name="entry_type"
+                                                                value={formData.entry_type || ""}
                                                                 onChange={handleChange}
                                                             >
                                                                 <option value="">Choose Type</option>
                                                                 <option value="event">Event</option>
                                                                 <option value="multi">Multi</option>
-                                                                <option value="slot">Slot</option>
-                                                                <option value="single">Single</option>
+                                                                {/* <option value="slot">Slot</option>
+                                                                <option value="single">Single</option> */}
                                                             </select>
 
                                                         </div>
@@ -788,7 +895,7 @@ const MyEventsPage = () => {
                                                         <HtmlEditor
                                                             editorRef={noteRef}
                                                             initialContent={editorData.content}
-                                                            onChange={(content) => editorData({ ...editorData, content })}
+                                                            onChange={(content) => editorData({ content })}
                                                         />
                                                     </div>
 

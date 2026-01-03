@@ -9,7 +9,7 @@ const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [eventData, setEventData] = useState([]);
     const [loading, setLoading] = useState(false);
-    const showProgress = isProgressBarShow !== false;
+    const showProgress = isProgressBarShow != false;
 
     // Fetch Event List
     const fetchEvents = async () => {
@@ -30,23 +30,71 @@ const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
         fetchEvents();
     }, []);
 
-    // 🔹 Only define steps when eventDetails exists
+    // Only define steps when eventDetails exists
     const steps = React.useMemo(() => {
         if (!eventDetails) return [];
-        if (eventDetails.entry_type && eventDetails.entry_type !== "event") {
+
+        const isFree = eventDetails.is_free == 'Y';
+        const isNonEventType = eventDetails.entry_type && eventDetails.entry_type != "event";
+
+        if (isFree) {
+            // Free events: only three tabs
             return [
-                { serial: 1, label: "Manage Event", path: `/event/edit-event/${eventDetails.id}` },
-                { serial: 2, label: "Manage Tickets", path: `/event/edit-event/${eventDetails.id}/manage-tickets` },
-                { serial: 3, label: "Manage Date & Time", path: `/event/edit-event/${eventDetails.id}/manage-date-time` },
-                { serial: 4, label: "Ticket Pricing", path: `/event/edit-event/${eventDetails.id}/ticket-pricing` },
-                { serial: 5, label: "Publish Event", path: `/event/edit-event/${eventDetails.id}/publish-event` },
+                { serial: 1, label: "Manage Event", path: `/event/edit-event/${eventDetails.id}`, subPaths: [] },
+                {
+                    serial: 2,
+                    label: "Manage Tickets",
+                    path: `/event/edit-event/${eventDetails.id}/manage-tickets`,
+                    subPaths: [
+                        `/event/edit-event/${eventDetails.id}/manage-addons`,
+                        `/event/edit-event/${eventDetails.id}/manage-questions`,
+                        `/event/edit-event/${eventDetails.id}/manage-packages`,
+                    ]
+                },
+                { serial: 3, label: "Publish Event", path: `/event/edit-event/${eventDetails.id}/publish-event`, subPaths: [] },
+            ];
+        } else if (isNonEventType) {
+            // Paid / Non-event type events: full steps
+            return [
+                { serial: 1, label: "Manage Event", path: `/event/edit-event/${eventDetails.id}`, subPaths: [] },
+                {
+                    serial: 2,
+                    label: "Manage Tickets",
+                    path: `/event/edit-event/${eventDetails.id}/manage-tickets`,
+                    subPaths: [
+                        `/event/edit-event/${eventDetails.id}/manage-addons`,
+                        `/event/edit-event/${eventDetails.id}/manage-questions`,
+                        `/event/edit-event/${eventDetails.id}/manage-packages`,
+                    ]
+                },
+                { serial: 3, label: "Manage Date & Time", path: `/event/edit-event/${eventDetails.id}/manage-date-time`, subPaths: [] },
+                { serial: 4, label: "Ticket Pricing", path: `/event/edit-event/${eventDetails.id}/ticket-pricing`, subPaths: [] },
+                { serial: 5, label: "Publish Event", path: `/event/edit-event/${eventDetails.id}/publish-event`, subPaths: [] },
             ];
         } else {
+            // Paid / Normal event type
             return [
-                { serial: 1, label: "Manage Event", path: `/event/edit-event/${eventDetails.id}` },
-                { serial: 2, label: "Manage Tickets", path: `/event/edit-event/${eventDetails.id}/manage-tickets` },
-                { serial: 3, label: "Manage Committee", path: `/event/edit-event/${eventDetails.id}/committee/manage-committee` },
-                { serial: 4, label: "Publish Event", path: `/event/edit-event/${eventDetails.id}/publish-event` },
+                { serial: 1, label: "Manage Event", path: `/event/edit-event/${eventDetails.id}`, subPaths: [] },
+                {
+                    serial: 2,
+                    label: "Manage Tickets",
+                    path: `/event/edit-event/${eventDetails.id}/manage-tickets`,
+                    subPaths: [
+                        `/event/edit-event/${eventDetails.id}/manage-addons`,
+                        `/event/edit-event/${eventDetails.id}/manage-questions`,
+                        `/event/edit-event/${eventDetails.id}/manage-packages`,
+                    ]
+                },
+                {
+                    serial: 3,
+                    label: "Manage Committee",
+                    path: `/event/edit-event/${eventDetails.id}/committee/manage-committee`,
+                    subPaths: [
+                        `/event/edit-event/${eventDetails.id}/committee/manage-committee-tickets`,
+                        `/event/edit-event/${eventDetails.id}/committee/manage-committee-groups`,
+                    ]
+                },
+                { serial: 4, label: "Publish Event", path: `/event/edit-event/${eventDetails.id}/publish-event`, subPaths: [] },
             ];
         }
     }, [eventDetails]);
@@ -59,7 +107,12 @@ const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
 
         const currentPath = normalizePath(pathname);
 
-        const index = steps.findIndex(step => normalizePath(step.path) == currentPath);
+        const index = steps.findIndex(step => {
+            const stepPath = normalizePath(step.path);
+            // Check main path OR any subPath
+            return stepPath == currentPath || (step.subPaths && step.subPaths.some(sub => normalizePath(sub) == currentPath));
+        });
+
         return index >= 0 ? index : 0;
     }, [pathname, steps]);
 
@@ -75,6 +128,10 @@ const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
                         style={{ backgroundColor: "#e62d56" }}
                     >
                         {eventDetails?.name || "Select Event"}
+                        {" "}
+                        🧩 {eventDetails?.entry_type?.toUpperCase()}
+                        {" | "}
+                        💰 {eventDetails?.is_free == "Y" ? "Free" : "Paid"}
                     </button>
 
                     {isDropdownOpen && (
@@ -99,6 +156,12 @@ const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
                                             onClick={() => setIsDropdownOpen(false)}
                                         >
                                             {item.name}
+                                            {" "}
+                                            <small className="text-muted">
+                                                🧩 <b>{item.entry_type?.toUpperCase()}</b>
+                                                {" | "}
+                                                💰 <b>{item.is_free == "Y" ? "Free" : "Paid"}</b>
+                                            </small>
                                         </Link>
                                     </li>
                                 ))}

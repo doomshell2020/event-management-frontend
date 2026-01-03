@@ -439,18 +439,43 @@ const ManagePackages = () => {
                                                                         <i className="bi bi-box-seam me-1"></i>
                                                                         {pkg.name}
                                                                     </h5>
-                                                                    <small className="text-muted">
-                                                                        <i className="bi bi-sliders me-1"></i>
-                                                                        Limit: <strong>{pkg.package_limit}</strong>
+
+                                                                    <small className="text-muted d-block">
+                                                                        <i className="bi bi-stack me-1"></i>
+                                                                        Total Limit: <strong>{pkg.total_package ?? 0}</strong>
+                                                                    </small>
+
+                                                                    <small className="text-muted d-block">
+                                                                        <i className="bi bi-cart-check me-1"></i>
+                                                                        Sold: <strong>{pkg.sold_count ?? 0}</strong>
+                                                                    </small>
+
+                                                                    <small className="text-muted d-block">
+                                                                        <i className="bi bi-box-arrow-in-down me-1"></i>
+                                                                        Available:{" "}
+                                                                        <strong>
+                                                                            {pkg.total_package
+                                                                                ? Math.max(pkg.total_package - (pkg.sold_count ?? 0), 0)
+                                                                                : "Unlimited"}
+                                                                        </strong>
                                                                     </small>
                                                                 </div>
 
                                                                 {/* Center */}
                                                                 <div className="text-center">
-                                                                    <small className="text-muted">
-                                                                        <i className="bi bi-stack me-1"></i>
-                                                                        Total: <strong>{pkg.total_package}</strong>
-                                                                    </small>
+                                                                    {pkg.total_package && (
+                                                                        pkg.total_package - (pkg.sold_count ?? 0) <= 0 ? (
+                                                                            <span className="badge bg-danger px-3 py-2">
+                                                                                <i className="bi bi-x-circle me-1"></i>
+                                                                                Sold Out
+                                                                            </span>
+                                                                        ) : (
+                                                                            <span className="badge bg-success px-3 py-2">
+                                                                                <i className="bi bi-check-circle me-1"></i>
+                                                                                Available
+                                                                            </span>
+                                                                        )
+                                                                    )}
                                                                 </div>
 
                                                                 {/* Right */}
@@ -488,7 +513,6 @@ const ManagePackages = () => {
                                                                                         onClick={() => {
                                                                                             setPackageId(pkg.id);
                                                                                             setPackageForm({
-                                                                                                ...packageForm,
                                                                                                 name: pkg.name || "",
                                                                                                 limit: pkg.package_limit || "",
                                                                                                 visibility: pkg.hidden || "N",
@@ -507,8 +531,7 @@ const ManagePackages = () => {
                                                                                     <button
                                                                                         className="dropdown-item d-flex align-items-center gap-2"
                                                                                         onClick={() => {
-                                                                                            const newHidden =
-                                                                                                pkg.hidden === "Y" ? "N" : "Y";
+                                                                                            const newHidden = pkg.hidden === "Y" ? "N" : "Y";
 
                                                                                             api.put(`/api/v1/packages/update/${pkg.id}`, {
                                                                                                 hidden: newHidden,
@@ -552,6 +575,7 @@ const ManagePackages = () => {
                                                                     </div>
                                                                 </div>
                                                             </div>
+
 
                                                             {/* ===== Totals Section ===== */}
                                                             <div className="mt-3 small text-muted d-flex justify-content-between">

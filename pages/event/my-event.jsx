@@ -264,11 +264,11 @@ export default function OrganizerEvents({ userId }) {
                                                     <th style={{ width: "2%" }} scope="col">#</th>
                                                     <th style={{ width: "14%" }} scope="col">Image</th>
                                                     <th style={{ width: "8%" }} scope="col">Details</th>
+                                                    <th style={{ width: "18%" }} scope="col">Events Dates</th>
+                                                    <th style={{ width: "15%" }} scope="col">Action</th>
+                                                    {/* <th style={{ width: "16%" }} scope="col">Ticket Types</th> */}
                                                     {/* <th style={{ width: "17%" }} scope="col">Date and Time</th> */}
                                                     {/* <th style={{ width: "8%" }} scope="col">Venue</th> */}
-                                                    <th style={{ width: "18%" }} scope="col">Events Dates</th>
-                                                    {/* <th style={{ width: "16%" }} scope="col">Ticket Types</th> */}
-                                                    <th style={{ width: "15%" }} scope="col">Action</th>
                                                 </tr>
                                             </thead>
 
@@ -343,10 +343,9 @@ export default function OrganizerEvents({ userId }) {
                                                                     <small className="text-muted">
                                                                         🧩 <b>{event.entry_type?.toUpperCase()}</b>
                                                                         {" | "}
-                                                                        💰 <b>{event.is_free === "Y" ? "Free" : "Paid"}</b>
+                                                                        💰 <b>{event.is_free == "Y" ? "Free" : "Paid"}</b>
                                                                     </small>
                                                                 </td>
-
 
 
                                                                 {/* ✅ Dates */}
