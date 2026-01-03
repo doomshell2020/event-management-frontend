@@ -49,6 +49,7 @@ const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
                         `/event/edit-event/${eventDetails.id}/manage-addons`,
                         `/event/edit-event/${eventDetails.id}/manage-questions`,
                         `/event/edit-event/${eventDetails.id}/manage-packages`,
+                        `/event/edit-event/${eventDetails.id}/assign-ticket`,
                     ]
                 },
                 { serial: 3, label: "Publish Event", path: `/event/edit-event/${eventDetails.id}/publish-event`, subPaths: [] },

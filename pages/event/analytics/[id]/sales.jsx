@@ -94,11 +94,11 @@ const SalesPage = () => {
                                             <Link href={`/event/analytics/${id}/sales-addons`} className="text-16">Addons</Link>
                                         </li>
                                     </ul>
-                                    <div className="h-100" style={{ minWidth: "150px" }}>
+                                    {/* <div className="h-100" style={{ minWidth: "150px" }}>
                                         <button className="d-flex align-items-center gap-2 bg-dark text-white px-4 py-2 rounded text-sm fw-medium">
                                             Export Ticket
                                         </button>
-                                    </div>
+                                    </div> */}
                                 </div>
 
                                 <div className="contant_bg">

@@ -216,7 +216,7 @@ const ManageTickets = () => {
                                                     Settings
                                                 </Link>
                                             </li>
-                                            {eventDetails?.is_free == 'N' && (
+                                            {eventDetails?.is_free == 'N' ? (
                                                 <>
                                                     <li>
                                                         <Link href={`/event/edit-event/${id}/manage-addons`} className="text-16">
@@ -231,6 +231,14 @@ const ManageTickets = () => {
                                                     <li>
                                                         <Link href={`/event/edit-event/${id}/manage-packages`} className="text-16">
                                                             Package
+                                                        </Link>
+                                                    </li>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <li>
+                                                        <Link href={`/event/edit-event/${id}/assign-ticket`} className="text-16">
+                                                            Assign Ticket
                                                         </Link>
                                                     </li>
                                                 </>
