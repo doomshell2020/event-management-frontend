@@ -24,7 +24,7 @@ const EditAppointmentPage = () => {
     const [eventID, setEventID] = useState("");
     const noteRef = useRef(null);
     const [isLoading, setIsLoading] = useState(false);
-    const content = getHtmlEditorContent(noteRef);
+    // const content = getHtmlEditorContent(noteRef);
     const [editorData, setEditorData] = useState({ content: "" });
 
     const handleChange = (index, field, value) => {
@@ -114,6 +114,7 @@ const EditAppointmentPage = () => {
         event.preventDefault();
         event.stopPropagation();
         setIsLoading(true);
+        const content = getHtmlEditorContent(noteRef).trim();
         try {
             // ✅ Ensure slots is sent as JSON string
             const slotsJSON = JSON.stringify(slots);
@@ -123,7 +124,7 @@ const EditAppointmentPage = () => {
             body.append("currency", paymentCurrency);
             body.append("event_id", eventID);
             body.append("location", location || "");
-            body.append("description", content.trim());
+            body.append("description", content);
             body.append("slots", slotsJSON);
             body.append("tax_applied", isTaxApplied);
 
@@ -231,6 +232,7 @@ const EditAppointmentPage = () => {
                                                     </label>
                                                     <input
                                                         type="text"
+                                                        required
                                                         className="form-control rounded-0"
                                                         name="location"
                                                         value={location}
@@ -241,10 +243,11 @@ const EditAppointmentPage = () => {
 
                                                 {/* Currency */}
                                                 <div className="col-lg-2 col-md-6 mb-3">
-                                                    <label className="form-label">Currency</label>
+                                                    <label className="form-label">Currency <span className="text-danger">*</span></label>
                                                     <select
                                                         className="form-select rounded-0"
                                                         name="payment_currency"
+                                                        required
                                                         value={paymentCurrency}
                                                         onChange={(e) => setPaymentCurrency(e.target.value)}
                                                     >
@@ -263,6 +266,7 @@ const EditAppointmentPage = () => {
 
                                                     <select
                                                         className="form-select rounded-0"
+                                                        required
                                                         name="is_tax_applied"
                                                         value={isTaxApplied}
                                                         onChange={(e) => setIsTaxApplied(e.target.value)}
@@ -313,10 +317,18 @@ const EditAppointmentPage = () => {
                                                     <HtmlEditor
                                                         editorRef={noteRef}
                                                         initialContent={editorData.content}
+                                                        onChange={(content) => setEditorData({ ...editorData, content })}
+                                                    />
+
+
+
+                                                    {/* <HtmlEditor
+                                                        editorRef={noteRef}
+                                                        initialContent={editorData.content}
                                                         onChange={(content) =>
                                                             setEditorData({ ...editorData, content })
                                                         }
-                                                    />
+                                                    /> */}
                                                 </div>
 
                                             </div>
@@ -372,9 +384,14 @@ const EditAppointmentPage = () => {
                                                             </label>
                                                             <DatePicker
                                                                 selected={slot.date ? new Date(slot.date) : null}
-                                                                onChange={(date) =>
-                                                                    handleChange(index, "date", date.toISOString().split("T")[0])
-                                                                }
+                                                                // onChange={(date) =>
+                                                                //     handleChange(index, "date", date.toISOString().split("T")[0])
+                                                                // }
+                                                                onChange={(date) => {
+                                                                    const formattedDate = date.toLocaleDateString("en-CA"); // yyyy-mm-dd
+                                                                    handleChange(index, "date", formattedDate);
+                                                                }}
+                                                                required
                                                                 className="form-control"
                                                                 style={formControlStyle}
                                                                 minDate={new Date()}
@@ -403,6 +420,7 @@ const EditAppointmentPage = () => {
                                                                     });
                                                                     handleChange(index, "slot_start_time", dbTime);
                                                                 }}
+                                                                required
                                                                 showTimeSelect
                                                                 showTimeSelectOnly
                                                                 timeIntervals={5}
@@ -434,6 +452,7 @@ const EditAppointmentPage = () => {
                                                                     });
                                                                     handleChange(index, "slot_end_time", dbTime);
                                                                 }}
+                                                                required
                                                                 showTimeSelect
                                                                 showTimeSelectOnly
                                                                 timeIntervals={5}
@@ -457,7 +476,11 @@ const EditAppointmentPage = () => {
                                                                 className="form-control"
                                                                 style={formControlStyle}
                                                                 value={slot.price}
-                                                                onChange={(e) => handleChange(index, "price", e.target.value)}
+                                                                // onChange={(e) => handleChange(index, "price", e.target.value)}
+                                                                onChange={(e) => {
+                                                                    const value = e.target.value.replace(/[^0-9]/g, "");
+                                                                    handleChange(index, "price", value);
+                                                                }}
                                                             />
                                                         </div>
 
@@ -468,12 +491,16 @@ const EditAppointmentPage = () => {
                                                             </label>
 
                                                             <input
-                                                                type="number"
+                                                                type="text"
                                                                 required
                                                                 className="form-control"
                                                                 style={formControlStyle}
                                                                 value={slot.count}
-                                                                onChange={(e) => handleChange(index, "count", e.target.value)}
+                                                                // onChange={(e) => handleChange(index, "count", e.target.value)}
+                                                                onChange={(e) => {
+                                                                    const value = e.target.value.replace(/[^0-9]/g, "");
+                                                                    handleChange(index, "count", value);
+                                                                }}
                                                             />
                                                         </div>
 

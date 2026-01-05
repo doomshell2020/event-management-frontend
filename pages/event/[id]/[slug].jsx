@@ -131,6 +131,17 @@ const EventDetailPage = ({ event, slug }) => {
 
   // appointment cart...
   const handleOpenAppointmentCart = (slots, selectedSlots) => {
+    if (!token) {
+      Swal.fire({
+        icon: "warning",
+        title: "Login Required",
+        text: "Please log in to view your cart.",
+        confirmButtonText: "Login Now"
+      }).then(() => {
+        router.push("/login");
+      });
+      return;
+    }
     // Extract only IDs
     const selectedIds = selectedSlots.map(s => s.id);
     setSlotIds(selectedIds)
@@ -404,22 +415,22 @@ const EventDetailPage = ({ event, slug }) => {
         </div>
       </section>
 
-      <section className=" event-appointment-sec">
+      <section className="event-appointment-sec">
         <div className="container">
           {appointmentData?.length > 0 && (
             <>
               <h5 className="mb-4">Available Appointments</h5>
+
               <div className="row g-4">
                 {appointmentData.map((w) => (
                   <div
-                    className={`col-md-${appointmentData.length === 1 ? "12 only-single-cart" : "6"}`}
                     key={w.id}
+                    className={`col-md-${appointmentData.length === 1 ? "12 only-single-cart" : "6"
+                      }`}
                   >
-
-
                     <div className="card shadow-sm border-0 h-100">
+                      {/* IMAGE */}
                       <div className="event-appo-img">
-                        {/* Image */}
                         <img
                           src={w.Image}
                           className="card-img-top"
@@ -427,142 +438,158 @@ const EventDetailPage = ({ event, slug }) => {
                           alt={w.name}
                         />
                       </div>
+
                       <div className="card-body py-4">
+                        {/* TITLE */}
+                        <h6 className="fw-bold mb-1 text-uppercase">{w.name}</h6>
 
-                        {/* Title */}
-                        <h6 className="fw-bold mb-1 text-uppercase">
-                          {w.name}
-                        </h6>
-
-                        {/* Location */}
-                        <p className=" mb-2">
-                          <i className="bi bi-geo-alt-fill me-1"></i> {w.location}
+                        {/* LOCATION */}
+                        <p className="mb-2">
+                          <i className="bi bi-geo-alt-fill me-1"></i>
+                          {w.location}
                         </p>
 
-                        {/* Description */}
+                        {/* DESCRIPTION */}
                         <div
                           className="text-muted mb-3 card-description"
                           style={{ fontSize: "13px" }}
                           dangerouslySetInnerHTML={{ __html: w.description }}
                         />
 
-                        {/* Slots Section */}
-                        {w.wellnessSlots?.length > 0 && (
-                          <p className="fw-bold mb-2 text-dark">Select Slot:</p>
-                        )}
+                        <div className="py-3">
+                          <div className="appoinment-checkbtn">
+                            {(() => {
+                              const selectedForThis = selectedSlots[w.id] || [];
+                              const selectedCount = selectedForThis.length;
+                              const totalPrice = selectedForThis.reduce(
+                                (sum, s) => sum + Number(s.price),
+                                0
+                              );
 
-                        {/* WRAP EVERYTHING IN IIFE */}
-                        <div className="appoinment-checkbtn">
-                          {(() => {
-                            // per card selection values 
-                            const selectedForThis = selectedSlots[w.id] || [];
-                            const selectedCount = selectedForThis.length;
-                            const totalPrice = (selectedSlots[w.id] || []).reduce((sum, s) => sum + Number(s.price), 0);
-                            return (
-                              <>
-                                {/* SLOT LIST */}
-                                {w.wellnessSlots?.map((slot) => {
-                                  // const isSelected = selectedForThis.includes(slot.id);
-                                  const isSelected = (selectedSlots[w.id] || []).some((s) => s.id === slot.id);
-                                  return (
-
-                                    <div className="slot-btn"
-                                      key={slot.id}
-                                      onClick={() => toggleSlotSelection(w.id, slot)}
-                                      style={{
-                                        border: isSelected ? "2px solid #21a67a" : "1px solid #e1e1e1",
-                                        padding: "12px",
-                                        borderRadius: "9px",
-                                        marginBottom: "10px",
-                                        cursor: "pointer",
-                                        backgroundColor: isSelected ? "rgb(236 243 251)" : "#fff",
-                                        display: "flex",
-                                        justifyContent: "space-between",
-                                        alignItems: "center",
-                                        transition: "0.3s",
-                                      }}
-                                    >
-                                      {/* Checkbox */}
-                                      <input
-                                        type="checkbox"
-                                        className="form-check-input me-3"
-                                        checked={isSelected}
-                                        onChange={(e) => {
-                                          e.stopPropagation();
-                                          toggleSlotSelection(w.id, slot);
+                              return (
+                                <>
+                                  {/* SLOT LIST */}
+                                  {w.wellnessSlots?.map((slot) => {
+                                    const isSelected = selectedForThis.some(
+                                      (s) => s.id === slot.id
+                                    );
+                                    return (
+                                      <div
+                                        key={slot.id}
+                                        className="slot-btn"
+                                        onClick={() =>
+                                          toggleSlotSelection(w.id, slot)
+                                        }
+                                        style={{
+                                          border: isSelected
+                                            ? "2px solid #21a67a"
+                                            : "1px solid #e1e1e1",
+                                          padding: "12px",
+                                          borderRadius: "9px",
+                                          marginBottom: "10px",
+                                          cursor: "pointer",
+                                          backgroundColor: isSelected
+                                            ? "rgb(236 243 251)"
+                                            : "#fff",
+                                          display: "flex",
+                                          justifyContent: "space-between",
+                                          alignItems: "center",
                                         }}
-                                      />
+                                      >
+                                        {/* CHECKBOX */}
+                                        <input
+                                          type="checkbox"
+                                          className="form-check-input me-3"
+                                          checked={isSelected}
+                                          readOnly
+                                          style={{cursor:"pointer"}}
+                                        />
 
-                                      {/* DATE + TIME */}
-                                      <div style={{ fontSize: "14px" }}>
-                                        <div className="d-flex align-items-center gap-3">
+                                        {/* DATE & TIME */}
+                                        <div style={{ fontSize: "14px" }}>
+                                          <div className="d-flex align-items-center gap-3">
+                                            <span className="d-flex align-items-center">
+                                              <i className="bi bi-calendar me-1"></i>
+                                              <strong>
+                                                {formatReadableDate(slot.date)}
+                                              </strong>
+                                            </span>
 
-                                          <span className="d-flex align-items-center">
-                                            <i className="bi bi-calendar me-1"></i>
-                                            <strong>{formatReadableDate(slot.date)}</strong>
-                                          </span>
+                                            <span className="d-flex align-items-center">
+                                              <i className="bi bi-clock me-1"></i>
+                                              {formatTime(slot.slot_start_time)} -{" "}
+                                              {formatTime(slot.slot_end_time)}
+                                            </span>
+                                          </div>
+                                        </div>
 
-                                          <span className="d-flex align-items-center">
-                                            <i className="bi bi-clock me-1"></i>
-                                            {formatTime(slot.slot_start_time)} - {formatTime(slot.slot_end_time)}
-                                          </span>
-
+                                        {/* PRICE */}
+                                        <div
+                                          style={{
+                                            fontWeight: "bold",
+                                            color: "rgb(33, 166, 122)",
+                                            fontSize: "16px",
+                                          }}
+                                        >
+                                          {w?.currencyName?.Currency_symbol}{" "}
+                                          {slot.price}
                                         </div>
                                       </div>
+                                    );
+                                  })}
 
-                                      {/* PRICE */}
-                                      <div style={{ fontWeight: "bold", color: "rgb(33, 166, 122)", fontSize: "16px" }}>
-                                        {w?.currencyName?.Currency_symbol}{" "}{slot.price}
+                                  {/* SUMMARY */}
+                                  {selectedCount > 0 && (
+                                    <div
+                                      style={{
+                                        padding: "12px",
+                                        background: "#f8fdfb",
+                                        border: "1px solid #d7f2ea",
+                                        borderRadius: "8px",
+                                        marginBottom: "15px",
+                                        display: "flex",
+                                        justifyContent: "space-between",
+                                        fontSize: "14px",
+                                      }}
+                                    >
+                                      <div>{selectedCount} slots selected</div>
+                                      <div style={{ fontWeight: "bold" }}>
+                                        Total: {w?.currencyName?.Currency_symbol}{" "}
+                                        {totalPrice}
                                       </div>
                                     </div>
-                                  );
-                                })}
+                                  )}
 
-                                {/* SUMMARY BOX */}
-                                {selectedCount > 0 && (
-                                  <div
-                                    style={{
-                                      padding: "12px",
-                                      background: "#f8fdfb",
-                                      border: "1px solid #d7f2ea",
-                                      borderRadius: "8px",
-                                      marginTop: "10px",
-                                      marginBottom: "15px",
-                                      fontSize: "14px",
-                                      display: "flex",
-                                      justifyContent: "space-between",
-                                    }}
-                                  >
-                                    <div>{selectedCount} slots selected</div>
-                                    <div style={{ fontWeight: "bold" }}>
-                                      Total: {w?.currencyName?.Currency_symbol}{" "}{totalPrice}
+                                  {/* BOOK BUTTON */}
+                                  {w.wellnessSlots?.length > 0 && (
+                                    <div className="text-center">
+                                      <button
+                                        className="btn mt-3 w-100"
+                                        disabled={selectedCount === 0}
+                                        style={{
+                                          background:
+                                            selectedCount > 0
+                                              ? "#21a67a"
+                                              : "#9fd6c5",
+                                          color: "#fff",
+                                          borderRadius: "50px",
+                                          padding: "10px 30px",
+                                        }}
+                                        onClick={() =>
+                                          handleOpenAppointmentCart(
+                                            w,
+                                            selectedForThis
+                                          )
+                                        }
+                                      >
+                                        Book Appointment
+                                      </button>
                                     </div>
-                                  </div>
-                                )}
-
-                                {/* BOOK BUTTON */}
-                                {w.wellnessSlots?.length > 0 && (
-                                  <div className="text-center">
-                                    <button
-                                      className="btn mt-3 w-100"
-                                      disabled={selectedCount === 0}
-                                      style={{
-                                        background: selectedCount > 0 ? "#21a67a" : "#9fd6c5",
-                                        color: "#fff",
-                                        borderRadius: "50px",
-                                        padding: "10px 30px",
-                                        letterSpacing: ".5px",
-                                      }}
-                                      onClick={() => handleOpenAppointmentCart(w, selectedForThis)}
-                                    >
-                                      Book Appointment
-                                    </button>
-                                  </div>
-                                )}
-                              </>
-                            );
-                          })()}
-
+                                  )}
+                                </>
+                              );
+                            })()}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -573,6 +600,7 @@ const EventDetailPage = ({ event, slug }) => {
           )}
         </div>
       </section>
+
 
       {/* ✅ Cart Modal */}
       {

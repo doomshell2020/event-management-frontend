@@ -6,7 +6,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { Delete } from "../../redux/actions/action";
 import { useRouter } from "next/router";
 import Image from "next/image";
-
+import api from "@/utils/api";
+import Cookies from "js-cookie";
+import { handleAdminLogout } from "@/utils/logout";
 export default function Header() {
   const router = useRouter();
   const dispatch = useDispatch();
@@ -21,57 +23,49 @@ export default function Header() {
   const open = Boolean(anchorEl);
   const [Data, setData] = useState([]);
   const [profile, setProfile] = useState({});
-
-  // -------------------------
-  // Navigation
-  // -------------------------
-  const routeChange = (path = "/login") => router.push(path);
-
-  // -------------------------
-  // Logout
-  // -------------------------
-  const handleLogout = async () => {
-    try {
-      localStorage.removeItem("userAuthToken");
-      localStorage.removeItem("user");
-      sessionStorage.clear();
-
-      await fetch("/api/logout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ role: "admin" }),
-      });
-
-      routeChange("/admin");
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
-  };
-
+  const [loading, setLoading] = useState(true);
   // -------------------------
   // Fetch Admin Profile
   // -------------------------
   useEffect(() => {
-    const fetchProfile = async () => {
-      const token = localStorage.getItem("accessToken_");
-      if (!token) return routeChange("/admin");
-
+    const fetchUser = async () => {
       try {
-        const response = await fetch("/api/v1/users", {
-          headers: { Authorization: token },
-        });
+        const token = Cookies.get("adminAuthToken");
+        if (!token) {
+          router.push("/login");
+          return;
+        }
 
-        const data = await response.json();
-        if (data.success && data.data) setProfile(data.data);
-        else routeChange("/admin");
+        // ✅ Fetch user details from API
+        const res = await api.get("/api/v1/admin/auth/me");
+        if (res.data?.success) {
+          setProfile(res.data.data);
+        } else {
+          router.push("/admin/auth");
+        }
       } catch (error) {
-        console.error("Fetch profile error:", error.message);
-        routeChange("/admin");
+        console.error("Error fetching user profile:", error);
+        router.push("/admin/auth");
+      } finally {
+        setLoading(false);
       }
+
     };
 
-    fetchProfile();
-  }, []);
+    fetchUser();
+  }, [router]);
+
+
+
+
+
+
+
+
+
+
+
+
 
   // -------------------------
   // Cart Total
@@ -248,15 +242,16 @@ export default function Header() {
 
                     <Image
                       src={
-                        profile?.ImageURL
-                          ? `${process.env.NEXT_PUBLIC_S3_URL}/profiles/${profile.ImageURL}`
-                          : `${process.env.NEXT_PUBLIC_S3_URL}/profiles/dummy-user.png`
+                        profile?.profile_image
+                          ? profile.profile_image
+                          : "https://eboxtickets.com/images/admin.jpg"
                       }
                       alt="Profile"
                       width={100}
                       height={100}
                       className=""
                     />
+
 
 
                   </Dropdown.Toggle>
@@ -266,9 +261,9 @@ export default function Header() {
                         <div className="main-img-user">
                           <Image
                             src={
-                              profile?.ImageURL
-                                ? `${process.env.NEXT_PUBLIC_S3_URL}/profiles/${profile.ImageURL}`
-                                : `${process.env.NEXT_PUBLIC_S3_URL}/profiles/dummy-user.png`
+                              profile?.profile_image
+                                ? profile.profile_image
+                                : "https://eboxtickets.com/images/admin.jpg"
                             }
                             alt="Profile"
                             width={100}
@@ -278,8 +273,8 @@ export default function Header() {
                         </div>
                         <div className="ms-3 my-auto">
                           <h6 className="tx-15 font-weight-semibold mb-0">
-                            {profile.FirstName ? (
-                              <span>{profile.FirstName}</span>
+                            {profile.first_name ? (
+                              <span>{profile.first_name}</span>
                             ) : (
                               <span>---</span>
                             )}
@@ -298,7 +293,9 @@ export default function Header() {
                     <Link
                       href="#"
                       className="dropdown-item"
-                      onClick={handleLogout}
+                      onClick={() => {
+                        handleAdminLogout(router);
+                      }}
                     >
                       <i className="far fa-arrow-alt-circle-left"></i> Sign Out
                     </Link>

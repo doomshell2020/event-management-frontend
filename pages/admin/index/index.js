@@ -1,1094 +1,773 @@
-import React, { useEffect, useState } from "react";
-import Seo from "@/shared/layout-components/seo/seo";
-import Moment from "react-moment";
+import React, { useState, useEffect } from "react";
+import { Breadcrumb, Card, Col, Row, Modal, Button } from 'react-bootstrap';
+import Seo from '@/shared/layout-components/seo/seo';
+import ReactEcharts from "echarts-for-react";
+import dynamic from "next/dynamic";
+import api from "@/utils/api";
 import moment from "moment";
-import Image from "next/image";
-// import profilePic from '@/public/uploads/profiles/ImageURL_1721112510304.jpg'
-import {
-  useTable,
-  useSortBy,
-  useGlobalFilter,
-  usePagination,
-} from "react-table";
-import {
-  Breadcrumb,
-  Col,
-  Row,
-  Card,
-  ButtonGroup,
-  Spinner,
-  Button,
-  ProgressBar,
-  Dropdown,
-  Form,
-} from "react-bootstrap";
-import axios from "axios";
-import ContentLoader from "react-content-loader"
 import Link from "next/link";
+import Swal from "sweetalert2";
+import ContentLoader from "react-content-loader";
+const ReactApexChart = dynamic(() => import("react-apexcharts"), {
+  ssr: false,
+});
 
 
-export const COLUMNS = [
-  {
-    Header: "S.No",
-    accessor: (row, index) => index + 1,
-    className: "borderrigth",
-  },
-  {
-    Header: "Name",
-    accessor: "Name",
-    className: "borderrigth",
-  },
-  {
-    Header: "URL",
-    accessor: "VanityURL",
-    className: "borderrigth",
-  },
-  {
-    Header: "Created",
-    accessor: "updatedAt",
-    className: "borderrigth",
-    Cell: ({ row }) => <div></div>,
-  },
-];
+const BarChartLoader = () => (
+  <ContentLoader
+    speed={2}
+    width="100%"
+    height={300}
+    viewBox="0 0 400 300"
+    backgroundColor="#f3f3f3"
+    foregroundColor="#ecebeb"
+  >
+    <rect x="20" y="20" rx="4" ry="4" width="40" height="260" />
+    <rect x="80" y="80" rx="4" ry="4" width="40" height="200" />
+    <rect x="140" y="60" rx="4" ry="4" width="40" height="220" />
+    <rect x="200" y="100" rx="4" ry="4" width="40" height="180" />
+    <rect x="260" y="40" rx="4" ry="4" width="40" height="240" />
+    <rect x="320" y="90" rx="4" ry="4" width="40" height="190" />
+  </ContentLoader>
+);
+
+const PieChartLoader = () => (
+  <ContentLoader
+    speed={2}
+    width="100%"
+    height={300}
+    viewBox="0 0 400 300"
+    backgroundColor="#f3f3f3"
+    foregroundColor="#ecebeb"
+  >
+    <circle cx="200" cy="150" r="110" />
+  </ContentLoader>
+);
+
 
 const Dashboard = () => {
-  const [member, setMember] = useState([]);
-  const [event, setEvent] = useState([]);
-  const [TicketSoldData, setTicketSoldData] = useState("");
-  const [addonSales, setAddonSale] = useState({});
-  const [ticketPerDay, setTicketPerDay] = useState([]);
-  // const [selectedEvent, setSelectedEvent] = useState('ONDALINDA x MONTENEGRO 2024');
-  // const [selectedEvent, setSelectedEvent] = useState("O xCAREYES");
-  // const [selectedEvent, setSelectedEvent] = useState("ONDALINDA x MONTENEGRO 2025");
-  const [selectedEvent, setSelectedEvent] = useState("");
-  const [DATATABLE, setDataTable] = useState([]);
-  // const [eventId, setEventID] = useState(109);
-  const [eventId, setEventID] = useState('');
-  const [LastHousesBooked, setLastHousesBooked] = useState([]);
-  const [RecentlyBookedTickets, setRecentlyBookedTickets] = useState([]);
-
-  const [addonsSoldTierWise, setAddonsSoldTierWise] = useState([]);
-  const [ticketsSoldTierWise, setTicketsSoldTierWise] = useState([]);
-  // console.log(ticketsSoldTierWise)
-  const [ticketsAddonsSoldPerDays, setTicketsAddonsSoldPerDays] = useState([]);
-  const [last10MembersRegisters, setLast10MembersRegisters] = useState([]);
-  const [totalDonation, setTotalDonation] = useState(null);
-  const [currency, setCurrency] = useState(null);
-  const [totalRevenue, setTotalRevenue] = useState(null);
-  const [totalAddons, setTotalAddons] = useState(null);
-  const [totalSoldAddons, setTotalSoldAddons] = useState(null);
-
-  const [isLoading, setIsLoading] = useState(false);
-  // Step 2: Handle the selection change
-  const handleSelect = (eventName, eventID) => {
-    setEventID(eventID);
-    setSelectedEvent(eventName);
-    // callEventSoldApi(eventID);
-    callEventSoldApiV1(eventID);
-    callLastHouseBooked(eventID)
-    callRecentlyBookedTickets(eventID)
-  };
-
-  const tableInstance = useTable(
-    {
-      columns: COLUMNS,
-      data: DATATABLE,
+  const [chartLoading, setChartLoading] = useState(true);
+  const [pieLoading, setPieLoading] = useState(true);
+  const [pieChart, setPieChart] = useState({
+    labels: [],
+    series: []
+  });
+  const pieOptions = {
+    labels: pieChart.labels,
+    legend: {
+      position: "bottom"
     },
-    useGlobalFilter,
-    useSortBy,
-    usePagination
-  );
+    dataLabels: {
+      enabled: true,
+      formatter: (val) => `${val.toFixed(1)}%`
+    }
+  };
 
-  const {
-    getTableProps, // table props from react-table
-    headerGroups, // headerGroups, if your table has groupings
-    getTableBodyProps, // table body props from react-table
-    prepareRow, // Prepare the row (this function needs to be called for each row before getting the row props)
-    state,
-    setGlobalFilter,
-    page, // use, page or rows
-    nextPage,
-    previousPage,
-    canNextPage,
-    canPreviousPage,
-    pageOptions,
-    gotoPage,
-    pageCount,
-    setPageSize,
-  } = tableInstance;
+  const [chartData, setChartData] = useState(null);
+  const echarts = {
+    option: {
+      tooltip: { trigger: "axis" },
+      grid: { x: 40, y: 20, x2: 40, y2: 20 },
 
-  const { globalFilter, pageIndex, pageSize } = state;
+      xAxis: [{
+        type: "category",
+        data: chartData?.months || [],
+        axisLabel: { fontSize: 10, color: "#5f6d7a" }
+      }],
 
-  // Last 10 user registration
-  const handleViewmembers = async () => {
-    try {
-      const API_URL = `/api/v1/dashboard?key=submitApplication`;
-      const response = await axios.get(API_URL, {
-        headers: {
-          "Content-Type": "application/json",
+      yAxis: [{
+        type: "value",
+        axisLabel: { fontSize: 10, color: "#5f6d7a" }
+      }],
+
+      color: ["#38cab3", "#f74f75"],
+
+      series: [
+        {
+          name: "View Price",
+          type: "bar",
+          data: chartData?.view_price || []
         },
-      });
-      setMember(response.data.data);
-    } catch (error) {
-      // Handle errors
-      console.error("There was a problem with your Axios request:", error);
+        {
+          name: "Purchased Price",
+          type: "bar",
+          data: chartData?.purchased_price || []
+        }
+      ]
     }
   };
 
 
-  // All events name show
-  const handleViewEvents = async () => {
+
+
+  const [counts, setCounts] = useState(null);
+  const [tickets, setTickets] = useState([]);
+  const [events, setEvents] = useState([]);
+  const [staffList, setStaffList] = useState([]);
+  const [showStaffModal, setShowStaffModal] = useState(false);
+  const [loadingStaff, setLoadingStaff] = useState(false);
+  const [selectedEventId, setSelectedEventId] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // get dashboard counts
+  const getDashboardCounts = async () => {
     try {
-      const API_URL = `/api/v1/dashboard?key=allEvents`;
-      const response = await axios.get(API_URL, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      setEvent(response.data.data);
-      // console.log("--event--", response.data.data[0].Name)
-      // setEventID(response.data.data[0].id)
-      // Extract first id
-      if (response.data.data && response.data.data.length > 0) {
-        const firstId = response.data.data[0].id;
-        const firstEventName = response.data.data[0].Name;
-
-        setEventID(firstId); // Update state
-        callEventSoldApiV1(firstId);
-        callLastHouseBooked(firstId);
-        callRecentlyBookedTickets(firstId);
-        setSelectedEvent(firstEventName);
-
-        // Call API directly with firstId
-      } else {
-        console.log("No data available");
-      }
-    } catch (error) {
-      // Handle errors
-      console.error("There was a problem with your Axios request:", error);
+      setIsLoading(true);
+      const res = await api.get("/api/v1/admin/dashboard/dashboard-counts");
+      setCounts(res?.data?.data);
+    } catch (err) {
+      console.error("Error fetching dashboard counts:", err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // New api intigrate ondalinda setup tables data search
-  const callEventSoldApiV1 = async (eventId) => {
-    setIsLoading(true);
-    const API_URL = `/api/v1/dashboard`;
-    try {
-      const body = {
-        key: "dashboardData",
-        eventId: eventId,
-      };
 
-      const { data } = await axios.post(API_URL, body);
-      setLast10MembersRegisters(data.data.last10UsersRegisters);
-      setTicketsAddonsSoldPerDays(data.data.ticketSalesData);
-      setTicketsSoldTierWise(data.data.tierWiseTicketSalesArray);
-      setAddonsSoldTierWise(data.data.tierWiseAddonSalesArray);
-      setTotalRevenue(data.data.total_revenue);
-      setTotalDonation(data.data.total_donation);
-      setCurrency(data.data.currencySymbol);
-      setTotalAddons(data.data.total_addon_count);
-      setTotalSoldAddons(data.data.totaladdonSold);
+  // latest tickets....
+  const getLatestTickets = async () => {
+    try {
+      setIsLoading(true);
+      const res = await api.get("/api/v1/admin/dashboard/latest-tickets");
+      // console.log("res?.data?.data",res?.data?.data?.tickets)
+      setTickets(res?.data?.data?.tickets);
+    } catch (err) {
+      console.error("Error fetching dashboard counts:", err);
+    } finally {
       setIsLoading(false);
-    } catch (error) {
-      setIsLoading(false);
-      console.error("There was a problem with your Axios request:", error);
     }
   };
 
-  // last houses booked
-  const callLastHouseBooked = async (eventId) => {
-    setIsLoading(true);
-    const API_URL = `/api/v1/dashboard`;
+  // latest events....
+  const getLatestEvents = async () => {
     try {
-      const body = {
-        key: "getLastHousesBooked",
-        event_id: eventId,
-      };
-      const { data } = await axios.post(API_URL, body);
-      setLastHousesBooked(data?.data || []);
+      setIsLoading(true);
+      const res = await api.get("/api/v1/admin/dashboard/latest-events");
+      setEvents(res?.data?.data?.events);
+    } catch (err) {
+      console.error("Error fetching dashboard counts:", err);
+    } finally {
       setIsLoading(false);
-    } catch (error) {
-      setIsLoading(false);
-      console.error("There was a problem with your Axios request:", error);
     }
   };
-  // Recently booked tickets
-  const callRecentlyBookedTickets = async (eventId) => {
-    setIsLoading(true);
-    const API_URL = `/api/v1/dashboard`;
+  const getPaymentChart = async () => {
     try {
-      const body = {
-        key: "RecentlyBookedTicketsUser",
-        event_id: eventId,
-      };
-      const { data } = await axios.post(API_URL, body);
-      setRecentlyBookedTickets(data?.data || []);
-      setIsLoading(false);
-    } catch (error) {
-      setIsLoading(false);
-      console.error("There was a problem with your Axios request:", error);
+      setChartLoading(true);
+      const res = await api.get('/api/v1/admin/dashboard/payment-chart');
+      setChartData(res?.data?.data);
+    } catch (err) {
+      console.error("Chart API Error:", err);
+    } finally {
+      setChartLoading(false);
+    }
+  };
+
+  const getPaymentPieChart = async () => {
+    try {
+      setPieLoading(true);
+      const res = await api.get('/api/v1/admin/dashboard/payment-pie-chart');
+      setPieChart(res?.data?.data);
+    } catch (err) {
+      console.error("Pie chart API error:", err);
+    } finally {
+      setPieLoading(false);
     }
   };
 
 
   useEffect(() => {
-    handleViewmembers();
-    handleViewEvents();
-    // callEventSoldApi(eventId);
-    callEventSoldApiV1(eventId);
-    callLastHouseBooked(eventId);
-    callRecentlyBookedTickets(eventId);
+    getDashboardCounts();
+    getLatestTickets();
+    getLatestEvents();
+    getPaymentChart();
+    getPaymentPieChart();
   }, []);
+  const formatNumber = (value) => {
+    return new Intl.NumberFormat('en-IN').format(value || 0);
+  };
+  const formatCurrencyAmount = (row, key) => {
+    const symbol =
+      row?.order?.event?.currencyName?.Currency_symbol || "";
+    const amount = row?.order?.[key];
+    if (!amount) return "-";
+    return `${symbol} ${Number(amount).toLocaleString("en-IN")}`;
+  };
+
+  const formatAmount = (row, key) => {
+    const symbol = row?.currencyName?.Currency_symbol || "";
+    const value = Number(row?.[key] || 0);
+    return value > 0 ? `${symbol} ${value}` : "0";
+  };
+
+
+  const handleStatusToggle = async (id, currentStatus) => {
+    const newStatus = currentStatus === "Y" ? "N" : "Y";
+    const statusText = newStatus === "Y" ? "Activate" : "Deactivate";
+
+    const result = await Swal.fire({
+      title: `Are you sure?`,
+      text: `Do you want to ${statusText} this Event Organizer?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: `Yes, ${statusText}`,
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#20c997",
+      reverseButtons: true,
+    });
+
+    if (!result.isConfirmed) return;
+    try {
+      Swal.fire({
+        title: "Updating status...",
+        text: "Please wait",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
+      await api.put(`/api/v1/admin/events/update-status/${id}`, {
+        status: newStatus,
+      });
+      getLatestEvents();
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: `Status updated successfully`,
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      console.error("Status update failed", error);
+      Swal.fire({
+        icon: "error",
+        title: "Failed",
+        text: "Unable to update status. Please try again.",
+      });
+    }
+  };
+
+  // featured status
+  const handleFeaturedStatusChange = async (eventId, currentStatus) => {
+    const isCurrentlyFeatured = currentStatus === "Y";
+    const updatedStatus = isCurrentlyFeatured ? "N" : "Y";
+
+    const result = await Swal.fire({
+      title: "Confirm Action",
+      text: isCurrentlyFeatured
+        ? "Are you sure you want to remove this event from Featured?"
+        : "Are you sure you want to mark this event as Featured?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: isCurrentlyFeatured
+        ? "Yes, Remove Featured"
+        : "Yes, Mark as Featured",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#20c997",
+      reverseButtons: true,
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      Swal.fire({
+        title: "Updating Featured Status",
+        text: "Please wait...",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        didOpen: () => Swal.showLoading(),
+      });
+
+      await api.put(`/api/v1/admin/events/${eventId}/featured`, {
+        featured: updatedStatus,
+      });
+      // 🔁 IMPORTANT: Reload events from API
+      getLatestEvents();
+      Swal.fire({
+        icon: "success",
+        title: "Update Successful",
+        text: isCurrentlyFeatured
+          ? "The event has been removed from Featured."
+          : "The event has been marked as Featured.",
+        timer: 1500,
+        showConfirmButton: false,
+      });
 
 
 
-  const MyLoader = () => (
-    <ContentLoader
-      speed={1.5} // Slows down the animation
-      viewBox="0 0 400 100" // Adjusted size for larger content
-      backgroundColor="#f3f3f3"
-      foregroundColor="#ecebeb"
-    >
-      {/* Adjusted size for larger boxes */}
-      <rect x="0" y="0" rx="5" ry="5" width="100" height="20" />
-      <rect x="110" y="0" rx="5" ry="5" width="180" height="20" />
-      <rect x="150" y="60" rx="5" ry="5" width="80" height="20" />
-      <rect x="240" y="60" rx="5" ry="5" width="100" height="20" />
-      <rect x="30" y="60" rx="5" ry="5" width="120" height="20" />
-      <rect x="0" y="90" rx="5" ry="5" width="50" height="20" />
-      <rect x="30" y="30" rx="5" ry="5" width="180" height="20" />
-      <rect x="220" y="30" rx="5" ry="5" width="200" height="20" />
-    </ContentLoader>
-  );
+    } catch (error) {
+      console.error("Featured status update failed", error);
+
+      Swal.fire({
+        icon: "error",
+        title: "Update Failed",
+        text: "Unable to update featured status. Please try again.",
+      });
+    }
+  };
+
+
+  const handleView = (eventId) => {
+    setSelectedEventId(eventId);
+    setShowStaffModal(true);
+    fetchStaffList(eventId);
+  };
+  const fetchStaffList = async (eventId) => {
+    try {
+      setLoadingStaff(true);
+
+      const response = await api.get(
+        `/api/v1/admin/events/${eventId}/staff`
+      );
+      setStaffList(response?.data?.data?.staff || []);
+    } catch (error) {
+      console.error("Error fetching staff:", error);
+      setStaffList([]);
+    } finally {
+      setLoadingStaff(false);
+    }
+  };
+
+
+
+
+
+
 
 
 
   return (
-    <>
-      <Seo title={"Ondalinda Admin Dashboard"} />
-      <React.Fragment>
-        <div className="breadcrumb-header justify-content-between">
-          <div className="left-content">
-            <span className="main-content-title mg-b-0 mg-b-lg-1">
-              DASHBOARD
-            </span>
-          </div>
+    <div>
+      <Seo title={"Dashboard"} />
 
-          {/* <Card className="card custom-card">
-            <div className="card-body  px-3 py-4 d-flex flex-column justify-content-center">
-              <div className="d-flex justify-content-center">
-                <div className="flex-fill">
-         
-                        
-                  <div className="dash-brd-drp">
-                    <ButtonGroup className="w-100">
-                      <Dropdown className="w-100">
-                        <Dropdown.Toggle
-                          variant=""
-                          aria-expanded="false"
-                          aria-haspopup="true"
-                          className="btn  ripple btn-primary w-100"
-                          data-bs-toggle="dropdown"
-                          id="dropdownMenuButton"
-                          type="button"
-                        >
-                          {selectedEvent}
-                        </Dropdown.Toggle>
-                        <Dropdown.Menu
-                          className="dropdown-menu tx-13 w-100"
-                          style={{ margin: "0px" }}
-                        >
-                          {event.map((value, index) => {
-                            return (
-                              <Dropdown.Item
-                                key={index}
-                                href="#"
-                                onClick={() => handleSelect(value && value.Name, value.id)}
-                              >
-                                {value && value.Name ? value.Name : '---'}
-                              </Dropdown.Item>
-                            )
-                          })}
-                        </Dropdown.Menu>
-                      </Dropdown>
-                    </ButtonGroup>
-                  </div>
-
-                </div>
-              </div>
-            </div>
-          </Card> */}
-
-          <div className="justify-content-center mt-2">
-            <div className="d-flex align-items-center">
-              <div>
-                {/* <p className="text-danger mb-0 me-5"><strong className="text-danger">Note:-</strong><span>The data on the dashboard is currently static.</span></p> */}
-              </div>
-              <Breadcrumb>
-                <Breadcrumb.Item className=" tx-15" href="#!">
-                  Dashboard
-                </Breadcrumb.Item>
-                <Breadcrumb.Item active aria-current="page">
-                  Sales
-                </Breadcrumb.Item>
-              </Breadcrumb>
-            </div>
-          </div>
+      {/* <!-- breadcrumb --> */}
+      <div className="breadcrumb-header justify-content-between">
+        <div className="left-content">
+          <span className="main-content-title mg-b-0 mg-b-lg-1">Dashboard</span>
         </div>
-        {/* <!-- /breadcrumb --> */}
+        <div className="justify-content-center mt-2">
+          <Breadcrumb className="breadcrumb">
+            <Breadcrumb.Item
+              className="breadcrumb-item "
+              active
+              aria-current="page"
+            >
+              Dashboard
+            </Breadcrumb.Item>
+          </Breadcrumb>
+        </div>
+      </div>
 
-        {/* <!-- row --> */}
-        <Row>
-          <Col xl={12} lg={12} md={12} sm={12}>
-            <Row>
-              <Col sm={12} md={6} xl={3}>
-                <Card className="card custom-card admn-hm-crd" style={{ height: 140 }}>
-                  <div className="card-body  px-3 py-4 d-flex flex-column justify-content-center">
-                    <div className="d-flex justify-content-center">
-                      <div className="flex-fill">
-                        {/* <div className="d-flex mb-1 align-items-top justify-content-between">
-                          <h5 className="fw-semibold mb-0 lh-1  ">
-                            Open Events
-                          </h5>
-                        </div> */}
-                        <div className="dash-brd-drp">
-                          <ButtonGroup className="w-100">
-                            <Dropdown className="w-100">
-                              <Dropdown.Toggle
-                                variant=""
-                                aria-expanded="false"
-                                aria-haspopup="true"
-                                className="btn  ripple btn-primary w-100"
-                                data-bs-toggle="dropdown"
-                                id="dropdownMenuButton"
-                                type="button"
-                              >
-                                {/* ONDALINDA x MONTENEGRO 2024 */}
-                                {selectedEvent}
-                              </Dropdown.Toggle>
-                              <Dropdown.Menu
-                                className="dropdown-menu tx-13 w-100"
-                                style={{ margin: "0px" }}
-                              >
-                                {event.map((value, index) => {
-                                  return (
-                                    <Dropdown.Item
-                                      key={index}
-                                      href="#"
-                                      onClick={() =>
-                                        handleSelect(
-                                          value && value.Name,
-                                          value.id
-                                        )
-                                      }
-                                    >
-                                      {value && value.Name ? value.Name : "---"}
-                                    </Dropdown.Item>
-                                  );
-                                })}
-                              </Dropdown.Menu>
-                            </Dropdown>
-                          </ButtonGroup>
-                        </div>
-                      </div>
-                    </div>
+
+      <Row className="row-sm">
+        <Col >
+          <Card className=" bg-primary-gradient text-white ">
+            <Card.Body>
+              <Row className='g-0'>
+                <div style={{ width: "max-content", maxWidth: '30px' }}>
+                  <div className="icon1">
+                    <i style={{ fontSize: "35px" }} className="fe fe-users"></i>
                   </div>
-                </Card>
-              </Col>
-
-              <Col sm={12} md={6} xl={3}>
-                <Row>
-
-                  <Col sm={12}>
-                    <Card className="card custom-card admn-hm-crd" style={{ height: 140 }}>
-                      <div className="card-body p-3 d-flex flex-column justify-content-center">
-                        <div className="d-flex h-100">
-                          <div className="flex-fill flex-fill d-flex flex-column justify-content-between">
-                            {isLoading ? (
-                              <MyLoader />
-                            ) : (
-                              <div className="d-flex mb-1 align-items-top justify-content-between">
-                                <h6 className="fw-bold mb-0 lh-1  ">
-                                  Total Revenue
-                                </h6>
-                                <h6 className="fw-bold mb-0 lh-1">
-                                  <Link
-                                    href={`/admin/orders/?event=${encodeURIComponent(selectedEvent)}`}
-                                    target="_blank"
-                                    style={{ color: "blue", cursor: "pointer", textAlign: "right" }}
-                                  >
-                                    {/* {totalRevenue ? totalRevenue : 0} */}
-                                    {/* {totalRevenue ? new Intl.NumberFormat('en-IN').format(totalRevenue) : "0"} */}
-                                    {/* {totalRevenue
-                                      ? `${totalRevenue.replace(/(\d+)/, (match) =>
-                                        new Intl.NumberFormat('en-IN').format(Number(match))
-                                      )}`: "0"} */}
-                                    {currency && totalRevenue
-                                      ? `${currency} ${(totalRevenue).toLocaleString()}`
-                                      : "N/A"}
-                                  </Link>
-                                </h6>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </Card>
-                  </Col>
-                  {/* <Col sm={12}>
-                    <Card className="card custom-card admn-hm-crd" style={{ height: 58 }}>
-                      <div className="card-body p-3 d-flex flex-column justify-content-center">
-                        <div className="d-flex h-100">
-                          <div className="flex-fill flex-fill d-flex flex-column justify-content-between">
-                            {isLoading ? (
-                              <MyLoader />
-                            ) : (
-                              <div className="d-flex mb-1 align-items-top justify-content-between">
-                                <h6 className="fw-bold mb-0 lh-1  ">
-                                  Total Donation Amount
-                                </h6>
-                                <h6 className="fw-bold mb-0 lh-1  ">
-                                  <Link
-                                    href={`/admin/orders/donation?event=${encodeURIComponent(selectedEvent)}`}
-                                    target="_blank"
-                                    style={{ color: "blue", cursor: "pointer", textAlign: "right" }}
-                                  >
-                                    {currency && totalDonation
-                                      ? `${currency} ${(totalDonation).toLocaleString()}`
-                                      : "N/A"}
-                                  </Link>
-                                </h6>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </Card>
-                  </Col> */}
-                </Row>
-              </Col>
-
-              {/* Addons  */}
-              <Col sm={12} md={6} xl={3}>
-                <Card className="card custom-card admn-hm-crd" style={{ height: 140 }}>
-                  <div className="card-body p-3 d-flex flex-column justify-content-center">
-                    <div className="d-flex h-100">
-                      <div className=" flex-fill d-flex flex-column ">
-                        <div className="d-flex mb-1 align-items-top justify-content-between">
-                          <h6 className="fw-bold mb-2 lh-1  ">
-                            Total Number of Addons Sold
-                          </h6>
-                          <h6 className="fw-bold mb-2 lh-1">
-                            {isLoading ? (
-                              <MyLoader />
-                            ) : (
-                              <>
-                                <Link
-                                  href={`/admin/orders/scantickets?event_id=${eventId}&ticket_type=addon`}
-                                  target="_blank"
-                                  style={{ color: "blue", cursor: "pointer" }}
-                                >
-                                  {totalSoldAddons ? totalSoldAddons : 0}
-                                </Link>
-                                {" / "}
-                                {totalAddons ? totalAddons : 0}
-                              </>
-                            )}
-                          </h6>
-
-                        </div>
-                        {isLoading ? (
-                          <MyLoader />
-                        ) : (
-                          <>
-                            <div className="mb-0 d-flex justify-content-between fw-bold">
-                              <div
-                                className="d-flex flex-column"
-                                style={{ rowGap: "5px" }}
-                              >
-                                {addonsSoldTierWise.map((addon) => (
-                                  <p key={addon.tier} className="fw-bold mb-0" style={{ fontSize: "11px" }}>
-                                    {/* {addon.ticket_name} */}
-                                    {addon.ticket_name
-                                      .toLowerCase() // Pehle poore string ko lowercase karein
-                                      .split(" ") // Words me tod dein (space ke basis par)
-                                      .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Har word ka first letter capital karein
-                                      .join(" ")}
-                                  </p>
-                                ))}
-                              </div>
-                              <div
-                                className="d-flex flex-column"
-                                style={{ rowGap: "5px" }}
-                              >
-                                {addonsSoldTierWise.map((addon) => (
-                                  <p key={addon.tier} className="mb-0 fw-bold" style={{ fontSize: "11px" }}>
-                                    {addon.currencysymbol}{addon.per_ticket_price} {addon.currencyname}
-                                  </p>
-                                ))}
-                              </div>
-                              <div
-                                className="d-flex flex-column"
-                                style={{ rowGap: "5px" }}
-                              >
-                                {addonsSoldTierWise.map((addon) => (
-                                  <p key={addon.tier} className="mb-0 fw-bold" style={{ fontSize: "11px" }}>
-                                    <Link
-                                      href={`/admin/orders/order-details/${encodeURIComponent(selectedEvent || "")}?type=addon&ticketId=${addon.addonId}`}
-                                      target="_blank"
-                                      style={{ color: "blue", cursor: "pointer" }}
-                                    >
-                                      {addon.addons_sold > 0
-                                        ? addon.addons_sold
-                                        : 0}
-                                    </Link>
-
-                                  </p>
-                                ))}
-                              </div>
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    </div>
+                </div>
+                <Col style={{ flex: "1" }}>
+                  <div className="mt-0">
+                    <span className="text-white">Total Customers</span>
+                    <h2 className="text-white mb-0" style={{ fontSize: "20px" }}> {counts?.customers?.active || 0}/{counts?.customers?.inactive || 0}</h2>
                   </div>
-                </Card>
-              </Col>
+                </Col>
+              </Row>
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col >
+          <Card className="bg-danger-gradient text-white ">
+            <Card.Body>
+              <Row className='g-0'>
+                <div style={{ width: "max-content", maxWidth: '30px' }}>
+                  <div className="icon1">
+                    <i style={{ fontSize: "35px" }} className="fe fe-shopping-cart"></i>
+                  </div>
+                </div>
+                <Col style={{ flex: "1" }}>
+                  <div className="mt-0">
+                    <span className="text-white">Event Organizers</span>
+                    <h2 className="text-white mb-0" style={{ fontSize: "20px" }}>{counts?.organizers?.active || 0}/{counts?.organizers?.inactive || 0}</h2>
+                  </div>
+                </Col>
+              </Row>
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col >
+          <Card className="bg-secondary-gradient text-white ">
+            <Card.Body>
+              <Row className='g-0'>
+                <div style={{ width: "max-content", maxWidth: '30px' }}>
+                  <div className="icon1">
+                    <i style={{ fontSize: "35px" }} className="fe fe-bar-chart-2"></i>
+                  </div>
+                </div>
+                <Col style={{ flex: "1" }}>
+                  <div className="mt-0">
+                    <span className="text-white">Total Events</span>
+                    <h2 className="text-white mb-0" style={{ fontSize: "20px" }}>
+                      {counts?.events?.active || 0}/{counts?.events?.inactive || 0}
+                    </h2>
+                  </div>
+                </Col>
+              </Row>
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col >
+          <Card className="bg-warning-gradient text-white ">
+            <Card.Body>
+              <Row className='g-0'>
+                <div style={{ width: "max-content", maxWidth: '30px' }}>
+                  <div className="icon1">
+                    <i style={{ fontSize: "35px" }} className="fe fe-pie-chart"></i>
+                  </div>
+                </div>
+                <Col style={{ flex: "1" }}>
+                  <div className="mt-0">
+                    <span className="text-white">Total Sales</span>
+                    <h2 className="text-white mb-0" style={{ fontSize: "20px" }}>
+                      {formatNumber(counts?.total_sales)}
+                    </h2>
+                  </div>
+                </Col>
+              </Row>
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col >
+          <Card className="bg-info-gradient text-white ">
+            <Card.Body>
+              <Row className='g-0'>
+                <div style={{ width: "max-content", maxWidth: '30px' }}>
+                  <div className="icon1">
+                    <i style={{ fontSize: "35px" }} className="fe fe-pie-chart"></i>
+                  </div>
+                </div>
+                <Col style={{ flex: "1" }}>
+                  <div className="mt-0">
+                    <span className="text-white">Total Earning</span>
+                    <h2 className="text-white mb-0" style={{ fontSize: "20px" }}>
+                      {formatNumber(counts?.total_earning)}
+                    </h2>
+                  </div>
+                </Col>
+              </Row>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
 
-              {/* Ticket  */}
-              <Col sm={12} md={6} xl={3}>
-                <Card className="card custom-card admn-hm-crd" style={{ height: 140 }}>
-                  <div className="card-body p-3 d-flex flex-column justify-content-center">
-                    <div className="d-flex h-100">
-                      <div className="flex-fill d-flex flex-column ">
-                        <div className="d-flex mb-1 align-items-top justify-content-between">
-                          <h6 className="fw-bold mb-2 lh-1  ">
-                            Ticket Sales Tier Wise
-                          </h6>
-                          <h6 className="fw-bold mb-2 lh-1  ">
-                            {isLoading ? (
-                              <MyLoader />
-                            ) : (
-                              (() => {
-                                const totalSoldTickets = ticketsSoldTierWise.reduce(
-                                  (total, ticket) => total + ticket.tickets_sold,
-                                  0
-                                );
-                                const totalTickets = ticketsSoldTierWise.length > 0
-                                  ? ticketsSoldTierWise[0].total_ticket_count
-                                  : 0;
+      <Row className="row-sm">
+        <Col lg={8} md={12}>
+          <Card>
+            <Card.Body>
+              <div className="main-content-label mg-b-5">Payment Chart</div>
+              <div id="">
+                {chartLoading ? (
+                  <BarChartLoader />
+                ) : (
+                  <ReactEcharts
+                    option={echarts.option}
+                    style={{ height: "300px", width: "100%" }}
+                  />
+                )}
+              </div>
+            </Card.Body>
+          </Card>
+        </Col>
 
-                                return (
 
-                                  <p className="mb-0 fw-bold">
-                                    <Link
-                                      href={`/admin/orders/scantickets?event_id=${eventId}&ticket_type=ticket`}
-                                      target="_blank"
-                                      style={{ color: "blue", cursor: "pointer" }}
-                                    >
-                                      {totalSoldTickets > 0
-                                        ? totalSoldTickets
-                                        : "---"}{" "}
-                                    </Link>
-                                    / {totalTickets > 0 ? totalTickets : "---"}
-                                  </p>
-                                );
-                              })()
-                            )}
-                          </h6>
-                        </div>
+        <Col lg={4} md={12}>
+          <Card>
+            <Card.Header>
+              <h3 className="card-title">Payment Method</h3>
+            </Card.Header>
+            <Card.Body className="apexchart apexchart1">
+              {pieLoading ? (
+                <PieChartLoader />
+              ) : (
+                <ReactApexChart
+                  options={pieOptions}
+                  series={pieChart.series}
+                  type="pie"
+                  height={300}
+                />
+              )}
+              {/* <ReactApexChart
+                options={pieOptions}
+                series={pieSeries}
+                type="pie"
+                width="100%"
+              /> */}
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+      {/* latest events */}
+      <Row className="row-sm">
+        <Col lg={12} md={12}>
+          <Card>
+            <Card.Header>
+              <h3 className="card-title">Latest Events</h3>
+            </Card.Header>
+            <Card.Body >
+              <div className="table-responsive">
+                <table className="table table-bordered table-hover mb-0">
+                  <thead className="thead-light">
+                    <tr>
+                      <th>S No</th>
+                      <th>Organiser</th>
+                      <th>Event Name</th>
+                      <th>Date & Time</th>
+                      <th>Venue</th>
+                      <th>Ticket Types</th>
+                      <th>Total Sales</th>
+                      <th>Commission</th>
+                      <th>Featured</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
 
-                        {isLoading ? (
-                          // <Spinner
-                          //   animation="border"
-                          //   role="status"
-                          //   variant="primary"
-                          // >
-                          //   <span className="sr-only">Loading...</span>
-                          // </Spinner>
+                  <tbody>
+                    {events.map((value, index) => {
+                      const organizer = value?.Organizer;
+                      const eventName = value?.name || "---";
+                      const eventUrl = `/event/${value?.id}/${value?.slug}`;
+                      const fromDate = value?.date_from;
+                      const toDate = value?.date_to;
+                      const tickets = value?.tickets;
+                      const amount = formatAmount(value, "total_sales");
+                      const { id, featured } = value;
+                      const isFeatured = featured === "Y";
 
-                          <MyLoader />
-                        ) : (
-                          <div className="over">
-                            <div
-                              className="d-flex flex-column"
-                              style={{ columnGap: 20 }}
+                      return (
+                        <tr key={value.id}>
+                          <td>{index + 1}</td>
+                          <td>{organizer
+                            ? `${organizer.first_name || ""} ${organizer.last_name || ""}`.trim()
+                            : "-"}</td>
+                          <td>
+                            <Link href={eventUrl} target="_blank" rel="noopener noreferrer"
+                              style={{
+                                color: "#0d6efd",        // blue
+                                textDecoration: "underline",
+                                cursor: "pointer"
+                              }}
                             >
-                              {ticketsSoldTierWise.map((ticket, index) => (
-                                <div
-                                  key={index}
-                                  className="d-flex justify-content-between"
-                                  style={{ rowGap: 5 }}
-                                >
-                                  <div>
-                                    <p className="fw-bold mb-0" style={{ fontSize: "11px" }}>
-                                      {ticket.tier}
-                                    </p>
-                                  </div>
-
-                                  <div className="w-50 d-flex justify-content-between">
-                                    <p className="mb-0 fw-bold" style={{ fontSize: "11px" }}>
-                                      {ticket.currencysymbol}
-                                      {ticket.per_ticket_price.toLocaleString()}{" "}
-                                      {ticket.currencyname}
-                                    </p>
-                                    <p className="mb-0 fw-bold" style={{ fontSize: "11px" }}>
-                                      <Link
-                                        href={`/admin/orders/order-details/${encodeURIComponent(selectedEvent || "")}?type=ticket&ticketId=${ticket.ticketId}`}
-                                        target="_blank"
-                                        style={{ color: "blue", cursor: "pointer" }}
-                                      >
-                                        {ticket.tickets_sold}
-                                      </Link>
-                                    </p>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              </Col>
-            </Row>
-          </Col>
-
-          <Col xl={12} lg={12} md={12} sm={12}>
-            <Row>
-              <Col sm={12} md={6}>
-                <Card className="card admn-hm-crd overflow-hidden">
-                  <Card.Header className=" pb-1">
-                    <h3 className="card-title mb-2">
-                      Last 5 Submitted Application
-                    </h3>
-                  </Card.Header>
-                  <Card.Body className="p-0 customers mt-1">
-                    <div className="list-group list-lg-group list-group-flush">
-                      {isLoading ? (
-                        <MyLoader />
-                      ) : (
-                        <div className="list-group-item list-group-item-action border-0">
-                          {last10MembersRegisters.map((value, index) => {
-                            return (
-                              <div className="media mt-0 mb-3" key={index}>
-                                {value.ImageURL ? (
-                                  <Image
-                                    src={
-                                      value?.ImageURL
-                                        ? `${process.env.NEXT_PUBLIC_S3_URL}/profiles/${value.ImageURL}`
-                                        : "/imagenot/dummy-user.png"
-                                    }
-                                    alt="Description of the image"
-                                    width={100} // Specify width
-                                    height={100} // Specify height
-                                    className="avatar-lg rounded-circle me-3 my-auto shadow"
-                                  />
-                                ) : (
-                                  <Image
-                                    src="/uploads/profiles/default.png"
-                                    alt="No Image"
-                                    width={100} // Specify width
-                                    height={100} // Specify height
-                                    className="avatar-lg rounded-circle me-3 my-auto shadow"
-                                  />
-                                )}
-                                <div className="media-body">
-                                  <div className="d-flex align-items-center justify-content-between">
-                                    <div className="mt-0">
-                                      <h5 className="mb-1 tx-14 font-weight-sembold text-dark">
-                                        {value && value.LastName
-                                          ? value.LastName
-                                          : "---"}{" "}
-                                        {value && value.FirstName
-                                          ? value.FirstName
-                                          : "---"}
-                                      </h5>
-                                      <p className="mb-0 tx-12 text-muted">
-                                        Email:{" "}
-                                        {value && value.Email
-                                          ? value.Email
-                                          : "---"}
-                                      </p>
-                                    </div>
-
-                                    <div className="mt-0">
-                                      <p className="mb-0 tx-12 text-muted">
-                                        <div style={{ whiteSpace: "nowrap" }}>
-                                          <Moment format="DD-MMM-YYYY" utc>
-                                            {new Date(value.DateCreated)}
-                                          </Moment>
-                                        </div>
-                                      </p>
-                                    </div>
-                                  </div>
-                                </div>
+                              {eventName}
+                            </Link>
+                          </td>
+                          <td>
+                            <strong>From</strong> {fromDate
+                              ? moment(fromDate).format("DD MMM, YYYY hh:mm A")
+                              : "---"}<br />
+                            <strong>To</strong> {toDate
+                              ? moment(toDate).format("DD MMM, YYYY hh:mm A")
+                              : "---"}<br />
+                          </td>
+                          <td>{value.location ? value.location : "---"}</td>
+                          <td> {Array.isArray(tickets) && tickets.length > 0
+                            ? tickets.map((ticket, index) => (
+                              <div key={ticket.id || index}>
+                                {ticket.title || "---"}
                               </div>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  </Card.Body>
-                </Card>
-              </Col>
-
-              {/* Ticket  */}
-              <Col sm={12} md={3}>
-                <Card className="card overflow-hidden admn-hm-crd">
-                  <Card.Header className=" pb-1">
-                    <h3 className="card-title mb-2">Ticket Sold Per Day</h3>
-                  </Card.Header>
-                  <Card.Body className="p-0 customers mt-1">
-                    <div className="list-group list-lg-group list-group-flush">
-                      {isLoading ? (
-                        <MyLoader />
-                      ) : (
-                        <div className="list-group-item list-group-item-action border-0">
-                          {ticketsAddonsSoldPerDays.map((value, index) => {
-                            if (value.ticket_sold === 0) {
-                              return null;
-                            }
-                            return (
-                              <div className="media mt-0" key={index}>
-                                <div className="media-body">
-                                  <div className="d-flex align-items-center mb-3 justify-content-between">
-                                    <div className="mt-0">
-                                      <p className="mb-0 tx-12 text-muted">
-                                        <div style={{ whiteSpace: "nowrap" }}>
-                                          <Moment format="DD-MMM-YYYY" utc>
-                                            {value.date}
-                                          </Moment>
-
-                                        </div>
-                                      </p>
-                                    </div>
-                                    <span className="tx-14">
-                                      <span className="float-end ">
-                                        {value.ticket_sold}
-                                      </span>
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  </Card.Body>
-                </Card>
-              </Col>
-
-              {/* Addons  */}
-              <Col sm={12} md={3}>
-                <Card className="card overflow-hidden admn-hm-crd">
-                  <Card.Header className=" pb-1">
-                    <h3 className="card-title mb-2">Addons Sold Per Day</h3>
-                  </Card.Header>
-                  <Card.Body className="p-0 customers mt-1">
-                    <div className="list-group list-lg-group list-group-flush">
-                      {isLoading ? (
-                        <MyLoader />
-                      ) : (
-                        <div className="list-group-item list-group-item-action border-0">
-                          {ticketsAddonsSoldPerDays.map((item, index) => {
-                            if (item.ticket_sold === 0 || item.addon_sold === 0) {
-                              return null;
-                            }
-                            return (
-                              <div className="media mt-0" key={index}>
-                                <div className="media-body">
-                                  <div className="d-flex align-items-center mb-3 justify-content-between">
-                                    <div className="mt-0">
-                                      <p className="mb-0 tx-12 text-muted">
-                                        <div style={{ whiteSpace: "nowrap" }}>
-                                          <Moment format="DD-MMM-YYYY" utc>
-                                            {new Date(item.date)}
-                                          </Moment>
-                                        </div>
-                                      </p>
-                                    </div>
-                                    <span className="tx-14">
-                                      <span className="float-end ">
-                                        {item.addon_sold}
-                                      </span>
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  </Card.Body>
-                </Card>
-              </Col>
-            </Row>
-          </Col>
-
-
-
-          {/* comment  last houses booked and people who booked tickets */}
-          <Col xl={12} lg={12} md={12} sm={12}>
-            <Row>
-              <Col md={12} lg={6}>
-                <Card className="card admn-hm-crd overflow-hidden">
-                  <Card.Header className=" pb-1">
-                    <h3 className="card-title mb-2">
-                      Last 5 Booked Accommodations
-                    </h3>
-                  </Card.Header>
-                  <Card.Body className="p-0 customers mt-1">
-                    <div className="list-group list-lg-group list-group-flush">
-                      {isLoading ? (
-                        <MyLoader />
-                      ) : (
-                        <div className="list-group-item list-group-item-action border-0">
-                          {
-                            LastHousesBooked.map((valueOrder, index) => {
-                              // Prefer BookAccommodationInfo, else use first item in AccommodationExtensions
-                              const housingSource = valueOrder?.BookAccommodationInfo || valueOrder?.AccommodationExtensions?.[0] || null;
-                              const isExtended = !!valueOrder.AccommodationExtensions?.[0];
-
-                              const housingInfo = housingSource?.Housing || null;
-                              const checkInDate = housingSource?.check_in_date;
-                              const checkOutDate = housingSource?.check_out_date;
-                              const user = valueOrder?.User || {};
-
-                              return (
-                                <div key={index} className="media mt-0 mb-3" style={{ borderBottom: "1px solid #eee", paddingBottom: "10px", marginBottom: "10px" }}>
-                                  <div className="media-body m-view" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "10px" }}>
-
-                                    <div className="tickets_box" style={{ minWidth: "110px" }}>
-                                      {isExtended ? (
-                                        <span style={{ margin: 0, fontSize: "14px", color: "#999", cursor: "not-allowed" }}>
-                                          # {valueOrder?.OriginalTrxnIdentifier || "--"}
-                                        </span>
-                                      ) : (
-                                        <Link
-                                          title="View Order Details"
-                                          target="_blank"
-                                          href={`/admin/orders/${valueOrder?.OriginalTrxnIdentifier}`}
-                                        >
-                                          <h5 style={{ margin: 0, fontSize: "14px", color: "#0000ff" }}>
-                                            # {valueOrder?.OriginalTrxnIdentifier || "--"}
-                                          </h5>
-                                        </Link>
-                                      )}
-
-                                      <p style={{ margin: "4px 0 0 0", fontSize: "12px", color: "#6c757d", whiteSpace: "nowrap" }}>
-                                        <Moment format="DD-MMM-YYYY" utc>
-                                          {new Date(valueOrder?.created)}
-                                        </Moment>
-                                      </p>
-                                    </div>
-
-                                    <div style={{ flex: 1, minWidth: "200px" }}>
-                                      {housingInfo ? (
-                                        <Link
-                                          title="View Property Details"
-                                          target="_blank"
-                                          href={`/housing/${housingInfo?.Name?.replace(/ /g, "+") || ""}`}
-                                        >
-                                          <h5 style={{ margin: 0, fontSize: "14px", color: "#0000ff" }}>
-                                            {housingInfo?.Name || "--"}, {housingInfo?.HousingNeighborhood?.name || "--"}
-                                            {isExtended && (
-                                              <span style={{ color: "green" }}> (Extended)</span>
-                                            )}
-                                          </h5>
-
-                                        </Link>
-                                      ) : (
-                                        <h5 style={{ margin: 0, fontSize: "14px", color: "#6c757d" }}>-- No Housing Info --</h5>
-                                      )}
-
-                                      {checkInDate && checkOutDate && (
-                                        <p style={{ margin: "4px 0 0 0", fontSize: "12px", color: "#6c757d" }}>
-                                          {(() => {
-                                            const checkIn = new Date(checkInDate);
-                                            const checkOut = new Date(checkOutDate);
-                                            const sameMonth = checkIn.getUTCMonth() === checkOut.getUTCMonth() && checkIn.getUTCFullYear() == checkOut.getUTCFullYear();
-                                            const monthIn = checkIn.toLocaleDateString("en-US", { month: "short", timeZone: "UTC" });
-                                            const monthOut = checkOut.toLocaleDateString("en-US", { month: "short", timeZone: "UTC" });
-                                            const dayIn = checkIn.getUTCDate();
-                                            const dayOut = checkOut.getUTCDate();
-                                            const year = checkOut.getUTCFullYear();
-
-                                            return sameMonth
-                                              ? `${monthIn} ${dayIn} - ${dayOut}, ${year}`
-                                              : `${monthIn} ${dayIn} - ${monthOut} ${dayOut}, ${year}`;
-                                          })()}
-                                        </p>
-                                      )}
-
-                                    </div>
-
-                                    <div className="tickets_box" style={{ minWidth: "150px", textAlign: "right" }}>
-                                      <h5 style={{ margin: 0, fontSize: "14px", whiteSpace: "nowrap" }}>
-                                        {user?.FirstName || "--"} {user?.LastName || ""}
-                                      </h5>
-                                      <p style={{ margin: "4px 0 0 0", fontSize: "12px", color: "#6c757d", whiteSpace: "nowrap" }}>
-                                        {user?.Email || "--"}
-                                      </p>
-                                    </div>
-
-                                  </div>
-                                </div>
-                              );
-                            })
-
-                          }
-                        </div>
-
-
-                      )}
-                    </div>
-                  </Card.Body>
-                </Card>
-              </Col>
-
-              <Col md={12} lg={6}>
-                <Card className="card admn-hm-crd overflow-hidden">
-                  <Card.Header className="pb-1">
-                    <h3 className="card-title mb-2">
-                      Last 5 Booked Tickets / Addons
-                    </h3>
-                  </Card.Header>
-                  <Card.Body className="p-0 customers mt-1">
-                    <div className="list-group list-lg-group list-group-flush">
-                      {isLoading ? (
-                        <MyLoader />
-                      ) : (
-                        <div className="list-group-item list-group-item-action border-0">
-                          {RecentlyBookedTickets.map((value, index) => {
-                            const user = value.User || {};
-                            const ticketCount = value.TicketBooks?.length || 0;
-                            const addonCount = value.AddonBooks?.length || 0;
-
-                            return (
-                              <div className="m-view"
-                                key={index}
+                            ))
+                            : "---"}</td>
+                          <td>{amount}</td>
+                          <td>{formatAmount(value, "total_tax")}</td>
+                          <td>
+                            <div className="d-flex justify-content-center gap-2">
+                              <i
+                                className={`${isFeatured ? "fas" : "far"} fa-star`}
                                 style={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "space-between",
-                                  padding: "8px 0",
-                                  borderBottom: "1px solid #eee",
-                                  gap: "10px",
+                                  cursor: "pointer",
+                                  color: isFeatured ? "#f5c518" : "#333",
+                                  fontSize: "16px",
                                 }}
-                              >
-                                {/* ✅ Left: Order ID & Date */}
-                                <div className="tickets_box" style={{ minWidth: "140px" }}>
-                                  <Link
-                                    title="View Order Details"
-                                    target="_blank"
-                                    href={`/admin/orders/${value.OriginalTrxnIdentifier}`}>
-                                    <div
-                                      style={{
-                                        fontSize: "14px",
-                                        color: "#0000ff",
-                                        marginBottom: "3px",
-                                        fontWeight: 400, // normal
-                                      }}
-                                    >
-                                      # {value.OriginalTrxnIdentifier || "---"}
-                                    </div>
-                                  </Link>
-                                  <div
-                                    style={{
-                                      fontSize: "12px",
-                                      color: "#6c757d",
-                                      whiteSpace: "nowrap",
-                                      fontWeight: 400, // normal
-                                    }}
-                                  >
-                                    <Moment format="DD-MMM-YYYY" utc>
-                                      {new Date(value.created)}
-                                    </Moment>
-                                  </div>
-                                </div>
-
-                                {/* ✅ Middle: Ticket & Addon Count */}
-                                <div className="tickets_box"
-                                  style={{
-                                    minWidth: "120px",
-                                    textAlign: "center",
-                                  }}
-                                >
-                                  <div
-                                    style={{
-                                      fontSize: "13px",
-                                      color: "#444",
-                                      marginBottom: "2px",
-                                      fontWeight: 400, // normal
-                                    }}
-                                  >
-                                    Tickets: <span style={{ fontWeight: 400 }}>{ticketCount}</span>
-                                  </div>
-                                  <div
-                                    style={{
-                                      fontSize: "13px",
-                                      color: "#444",
-                                      fontWeight: 400, // normal
-                                    }}
-                                  >
-                                    Addons: <span style={{ fontWeight: 400 }}>{addonCount}</span>
-                                  </div>
-                                </div>
-
-                                {/* ✅ Right: User Info */}
-                                <div className="tickets_box"
-                                  style={{
-                                    minWidth: "150px",
-                                    textAlign: "right",
-                                  }}
-                                >
-                                  <div
-                                    style={{
-                                      fontSize: "14px",
-                                      color: "#343a40",
-                                      marginBottom: "3px",
-                                      fontWeight: 400, // normal
-                                    }}
-                                  >
-                                    {user.FirstName || "---"} {user.LastName || ""}
-                                  </div>
-                                  <div
-                                    style={{
-                                      fontSize: "12px",
-                                      color: "#6c757d",
-                                      whiteSpace: "nowrap",
-                                      fontWeight: 400, // normal
-                                    }}
-                                  >
-                                    {user.Email || "---"}
-                                  </div>
-                                </div>
+                                title={isFeatured ? "Remove from Featured" : "Mark as Featured"}
+                                onClick={() => handleFeaturedStatusChange(id, featured)}
+                              />
+                              <i
+                                className="fas fa-eye"
+                                style={{
+                                  cursor: "pointer",
+                                  color: "#333",
+                                  fontSize: "16px",
+                                }}
+                                title="View Staff"
+                                onClick={() => handleView(id)}
+                              />
+                            </div>
+                          </td>
+                          <td>
+                            <div className="d-flex flex-column align-items-center gap-1">
+                              <div className="form-check form-switch m-0">
+                                <input
+                                  className="form-check-input"
+                                  type="checkbox"
+                                  style={{ cursor: "pointer" }}
+                                  checked={value.status === "Y"}
+                                  onChange={() => handleStatusToggle(id, value.status)}
+                                />
                               </div>
-                            );
-                          })}
+                            </div>
+                          </td>
+                        </tr>
+                      )
+                    })}
 
-                        </div>
+                  </tbody>
+                </table>
+              </div>
+            </Card.Body>
+          </Card>
+        </Col> </Row>
+      <Row className="row-sm">
+        <Col lg={12} md={12}>
+          <Card>
+            <Card.Header>
+              <h3 className="card-title">Latest Sold Tickets</h3>
+            </Card.Header>
+            <Card.Body >
+              <div className="table-responsive">
+                <table className="table table-bordered table-hover mb-0">
+                  <thead className="thead-light">
+                    <tr>
+                      <th>S.No</th>
+                      <th>Purchase Date</th>
+                      <th>Ticket No.</th>
+                      <th>Event</th>
+                      <th>Event Date & Time</th>
+                      <th>Customer</th>
+                      {/* <th>Mobile</th> */}
+                      <th>Qty.</th>
+                      <th>Amount</th>
+                      <th>Commission</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tickets.map((value, index) => {
+                      const {
+                        ticket_id,
+                        addon_id,
+                        appointment_id
+                      } = value;
 
-                      )}
-                    </div>
-                  </Card.Body>
-                </Card>
-              </Col>
+                      const ticketNo =
+                        ticket_id ||
+                        addon_id ||
+                        appointment_id ||
+                        "-";
+                      const eventName = value?.order?.event?.name;
+
+                      const event = value?.order?.event;
+
+                      if (!event?.date_from || !event?.date_to) return "-";
+
+                      const user = value?.order?.user;
+
+                      if (!user) return <span>-</span>;
+
+                      const fullName =
+                        [user.first_name, user.last_name].filter(Boolean).join(" ");
+                      return (
+                        <tr key={value.id}>
+                          <td>{index + 1}</td>
+                          <td> {value?.order
+                            ? moment(value?.order?.created).format("DD MMM, YYYY hh:mm A")
+                            : "---"}</td>
+                          <td> {ticketNo}</td>
+                          <td>{eventName}</td>
+                          <td>
+                            <strong>From</strong> {moment(event.date_from).format("DD MMM, YYYY hh:mm A")}<br />
+                            <strong>To</strong>  {moment(event.date_to).format("DD MMM, YYYY hh:mm A")}
+                          </td>
+                          <td><b>Name:</b> {fullName || "-"}<br /><b>Email: </b>{user.email || "-"}<br /><b>Mobile: </b>{user.mobile || "-"}</td>
+                          {/* <td>+12687209926</td> */}
+                          <td>{value.count}</td>
+                          <td>{formatCurrencyAmount(value, "sub_total")}</td>
+                          <td>{formatCurrencyAmount(value, "tax_total")}</td>
+                        </tr>
+                      )
+                    })}
 
 
 
-            </Row>
-          </Col>
-          {/* <!-- </div> --> */}
-        </Row>
-      </React.Fragment>
-    </>
-  );
+                  </tbody>
+                </table>
+              </div>
+            </Card.Body>
+          </Card>
+        </Col>
+
+
+
+      </Row>
+
+
+
+
+
+
+      <Modal
+        show={showStaffModal}
+        onHide={() => setShowStaffModal(false)}
+        centered
+        size="lg"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>
+            Staff List
+            {staffList.length > 0 && ` (${staffList.length})`}
+          </Modal.Title>
+        </Modal.Header>
+
+        <Modal.Body>
+          {loadingStaff ? (
+            <div className="text-center py-4">Loading...</div>
+          ) : Array.isArray(staffList) && staffList.length > 0 ? (
+            <table className="table table-bordered mb-0">
+              <thead>
+                <tr>
+                  <th>S.No</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Mobile</th>
+                </tr>
+              </thead>
+              <tbody>
+                {staffList.map((staff, index) => (
+                  <tr key={staff.id || index}>
+                    <td>{index + 1}</td>
+                    <td>{staff.first_name}</td>
+                    <td>{staff.email}</td>
+                    <td>{staff.mobile}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <div className="text-center py-4 text-muted">
+              Staff not Available
+            </div>
+          )}
+        </Modal.Body>
+
+        <Modal.Footer>
+          <Button variant="primary" onClick={() => setShowStaffModal(false)}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+    </div>
+  )
 };
 
 Dashboard.layout = "Contentlayout";
