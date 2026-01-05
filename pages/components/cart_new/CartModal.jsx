@@ -1438,7 +1438,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                                             <input
                                                                                                 type="text"
                                                                                                 className="form-control"
-                                                                                                placeholder={q.question}
+                                                                                                placeholder={`Type your answer`}
                                                                                                 value={ticketAnswers?.[ticket.id]?.[q.id] || ""}
                                                                                                 onChange={(e) => handleQuestionChange(ticket.id, q.id, e.target.value)}
                                                                                             />

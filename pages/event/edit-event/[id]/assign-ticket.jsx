@@ -220,62 +220,30 @@ const AssignTicket = () => {
             return;
         }
 
+        const formData = new FormData();
+        formData.append("excel", excelFile);
+        formData.append("event_id", eventId);
+        formData.append("ticket_id", ticketId);
+
         try {
-            // 🔄 Show loading swal
-            Swal.fire({
-                title: "Importing committee members...",
-                text: "Please wait",
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-
-            const payload = {
-                from_event_id: selectedImportEvent.id,
-                to_event_id: id // 🔥 current event id
-            };
-
             const res = await api.post(
-                "/api/v1/committee/import-committee-members",
-                payload
+                "/api/v1/tickets/import-comps",
+                formData,
+                {
+                    headers: { "Content-Type": "multipart/form-data" }
+                }
             );
 
-            Swal.close();
-
             if (res.data.success) {
-                await fetchMembers(id);
-                Swal.fire({
-                    icon: "success",
-                    title: "Imported Successfully",
-                    text: `${res.data.data.imported} committee members imported`
-                });
-
-                // Optional: reset state
-                setEventSearchText("");
-                setSelectedImportEvent(null);
-                setIsEventSelected(false);
-
-            } else {
-                Swal.fire({
-                    icon: "info",
-                    title: "No Changes",
-                    text: res.data.message || "Nothing to import"
-                });
+                alert(`✅ ${res.data.message}`);
             }
-
-        } catch (error) {
-            Swal.close();
-            console.error(error);
-
-            Swal.fire({
-                icon: "error",
-                title: "Import Failed",
-                text: "Something went wrong while importing committee members"
-            });
+        } catch (err) {
+            console.error(err);
+            alert("❌ Failed to import Excel");
         }
     };
+
+    const [excelFile, setExcelFile] = useState(null);
 
     const [backgroundImage] = useState("/assets/front-images/about-slider_bg.jpg");
     const showLoader = loading || processing;
@@ -572,36 +540,39 @@ const AssignTicket = () => {
                                                 <div className="col-lg-4 col-md-12">
                                                     <div className="import_committee">
                                                         <h6 className="mt-1">Import Users List</h6>
-                                                        <form className="row g-3 align-items-center" onSubmit={handleImportExcel} >
-
+                                                        <form
+                                                            className="row g-3 align-items-center"
+                                                            onSubmit={handleImportExcel}
+                                                        >
                                                             <div className="col-12">
                                                                 <div className="input-group">
-
                                                                     <div className="input-group-text">
-                                                                        <i className="bi bi-search"></i>
+                                                                        <i className="bi bi-file-earmark-excel"></i>
                                                                     </div>
 
-                                                                    <div className="position-relative">
-                                                                        <input
-                                                                            type="file"
-                                                                            placeholder="Search Events by name"
-                                                                            className="form-control eventserach"
-
-                                                                            autoComplete="off"
-                                                                        />
-
-                                                                    </div>
-
-
+                                                                    <input
+                                                                        type="file"
+                                                                        className="form-control"
+                                                                        accept=".xlsx,.xls"
+                                                                        onChange={(e) => setExcelFile(e.target.files[0])}
+                                                                        required
+                                                                    />
                                                                 </div>
+                                                                <small className="text-muted">
+                                                                    Upload Excel file (.xlsx, .xls)
+                                                                </small>
                                                             </div>
 
                                                             <div className="col-12">
-                                                                <button type="submit" className="btn save next primery-button fw-normal w-100">
-                                                                    Import
+                                                                <button
+                                                                    type="submit"
+                                                                    className="btn save next primery-button fw-normal w-100"
+                                                                >
+                                                                    Import Users & Generate Tickets
                                                                 </button>
                                                             </div>
                                                         </form>
+
                                                     </div>
                                                 </div>
                                             </div>
