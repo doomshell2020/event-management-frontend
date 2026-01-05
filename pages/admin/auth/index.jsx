@@ -14,8 +14,8 @@ import { useAuth, login } from "@/shared/layout-components/layout/AuthContext";
 export default function Login() {
     // Firebase
       const router = useRouter();
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const [email, setEmail] = useState("admin@eboxtickets.com");
+    const [password, setPassword] = useState("passw0rd!");
     const [data, setData] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [validatedCustom, setValidatedCustom] = useState(false);
