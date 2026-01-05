@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from "react";
 import {
-    Modal,
     Card,
     Col,
     Row,
     Button,
     Spinner,
-    Alert,
-    Collapse,
 } from "react-bootstrap";
 import {
     useTable,
@@ -16,8 +13,6 @@ import {
     usePagination,
 } from "react-table";
 import Seo from "@/shared/layout-components/seo/seo";
-import axios from "axios";
-import Link from "next/link";
 import api from "@/utils/api";
 import Moment from "react-moment";
 import Swal from "sweetalert2";
@@ -61,13 +56,29 @@ export const CustomerList = () => {
                 </div>
             ),
         },
-         {
+        {
+            Header: "Created",
+            accessor: "created",
+            className: "borderrigth",
+            Cell: ({ row }) => (
+                <div>
+                    {row.original.createdAt ? (
+                        <Moment format="DD MMM YYYY">
+                            {row.original.createdAt}
+                        </Moment>
+                    ) : (
+                        "---"
+                    )}
+                </div>
+            ),
+        },
+        {
             Header: "Total Spends",
             accessor: "totalSpends",
             className: "borderrigth",
             Cell: ({ row }) => (
                 <div>
-                   {Number(row.original.total_spent || 0).toLocaleString('en-IN')}
+                    {Number(row.original.total_spent || 0).toLocaleString('en-IN')}
                 </div>
             ),
         },
@@ -93,12 +104,28 @@ export const CustomerList = () => {
                         </div>
 
                         {/* Resend Button */}
-                        {/* <button
-                            className="btn btn-primary btn-sm"
-                            onClick={() => handleSendEmail(row.original.id)}
-                        >
-                            Resend Verification Email
-                        </button> */}
+                        {status === "Y" ? (
+                            // ✅ Already Verified
+                            <button
+                                className="btn btn-success btn-sm d-flex align-items-center justify-content-center"
+                                style={{ width: "32px", height: "32px", cursor: "not-allowed" }}
+                                title="Email already verified"
+                                disabled
+                            >
+                                <i className="fe fe-check" />
+                            </button>
+                        ) : (
+                            // ❌ Not Verified → Resend Email
+                            <button
+                                className="btn btn-primary btn-sm d-flex align-items-center justify-content-center"
+                                style={{ width: "32px", height: "32px" }}
+                                title="Resend Verification Email"
+                                onClick={() => handleSendEmail(id)}
+                            >
+                                <i className="fe fe-mail" />
+                            </button>
+                        )}
+
 
                     </div>
                 );
@@ -134,57 +161,59 @@ export const CustomerList = () => {
 
     let navigate = useRouter();
     const [customers, setCustomers] = useState([]);
+    // console.log("----customers",customers)
     const [isLoading, setIsLoading] = useState(true);
 
-    // const handleSendEmail = async (id) => {
-    //     const result = await Swal.fire({
-    //         title: "Are you sure?",
-    //         text: "Do you want to resend the verification email to this customer?",
-    //         icon: "warning",
-    //         showCancelButton: true,
-    //         confirmButtonText: "Yes, Send Email",
-    //         cancelButtonText: "Cancel",
-    //         confirmButtonColor: "#20c997",
-    //         reverseButtons: true,
-    //     });
+    const handleSendEmail = async (id) => {
+        const result = await Swal.fire({
+            title: "Are you sure?",
+            text: "Do you want to resend the verification email to this customer?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, Send Email",
+            cancelButtonText: "Cancel",
+            confirmButtonColor: "#20c997",
+            reverseButtons: true,
+        });
 
-    //     // If user clicks Cancel
-    //     if (!result.isConfirmed) return;
+        if (!result.isConfirmed) return;
 
-    //     try {
-    //         Swal.fire({
-    //             title: "Sending email...",
-    //             text: "Please wait",
-    //             allowOutsideClick: false,
-    //             allowEscapeKey: false,
-    //             didOpen: () => {
-    //                 Swal.showLoading();
-    //             },
-    //         });
+        try {
+            Swal.fire({
+                title: "Sending email...",
+                text: "Please wait",
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                didOpen: () => Swal.showLoading(),
+            });
 
-    //         await api.post(`/api/v1/admin/customers/resend-verification-email/${id}`);
+            await api.post(`/api/v1/admin/customers/resend-verification-email`, {
+                userId: id,
+            });
 
-    //         Swal.fire({
-    //             icon: "success",
-    //             title: "Email Sent",
-    //             text: "Verification email has been sent successfully.",
-    //             timer: 1500,
-    //             showConfirmButton: false,
-    //         });
-    //     } catch (error) {
-    //         console.error("Email sending failed", error);
+            Swal.fire({
+                icon: "success",
+                title: "Email Sent",
+                text: "Verification email has been sent successfully.",
+                timer: 1500,
+                showConfirmButton: false,
+            });
 
-    //         Swal.fire({
-    //             icon: "error",
-    //             title: "Failed",
-    //             text: "Unable to send verification email. Please try again.",
-    //         });
-    //     }
-    // };
+        } catch (error) {
+            console.error("Email sending failed", error);
 
+            // ✅ Extract API message safely
+            const apiMessage =
+                error?.response?.data?.message ||
+                "Unable to send verification email. Please try again.";
 
-
-
+            Swal.fire({
+                icon: "error",
+                title: "Failed",
+                text: apiMessage,
+            });
+        }
+    };
 
     const handleStatusToggle = async (id, currentStatus) => {
         const newStatus = currentStatus === "Y" ? "N" : "Y";
@@ -289,9 +318,6 @@ export const CustomerList = () => {
 
     const { globalFilter, pageIndex, pageSize } = state;
     useEffect(() => { setPageSize(50) }, []);
-    const handleEdit = (id) => {
-        navigate.push(`/admin/event-organizers/${id}`);
-    };
 
     return (
         <div>

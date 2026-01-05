@@ -22,11 +22,7 @@ import Swal from "sweetalert2";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import moment from "moment";
-import { useRouter } from "next/router";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 import pdfMake from "pdfmake/build/pdfmake";
-import pdfFonts from "pdfmake/build/vfs_fonts";
 import Link from "next/link";
 
 export const Events = () => {

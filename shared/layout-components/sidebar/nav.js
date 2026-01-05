@@ -90,7 +90,7 @@ export const MENUITEMS = [
  {
     Items: [
       {
-        title: "Customer Manager",
+        title: "Customers",
         icon: (
           <svg
             className="side-menu__icon"
@@ -119,7 +119,7 @@ export const MENUITEMS = [
   {
     Items: [
       {
-        title: "Event Manager",
+        title: "Events",
         icon: (
           <svg
             className="side-menu__icon"
@@ -144,7 +144,7 @@ export const MENUITEMS = [
   {
     Items: [
       {
-        title: "Order Manager",
+        title: "Orders",
         icon: (
           <svg
             className="side-menu__icon"
@@ -170,7 +170,7 @@ export const MENUITEMS = [
   {
     Items: [
       {
-        title: "Ticket Manager",
+        title: "Tickets",
         icon: (
           <svg
             className="side-menu__icon"
@@ -195,7 +195,7 @@ export const MENUITEMS = [
   {
     Items: [
       {
-        title: "Static Manager",
+        title: "Static",
         icon: (
           <svg
             className="side-menu__icon"
@@ -267,7 +267,7 @@ export const MENUITEMS = [
   {
     Items: [
       {
-        title: "Seo Manager",
+        title: "Seo",
         icon: (
           <svg
             className="side-menu__icon"

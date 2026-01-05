@@ -7,7 +7,7 @@ export default function Footer() {
     <div className="main-footer">
       <Col md={12} sm={12} className=" text-center">
         <div className="container-fluid pt-0 ht-100p">
-          Copyright © 2025{" "}
+          Copyright © 2026{" "}
           <Link href="#!" className="text-primary">
             eboxtickets.com
           </Link>
