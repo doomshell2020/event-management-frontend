@@ -1,22 +1,38 @@
 import { formatPrice } from "@/utils/commonFunction";
 import { format } from "date-fns";
 
-const OrderItemCard = ({ currencyInfo, item, orderData, handleCancelAppointment }) => {
-    const isTicket = item.type == "ticket";
-    const isAppointment = item.type == "appointment";
-    const isAddon = item.type == "addon";
-    const isPackage = item.type == "package";
-    const isCommitteeSale = item.type == "committesale";
+const OrderItemCard = ({
+    currencyInfo,
+    item,
+    orderData,
+    handleCancelAppointment,
+    baseUrls
+}) => {
+    const type = item?.type;
 
+    const isTicket = type == "ticket";
+    const isAppointment = type == "appointment";
+    const isAddon = type == "addon";
+    const isPackage = type == "package";
+    const isCommitteeSale = type == "committesale";
+    const isComps = type == "comps";
 
-    const currency = orderData?.event?.currencyName?.Currency_symbol || "";
+    // Complimentary / Free logic
+    const isFreeTicket =
+        isComps ||
+        isCommitteeSale ||
+        ((isTicket || isComps) && Number(item?.price) == 0);
+
+    // Currency
+    const currency =
+        orderData?.event?.currencyName?.Currency_symbol || "";
     const currencySymbol = isAppointment
         ? currency
         : currencyInfo?.Currency_symbol || "";
 
-    // 🔹 Title
+    // Title
     const title =
-        isTicket || isCommitteeSale
+        isTicket || isCommitteeSale || isComps
             ? "Ticket"
             : isAppointment
                 ? "Appointment"
@@ -24,30 +40,30 @@ const OrderItemCard = ({ currencyInfo, item, orderData, handleCancelAppointment 
                     ? "Addon"
                     : "Package";
 
-
-
-    // 🔹 Name mapping (CORRECT)
+    // Item Name
     const itemName =
-        isTicket || isCommitteeSale
-            ? item.ticketType?.title
+        isTicket || isCommitteeSale || isComps
+            ? item?.ticketType?.title
             : isAddon
-                ? item.addonType?.name
+                ? item?.addonType?.name
                 : isPackage
-                    ? item.package?.name
+                    ? item?.package?.name
                     : isAppointment
-                        ? item.appointment?.wellnessList?.name
+                        ? item?.appointment?.wellnessList?.name
                         : "";
 
-
     return (
-        <div className="mb-3 p-3 border rounded bg-white">
+        <div className="mb-3 p-3 border rounded-3 bg-white shadow-sm">
 
             {/* HEADER */}
-            <div className="d-flex justify-content-between mb-2">
+            <div className="d-flex justify-content-between align-items-start mb-3">
                 <div>
-                    <strong>{title}</strong>
+                    <div className="fw-semibold fs-6">
+                        {title}
+                    </div>
+
                     {itemName && (
-                        <div className="text-muted text-14">
+                        <div className="text-muted small">
                             {itemName}
                         </div>
                     )}
@@ -55,47 +71,55 @@ const OrderItemCard = ({ currencyInfo, item, orderData, handleCancelAppointment 
 
                 {isAppointment && (
                     <button
-                        className="btn btn-danger btn-sm"
-                        disabled={item.cancel_status == "cancel"}
-                        onClick={() => handleCancelAppointment(item.id)}
+                        className="btn btn-outline-danger btn-sm"
+                        disabled={item?.cancel_status == "cancel"}
+                        onClick={() => handleCancelAppointment(item?.id)}
                     >
-                        {item.cancel_status == "cancel"
+                        {item?.cancel_status == "cancel"
                             ? "Cancelled"
-                            : "Cancel Appointment"}
+                            : "Cancel"}
                     </button>
                 )}
             </div>
 
             <div className="row align-items-center">
 
-                {/* QR */}
-                <div className="col-md-3 text-center">
-                    {item.qr_image && (
-                        <img
-                            src={item.qr_image}
-                            alt="QR"
-                            className="border rounded p-2"
-                            style={{ width: "110px" }}
-                        />
-                    )}
-                </div>
+                {/* LEFT CONTENT */}
+                <div className="col-md-8">
 
-                {/* DETAILS */}
-                <div className="col-md-9">
-
-                    {/* DATE (Appointment only) */}
-                    {isAppointment && item.slot?.slot_date && (
-                        <div className="mb-1">
-                            <strong>Date & Time :</strong>{" "}
-                            {format(new Date(item.slot.slot_date), "EEE, dd MMM yyyy")}
+                    {isAppointment && item?.slot?.slot_date && (
+                        <div className="mb-2 text-muted small">
+                            <strong>Date:</strong>{" "}
+                            {format(
+                                new Date(item.slot.slot_date),
+                                "EEE, dd MMM yyyy"
+                            )}
                         </div>
                     )}
 
-                    {/* PRICE */}
-                    <div className="fw-bold text-success">
-                        Amount : {currencySymbol}{formatPrice(item.price)}
-                    </div>
+                    {/* PRICE / FREE */}
+                    {isFreeTicket ? (
+                        <div className="px-3 py-2 rounded bg-light text-secondary fw-semibold d-inline-block">
+                            Complimentary
+                        </div>
+                    ) : (
+                        <div className="px-3 py-2 rounded bg-success bg-opacity-10 text-success fw-bold d-inline-block">
+                            {currencySymbol}{formatPrice(item?.price)}
+                        </div>
+                    )}
+                </div>
 
+                {/* QR SECTION */}
+                <div className="col-md-4 d-flex justify-content-md-end justify-content-start mt-3 mt-md-0">
+                    {item?.qr_image && (
+                        <div className="border rounded-3 p-2 bg-light">
+                            <img
+                                src={`${baseUrls?.qr_image_url}${item.qr_image}`}
+                                alt="QR Code"
+                                style={{ width: "110px" }}
+                            />
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

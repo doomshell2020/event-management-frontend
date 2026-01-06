@@ -2,7 +2,7 @@ import { formatPrice } from "@/utils/commonFunction";
 
 
 const PaymentSummary = ({ orderData }) => {
-// console.log('orderData :', orderData);
+console.log('orderData :', orderData);
     const currency =
         orderData?.event?.currencyName?.Currency_symbol || "";
 

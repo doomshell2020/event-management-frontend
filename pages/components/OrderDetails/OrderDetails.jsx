@@ -2,7 +2,7 @@ import OrderItemCard from "./OrderItemCard";
 import PaymentSummary from "./PaymentSummary";
 import { format } from "date-fns";
 
-const OrderDetails = ({ orderData, handleCancelAppointment }) => {
+const OrderDetails = ({ orderData, handleCancelAppointment, baseUrls }) => {
     if (!orderData) return null;
 
     const { event, orderItems } = orderData;
@@ -57,6 +57,7 @@ const OrderDetails = ({ orderData, handleCancelAppointment }) => {
                         item={item}
                         orderData={orderData}
                         handleCancelAppointment={handleCancelAppointment}
+                        baseUrls={baseUrls}
                     />
                 ))}
             </div>

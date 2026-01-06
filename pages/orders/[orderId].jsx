@@ -15,8 +15,9 @@ export default function MyOrdersDetails() {
     );
 
     const [orderData, setOrderData] = useState(null);
-    const [loading, setLoading] = useState(true);
     // console.log('orderData :', orderData);
+    const [baseUrls, setBaseUrls] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     const fetchOrders = useCallback(async () => {
         if (!orderId) return;
@@ -25,6 +26,7 @@ export default function MyOrdersDetails() {
         try {
             const res = await api.get(`/api/v1/orders/details/${orderId}`);
             if (res.data?.success) {
+                setBaseUrls(res.data.base_urls);
                 setOrderData(res.data.data);
             } else {
                 setOrderData(null);
@@ -142,6 +144,7 @@ export default function MyOrdersDetails() {
                                 <OrderDetails
                                     orderData={orderData}
                                     handleCancelAppointment={handleCancelAppointment}
+                                    baseUrls={baseUrls}
                                 />
                             </div>
                         </div>
