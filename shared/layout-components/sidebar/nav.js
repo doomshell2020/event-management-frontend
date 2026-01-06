@@ -87,7 +87,7 @@ export const MENUITEMS = [
     ]
   },
 
- {
+  {
     Items: [
       {
         title: "Customers",
@@ -166,7 +166,31 @@ export const MENUITEMS = [
       },
     ],
   },
-
+  {
+    Items: [
+      {
+        title: "Payouts",
+        icon: (
+          <svg
+            className="side-menu__icon"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            width="24"
+            height="24"
+          >
+            {/* Wallet + Money icon */}
+            <path d="M21 7H5a3 3 0 00-3 3v6a3 3 0 003 3h16a3 3 0 003-3v-6a3 3 0 00-3-3zm1 9a1 1 0 01-1 1H5a1 1 0 01-1-1v-6a1 1 0 011-1h16a1 1 0 011 1v6z" />
+            <path d="M16 12a2 2 0 100 4 2 2 0 000-4z" />
+            <path d="M3 6V5a3 3 0 013-3h10v2H6a1 1 0 00-1 1v1H3z" />
+          </svg>
+        ),
+        type: "link",
+        selected: false,
+        active: false,
+        path: `/admin/payouts`,
+      },
+    ],
+  },
   {
     Items: [
       {
