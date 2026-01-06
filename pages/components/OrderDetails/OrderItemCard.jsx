@@ -38,7 +38,7 @@ const OrderItemCard = ({
                 ? "Appointment"
                 : isAddon
                     ? "Addon"
-                    : "Package";
+                    : "Unknown Item";
 
     // Item Name
     const itemName =

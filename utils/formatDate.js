@@ -24,6 +24,8 @@
 //     }
 // };
 
+import moment from "moment-timezone";
+
 export const formatDateTime = (
     dateString,
     timezone = null,
@@ -52,8 +54,6 @@ export const formatDateTime = (
     }
 };
 
-
-
 export const formatDateTimeShort = (dateString) => {
     if (!dateString) return "";
 
@@ -74,4 +74,16 @@ export const formatDateTimeShort = (dateString) => {
         console.error("Invalid date:", dateString);
         return "";
     }
+};
+
+export const formatEventDateTime = (
+    date,
+    timezone,
+    format = "ddd, DD MMM YYYY | hh:mm A"
+) => {
+    if (!date) return "N/A";
+
+    return moment(date)
+        .tz(timezone || "UTC")
+        .format(format);
 };
