@@ -15,6 +15,7 @@ export default function MyOrdersDetails() {
     );
 
     const [orderData, setOrderData] = useState(null);
+    const [baseUrls, setBaseUrls] = useState(null);
     const [loading, setLoading] = useState(true);
 
     // ===============================
@@ -27,6 +28,7 @@ export default function MyOrdersDetails() {
         try {
             const res = await api.get(`/api/v1/orders/details/${orderId}`);
             if (res.data?.success) {
+                setBaseUrls(res.data.base_urls);
                 setOrderData(res.data.data);
             } else {
                 setOrderData(null);
@@ -98,10 +100,10 @@ export default function MyOrdersDetails() {
         <>
             <FrontendHeader backgroundImage={backgroundImage} />
 
-            <section id="event-detail-page" className="pt-5">
+            <section id="event-detail-page" className="pt-4 pt-lg-5">
                 <div className="container">
                     <div className="section-heading">
-                        <h1 className="mb-3">Order Details</h1>
+                        <h1 className="mb-3 order-detail-title">Order Details</h1>
                         {/* <h2 className="mt-4"></h2> */}
                     </div>
 
@@ -128,15 +130,15 @@ export default function MyOrdersDetails() {
                                 {/* LEFT IMAGE */}
                                 <div className="col-md-5">
                                     <div className="ticker_img fadeInLeft position-sticky top-0">
-                                    <div className="ticker_imgmn">
-                                        <img
-                                            src={
-                                                orderData?.event?.feat_image_url ||
-                                                "/assets/front-images/my-tacket-section.jpg"
-                                            }
-                                            alt="Event"
-                                        />
-                                    </div>
+                                        <div className="ticker_imgmn">
+                                            <img
+                                                src={
+                                                    orderData?.event?.feat_image_url ||
+                                                    "/assets/front-images/my-tacket-section.jpg"
+                                                }
+                                                alt="Event"
+                                            />
+                                        </div>
                                     </div>
                                 </div>
 
@@ -144,6 +146,7 @@ export default function MyOrdersDetails() {
                                 <OrderDetails
                                     orderData={orderData}
                                     handleCancelAppointment={handleCancelAppointment}
+                                    baseUrls={baseUrls}
                                 />
                             </div>
                         </div>

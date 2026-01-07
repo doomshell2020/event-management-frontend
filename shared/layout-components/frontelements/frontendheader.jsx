@@ -68,7 +68,7 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
     <>
 
       <header className="headernav">
-        <Navbar expand="lg" className="p-0">
+        <Navbar expand="lg" className="p-0 pt-lg-0 pt-2">
           <Container>
             <div className="navflexbox w-100">
               <Link href="/" className="logodiv">
@@ -78,7 +78,85 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
                   className="headerlogo"
                 />
               </Link>
+              {/* mobile-button-show-start */}
+              <div>
+              <div className="userMenu d-lg-none" style={{ marginRight: "60px" }}>
+                    {isLoggedIn ? (
+                      <>
+                        <button
+                          className="userwelcome-button primery-button"
+                          onClick={() => setShowDropdown(!showDropdown)}
+                        >
+                          Welcome {username} ▾
+                        </button>
+
+                        {showDropdown && (
+                          <ul className="header-dropdown">
+                            <li>
+                              <Link
+                                href="/event/myevent"
+                                className="dropdownLink active-des-link"
+                              >
+                                <i className="fas fa-tachometer-alt" /> Dashboard
+                              </Link>
+                            </li>
+                            <li>
+                              <Link
+                                href="/users/view-profile"
+                                className="dropdownLink"
+                              >
+                                <i className="fas fa-user" /> My Profile
+                              </Link>
+                            </li>
+
+                            <li>
+                              <Link href="/event/my-event" className="dropdownLink">
+                                <i className="fas fa-calendar-alt" /> My Events
+                              </Link>
+                            </li>
+                            <li>
+                              <Link href="/orders" className="dropdownLink">
+                                <i className="fas fa-shopping-cart" /> My Orders
+                              </Link>
+                            </li>
+                            <li>
+                              <Link href="/users/employee" className="dropdownLink">
+                                <i className="fas fa-users" /> My Staff
+                              </Link>
+                            </li>
+                            <li>
+                              <Link
+                                href="/event/post-event"
+                                className="dropdownLink"
+                              >
+                                <i className="fas fa-plus-circle" /> Post Event
+                              </Link>
+                            </li>
+                            <li>
+                              <button
+                                onClick={() => {
+                                  setShowDropdown(false);
+                                  handleLogout(router);
+                                }}
+                                className="dropdownLink"
+                              >
+                                <i className="fas fa-sign-out-alt" /> Logout
+                              </button>
+                            </li>
+                          </ul>
+                        )}
+                      </>
+                    ) : (
+                      <Link href="/login">
+                        <button className="userloginbtn primery-button">
+                          Login / Register
+                        </button>
+                      </Link>
+                    )}
+                  </div>
+                  {/* mobile-button-show-end */}
               <Navbar.Toggle className="p-0" aria-controls="basic-navbar-nav"/>
+              </div>
               <Navbar.Collapse id="basic-navbar-nav">
                 <div className="menuflexbox ms-auto">
                   <nav className="menulistbox">
@@ -133,7 +211,7 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
                     </Link>
                   </nav>
 
-                  <div className="userMenu">
+                  <div className="userMenu d-none d-lg-block">
                     {isLoggedIn ? (
                       <>
                         <button

@@ -68,7 +68,7 @@ export default function MyOrders({ userId }) {
                                         order?.orderItems?.[0]?.appointment?.wellnessList?.currencyName?.Currency_symbol || "";
 
                                     return (
-                                        <div key={order.id} className="col-lg-6 col-md-12 mb-4">
+                                        <div key={order.id} className="col-lg-6 col-md-12 mb-3 mb-sm-4">
 
                                             {/* ✅ ONLY CHANGE IS HERE (class condition added) */}
                                             <div
@@ -82,7 +82,7 @@ export default function MyOrders({ userId }) {
 
                                                 <Link href={`/orders/${order.id}`}>
                                                     <div className="inner_box">
-                                                        <div className="row d-flex align-items-end justify-content-center g-0">
+                                                        <div className="row d-flex align-items-end justify-content-center g-3 g-sm-0">
 
                                                             <div className="col-sm-5">
                                                                 <h3 className="title m-0 fw-bold">

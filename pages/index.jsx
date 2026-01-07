@@ -326,7 +326,7 @@ const Home = ({ events }) => {
           <div className="section-heading"><h1></h1><h2></h2></div>
 
           <div className="row">
-            <div className="col-sm-4 col-12">
+            <div className="col-md-4 col-12">
               <div className="card">
                 <div className="img_icon">
                   <img
@@ -347,7 +347,7 @@ const Home = ({ events }) => {
               </div>
             </div>
 
-            <div className="col-sm-4 col-12">
+            <div className="col-md-4 col-12">
               <div className="card">
                 <div className="img_icon">
                   <img
@@ -367,7 +367,7 @@ const Home = ({ events }) => {
               </div>
             </div>
 
-            <div className="col-sm-4 col-12">
+            <div className="col-md-4 col-12">
               <div className="card">
                 <div className="img_icon">
                   <img
@@ -405,7 +405,7 @@ const Home = ({ events }) => {
                 />
               </div>
             </div>
-            <div className="col-md-6 col-sm-12">
+            <div className="col-md-6 col-sm-12 order-content">
               <div className="section-heading">
                 <h2 className="text-start">Promoters - Manage your Event ‘On the Go’</h2>
 
@@ -462,7 +462,7 @@ const Home = ({ events }) => {
         <div className="container">
           <div className="row">
 
-            <div className="col-md-6 col-sm-12">
+            <div className="col-md-6 col-sm-12 order-content">
               <div className="section-heading">
                 <h2 className="text-start">Ticket scanning with your phone</h2>
                 <p>We have a free ticket scanning app that works alongside your eboxtickets account to enable you to
@@ -482,7 +482,7 @@ const Home = ({ events }) => {
               </div>
             </div>
 
-            <div className="col-md-6 col-sm-12 img_view">
+            <div className="col-md-6 col-sm-12 img_view ">
               <div className="manage_img text-center">
                 <img src="/assets/front-images/Manage_audience2.png" className="audi_img" alt="Manage Audience" loading="lazy" />
               </div>
@@ -496,7 +496,7 @@ const Home = ({ events }) => {
         <div className="container">
           <div className="row">
 
-            <div className="col-md-6 col-sm-12 img_view">
+            <div className="col-md-6 col-sm-12 img_view ">
               <div className="manage_img text-center">
                 <img
                   src="/assets/front-images/Manage_audience3.png"
@@ -507,7 +507,7 @@ const Home = ({ events }) => {
               </div>
             </div>
 
-            <div className="col-md-6 col-sm-12">
+            <div className="col-md-6 col-sm-12 order-content">
               <div className="section-heading">
                 <h2 className="text-start">No internet connection?</h2>
                 <p>We have an offline ticket scanning app available for your Windows PC or laptop. Simply install
@@ -528,7 +528,7 @@ const Home = ({ events }) => {
         <div className="container">
 
           <div className="row">
-            <div className="col-md-8 col-sm-7 col-12">
+            <div className="col-md-8 order-content">
               <div className="section-heading">
                 <h2 className="text-start">Calculate Your Fees</h2>
                 <p>Ticket Price</p>
@@ -547,15 +547,15 @@ const Home = ({ events }) => {
 
                 <form className="row g-3 mt-1">
 
-                  <div className="col-md-4 col-sm-4 col-4 rang_f">
+                  <div className="col-sm-4 rang_f mt-0 mt-sm-2">
                     <label htmlFor="customerpays" className="form-label">Customer Pays</label>
                     <input type="text" className="form-control" id="customerpays" placeholder="$ 107" />
                   </div>
-                  <div className="col-md-4 col-sm-4 col-4 rang_f">
+                  <div className="col-sm-4 rang_f mt-0 mt-sm-2">
                     <label htmlFor="youreceive" className="form-label">You Receive</label>
                     <input type="text" className="form-control" id="youreceive" placeholder="$ 100" />
                   </div>
-                  <div className="col-md-4 col-sm-4 col-4 rang_f">
+                  <div className="col-sm-4 rang_f mt-0 mt-sm-2">
                     <label htmlFor="ourcost" className="form-label">Our Cost</label>
                     <input type="text" className="form-control" id="ourcost" placeholder="8%" />
                   </div>
@@ -564,7 +564,7 @@ const Home = ({ events }) => {
               </div>
             </div>
 
-            <div className="col-md-4 col-sm-5 col-12">
+            <div className="col-md-4">
               <div className="container_img">
                 <img src="/assets/front-images/Calculate_Fees_img.png" alt="Calculate Fees" />
               </div>
@@ -577,7 +577,7 @@ const Home = ({ events }) => {
       <div id="down_app">
         <div className="container">
           <div className="row justify-content-center align-items-center">
-            <div className="col-sm-6">
+            <div className="col-md-6 order-content">
               <div className="counting section-heading">
                 <h2>Download on any Device</h2>
                 <p>
@@ -594,7 +594,7 @@ const Home = ({ events }) => {
                 </div>
               </div>
             </div>
-            <div className="col-sm-6">
+            <div className="col-md-6">
               <div className="app_img">
                 <img src="/assets/front-images/app-screen.png" alt="App Screenshot" />
               </div>

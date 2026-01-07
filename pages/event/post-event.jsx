@@ -251,13 +251,13 @@ const EventDetailsPage = () => {
                                 </ul>
                             </div>
 
-                            <div className="form-deta bg-white mt-3 mb-4 pb-3 rounded custom-shadow">
+                            <div className="form-deta bg-white mt-3 mb-4 pb-0 rounded custom-shadow">
 
                                 <h2 className="text-16 text-white text-uppercase position-relative text-start fw-bold">
                                     <i className="far fa-calendar-plus"></i>Post Event
                                 </h2>
 
-                                <div className="inner-formdeta p-4 text-start fs-6 fw-normal">
+                                <div className="inner-formdeta p-4 pt-0 text-start fs-6 fw-normal pt-md-4">
 
                                     <div className="table-responsive">
                                         <div className="scroll_tab w-auto px-2">
@@ -270,12 +270,12 @@ const EventDetailsPage = () => {
                                         </div>
                                     </div>
 
-                                    <form onSubmit={handleSubmit}>
+                                    <form className="mt-2 mt-md-0" onSubmit={handleSubmit}>
                                         <h4 className="fw-bold">Event Info</h4>
                                         <div className="resistor-content">
                                             <div className="row g-3">
                                                 {/* Company */}
-                                                <div className="col-lg-4 col-md-6 mb-3">
+                                                <div className="col-xl-4 col-lg-6 col-md-6 mb-2 mt-0">
                                                     <label className="form-label">
                                                         Company <span className="text-danger">*</span>
                                                     </label>
@@ -306,7 +306,7 @@ const EventDetailsPage = () => {
                                                 </div>
 
                                                 {/* Event Name */}
-                                                <div className="col-lg-4 col-md-6 mb-3">
+                                                <div className="col-xl-4 col-lg-6 col-md-6 mb-2 mt-0">
                                                     <label className="form-label">
                                                         Event Name <span className="text-danger">*</span>
                                                     </label>
@@ -322,7 +322,7 @@ const EventDetailsPage = () => {
                                                 </div>
 
                                                 {/* Country */}
-                                                <div className="col-lg-4 col-md-6 mb-3">
+                                                <div className="col-xl-4 col-lg-6 col-md-6 mb-2 mt-0">
                                                     <label className="form-label">
                                                         Country <span className="text-danger">*</span>
                                                     </label>
@@ -342,7 +342,7 @@ const EventDetailsPage = () => {
                                                 </div>
 
                                                 {/* Location */}
-                                                <div className="col-lg-4 col-md-6 mb-3">
+                                                <div className="col-xl-4 col-lg-6 col-md-6 mb-2 mt-0">
                                                     <label className="form-label">
                                                         Location <span className="text-danger">*</span>
                                                     </label>
@@ -357,14 +357,14 @@ const EventDetailsPage = () => {
                                                 </div>
 
                                                 {/* Upload Image */}
-                                                <div className="col-lg-4 col-md-6 mb-3">
+                                                <div className="col-xl-4 col-lg-6 col-md-6 mb-2 mt-0">
                                                     <label className="form-label">
                                                         Upload Image{" "}
                                                         <small className="text-danger">(Size 550×550 JPG, JPEG, PNG Max 2MB)</small>
                                                     </label>
                                                     <input
                                                         type="file"
-                                                        className="form-control rounded-0"
+                                                        className="form-control rounded-0 pt-2"
                                                         accept=".jpg, .jpeg, .png" // ✅ HTML-level validation
                                                         onChange={(e) => {
                                                             const file = e.target.files[0];
@@ -392,8 +392,8 @@ const EventDetailsPage = () => {
                                                 </div>
 
                                                 {/* Free and Register Checkboxes */}
-                                                <div className="col-lg-4 col-md-6 mb-3 d-flex align-items-end">
-                                                    <div className="d-flex align-items-center justify-content-between w-100">
+                                                <div className="col-xl-4 col-lg-6 col-md-6 mb-0 mb-sm-2 mt-0 d-flex align-items-end">
+                                                    <div className="d-flex align-items-center justify-content-between w-100 form-check-btn-group">
                                                         <div className="btn freeEventCheck orange d-flex align-items-center w-50 text-white">
                                                             <input
                                                                 type="checkbox"
@@ -425,7 +425,7 @@ const EventDetailsPage = () => {
                                                 </div>
 
                                                 {/* Currency */}
-                                                <div className="col-lg-2 col-md-6 mb-3">
+                                                <div className="col-lg-3 col-md-6 mb-2 mt-0">
                                                     <label className="form-label">Currency</label>
                                                     <select
                                                         className="form-select rounded-0"
@@ -440,7 +440,7 @@ const EventDetailsPage = () => {
                                                 </div>
 
                                                 {/* Timezone */}
-                                                <div className="col-lg-2 col-md-6 mb-3">
+                                                <div className="col-lg-3 col-md-6 mb-2 mt-0">
                                                     <label className="form-label">
                                                         Timezone <span className="text-danger">*</span>
                                                     </label>
@@ -461,7 +461,7 @@ const EventDetailsPage = () => {
                                                 </div>
 
                                                 {/* Event Dates */}
-                                                <div className="col-lg-4 col-md-6 mb-3">
+                                                <div className="col-xl-4 col-lg-6 col-md-6 mb-2 mt-0">
                                                     <label className="form-label">
                                                         Event Start <span className="text-danger">*</span>
                                                     </label>
@@ -474,7 +474,7 @@ const EventDetailsPage = () => {
                                                     />
                                                 </div>
 
-                                                <div className="col-lg-4 col-md-6 mb-3">
+                                                <div className="col-xl-4 col-lg-6 col-md-6 mb-2 mt-0">
                                                     <label className="form-label">
                                                         Event End <span className="text-danger">*</span>
                                                     </label>
@@ -491,7 +491,7 @@ const EventDetailsPage = () => {
                                                 {isFree ? (
                                                     <>
                                                         {/* RSVP By - Only for Free Events */}
-                                                        <div className="col-lg-4 col-md-6 mb-3">
+                                                        <div className="col-xl-4 col-lg-6 col-md-6 mb-2 mt-0">
                                                             <label className="form-label">
                                                                 Request RSVP By <span className="text-danger">*</span>
                                                             </label>
@@ -508,7 +508,7 @@ const EventDetailsPage = () => {
                                                 ) : (
                                                     <>
                                                         {/* Sale Start/End for Paid Events */}
-                                                        <div className="col-lg-4 col-md-6 mb-3">
+                                                        <div className="col-xl-4 col-lg-6 col-md-6 mb-2 mt-0">
                                                             <label className="form-label">
                                                                 Sale Start <span className="text-danger">*</span>
                                                             </label>
@@ -520,7 +520,7 @@ const EventDetailsPage = () => {
                                                                 value={formData.sale_start}
                                                             />
                                                         </div>
-                                                        <div className="col-lg-4 col-md-6 mb-3">
+                                                        <div className="col-xl-4 col-lg-6 col-md-6 mb-2 mt-0">
                                                             <label className="form-label">
                                                                 Sale End <span className="text-danger">*</span>
                                                             </label>
@@ -534,7 +534,7 @@ const EventDetailsPage = () => {
                                                         </div>
 
                                                         {/* Ticket Limit per Person */}
-                                                        <div className="col-lg-4 col-md-6 mb-3">
+                                                        <div className="col-xl-4 col-lg-6 col-md-6 mb-2 mt-0">
                                                             <label className="form-label">Ticket Limit per person</label>
                                                             <select
                                                                 className="form-select rounded-0"
@@ -549,7 +549,7 @@ const EventDetailsPage = () => {
                                                         </div>
 
                                                         {/* Approval Expiry */}
-                                                        <div className="col-lg-4 col-md-6 mb-3">
+                                                        <div className="col-xl-4 col-lg-6 col-md-6 mb-2 mt-0">
                                                             <label className="form-label">Approval Expiry</label>
                                                             <select
                                                                 className="form-select rounded-0"
@@ -569,7 +569,7 @@ const EventDetailsPage = () => {
                                                 )}
 
                                                 {/* URL Slug */}
-                                                <div className="col-lg-4 col-md-6 mb-3">
+                                                <div className="col-xl-4 col-lg-6 col-md-6 mb-2 mt-0">
                                                     <label className="form-label">URL Slug</label>
                                                     <input
                                                         type="text"
@@ -585,7 +585,7 @@ const EventDetailsPage = () => {
                                                 </div>
 
                                                 {/* Youtube URL */}
-                                                <div className="col-lg-4 col-md-6 mb-3">
+                                                <div className="col-xl-4 col-lg-6 col-md-6 mb-2 mt-0">
                                                     <label className="form-label">Youtube URL</label>
                                                     <input
                                                         type="text"
@@ -597,7 +597,7 @@ const EventDetailsPage = () => {
                                                     />
                                                 </div>
 
-                                                <div className="col-lg-4 col-md-6 mb-3">
+                                                <div className="col-xl-4 col-lg-6 col-md-6 mb-2 mt-0">
                                                     <label className="form-label">Type of Event</label>
                                                     <select
                                                         className="form-select rounded-0"

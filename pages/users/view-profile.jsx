@@ -71,7 +71,7 @@ const ProfilePage = () => {
             <div className="row">
               {/* Left side - avatar & edit */}
               <div className="col-md-3">
-                <div className="user-profile text-center">
+                <div className="user-profile text-center mb-3 mb-md-0">
                   <div className="user-avatar">
                     <img
                       className="mx-auto text-center rounded-full w-24 h-24 object-cover"
@@ -80,7 +80,7 @@ const ProfilePage = () => {
                     />
 
                   </div>
-                  <h5 className="user-name text-center text-16 my-3">
+                  <h5 className="user-name text-center text-16 my-2 my-lg-3">
                     {user.first_name} {user.last_name}
                   </h5>
                   <Link

@@ -99,7 +99,7 @@ const LoginPage = () => {
           </div>
 
           <div className="form-content">
-            <div className="row align-items-center">
+            <div className="row align-items-center justify-content-center">
               <div className="col-md-6 col-sm-12 sig_img">
                 <img src="/assets/front-images/sigin.png" alt="Login Illustration" /></div>
 
@@ -152,7 +152,7 @@ const LoginPage = () => {
 
 
                     <div className="row justify-content-between">
-                      <div className="col-6">
+                      <div className="col-6 pe-0">
                         <div className="form-check">
                           <input
                             type="checkbox"
@@ -167,7 +167,7 @@ const LoginPage = () => {
                         </div>
                       </div>
 
-                      <div className="col-6 text-end">
+                      <div className="col-6 text-end ps-0">
                         <Link href="/forgot-password" className="for_pass fw-bold">
                           Forgot your password?
                         </Link>

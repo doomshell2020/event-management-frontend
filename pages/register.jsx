@@ -6,7 +6,7 @@ import Swal from "sweetalert2";
 import Link from "next/link";
 
 const RegisterPage = () => {
-  
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -214,8 +214,8 @@ const RegisterPage = () => {
 
 
                     <div className="row align-items-center">
-                      <label className="col-sm-3 col-form-label">Gender</label>
-                      <div className="col-sm-9 d-flex align-items-center">
+                      <label className="col-sm-3 col-3 col-form-label">Gender</label>
+                      <div className="col-sm-9 col-9 d-flex align-items-center">
                         <input type="radio" name="gender" value="Male" checked={formData.gender == "Male"} onChange={handleChange} />
                         <label className="ms-1 mb-0">Male</label>
 
@@ -224,9 +224,10 @@ const RegisterPage = () => {
                       </div>
                     </div>
 
-                    <div className="row align-items-center">
-                      <label className="col-sm-3 col-form-label">Date of Birth</label>
-                      <div className="col-sm-9">
+                    <div className="align-items-center d-flex">
+                      <label className="col-form-label me-2">Date of Birth</label>
+
+                      <div className="flex-grow-1">
                         <input
                           type="date"
                           name="dob"
@@ -237,16 +238,16 @@ const RegisterPage = () => {
                           min="2000-01-01"
                           max={new Date().toISOString().split("T")[0]}
                         />
-
                       </div>
                     </div>
+
 
                     <button type="submit" className="primery-button w-100 mt-3" disabled={loading}>
                       {loading ? "Registering..." : "Register"}
                     </button>
                   </form>
 
-                  <hr />
+                  <hr className="custom-hr  mb-2" />
 
                   <p className="text-center">
                     Already have an account?

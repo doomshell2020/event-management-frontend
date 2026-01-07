@@ -237,7 +237,7 @@ const UpdateProfile = () => {
                                     }}
                                 />
 
-                                <h6 className="mt-2">
+                                <h6 className="mt-3">
                                     <strong>{formData.firstName} {formData.lastName}</strong>
                                 </h6>
                             </div>
@@ -245,7 +245,7 @@ const UpdateProfile = () => {
 
 
                         {/* RIGHT SIDE FORM */}
-                        <div className="col-md-7">
+                        <div className="col-md-9">
                             <div className="edit-box p-4 shadow-sm">
 
                                 {/* SECTION: EDIT YOUR PROFILE */}
@@ -335,7 +335,7 @@ const UpdateProfile = () => {
                                     </div>
 
                                     {/* SECTION: CHANGE PASSWORD */}
-                                    <div className="section-title mt-4">Change Password</div>
+                                    <div className="section-title mt-2 mt-sm-4">Change Password</div>
                                     <p>Leave blank if you do not wish to change your password.</p>
 
                                     <div className="row">
@@ -363,11 +363,11 @@ const UpdateProfile = () => {
                                     </div>
 
                                     {/* SECTION: EMAIL NOTIFICATION */}
-                                    <div className="section-title mt-4">Email Notifications</div>
+                                    <div className="section-title mt-2 mt-sm-4">Email Notifications</div>
                                     <p>You can manage the notifications you receive via email.</p>
 
                                     <div className="d-flex gap-4 mb-3">
-                                        <div>
+                                        <div className="d-flex align-items-center gap-1 upadate-profile-check">
                                             <input
                                                 type="checkbox"
                                                 name="emailNewsLetter"
@@ -377,7 +377,7 @@ const UpdateProfile = () => {
                                             Email Newsletter
                                         </div>
 
-                                        <div>
+                                        <div className="d-flex align-items-center gap-1 upadate-profile-check">
                                             <input
                                                 type="checkbox"
                                                 name="emailRelatedEvents"

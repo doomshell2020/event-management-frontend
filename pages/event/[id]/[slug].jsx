@@ -422,12 +422,16 @@ const EventDetailPage = ({ event, slug }) => {
 
               <div className="row g-4">
                 {appointmentData.map((w) => (
-                  <div
-                    key={w.id}
-                    className={`col-md-${appointmentData.length === 1 ? "12 only-single-cart" : "6"
-                      }`}
-                  >
-                    <div className="card shadow-sm border-0 h-100">
+ <div
+  key={w.id}
+  className={
+    appointmentData.length === 1
+      ? "col-md-12 only-single-cart"
+      : "col-lg-6"
+  }
+>
+
+                    <div className="card shadow-sm border-0 h-100 mb-0">
                       {/* IMAGE */}
                       <div className="event-appo-img">
                         <img
@@ -455,7 +459,7 @@ const EventDetailPage = ({ event, slug }) => {
                           dangerouslySetInnerHTML={{ __html: w.description }}
                         />
 
-                        <div className="py-3">
+                        <div className="pb-1 pt-1">
                           <div className="appoinment-checkbtn">
                             {(() => {
                               const selectedForThis = selectedSlots[w.id] || [];
@@ -509,7 +513,7 @@ const EventDetailPage = ({ event, slug }) => {
 
                                         {/* DATE & TIME */}
                                         <div style={{ fontSize: "14px" }}>
-                                          <div className="d-flex align-items-center gap-3">
+                                          <div className="d-flex align-items-center gap-2 gap-sm-3">
                                             <span className="d-flex align-items-center">
                                               <i className="bi bi-calendar me-1"></i>
                                               <strong>
@@ -526,7 +530,7 @@ const EventDetailPage = ({ event, slug }) => {
                                         </div>
 
                                         {/* PRICE */}
-                                        <div
+                                        <div className="slot-price"
                                           style={{
                                             fontWeight: "bold",
                                             color: "rgb(33, 166, 122)",
