@@ -9,7 +9,7 @@ const OrderDetails = ({ orderData, handleCancelAppointment, baseUrls }) => {
     const { event, orderItems } = orderData;
     const { currencyName } = event;
     const eventTimezone = event?.event_timezone || "";
-    console.log('eventTimezone :', eventTimezone);
+    // console.log('eventTimezone :', eventTimezone);
 
     return (
         <div className="col-lg-8 col-md-7">

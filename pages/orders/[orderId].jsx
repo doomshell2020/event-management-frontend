@@ -15,8 +15,9 @@ export default function MyOrdersDetails() {
     );
 
     const [orderData, setOrderData] = useState(null);
-    // console.log('orderData :', orderData);
+    console.log('orderData :', orderData);
     const [baseUrls, setBaseUrls] = useState(null);
+    console.log('baseUrls :', baseUrls?.event_image_url);
     const [loading, setLoading] = useState(true);
 
     const fetchOrders = useCallback(async () => {
@@ -127,8 +128,9 @@ export default function MyOrdersDetails() {
                                     <div className="border rounded overflow-hidden">
                                         <img
                                             src={
-                                                orderData?.event?.feat_image_url ||
-                                                "/assets/front-images/my-tacket-section.jpg"
+                                                orderData?.event?.feat_image
+                                                    ? `${baseUrls?.event_image_url}${orderData.event.feat_image}`
+                                                    : "/assets/front-images/my-tacket-section.jpg"
                                             }
                                             alt="Event"
                                             className="w-100"
@@ -137,6 +139,7 @@ export default function MyOrdersDetails() {
                                                 objectFit: "cover",
                                             }}
                                         />
+
                                     </div>
                                 </div>
 

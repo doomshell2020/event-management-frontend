@@ -1,383 +1,266 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
-    Card,
-    Col,
-    Row,
-    Button,
-    Spinner,
-    Form,
-    Modal,
-    Badge
+  Card,
+  Row,
+  Col,
+  Table,
+  Spinner,
+  Badge,
+  Form,
+  Button
 } from "react-bootstrap";
-import {
-    useTable,
-    useSortBy,
-    usePagination,
-} from "react-table";
 import Seo from "@/shared/layout-components/seo/seo";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import moment from "moment";
+import api from "@/utils/api";
+import Link from "next/link";
 
-/* ---------------- MOCK DATA ---------------- */
-const EVENTS = [
-    { id: 1, name: "January Event" },
-    { id: 2, name: "Music Night" },
-];
+const EventsSalesList = () => {
+  const [loading, setLoading] = useState(true);
+  const [events, setEvents] = useState([]);
 
-const PAYOUTS = [
-    {
-        id: 1,
-        event_id: 1,
-        event: { name: "January Event", currency: "$" },
-        total_sales: 15000,
-        admin_commission: 1500,
-        payable_amount: 13500,
-        paid_amount: 5000,
-        status: "partial",
-        created_at: "2026-01-15T10:00:00Z",
-    },
-    {
-        id: 2,
-        event_id: 2,
-        event: { name: "Music Night", currency: "$" },
-        total_sales: 8000,
-        admin_commission: 800,
-        payable_amount: 7200,
-        paid_amount: 7200,
-        status: "paid",
-        created_at: "2026-01-12T11:30:00Z",
-    },
-];
+  /* Filters */
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState("");
 
-const PayoutsList = () => {
-    const [payouts, setPayouts] = useState([]);
-    const [filtered, setFiltered] = useState([]);
-    const [loading, setLoading] = useState(true);
+  /* FETCH */
+  const fetchEvents = async () => {
+    try {
+      setLoading(true);
+      const { data } = await api.get(
+        "/api/v1/admin/payouts/events/sales-summary"
+      );
+      setEvents(data?.data || []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    /* Filters */
-    const [eventId, setEventId] = useState("");
-    const [fromDate, setFromDate] = useState(null);
-    const [toDate, setToDate] = useState(null);
+  useEffect(() => {
+    fetchEvents();
+  }, []);
 
-    /* Modal */
-    const [show, setShow] = useState(false);
-    const [active, setActive] = useState(null); // selected payout or new
-    const [amount, setAmount] = useState("");
-    const [txnRef, setTxnRef] = useState("");
-    const [remarks, setRemarks] = useState("");
+  /* FILTER DATA */
+  const filteredEvents = useMemo(() => {
+    return events.filter(ev => {
+      const matchSearch = ev.event_name
+        ?.toLowerCase()
+        .includes(search.toLowerCase());
 
-    /* New Payout Mode */
-    const [isNew, setIsNew] = useState(false);
+      const matchStatus = status
+        ? status === "pending"
+          ? ev.balance > 0
+          : ev.balance === 0
+        : true;
 
-    useEffect(() => {
-        setLoading(true);
-        setTimeout(() => {
-            setPayouts(PAYOUTS);
-            setFiltered(PAYOUTS);
-            setLoading(false);
-        }, 500);
-    }, []);
+      return matchSearch && matchStatus;
+    });
+  }, [events, search, status]);
 
-    /* ---------------- FILTER ---------------- */
-    const handleSearch = (e) => {
-        e.preventDefault();
-        let data = [...payouts];
-
-        if (eventId) data = data.filter(p => p.event_id === Number(eventId));
-        if (fromDate) data = data.filter(p => moment(p.created_at).isSameOrAfter(fromDate, "day"));
-        if (toDate) data = data.filter(p => moment(p.created_at).isSameOrBefore(toDate, "day"));
-
-        setFiltered(data);
-    };
-
-    const resetFilter = () => {
-        setEventId("");
-        setFromDate(null);
-        setToDate(null);
-        setFiltered(payouts);
-    };
-
-    /* ---------------- SUMMARY ---------------- */
-    const summary = useMemo(() => {
-        return filtered.reduce(
-            (acc, p) => {
-                acc.sales += p.total_sales;
-                acc.paid += p.paid_amount;
-                acc.payable += p.payable_amount;
-                return acc;
-            },
-            { sales: 0, paid: 0, payable: 0 }
-        );
-    }, [filtered]);
-
-    /* ---------------- TABLE ---------------- */
-    const columns = useMemo(() => [
-        { Header: "Event", accessor: row => row.event.name },
-        {
-            Header: "Total Sale",
-            Cell: ({ row }) => `${row.original.event.currency} ${row.original.total_sales}`
-        },
-        {
-            Header: "Paid",
-            Cell: ({ row }) => `${row.original.event.currency} ${row.original.paid_amount}`
-        },
-        {
-            Header: "Balance",
-            Cell: ({ row }) => {
-                const bal = row.original.payable_amount - row.original.paid_amount;
-                return `${row.original.event.currency} ${bal}`;
-            }
-        },
-        {
-            Header: "Status",
-            Cell: ({ row }) => (
-                <Badge bg={row.original.status === "paid" ? "success" : "warning"}>
-                    {row.original.status.toUpperCase()}
-                </Badge>
-            )
-        },
-        {
-            Header: "Created At",
-            Cell: ({ row }) => moment(row.original.created_at).format("DD MMM YYYY hh:mm A")
-        },
-        {
-            Header: "Action",
-            Cell: ({ row }) =>
-                row.original.status !== "paid" && (
-                    <Button size="sm" onClick={() => {
-                        setActive(row.original);
-                        setAmount("");
-                        setTxnRef("");
-                        setRemarks("");
-                        setIsNew(false);
-                        setShow(true);
-                    }}>
-                        Pay Now
-                    </Button>
-                )
-        }
-    ], []);
-
-    const tableInstance = useTable(
-        { columns, data: filtered },
-        useSortBy,
-        usePagination
+  /* SUMMARY */
+  const totals = useMemo(() => {
+    return filteredEvents.reduce(
+      (acc, e) => {
+        acc.sales += Number(e.total_sales || 0);
+        acc.paid += Number(e.total_paid || 0);
+        acc.balance += Number(e.balance || 0);
+        return acc;
+      },
+      { sales: 0, paid: 0, balance: 0 }
     );
+  }, [filteredEvents]);
 
-    const { getTableProps, headerGroups, getTableBodyProps, prepareRow, page } = tableInstance;
+  return (
+    <div>
+      <Seo title="Events Sales Summary" />
 
-    /* ---------------- VALIDATION ---------------- */
-    const validate = () => {
-        if (!active) return false;
-        const balance = isNew ? active.payable_amount : active.payable_amount - active.paid_amount;
+      <Row className="mt-1">
+        {/* FILTER PANEL */}
+        <Col xl={2}>
+          <Card className="shadow-sm">
+            <Card.Header className="bg-light">
+              <h5 className="mb-0 fw-semibold">Filters</h5>
+            </Card.Header>
+            <Card.Body>
+              <Form.Group className="mb-3">
+                <Form.Label className="text-muted">
+                  Search Event
+                </Form.Label>
+                <Form.Control
+                  placeholder="Search by event name"
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                />
+              </Form.Group>
 
-        if (!amount || amount <= 0) return false;
-        if (amount > balance) return false;
-        if (!txnRef) return false;
-        return true;
-    };
+              <Form.Group className="mb-4">
+                <Form.Label className="text-muted">Status</Form.Label>
+                <Form.Select
+                  value={status}
+                  onChange={e => setStatus(e.target.value)}
+                >
+                  <option value="">All</option>
+                  <option value="pending">Pending</option>
+                  <option value="completed">Completed</option>
+                </Form.Select>
+              </Form.Group>
 
-    const submitPayout = () => {
-        if (!validate()) return;
+              <Button
+                variant="outline-secondary"
+                className="w-100"
+                onClick={() => {
+                  setSearch("");
+                  setStatus("");
+                }}
+              >
+                Reset Filters
+              </Button>
+            </Card.Body>
+          </Card>
+        </Col>
 
-        if (isNew) {
-            // Create new payout mock
-            const newPayout = {
-                id: payouts.length + 1,
-                event_id: active.id,
-                event: { name: active.name, currency: "$" },
-                total_sales: active.total_sales || 0,
-                admin_commission: active.admin_commission || 0,
-                payable_amount: active.total_sales || 0,
-                paid_amount: amount,
-                status: amount >= (active.total_sales || 0) ? "paid" : "partial",
-                created_at: new Date().toISOString(),
-            };
-            setPayouts(prev => [newPayout, ...prev]);
-            setFiltered(prev => [newPayout, ...prev]);
-        } else {
-            // Update existing payout mock
-            setPayouts(prev => prev.map(p => p.id === active.id
-                ? { ...p, paid_amount: p.paid_amount + Number(amount), status: p.paid_amount + Number(amount) >= p.payable_amount ? "paid" : "partial" }
-                : p
-            ));
-            setFiltered(prev => prev.map(p => p.id === active.id
-                ? { ...p, paid_amount: p.paid_amount + Number(amount), status: p.paid_amount + Number(amount) >= p.payable_amount ? "paid" : "partial" }
-                : p
-            ));
-        }
+        {/* MAIN CONTENT */}
+        <Col xl={10}>
+          {/* SUMMARY CARDS */}
+          <Row className="mb-1">
+            <Col md={4}>
+              <Card className="text-center shadow-sm border-0">
+                <Card.Body>
+                  <small className="text-muted text-uppercase">
+                    Total Sales
+                  </small>
+                  <h3 className="fw-bold mt-2">
+                    ₹{totals.sales}
+                  </h3>
+                </Card.Body>
+              </Card>
+            </Col>
 
-        setShow(false);
-    };
+            <Col md={4}>
+              <Card className="text-center shadow-sm border-success border-2">
+                <Card.Body>
+                  <small className="text-muted text-uppercase">
+                    Total Paid
+                  </small>
+                  <h3 className="fw-bold text-success mt-2">
+                    ₹{totals.paid}
+                  </h3>
+                </Card.Body>
+              </Card>
+            </Col>
 
-    return (
-        <div>
-            <Seo title="Payout Manager" />
+            <Col md={4}>
+              <Card className="text-center shadow-sm border-danger border-2">
+                <Card.Body>
+                  <small className="text-muted text-uppercase">
+                    Balance
+                  </small>
+                  <h3 className="fw-bold text-danger mt-2">
+                    ₹{totals.balance}
+                  </h3>
+                </Card.Body>
+              </Card>
+            </Col>
+          </Row>
 
-            <Row className="mt-4">
-                {/* FILTER PANEL */}
-                <Col xl={2}>
-                    <Card>
-                        <Card.Header><h5>Filters</h5></Card.Header>
-                        <Card.Body>
-                            <Form onSubmit={handleSearch}>
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Event</Form.Label>
-                                    <Form.Select value={eventId} onChange={e => setEventId(e.target.value)}>
-                                        <option value="">All</option>
-                                        {EVENTS.map(e => <option key={e.id} value={e.id}>{e.name}</option>)}
-                                    </Form.Select>
-                                </Form.Group>
+          {/* EVENTS TABLE */}
+          <Card className="shadow-sm">
+            <Card.Header className="bg-white">
+              <h4 className="card-title mb-0 fw-semibold">
+                Events Sales Summary
+              </h4>
+            </Card.Header>
 
-                                <Form.Group className="mb-3">
-                                    <Form.Label>From</Form.Label>
-                                    <DatePicker selected={fromDate} onChange={setFromDate} className="form-control" />
-                                </Form.Group>
+            <Card.Body className="p-0">
+              {loading ? (
+                <div className="text-center p-5">
+                  <Spinner />
+                </div>
+              ) : (
+                <Table hover responsive className="mb-0">
+                  <thead className="table-light">
+                    <tr>
+                      <th>#</th>
+                      <th>Event</th>
+                      <th>Orders</th>
+                      <th>Tickets</th>
+                      <th>Sales</th>
+                      <th>Paid</th>
+                      <th>Balance</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
 
-                                <Form.Group className="mb-3">
-                                    <Form.Label>To</Form.Label>
-                                    <DatePicker selected={toDate} onChange={setToDate} className="form-control" minDate={fromDate} />
-                                </Form.Group>
+                  <tbody>
+                    {filteredEvents.length == 0 ? (
+                      <tr>
+                        <td
+                          colSpan={8}
+                          className="text-center py-4 text-muted"
+                        >
+                          No events found
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredEvents.map((ev, index) => (
+                        <tr key={ev.event_id}>
+                          <td>{index + 1}</td>
 
-                                <Button type="submit" className="w-100 mb-2">Apply</Button>
-                                <Button variant="secondary" className="w-100" onClick={resetFilter}>Reset</Button>
-                            </Form>
-                        </Card.Body>
-                    </Card>
-                </Col>
-
-                {/* TABLE PANEL */}
-                <Col xl={10}>
-                    <Row className="mb-3">
-                        <Col md={3}><Card className="p-3"><h6>Total Sales</h6><h4>${summary.sales}</h4></Card></Col>
-                        <Col md={3}><Card className="p-3"><h6>Payable</h6><h4>${summary.payable}</h4></Card></Col>
-                        <Col md={3}><Card className="p-3"><h6>Paid</h6><h4 className="text-success">${summary.paid}</h4></Card></Col>
-                        <Col md={3}><Card className="p-3"><h6>Balance</h6><h4 className="text-danger">${summary.payable - summary.paid}</h4></Card></Col>
-                    </Row>
-
-                    <div className="d-flex justify-content-between align-items-center mb-2">
-                        <h4>Payouts</h4>
-                        <Button variant="primary" onClick={() => {
-                            setActive({});
-                            setIsNew(true);
-                            setAmount("");
-                            setTxnRef("");
-                            setRemarks("");
-                            setShow(true);
-                        }}>New Payout</Button>
-                    </div>
-
-                    <Card>
-                        <div className="table-responsive">
-                            {loading ? (
-                                <div className="text-center p-5"><Spinner /></div>
-                            ) : (
-                                <table {...getTableProps()} className="table table-bordered">
-                                    <thead>
-                                        {headerGroups.map(hg => (
-                                            <tr {...hg.getHeaderGroupProps()}>
-                                                {hg.headers.map(col => (
-                                                    <th {...col.getHeaderProps()}>{col.render("Header")}</th>
-                                                ))}
-                                            </tr>
-                                        ))}
-                                    </thead>
-                                    <tbody {...getTableBodyProps()}>
-                                        {page.map(row => {
-                                            prepareRow(row);
-                                            return (
-                                                <tr {...row.getRowProps()}>
-                                                    {row.cells.map(cell => (
-                                                        <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
-                                                    ))}
-                                                </tr>
-                                            );
-                                        })}
-                                    </tbody>
-                                </table>
-                            )}
-                        </div>
-                    </Card>
-                </Col>
-            </Row>
-
-            {/* PAYOUT MODAL */}
-            <Modal show={show} onHide={() => setShow(false)} centered>
-                <Modal.Header closeButton>
-                    <Modal.Title>{isNew ? "Create New Payout" : "Payout to Organizer"}</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Form>
-                        {/* Event Selection */}
-                        <Form.Group className="mb-3">
-                            <Form.Label>Select Event</Form.Label>
-                            <Form.Select
-                                value={active?.id || ""}
-                                onChange={(e) => {
-                                    const selectedEvent = EVENTS.find(ev => ev.id == parseInt(e.target.value));
-                                    setActive(selectedEvent);
-                                    setAmount("");
-                                    setTxnRef("");
-                                    setRemarks("");
-                                }}
-                                isInvalid={!active?.id}
+                          <td>
+                            <Link
+                              href={`/admin/payouts/${ev.event_id}`}
+                              target="_blank"
+                              className="fw-semibold text-decoration-none d-block"
                             >
-                                <option value="">-- Select Event --</option>
-                                {EVENTS.map(ev => (
-                                    <option key={ev.id} value={ev.id}>{ev.name}</option>
-                                ))}
-                            </Form.Select>
-                        </Form.Group>
+                              {ev.event_name}
+                            </Link>
+                            <small className="text-muted">
+                              {ev.organizer_name}
+                            </small>
+                          </td>
 
-                        {active?.id && (
-                            <>
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Amount</Form.Label>
-                                    <Form.Control
-                                        type="number"
-                                        value={amount}
-                                        onChange={(e) => setAmount(e.target.value)}
-                                        isInvalid={amount <= 0 || (!isNew && amount > active.payable_amount - active.paid_amount)}
-                                    />
-                                </Form.Group>
+                          <td>{ev.total_orders}</td>
+                          <td>{ev.total_tickets}</td>
 
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Transaction Ref</Form.Label>
-                                    <Form.Control
-                                        value={txnRef}
-                                        onChange={(e) => setTxnRef(e.target.value)}
-                                        isInvalid={!txnRef}
-                                    />
-                                </Form.Group>
+                          <td>
+                            {ev.currency_symbol}{ev.total_sales}
+                          </td>
 
-                                <Form.Group>
-                                    <Form.Label>Remarks</Form.Label>
-                                    <Form.Control
-                                        as="textarea"
-                                        rows={2}
-                                        value={remarks}
-                                        onChange={(e) => setRemarks(e.target.value)}
-                                    />
-                                </Form.Group>
-                            </>
-                        )}
-                    </Form>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShow(false)}>Cancel</Button>
-                    <Button
-                        variant="success"
-                        onClick={submitPayout}
-                        disabled={!validate()}
-                    >
-                        Confirm
-                    </Button>
-                </Modal.Footer>
-            </Modal>
-        </div>
-    );
+                          <td className="text-success">
+                            {ev.currency_symbol}{ev.total_paid}
+                          </td>
+
+                          <td className="text-danger">
+                            {ev.currency_symbol}{ev.balance}
+                          </td>
+
+                          <td>
+                            <Badge
+                              bg={
+                                ev.balance > 0
+                                  ? "warning"
+                                  : "success"
+                              }
+                              className="px-3 py-2"
+                            >
+                              {ev.balance > 0
+                                ? "Pending"
+                                : "Completed"}
+                            </Badge>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </Table>
+              )}
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+    </div>
+  );
 };
 
-PayoutsList.layout = "Contentlayout";
-export default PayoutsList;
+EventsSalesList.layout = "Contentlayout";
+export default EventsSalesList;

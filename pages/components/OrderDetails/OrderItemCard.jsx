@@ -10,6 +10,7 @@ const OrderItemCard = ({
 }) => {
     const type = item?.type;
 
+    console.log('item :', item);
     const isTicket = type == "ticket";
     const isAppointment = type == "appointment";
     const isAddon = type == "addon";
@@ -18,10 +19,12 @@ const OrderItemCard = ({
     const isComps = type == "comps";
 
     // Complimentary / Free logic
-    const isFreeTicket =
-        isComps ||
-        isCommitteeSale ||
-        ((isTicket || isComps) && Number(item?.price) == 0);
+    const isFreeTicket = isComps;
+
+    // const isFreeTicket =
+    //     isComps ||
+    //     isCommitteeSale ||
+    //     ((isTicket || isComps) && Number(item?.price) == 0);
 
     // Currency
     const currency =
@@ -103,7 +106,7 @@ const OrderItemCard = ({
                             Complimentary
                         </div>
                     ) : (
-                        <div className="px-3 py-2 rounded bg-success bg-opacity-10 text-success fw-bold d-inline-block">
+                        <div className="px-3 py-2 rounded bg-opacity-10 text-success fw-bold d-inline-block">
                             {currencySymbol}{formatPrice(item?.price)}
                         </div>
                     )}

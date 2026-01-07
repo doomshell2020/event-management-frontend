@@ -1264,9 +1264,10 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                         const isCommittee = ticket.type == "committee_sales";
                                                                         const committeeStatus = ticket.committee_status || null;
 
+                                                                        // console.log('ticket.committeeAssignedTickets :', ticket.committeeAssignedTickets);
                                                                         const committeeMembers = isCommittee
-                                                                            ? ticket.committeeAssignedTickets
-                                                                                ?.filter(ct =>
+                                                                        ? ticket.committeeAssignedTickets
+                                                                        ?.filter(ct =>
                                                                                     ct.status == "Y" &&
                                                                                     ct.committeeMember?.status == "Y" &&
                                                                                     ct.committeeMember?.user
@@ -1277,7 +1278,8 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                                     email: ct.committeeMember.user.email
                                                                                 })) || []
                                                                             : [];
-
+                                                                            
+                                                                            // console.log('committeeMembers :', committeeMembers);
                                                                         // ✅ Filter questions that belong to this ticket
                                                                         const ticketQuestions = eventData.questions?.filter(q =>
                                                                             q.ticket_type_id

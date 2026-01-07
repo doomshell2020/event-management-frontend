@@ -76,6 +76,7 @@ export const formatDateTimeShort = (dateString) => {
     }
 };
 
+// Use all where 
 export const formatEventDateTime = (
     date,
     timezone,
@@ -84,6 +85,23 @@ export const formatEventDateTime = (
     if (!date) return "N/A";
 
     return moment(date)
-        .tz(timezone || "UTC")
+        .tz(timezone || "Asia/Kolkata")
         .format(format);
+};
+
+
+export const isEventExpired = (event) => {
+    if (!event?.date_to?.utc || !event?.event_timezone) return false;
+
+    try {
+        const nowInEventTZ = moment().tz(event.event_timezone);
+        const eventEndInTZ = moment
+            .utc(event.date_to.utc)
+            .tz(event.event_timezone);
+
+        return nowInEventTZ.isAfter(eventEndInTZ);
+    } catch (e) {
+        console.error("Event expiry check failed:", e);
+        return false;
+    }
 };
