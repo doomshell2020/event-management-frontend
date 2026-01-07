@@ -42,6 +42,7 @@ const LoadingComponent = ({ isActive }) => {
 export default function CartModal({ show, handleClose, eventId }) {
 
     const { cart, refreshCart, eventData, normalCart, addonCart, slotCart, loadingCart, setEventId } = useCart();
+    // console.log('cart :', cart);
 
     const finalEventId = eventId || eventData?.id;
 

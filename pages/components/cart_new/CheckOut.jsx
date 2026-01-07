@@ -27,6 +27,7 @@ export default function CheckOutComponents({
   sub_total,
 }) {
   const { cart, eventData, loginUserId } = useCart();
+  // console.log('cart :', cart);
 
   const router = useRouter();
   const [clientSecret, setClientSecret] = useState("");
@@ -47,9 +48,11 @@ export default function CheckOutComponents({
       ticketType: item.item_type,  // ticket | addon | package
       ticketId: item.uniqueId,     // backend expects this as real item id
       quantity: item.count || 1,
+      committee_user_id: item.committee_member_id || null,
       price: roundAmount(item.ticket_price),
     }));
   }, [cart]);
+  // console.log('cartData :', cartData);
 
 
   /* Fetch User */
