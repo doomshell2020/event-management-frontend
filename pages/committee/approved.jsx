@@ -247,7 +247,7 @@ const CommitteeApproved = ({ approvedRequests, counts, assets }) => {
                                 <tbody>
                                     {approvedList.length > 0 ? (
                                         approvedList.map((item, index) => {
-                                        console.log('item :', item);
+                                        // console.log('item :', item);
                                             const user = item.user || {};
                                             const ticket = item.TicketType || {};
                                             const event = item.events || {};

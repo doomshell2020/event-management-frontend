@@ -32,6 +32,7 @@ const ManageTickets = () => {
         ticketImage: null,
     });
 
+    // console.log('ticketForm :', ticketForm);
     const [ticketId, setTicketId] = useState(null);
 
     const handleInputChange = (e) => {
@@ -41,6 +42,35 @@ const ManageTickets = () => {
             [name]: files && files.length > 0 ? files[0] : value,
         });
     };
+
+    const handleImagePreview = () => {
+        const imageUrl = ticketForm?.ticketImage || ticketForm?.ticketImage;
+
+        if (!imageUrl) {
+            Swal.fire({
+                icon: "info",
+                title: "No Image Found",
+                text: "This event does not have an image yet.",
+            });
+            return;
+        }
+
+        Swal.fire({
+            imageUrl: imageUrl.startsWith("http")
+                ? imageUrl
+                : `${process.env.NEXT_PUBLIC_API_BASE_URL || ""}/uploads/tickets/${imageUrl}`,
+            imageWidth: 400,
+            imageHeight: 400,
+            imageAlt: "Ticket Image",
+            showConfirmButton: false,  // ✅ hides the "Close" button
+            showCloseButton: true,     // ✅ shows the "X" icon at the top-right
+            customClass: {
+                popup: "rounded-lg shadow-lg p-0",
+                closeButton: "text-white bg-transparent position-absolute top-2 right-2 fs-5",
+            },
+        });
+    };
+
 
     // For file input only
     const handleFileChange = (e) => {
@@ -61,8 +91,8 @@ const ManageTickets = () => {
         try {
             setLoading(true);
             const res = await api.get(`/api/v1/tickets/list/${id}`);
-            console.log('res :', res);
             if (res.data.success) {
+                // console.log('res.data.data :', res.data.data);
                 setTicketList(res.data.data || []);
             } else {
                 setTicketList([]);
@@ -186,8 +216,6 @@ const ManageTickets = () => {
             "_blank"
         );
     };
-
-
 
     return (
         <>
@@ -429,7 +457,7 @@ const ManageTickets = () => {
                                                                                 count: ticket.count,
                                                                                 hidden: ticket.hidden,
                                                                                 access_type: ticket.access_type,
-                                                                                ticketImage: null,
+                                                                                ticketImage: ticket.ticket_image,
                                                                             });
                                                                             setShow(true);
                                                                             setOpenDropdown(null);
@@ -678,7 +706,21 @@ const ManageTickets = () => {
                             </div>
 
                             <div className="col-md-12">
-                                <label className="form-label">Ticket Image (Optional)</label>
+                                <label className="form-label d-flex align-items-center gap-2">
+                                    Ticket Image (Optional)
+
+                                    {(ticketForm?.ticketImage) && (
+                                        <span
+                                            className="preview_img fw-normal text-primary"
+                                            role="button"
+                                            style={{ cursor: "pointer", textDecoration: "underline" }}
+                                            onClick={handleImagePreview}
+                                        >
+                                            Preview Image
+                                        </span>
+                                    )}
+                                </label>
+
                                 <input
                                     type="file"
                                     name="ticketImage"
@@ -687,6 +729,7 @@ const ManageTickets = () => {
                                     onChange={handleFileChange}
                                 />
                             </div>
+
                         </div>
 
                         <Modal.Footer>

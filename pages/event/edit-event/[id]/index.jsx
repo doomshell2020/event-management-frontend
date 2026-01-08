@@ -278,7 +278,7 @@ const MyEventsPage = () => {
         Swal.fire({
             imageUrl: imageUrl.startsWith("http")
                 ? imageUrl
-                : `${process.env.NEXT_PUBLIC_BASE_URL || ""}${imageUrl}`,
+                : `${process.env.NEXT_PUBLIC_API_BASE_URL || ""}${imageUrl}`,
             imageWidth: 400,
             imageHeight: 400,
             imageAlt: "Event Image",
