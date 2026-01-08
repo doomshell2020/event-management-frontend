@@ -41,6 +41,7 @@ const LoadingComponent = ({ isActive }) => {
 export default function CartModal({ show, handleClose, eventId, slotIds }) {
     const [isLoading, setIsLoading] = useState(true);
     const [eventDetails, setEventDetails] = useState({});
+    const [currency, setCurrency] = useState('');
     const [taxAppliedStatus, setTaxAppliedStatus] = useState('');
     const [eventName, setEventName] = useState('');
     const [eventImage, setEventImage] = useState('');
@@ -51,24 +52,9 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
     const [coupon, setCoupon] = useState("");
     const [adminFees, setAdminFees] = useState(8);
     const [showNextStep, setShowNextStep] = useState(false);
-
-    const [increaseLoadingId, setIncreaseLoadingId] = useState(null);
-    const [decreaseLoadingId, setDecreaseLoadingId] = useState(null);
     // CART API FUNCTIONS
     const fetchCart = async (eventId) => {
         return await api.get(`/api/v1/cart/appointment-list?event_id=${eventId}`);
-    };
-
-    const increaseCart = async (cartId) => {
-        return await api.put(`/api/v1/cart/increase/${cartId}`);
-    };
-
-    const decreaseCart = async (cartId) => {
-        return await api.put(`/api/v1/cart/decrease/${cartId}`);
-    };
-
-    const deleteCart = async (cartId) => {
-        return await api.delete(`/api/v1/cart/delete/${cartId}`);
     };
 
     const addToCart = async (params) => {
@@ -80,7 +66,7 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
     };
 
     const [slotCart, setSlotCart] = useState({});
-    
+
     useEffect(() => {
         if (!show) return;
 
@@ -96,6 +82,9 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
                     `api/v2/events/${eventId}/wellness-appointments`,
                     { slotIds: slotIds }
                 );
+                const currencySymbol = res?.data?.data?.currencyName?.Currency_symbol || "$";
+                // console.log("---res.data.data", currencySymbol);
+                setCurrency(currencySymbol)
                 setEventDetails(res.data.data);
                 setTaxAppliedStatus(res.data?.data?.wellness?.[0].tax_applied);
                 setEventName(res?.data?.data?.name)
@@ -180,7 +169,7 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
             year: "numeric",
         });
     };
-   
+
 
     const formatTime = (timeString) => {
         if (!timeString) return "";
@@ -279,7 +268,7 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
         }, 1000);
     };
 
-    
+
     return (
         <Modal
             show={show}
@@ -305,7 +294,7 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
                                         {/* LEFT SIDE */}
                                         <Col lg={8} className="men-innr-sec">
                                             <div className="checkot-lft">
-                                             <div className="ck-event-dtl">
+                                                <div className="ck-event-dtl">
                                                     <div className="eventsBxSec">
                                                         <Row className="align-items-center gy-3 marginTpMinus4">
                                                             {eventDetails.wellness?.length > 0 && (
@@ -378,7 +367,7 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
 
                                                                                             {/* Price */}
                                                                                             <div style={{ fontWeight: 600, fontSize: "16px" }}>
-                                                                                                {w?.currencyName?.Currency_symbol} {slot.price}
+                                                                                                {currency} {slot.price}
                                                                                             </div>
                                                                                         </div>
                                                                                     ))
@@ -391,86 +380,6 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
                                                                 </div>
                                                             )}
                                                         </Row>
-
-
-
-
-
-                                                        {/* <Row className="align-items-center gy-3 marginTpMinus4">
-                                                            {eventDetails.wellness?.length > 0 && (
-                                                                <div className="ticket-section mt-4">
-                                                                    <h5 className="mb-3">Available Appointments</h5>
-                                                                    {eventDetails.wellness.map((w) => (
-                                                                        <div
-                                                                            key={w.id}
-                                                                            className="ticket-box mb-4 p-3 border rounded shadow-sm"
-                                                                        >
-                                                                         
-                                                                            <strong style={{ fontSize: "17px" }}>{w.name}</strong>
-                                                                    
-
-                                                                            {w.wellnessSlots?.length > 0 ? (
-                                                                                w.wellnessSlots.map((slot) => (
-                                                                                    <div
-                                                                                        key={slot.id}
-                                                                                        style={{
-                                                                                            display: "flex",
-                                                                                            alignItems: "center",
-                                                                                            justifyContent: "space-between",
-                                                                                            padding: "14px 16px",
-                                                                                            marginBottom: "12px",
-                                                                                            borderRadius: "8px",
-                                                                                            border: "2px solid #198754",
-                                                                                            backgroundColor: "rgba(25, 135, 84, 0.12)",
-                                                                                        }}
-                                                                                    >
-                                                                                        <div
-                                                                                            style={{
-                                                                                                display: "flex",
-                                                                                                alignItems: "center",
-                                                                                                gap: "14px",
-                                                                                            }}
-                                                                                        >
-                                                                                            <span
-                                                                                                style={{
-                                                                                                    width: "18px",
-                                                                                                    height: "18px",
-                                                                                                    borderRadius: "4px",
-                                                                                                    backgroundColor: "#198754",
-                                                                                                    display: "flex",
-                                                                                                    alignItems: "center",
-                                                                                                    justifyContent: "center",
-                                                                                                    color: "#fff",
-                                                                                                    fontSize: "12px",
-                                                                                                    fontWeight: "bold",
-                                                                                                }}
-                                                                                            >
-                                                                                                ✓
-                                                                                            </span>
-
-                                                                                            <span style={{ fontWeight: 600, fontSize: "15px" }}>
-                                                                                                <i className="bi bi-calendar me-1"></i>
-                                                                                                {formatReadableDate(slot.date)}
-                                                                                            </span>
-
-                                                                                            <span style={{ color: "#6c757d", fontSize: "14px" }}>
-                                                                                                  <i className="bi bi-clock me-1"></i>
-                                                                                                {formatTime(slot.slot_start_time)} – {formatTime(slot.slot_end_time)}
-                                                                                            </span>
-                                                                                        </div>
-
-                                                                                        <div style={{ fontWeight: 600, fontSize: "16px" }}>
-                                                                                            {w?.currencyName?.Currency_symbol} {slot.price}
-                                                                                        </div>
-                                                                                    </div>
-                                                                                ))
-                                                                            ) : (
-                                                                                <p style={{ color: "#6c757d" }}>No slots available</p>
-                                                                            )} </div>
-                                                                    ))}
-                                                                </div>
-                                                            )}
-                                                        </Row> */}
                                                     </div>
                                                 </div>
 

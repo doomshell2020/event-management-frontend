@@ -16,7 +16,7 @@ import {
 } from "@coreui/react";
 import Seo from "@/shared/layout-components/seo/seo";
 import Swal from "sweetalert2";
-import HtmlEditor, { getHtmlEditorContent } from "@/pages/components/HtmlEditor/HtmlEditor";
+import HtmlEditor, { getHtmlEditorContent } from "@/pages/components/HtmlEditor/EmailHtmlEditor";
 
 const TemplateCreate = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -29,19 +29,19 @@ const TemplateCreate = () => {
     let router = useRouter();
     const [validateDefault, setValidateDefault] = useState(false);
     const isEditorEmpty = (html = "") => {
-    const text = html
-        .replace(/<[^>]*>/g, "") // remove HTML tags
-        .replace(/&nbsp;/g, "")
-        .trim();
+        const text = html
+            .replace(/<[^>]*>/g, "") // remove HTML tags
+            .replace(/&nbsp;/g, "")
+            .trim();
 
-    return text.length === 0;
-};
+        return text.length === 0;
+    };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
         event.stopPropagation();
         // ✅ Frontend validation
-         if ( !title.trim() ||!subject.trim() || isEditorEmpty(content)) {
+        if (!title.trim() || !subject.trim() || isEditorEmpty(content)|| !selectedEvent) {
             setValidateDefault(true);
             Swal.fire({
                 icon: "warning",
@@ -58,6 +58,7 @@ const TemplateCreate = () => {
                 title: title.trim(),
                 subject: subject.trim(),
                 description: content.trim(),
+                eventId:selectedEvent
             };
             const res = await api.post("/api/v1/admin/email-templates", payload);
             if (res?.data?.success) {
@@ -91,7 +92,19 @@ const TemplateCreate = () => {
             setValidateDefault(true);
         }
     };
-
+    const [events, setEvents] = useState([]);
+    const [selectedEvent, setSelectedEvent] = useState("");
+    const getEvents = async () => {
+        try {
+            const { data } = await api.get("/api/v1/admin/email-templates/events");
+            setEvents(data?.data.events || []);
+        } catch (err) {
+            console.error("Error fetching event organizers:", err);
+        }
+    };
+    useEffect(() => {
+        getEvents();
+    }, []);
 
 
     return (
@@ -142,6 +155,27 @@ const TemplateCreate = () => {
                                         }}
                                     />
                                 </CCol>
+
+                                <CCol md={4}>
+                                    <CFormLabel>
+                                        Events <span style={{ color: "red" }}>*</span>
+                                    </CFormLabel>
+
+                                    <CFormSelect
+                                        required
+                                        value={selectedEvent}
+                                        onChange={(e) => setSelectedEvent(e.target.value)}
+                                    >
+                                        <option value="">--Select Event--</option>
+                                        {events &&
+                                            events.map((item) => (
+                                                <option key={item.id} value={item.id}>
+                                                    {item.name}
+                                                </option>
+                                            ))}
+                                    </CFormSelect>
+                                </CCol>
+
 
                                 <CCol md={12}>
                                     <b>Format Description</b><span style={{ color: "Red" }}>*</span><br />

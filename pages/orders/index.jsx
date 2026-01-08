@@ -90,15 +90,8 @@ export default function MyOrders({ userId }) {
                                             0
                                         ) || 0;
 
-                                    const eventCurrency =
-                                        event?.currencyName
-                                            ?.Currency_symbol || "";
-
-                                    const appointmentCurrency =
-                                        order?.orderItems?.[0]?.appointment
-                                            ?.wellnessList?.currencyName
-                                            ?.Currency_symbol || "";
-
+                                    const eventCurrency = order.event?.currencyName?.Currency_symbol
+                                    // console.log('eventCurrency :', eventCurrency);
                                     return (
                                         <div
                                             key={order.id}
@@ -189,26 +182,9 @@ export default function MyOrders({ userId }) {
                                                                             {totalTickets}
                                                                         </p>
 
-                                                                        <p className="time m-0">
-                                                                            <strong
-                                                                                style={{
-                                                                                    width:
-                                                                                        "70px",
-                                                                                    display:
-                                                                                        "inline-block",
-                                                                                }}
-                                                                            >
-                                                                                Amount
-                                                                            </strong>
-                                                                            :
-                                                                            {order?.orderItems?.[0]
-                                                                                ?.type ===
-                                                                            "appointment"
-                                                                                ? appointmentCurrency
-                                                                                : eventCurrency}
-                                                                            {
-                                                                                order?.grand_total
-                                                                            }
+                                                                        <p className="time m-0 p-0">
+                                                                            <strong style={{ width: "70px", display: "inline-block" }}>Amount</strong>
+                                                                            <span style={{ width: "10px", display: "inline-block", fontWeight: "bold" }}>:</span>{eventCurrency}{order.grand_total}
                                                                         </p>
                                                                     </div>
 

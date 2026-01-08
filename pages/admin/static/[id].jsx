@@ -1,6 +1,6 @@
 // new page design
 import React, { useState, useEffect, useRef } from "react";
-import { Card, Spinner, Col } from "react-bootstrap";
+import { Card, Spinner, Col, Modal, Button } from "react-bootstrap";
 import Link from "next/link";
 import { useRouter } from 'next/router';
 import api from "@/utils/api";
@@ -22,7 +22,7 @@ const StaticEdit = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [btnLoading, setBtnLoading] = useState(false);
     const [title, setTitle] = useState("");
-    // const content = getHtmlEditorContent(noteRef);
+    const [url, setUrl] = useState("");
     const [editorData, setEditorData] = useState({ content: "" });
 
     const fetchStaticDetails = async (id) => {
@@ -35,7 +35,7 @@ const StaticEdit = () => {
             const staticData = data?.data;
             if (staticData) {
                 setTitle(staticData.title || "");
-                // setEditorData({ content: staticData.descr ?? "" });
+                setUrl(staticData.url || "");
                 setEditorData({ content: staticData.descr })
             }
         } catch (error) {
@@ -57,6 +57,13 @@ const StaticEdit = () => {
         return text.length === 0;
     };
     const [validateDefault, setValidateDefault] = useState(false);
+    const handleUrlChange = (e) => {
+        let inputValue = e.target.value;
+        if (!inputValue.startsWith('/')) {
+            inputValue = `/${inputValue}`;
+        }
+        setUrl(inputValue);
+    };
     const handleSubmit = async (event) => {
         event.preventDefault();
         event.stopPropagation();
@@ -77,6 +84,7 @@ const StaticEdit = () => {
             const payload = {
                 title: title.trim(),
                 descr: content, // ✅ FIXED
+                url: url,
             };
             const res = await api.put(`/api/v1/admin/static/${id}`, payload);
             if (res?.data?.success) {
@@ -110,8 +118,8 @@ const StaticEdit = () => {
             setValidateDefault(true);
         }
     };
-
-
+    // update status
+    const [show, setShow] = useState(false);
 
     return (
         <div>
@@ -148,16 +156,41 @@ const StaticEdit = () => {
                                     />
                                 </CCol>
 
-                                <CCol md={12}>
-                                    <b>Description</b><span style={{ color: "Red" }}>*</span><br />
+                                <CCol md={4}>
+                                    <CFormLabel>
+                                        URL <span style={{ color: "red" }}>*</span>
+                                    </CFormLabel>
+                                    <CFormInput
+                                        type="text"
+                                        placeholder="Enter Url"
+                                        required
+                                        value={url}
+                                        onChange={handleUrlChange}
+                                    />
+                                </CCol>
 
+                                <CCol md={12}>
+                                    <div className="d-flex justify-content-between px-2 py-1 align-items-center">
+                                        <div>
+                                            <b>Description</b><span style={{ color: "Red" }}>*</span>
+                                        </div>
+                                        <button
+                                            variant=""
+                                            className="btn  btn-sm me-1 my-1"
+                                            style={{ background: "#23b7e5", color: "white" }}
+                                            type="button"
+                                            onClick={() => setShow(true)}
+                                        >
+                                            <i className="bi bi-eye"></i> Preview
+                                        </button>
+
+                                    </div>
                                     <div >
                                         <HtmlEditor
                                             editorRef={noteRef}
                                             initialContent={editorData.content}
                                             onChange={(content) => setEditorData({ ...editorData, content })}
                                         />
-
 
                                     </div>
                                 </CCol>
@@ -196,7 +229,38 @@ const StaticEdit = () => {
                         </Card.Body>
                     </Card>
                 </Col>
-
+                <Modal
+                show={show}   
+                size="lg"
+                alignment="center"
+                onClose={() => setShow(false)}
+                // aria-labelledby="example-modal-sizes-title-lg"
+                scrollable
+                >
+                    <Modal.Header>
+                        <Modal.Title>Preview</Modal.Title>
+                        <Button
+                            onClick={() => setShow(false)}
+                            className="btn-close"
+                            variant=""
+                        >
+                            x
+                        </Button>
+                    </Modal.Header>
+                    <Modal.Body>
+                        {editorData?.content ? (
+                            <div
+                                className="preview-content"
+                                dangerouslySetInnerHTML={{
+                                    __html: editorData.content,
+                                }}
+                            />
+                        ) : (
+                            <p>No content to preview</p>
+                        )}
+                    </Modal.Body>
+                    <Modal.Footer></Modal.Footer>
+                </Modal>
 
             </div>
             {/* <!--/Row--> */}

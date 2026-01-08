@@ -5,6 +5,7 @@ import {
     Row,
     Button,
     Spinner,
+    Form
 } from "react-bootstrap";
 import {
     useTable,
@@ -16,8 +17,8 @@ import Seo from "@/shared/layout-components/seo/seo";
 import api from "@/utils/api";
 import Moment from "react-moment";
 import Swal from "sweetalert2";
-
-import { useRouter } from "next/router";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 export const CustomerList = () => {
     const [COLUMNS, setCOLUMNS] = useState([
@@ -55,6 +56,15 @@ export const CustomerList = () => {
                     {row.original.mobile ? row.original.mobile : "---"}
                 </div>
             ),
+        }, {
+            Header: "Total Spends",
+            accessor: "totalSpends",
+            className: "borderrigth",
+            Cell: ({ row }) => (
+                <div>
+                    {Number(row.original.total_spent || 0).toLocaleString('en-IN')}
+                </div>
+            ),
         },
         {
             Header: "Created",
@@ -69,16 +79,6 @@ export const CustomerList = () => {
                     ) : (
                         "---"
                     )}
-                </div>
-            ),
-        },
-        {
-            Header: "Total Spends",
-            accessor: "totalSpends",
-            className: "borderrigth",
-            Cell: ({ row }) => (
-                <div>
-                    {Number(row.original.total_spent || 0).toLocaleString('en-IN')}
                 </div>
             ),
         },
@@ -157,13 +157,12 @@ export const CustomerList = () => {
         //     ),
         // },
     ]);
-
-
-    let navigate = useRouter();
     const [customers, setCustomers] = useState([]);
-    // console.log("----customers",customers)
     const [isLoading, setIsLoading] = useState(true);
-
+    const [firstName, setFirstName] = useState("");
+    const [email, setEmail] = useState("");
+    const [fromDate, setFromDate] = useState(null);
+    const [toDate, setToDate] = useState(null);
     const handleSendEmail = async (id) => {
         const result = await Swal.fire({
             title: "Are you sure?",
@@ -275,19 +274,23 @@ export const CustomerList = () => {
             });
         }
     };
-    const getCustomers = async () => {
-        const { data } = await api.get("/api/v1/admin/customers");
-        return data?.data?.customers || [];
+
+ const getCustomers = async () => {
+        try {
+           setIsLoading(true);
+            const { data } = await api.get("/api/v1/admin/customers");
+            setCustomers(data?.data?.customers || []);
+        } catch (err) {
+            console.error("Error fetching event organizers:", err);
+        } finally {
+            setIsLoading(false);
+        }
     };
+
     useEffect(() => {
-        setIsLoading(true);
-        getCustomers()
-            .then(setCustomers)
-            .catch(err =>
-                console.error("Error fetching event organizers:", err)
-            )
-            .finally(() => setIsLoading(false));
+        getCustomers();
     }, []);
+
     const tableInstance = useTable(
         {
             columns: COLUMNS,
@@ -318,12 +321,136 @@ export const CustomerList = () => {
 
     const { globalFilter, pageIndex, pageSize } = state;
     useEffect(() => { setPageSize(50) }, []);
+    const formatDate = (date) => {
+        if (!date) return "";
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+    };
+
+    const handleSearch = async (e) => {
+        e.preventDefault();
+        try {
+            const formattedFromDate = formatDate(fromDate);
+            const formattedToDate = formatDate(toDate);
+            const response = await api.get("/api/v1/admin/customers/search", {
+                params: {
+                    first_name:firstName,
+                    email,
+                    fromDate: formattedFromDate,
+                    toDate: formattedToDate,
+                },
+            });
+            setCustomers(response?.data?.data?.customers); // Save API results in state
+        } catch (error) {
+            console.error("Error fetching events:", error);
+            setCustomers([]);
+        }
+    };
+
+    const handleReset = () => {
+        setFirstName("");
+        setEmail("");
+        setFromDate(null);
+        setToDate(null);
+        setCustomers([]);
+        getCustomers();
+    };
+
+
+
 
     return (
         <div>
             <Seo title={"Customer Manager"} />
             <Row className="row-sm mt-4">
-                <Col xl={12}>
+                <Col xl={2}>
+                    <Card className="member-fltr-hid">
+                        <Card.Header>
+                            <div className="d-flex justify-content-between">
+                                <h4 className="card-title mg-b-0">Filters</h4>
+                            </div>
+                        </Card.Header>
+                        <Card.Body className="p-2">
+                            <Form onSubmit={handleSearch}>
+                                <Form.Group className="mb-3" controlId="formName">
+                                    <Form.Label>First Name</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="First Name"
+                                        value={firstName}
+                                        onChange={(e) => setFirstName(e.target.value.trim())}
+
+                                    />
+                                </Form.Group>
+
+                                <Form.Group className="mb-3" controlId="formName">
+                                    <Form.Label>Email</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Email"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value.trim())}
+                                    />
+                                </Form.Group>
+
+                                <Form.Group className="mb-3" controlId="formDateFrom">
+                                    <Form.Label>From Date</Form.Label>
+                                    <div style={{ width: "127%" }}>
+                                        <DatePicker
+                                            selected={fromDate}
+                                            onChange={(date) => {
+                                                setFromDate(date);
+
+                                                // Reset To Date if it is smaller than From Date
+                                                if (toDate && date && toDate < date) {
+                                                    setToDate(null);
+                                                }
+                                            }}
+                                            dateFormat="dd-MM-yyyy"
+                                            placeholderText="DD-MM-YY"
+                                            className="form-control"
+                                            wrapperClassName="w-100"
+                                            maxDate={toDate || null}   // optional (UX improvement)
+                                        />
+                                    </div>
+                                </Form.Group>
+
+                                <Form.Group className="mb-3" controlId="formDateTo">
+                                    <Form.Label>To Date</Form.Label>
+                                    <div style={{ width: "127%" }}>
+                                        <DatePicker
+                                            selected={toDate}
+                                            onChange={(date) => setToDate(date)}
+                                            dateFormat="dd-MM-yyyy"
+                                            placeholderText="DD-MM-YY"
+                                            className="form-control"
+                                            wrapperClassName="w-100"
+                                            disabled={!fromDate}      // ✅ Disable until From Date selected
+                                            minDate={fromDate}        // ✅ Cannot select smaller date
+                                        />
+                                    </div>
+                                </Form.Group>
+
+
+                                <div className="d-flex align-items-end justify-content-between">
+                                    <Button
+                                        variant="primary "
+                                        className="me-2 w-50"
+                                        type="submit"
+                                    >
+                                        Submit
+                                    </Button>
+                                    <Button variant="secondary" className="w-50" type="reset" onClick={handleReset}>
+                                        Reset
+                                    </Button>
+                                </div>
+                            </Form>
+                        </Card.Body>
+                    </Card>
+                </Col>
+                <Col xl={10}>
                     <Card>
                         <Card.Header className="">
                             <div className="d-flex justify-content-between">

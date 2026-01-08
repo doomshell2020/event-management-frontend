@@ -8,6 +8,7 @@ import {
     Spinner,
     Alert,
     Collapse,
+    Form
 } from "react-bootstrap";
 import {
     useTable,
@@ -15,8 +16,8 @@ import {
     useGlobalFilter,
     usePagination,
 } from "react-table";
+import { CCol, CFormLabel, CFormInput } from "@coreui/react";
 import Seo from "@/shared/layout-components/seo/seo";
-import axios from "axios";
 import Link from "next/link";
 import api from "@/utils/api";
 import Moment from "react-moment";
@@ -32,7 +33,7 @@ export const StaticList = () => {
             className: "borderrigth",
         },
         {
-            Header: "Title",
+            Header: "Page Name",
             accessor: "title",
             className: "borderrigth",
             Cell: ({ row }) => (
@@ -42,43 +43,93 @@ export const StaticList = () => {
         },
 
         {
-            Header: "Description",
-            accessor: "descr",
+            Header: "Preview",
+            accessor: "preview",
             className: "borderrigth",
             Cell: ({ row }) => {
-                const text = stripHtml(row.original.descr);
                 return (
-                    <div title={text}>
-                        {text.length > 80 ? text.slice(0, 80) + "..." : text}
+                    <div>
+                        <a
+                            href={row.original.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ textDecoration: 'underline', color: '#007bff' }} // optional blue
+                        >
+                            {row.original.url}
+                        </a>
                     </div>
                 );
             },
         },
 
+        {
+            Header: "Last Updated",
+            accessor: "lastUpdated",
+            className: "borderrigth",
+            Cell: ({ row }) => {
+                return (
+                    <div>
+                        {row.original.updatedAt ? (
+                            <Moment format="DD MMM YYYY">
+                                {row.original.updatedAt}
+                            </Moment>
+                        ) : (
+                            "---"
+                        )}
+                    </div>
+                );
+            },
+        },
 
         {
             Header: "Actions",
             accessor: "actions",
-            className: "borderrigth",
+            className: "borderrigth text-center",
             Cell: ({ row }) => {
                 const { id, status } = row.original;
 
+                const isDraft = status === "N";
+                const isPublished = status === "Y";
+
                 return (
-                    <div className="d-flex flex-column align-items-center gap-1">
+                    <div className="d-flex align-items-center gap-2  justify-content-center">
+                        {/* 🔄 STATUS TOGGLE BUTTON */}
+                        {isDraft && (
+                            <button
+                                className="btn btn-sm btn-outline-secondary"
+                                type="button"
+                                onClick={() => handleStatusToggle(id, status)}
+                                title="This page is in draft — click to publish"
+                            >
+                                <i className="bi bi-file-earmark-text me-1"></i>
+                                In Draft
+                            </button>
+                        )}
+
+                        {isPublished && (
+                            <button
+                                className="btn btn-sm btn-success"
+                                type="button"
+                                onClick={() => handleStatusToggle(id, status)}
+                                title="Click to unpublish this page"
+                            >
+                                Published
+                            </button>
+                        )}
                         <div className="d-flex align-items-center gap-2">
 
-                            {/* Edit Button */}
+                            {/* ✏️ Edit Button */}
                             <button
                                 className="btn btn-sm d-flex align-items-center justify-content-center"
                                 style={{ backgroundColor: "#20c997", color: "white" }}
                                 type="button"
-                                onClick={() => handleEdit(row.original.id)}
+                                onClick={() => handleEdit(id)}
                                 title="Edit"
                             >
                                 <i className="bi bi-pencil-square"></i>
                             </button>
 
-                            {/* Delete Button */}
+                            {/* 🗑️ Delete Button */}
                             <button
                                 className="btn btn-sm d-flex align-items-center justify-content-center"
                                 style={{ backgroundColor: "#eb0f0fff", color: "white" }}
@@ -88,24 +139,20 @@ export const StaticList = () => {
                             >
                                 <i className="bi bi-trash-fill"></i>
                             </button>
-
                         </div>
-                    </div>
 
+
+                    </div>
                 );
             },
-        },
+        }
     ]);
-
-    const stripHtml = (html = "") => {
-        if (!html) return "---";
-        return html.replace(/<[^>]*>?/gm, '').trim();
-    };
 
     let navigate = useRouter();
     const [staticPage, setStaticPage] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-
+    const [title, setTitle] = useState("");
+    const [status, setStatus] = useState("");
     // services/static.service.js
     const getStaticPageList = async () => {
         try {
@@ -167,6 +214,59 @@ export const StaticList = () => {
         }
     };
 
+    // publish / unpublish page status
+    const handleStatusToggle = async (id, currentStatus) => {
+        const newStatus = currentStatus === "Y" ? "N" : "Y";
+        const statusText = newStatus === "Y" ? "Publish" : "Unpublish";
+
+        const result = await Swal.fire({
+            title: "Are you sure?",
+            text: `Do you want to ${statusText} this page?`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: `Yes, ${statusText}`,
+            cancelButtonText: "Cancel",
+            confirmButtonColor: "#20c997",
+            reverseButtons: true,
+        });
+
+        if (!result.isConfirmed) return;
+
+        try {
+            Swal.fire({
+                title: "Updating page status...",
+                text: "Please wait",
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                },
+            });
+
+            await api.put(`/api/v1/admin/static/update-status/${id}`, {
+                status: newStatus,
+            });
+
+            getStaticPageList();
+
+            Swal.fire({
+                icon: "success",
+                title: "Success",
+                text: `Page ${statusText.toLowerCase()}ed successfully`,
+                timer: 1500,
+                showConfirmButton: false,
+            });
+        } catch (error) {
+            console.error("Status update failed", error);
+            Swal.fire({
+                icon: "error",
+                title: "Failed",
+                text: "Unable to update page status. Please try again.",
+            });
+        }
+    };
+
+
 
     const tableInstance = useTable(
         {
@@ -202,11 +302,85 @@ export const StaticList = () => {
         navigate.push(`/admin/static/${id}`);
     };
 
+    const handleSearch = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await api.get("/api/v1/admin/static/search", {
+                params: {
+                    title:title,
+                    status:status
+                },
+            });
+            setStaticPage(response?.data?.data?.statics); // Save API results in state
+        } catch (error) {
+            console.error("Error fetching events:", error);
+            setStaticPage([]);
+        }
+    };
+
+    const handleReset = () => {
+        setTitle("");
+        setStatus("");
+        setStaticPage([]);
+        getStaticPageList();
+    };
+
+
+
+
     return (
         <div>
             <Seo title={"Static Manager"} />
             <Row className="row-sm mt-4">
-                <Col xl={12}>
+             <Col xl={2}>
+                    <Card className="member-fltr-hid">
+                        <Card.Header>
+                            <div className="d-flex justify-content-between">
+                                <h4 className="card-title mg-b-0">Filters</h4>
+                            </div>
+                        </Card.Header>
+                        <Card.Body className="p-2">
+                            <Form onSubmit={handleSearch}>
+                                <Form.Group className="mb-3" controlId="formName">
+                                    <Form.Label>Page Name</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Page Name"
+                                        value={title}
+                                        onChange={(e) => setTitle(e.target.value.trim())}
+
+                                    />
+                                </Form.Group>
+
+                                  <CFormLabel htmlFor="validationDefault04"> Show Publish page</CFormLabel>
+                                    <Form.Select
+                                        aria-label="Default select example"
+                                        className="admn-slct"
+                                        value={status}
+                                        onChange={(e) => setStatus(e.target.value)}
+                                    >
+                                        <option value="">-Select-Event-</option>
+                                        <option value="Y">Publish Page</option>
+                                        <option value="N">UnPublish Page</option>
+                                    </Form.Select>
+
+                                <div className="d-flex align-items-end justify-content-between">
+                                    <Button
+                                        variant="primary "
+                                        className="me-2 w-50"
+                                        type="submit"
+                                    >
+                                        Submit
+                                    </Button>
+                                    <Button variant="secondary" className="w-50" type="reset" onClick={handleReset}>
+                                        Reset
+                                    </Button>
+                                </div>
+                            </Form>
+                        </Card.Body>
+                    </Card>
+                </Col>
+                <Col xl={10}>
                     <Card>
                         <Card.Header className="">
                             <div className="d-flex justify-content-between">

@@ -52,7 +52,8 @@ const EventDetailPage = ({ event, slug }) => {
   const [backgroundImage, setIsMobile] = useState("/assets/front-images/about-slider_bg.jpg");
   const [isLoading, setIsLoading] = useState(true);
   const [appointmentData, setAppointmentData] = useState([]);
-
+  const [currency, setCurrency] = useState("");
+  // console.log("currency",currency);
   const formatTime = (timeString) => {
     if (!timeString) return "";
 
@@ -181,6 +182,8 @@ const EventDetailPage = ({ event, slug }) => {
     const fetchDetails = async () => {
       try {
         const res = await api.get(`api/v2/events/${eventId}/appointments`);
+        const currencySymbol =  res?.data?.data?.currencyName?.Currency_symbol || "$";
+        setCurrency(currencySymbol)
         setAppointmentData(res.data.data.wellness);
       } catch (error) {
         console.error("Error loading cart/event:", error);
@@ -501,7 +504,7 @@ const EventDetailPage = ({ event, slug }) => {
                                             fontSize: "16px",
                                           }}
                                         >
-                                          {w?.currencyName?.Currency_symbol}{" "}
+                                          {currency}{" "}
                                           {slot.price}
                                         </div>
                                       </div>
@@ -524,7 +527,7 @@ const EventDetailPage = ({ event, slug }) => {
                                     >
                                       <div>{selectedCount} slots selected</div>
                                       <div style={{ fontWeight: "bold" }}>
-                                        Total: {w?.currencyName?.Currency_symbol}{" "}
+                                        Total: {currency}{" "}
                                         {totalPrice}
                                       </div>
                                     </div>

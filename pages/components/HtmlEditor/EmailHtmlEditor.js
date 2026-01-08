@@ -147,9 +147,81 @@ const HtmlEditor = ({ editorRef, onChange, initialContent = "", height = 500 }) 
     };
 
 
+    // replace hero banner image
+    const handleReplaceHeroImage = () => {
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = "image/*";
+
+        input.onchange = async (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            try {
+                Swal.fire({
+                    title: "Uploading...",
+                    text: "Please wait while the image is being uploaded.",
+                    allowOutsideClick: false,
+                    customClass: { popup: "add-tckt-dtlpop" },
+                    didOpen: () => Swal.showLoading(),
+                });
+
+                const formData = new FormData();
+                // 👇 SAME key as local upload API
+                formData.append("image", file);
+
+                const res = await api.post(
+                    "/api/v1/admin/static/upload-image",
+                    formData,
+                    { headers: { "Content-Type": "multipart/form-data" } }
+                );
+
+                const API_BASE_URL =
+                    process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
+
+                const imageUrl = `${API_BASE_URL}/uploads/static/${res.data.filename}`;
+
+                // 👇 background-image replace
+                const editableDiv = document.querySelector(".note-editable");
+                const heroDiv = editableDiv?.querySelector("#heroBanner");
+
+                if (heroDiv) {
+                    heroDiv.style.backgroundImage = `url('${imageUrl}')`;
+                }
+
+                // 👇 editor HTML update
+                if (editableDiv && onChange) {
+                    onChange(editableDiv.innerHTML);
+                }
+
+                Swal.close();
+            } catch (error) {
+                Swal.close();
+                console.error("Image upload failed:", error);
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "Image upload failed. Please try again.",
+                    customClass: { popup: "add-tckt-dtlpop" },
+                });
+            }
+        };
+
+        input.click();
+    };
 
 
-
+    // hero banner image replace custom buttons
+    const customHeroButton = function (context) {
+        const ui = $.summernote.ui;
+        const button = ui.button({
+            contents: '<i class="note-icon-picture" /> Replace Hero Image',
+            tooltip: 'Replace hero section image',
+            container: context.layoutInfo.editor[0],
+            click: () => handleReplaceHeroImage()  // create a separate handler if logic differs
+        });
+        return button.render();
+    };
 
 
 
@@ -161,6 +233,7 @@ const HtmlEditor = ({ editorRef, onChange, initialContent = "", height = 500 }) 
     return (
         <SummernoteLite
             ref={editorRef}
+            placeholder={""}
             height={height}
             dialogsInBody={true}
             codeviewFilter={false}
@@ -180,7 +253,7 @@ const HtmlEditor = ({ editorRef, onChange, initialContent = "", height = 500 }) 
                 ['para', ['ul', 'ol', 'paragraph']],
                 ['table', ['table']],
                 ['view', ['fullscreen', 'codeview', 'help']],
-                ['custom', ['replaceImage']]
+                ['custom', ['replaceImage', 'replaceHeroImage']]
                 // ["style", ["style"]],
                 // ["font", ["bold", "underline"]],
                 // ["para", ["ul", "ol"]],
@@ -197,8 +270,13 @@ const HtmlEditor = ({ editorRef, onChange, initialContent = "", height = 500 }) 
                 '20', '24', '28', '32', '36',
                 '48', '60', '72'
             ]}
-            buttons={{ replaceImage: customButton }}
+            // buttons={{ replaceImage: customButton }}
+            buttons={{
+                replaceImage: customButton,
+                replaceHeroImage: customHeroButton // ✅ register new one
+            }}
             onChange={(content) => onChange?.(content)}
+
         />
     );
 };

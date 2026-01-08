@@ -1819,8 +1819,8 @@ textarea.form-control.is-invalid {padding-right: calc(1.5em + 0.75rem);
   border-top-right-radius: 3px;}
 .modal-header .btn-close {padding: 1rem;
   margin: -1rem -1rem -1rem auto;
-  background-image: none !important;
-  font-size: 25px;}
+  /* background-image: none !important; */
+  font-size: 15px;}
 .modal-title {margin-bottom: 0;
   line-height: 1.5;
   font-size: 16px;}
@@ -4069,7 +4069,7 @@ hr {border-top: 1px solid #ededf5;}
   padding: 5px;
   line-height: 1;
   font-size: 24px;
-  background-image: none;
+  /* background-image: none; */
   color: #000;}
 .btn-close:focus {box-shadow: none !important;}
 @media (max-width: 576px) {.alert {

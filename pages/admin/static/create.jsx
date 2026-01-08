@@ -21,6 +21,7 @@ import HtmlEditor, { getHtmlEditorContent } from "@/pages/components/HtmlEditor/
 const StaticCreate = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [title, setTitle] = useState("");
+    const [url, setUrl] = useState("");
     const noteRef = useRef(null);
     const content = getHtmlEditorContent(noteRef);
     const [editorData, setEditorData] = useState({ content: "" });
@@ -28,20 +29,26 @@ const StaticCreate = () => {
     let router = useRouter();
     const [validateDefault, setValidateDefault] = useState(false);
     const isEditorEmpty = (html = "") => {
-    const text = html
-        .replace(/<[^>]*>/g, "") // remove HTML tags
-        .replace(/&nbsp;/g, "")
-        .trim();
+        const text = html
+            .replace(/<[^>]*>/g, "") // remove HTML tags
+            .replace(/&nbsp;/g, "")
+            .trim();
 
-    return text.length === 0;
-};
-
+        return text.length === 0;
+    };
+    const handleUrlChange = (e) => {
+        let inputValue = e.target.value;
+        if (!inputValue.startsWith('/')) {
+            inputValue = `/${inputValue}`;
+        }
+        setUrl(inputValue);
+    };
     const handleSubmit = async (event) => {
         event.preventDefault();
         event.stopPropagation();
 
         // ✅ Frontend validation
-         if (!title?.trim() || isEditorEmpty(content)) {
+        if (!title?.trim() || isEditorEmpty(content)) {
             setValidateDefault(true);
             Swal.fire({
                 icon: "warning",
@@ -56,11 +63,10 @@ const StaticCreate = () => {
         try {
             const payload = {
                 title: title.trim(),
+                url: url.trim(),
                 descr: content.trim(),
             };
-
             const res = await api.post("/api/v1/admin/static", payload);
-
             if (res?.data?.success) {
                 const result = await Swal.fire({
                     icon: "success",
@@ -114,14 +120,14 @@ const StaticCreate = () => {
                                 validated={validateDefault}
                                 onSubmit={handleSubmit}
                             >
-                                {/* Organizer Name */}
+
                                 <CCol md={4}>
                                     <CFormLabel>
-                                        Title <span style={{ color: "red" }}>*</span>
+                                        Page Name <span style={{ color: "red" }}>*</span>
                                     </CFormLabel>
                                     <CFormInput
                                         type="text"
-                                        placeholder="Enter Title"
+                                        placeholder="Enter Page Name"
                                         required
                                         value={title}
                                         onChange={(e) => {
@@ -129,6 +135,22 @@ const StaticCreate = () => {
                                         }}
                                     />
                                 </CCol>
+
+
+                                <CCol md={4}>
+                                    <CFormLabel>
+                                        URL <span style={{ color: "red" }}>*</span>
+                                    </CFormLabel>
+                                    <CFormInput
+                                        type="text"
+                                        placeholder="Enter Url"
+                                        required
+                                        value={url}
+                                        onChange={handleUrlChange}
+                                    />
+                                </CCol>
+
+
 
                                 <CCol md={12}>
                                     <b>Description</b><span style={{ color: "Red" }}>*</span><br />

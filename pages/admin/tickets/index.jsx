@@ -19,7 +19,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import moment from "moment";
 import Link from "next/link";
-
+import AsyncSelect from "react-select/async";
 export const TicketList = () => {
     const [COLUMNS, setCOLUMNS] = useState([
         {
@@ -188,7 +188,8 @@ export const TicketList = () => {
     const [ticketNumber, setTicketNumber] = useState("");
     const [fromDate, setFromDate] = useState(null);
     const [toDate, setToDate] = useState(null);
-
+    const [selectedCustomer, setSelectedCustomer] = useState(null);
+    const [selectedEvent, setSelectedEvent] = useState(null);
     const getTicketList = async () => {
         try {
             setIsLoading(true);
@@ -264,6 +265,8 @@ export const TicketList = () => {
         setCustomer("");
         setMobile("");
         setEvent("");
+        setSelectedCustomer(null);   // 👈 THIS WAS MISSING
+        setSelectedEvent(null);   // 👈 THIS WAS MISSING
         setTicketNumber("");
         setFromDate(null);
         setToDate(null);
@@ -342,7 +345,81 @@ export const TicketList = () => {
         document.body.removeChild(link);
     };
 
+    const loadUserOptions = async (inputValue) => {
+        if (inputValue.length < 2) return [];
+        try {
+            const response = await api.get(
+                "/api/v1/admin/customers/first-name/search",
+                {
+                    params: {
+                        search: inputValue, // 👈 backend expects this
+                    },
+                }
+            );
+            const data = response.data;
+            if (data?.success) {
+                return data.data.customers.map((user) => ({
+                    value: user.id,
+                    label: user.first_name, // 👈 correct key
+                    user,
+                }));
+            }
 
+            return [];
+        } catch (error) {
+            console.error("Error fetching users:", error);
+            return [];
+        }
+    };
+
+    const handleUserSelect = (selectedOption) => {
+        setSelectedCustomer(selectedOption); // 👈 dropdown control
+
+        if (selectedOption) {
+            setCustomer(selectedOption.user.first_name);
+        } else {
+            setCustomer("");
+        }
+    };
+
+    const loadEventOptions = async (inputValue) => {
+        if (inputValue.length < 2) return [];
+
+        try {
+            const response = await api.get(
+                "/api/v1/admin/events/search/search",
+                {
+                    params: {
+                        search: inputValue, // backend expects this
+                    },
+                }
+            );
+
+            const data = response.data;
+
+            if (data?.success) {
+                return data.data.events.map((event) => ({
+                    value: event.id,
+                    label: event.name,
+                    event, // full event object if needed later
+                }));
+            }
+
+            return [];
+        } catch (error) {
+            console.error("Error fetching events:", error);
+            return [];
+        }
+    };
+    const handleEventSelect = (selectedOption) => {
+        setSelectedEvent(selectedOption); // 👈 dropdown control
+
+        if (selectedOption) {
+            setEvent(selectedOption.event?.name);
+        } else {
+            setEvent("");
+        }
+    };
 
 
 
@@ -363,17 +440,39 @@ export const TicketList = () => {
                         <Card.Body className="p-2">
                             <Form onSubmit={handleSearch}>
 
+
                                 <Form.Group className="mb-3">
                                     <Form.Label>Customer</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="Customer Name"
-                                        value={customer}
-                                        onChange={(e) => setCustomer(e.target.value)}
+                                    <AsyncSelect
+                                        className="search-dropdown"
+                                        cacheOptions
+                                        loadOptions={loadUserOptions}
+                                        value={selectedCustomer}
+                                        onChange={handleUserSelect}
+                                        placeholder="Search by name"
+                                        isClearable
+                                        getOptionLabel={(option) => option.user.first_name}
+                                        getOptionValue={(option) => option.value}
+                                        formatOptionLabel={(option, { context }) => {
+                                            if (context === "menu") {
+                                                return (
+                                                    <div>
+                                                        <strong>{option.user.first_name}</strong>
+                                                    </div>
+                                                );
+                                            }
+                                            return option.user.first_name;
+                                        }}
+                                        styles={{
+                                            menu: (provided) => ({
+                                                ...provided,
+                                                zIndex: 1050,
+                                            }),
+                                        }}
                                     />
                                 </Form.Group>
 
-                                <Form.Group className="mb-3">
+                                {/* <Form.Group className="mb-3">
                                     <Form.Label>Mobile</Form.Label>
                                     <Form.Control
                                         type="text"
@@ -381,17 +480,43 @@ export const TicketList = () => {
                                         value={mobile}
                                         onChange={(e) => setMobile(e.target.value)}
                                     />
-                                </Form.Group>
+                                </Form.Group> */}
 
                                 <Form.Group className="mb-3">
                                     <Form.Label>Event</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="Event Name"
-                                        value={event}
-                                        onChange={(e) => setEvent(e.target.value)}
+                                    <AsyncSelect
+                                        className="search-dropdown"
+                                        cacheOptions
+                                        loadOptions={loadEventOptions}
+                                        value={selectedEvent}
+                                        onChange={handleEventSelect}
+                                        placeholder="Search by event"
+                                        isClearable
+                                        getOptionLabel={(option) => option.event?.name}
+                                        getOptionValue={(option) => option.value}
+                                        formatOptionLabel={(option, { context }) => {
+                                            if (context === "menu") {
+                                                return (
+                                                    <div>
+                                                        <strong>{option.event?.name}</strong>
+                                                    </div>
+                                                );
+                                            }
+                                            return option.event?.name;
+                                        }}
+                                        styles={{
+                                            menu: (provided) => ({
+                                                ...provided,
+                                                zIndex: 1050,
+                                            }),
+                                        }}
                                     />
                                 </Form.Group>
+
+
+
+
+
 
                                 <Form.Group className="mb-3">
                                     <Form.Label>Ticket Number</Form.Label>
