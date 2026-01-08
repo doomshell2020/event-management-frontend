@@ -9,6 +9,8 @@ import { useAuth } from "@/shared/layout-components/layout/AuthContext";
 import Swal from "sweetalert2";
 import { useRouter } from "next/router";
 import api from "@/utils/api";
+import { isEventExpired, formatEventDateTime } from "@/utils/formatDate";
+
 
 export async function getServerSideProps({ params }) {
   const { id, slug } = params;
@@ -20,7 +22,8 @@ export async function getServerSideProps({ params }) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        id: id
+        id: id,
+        is_details_page: true
       }),
     });
 
@@ -46,10 +49,11 @@ export async function getServerSideProps({ params }) {
 const EventDetailPage = ({ event, slug }) => {
   const { token } = useAuth();
   const router = useRouter();
-  // ⛳ All hooks MUST be at the top
   const [backgroundImage, setIsMobile] = useState("/assets/front-images/about-slider_bg.jpg");
   const [isLoading, setIsLoading] = useState(true);
   const [appointmentData, setAppointmentData] = useState([]);
+  const [currency, setCurrency] = useState("");
+  // console.log("currency",currency);
   const formatTime = (timeString) => {
     if (!timeString) return "";
 
@@ -63,7 +67,6 @@ const EventDetailPage = ({ event, slug }) => {
     return `${hours}:${minutes} ${suffix}`;
   };
 
-
   const formatReadableDate = (dateStr) => {
     if (!dateStr) return "";
     const date = new Date(dateStr);
@@ -74,7 +77,30 @@ const EventDetailPage = ({ event, slug }) => {
     });
   };
 
+  const getYoutubeEmbedUrl = (url) => {
+    if (!url) return null;
 
+    try {
+      // youtu.be/VIDEO_ID
+      if (url.includes("youtu.be/")) {
+        return `https://www.youtube.com/embed/${url.split("youtu.be/")[1].split("?")[0]}`;
+      }
+
+      // youtube.com/watch?v=VIDEO_ID
+      if (url.includes("watch?v=")) {
+        return `https://www.youtube.com/embed/${url.split("watch?v=")[1].split("&")[0]}`;
+      }
+
+      // youtube.com/shorts/VIDEO_ID ✅ SUPPORT SHORTS
+      if (url.includes("youtube.com/shorts/")) {
+        return `https://www.youtube.com/embed/${url.split("shorts/")[1].split("?")[0]}`;
+      }
+
+      return null;
+    } catch (error) {
+      return null;
+    }
+  };
 
   // Prepare dates safely
   const startDate = event ? new Date(event.date_from?.local || event.date_from?.utc) : null;
@@ -82,6 +108,10 @@ const EventDetailPage = ({ event, slug }) => {
   const saleStart = event ? new Date(event.sale_start?.local || event.sale_start?.utc) : null;
   const saleEnd = event ? new Date(event.sale_end?.local || event.sale_end?.utc) : null;
   const eventId = event ? event.id : null;
+
+  // ⏰ Check if event is expired
+  const expired = isEventExpired(event);
+
   // Early return MUST come after hooks
   if (!event || Object.keys(event).length == 0) {
     return (
@@ -109,7 +139,6 @@ const EventDetailPage = ({ event, slug }) => {
   const [showAppointmentCart, setShowAppointmentCart] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState(eventId);
   const [slotIds, setSlotIds] = useState([]);
-  // console.log("-----------slotIds",slotIds)
 
   const handleOpenCart = () => {
     if (!token) {
@@ -153,6 +182,8 @@ const EventDetailPage = ({ event, slug }) => {
     const fetchDetails = async () => {
       try {
         const res = await api.get(`api/v2/events/${eventId}/appointments`);
+        const currencySymbol =  res?.data?.data?.currencyName?.Currency_symbol || "$";
+        setCurrency(currencySymbol)
         setAppointmentData(res.data.data.wellness);
       } catch (error) {
         console.error("Error loading cart/event:", error);
@@ -187,10 +218,6 @@ const EventDetailPage = ({ event, slug }) => {
   };
 
 
-
-
-
-
   return (
     <>
       <FrontendHeader backgroundImage={backgroundImage} />
@@ -217,15 +244,12 @@ const EventDetailPage = ({ event, slug }) => {
                   alt="background"
                 />
 
-
-
-
                 <div className="social mt-3 d-flex social_bg justify-content-between align-items-center">
                   <h5 className="mb-0">Share With Friends</h5>
                   <ul className="list-inline social_ul m-0">
                     <li className="list-inline-item">
                       <Link
-                        href={`https://www.facebook.com/sharer.php?u=https://eboxtickets.com/event/${slug}`}
+                        href={`https://www.facebook.com/sharer.php?u=${process.env.NEXT_PUBLIC_API_BASE_URL}event/${slug}`}
                         target="_blank"
                       >
                         <i className="fab fa-facebook-f"></i>
@@ -233,7 +257,7 @@ const EventDetailPage = ({ event, slug }) => {
                     </li>
                     <li className="list-inline-item">
                       <Link
-                        href={`https://twitter.com/share?url=https://eboxtickets.com/event/${slug}&text=${event.name}`}
+                        href={`https://twitter.com/share?url=${process.env.NEXT_PUBLIC_API_BASE_URL}event/${slug}&text=${event.name}`}
                         target="_blank"
                       >
                         <i className="fab fa-twitter"></i>
@@ -241,7 +265,7 @@ const EventDetailPage = ({ event, slug }) => {
                     </li>
                     <li className="list-inline-item">
                       <Link
-                        href={`mailto:?subject=Ebox Tickets: ${event.name}&body=Check out this event: https://eboxtickets.com/event/${slug}`}
+                        href={`mailto:?subject=Ebox Tickets: ${event.name}&body=Check out this event: ${process.env.NEXT_PUBLIC_API_BASE_URL}event/${slug}`}
                         target="_blank"
                       >
                         <i className="fa fa-envelope"></i>
@@ -255,14 +279,16 @@ const EventDetailPage = ({ event, slug }) => {
             {/* Right side details */}
             <div className="col-md-7">
               <div className="event-ticket-box">
+
                 <div className="section-heading">
                   <h2 className="text-start">{event.name}</h2>
                   <h6>
                     Hosted By <a href="#"> #{event.companyInfo?.name || 'Company'}</a>
                   </h6>
 
+
                   {/* 🚫 Inactive Event Warning */}
-                  {event.status == "N" && (
+                  {!expired && event.status == "N" && (
                     <div
                       style={{
                         background: "#ffdddd",
@@ -278,7 +304,7 @@ const EventDetailPage = ({ event, slug }) => {
                     </div>
                   )}
 
-                  {event.status == "Y" && (
+                  {!expired && event.status == "Y" && (
                     <div className="mt-3 d-flex gap-2">
                       <button
                         onClick={(e) => {
@@ -304,8 +330,6 @@ const EventDetailPage = ({ event, slug }) => {
 
                 </div>
 
-
-
                 <div className="info">
                   <ul className="d-flex ps-0 mb-0">
                     <li className="flex-fill">
@@ -314,100 +338,50 @@ const EventDetailPage = ({ event, slug }) => {
                         <span>{startDate ? format(startDate, "EEE, dd MMM yyyy | hh:mm a") : ""}</span>
                       </div>
                     </li>
+
                     <li className="flex-fill">
                       <div>
                         <h6>End Date</h6>
                         <span>{endDate ? format(endDate, "EEE, dd MMM yyyy | hh:mm a") : ""}</span>
                       </div>
                     </li>
+
                     <li className="flex-fill">
                       <div>
                         <h6>Location</h6>
                         <span>{event.location || "Not Available"}</span>
                       </div>
                     </li>
+
                   </ul>
                 </div>
 
-                {/* <h5 className="event_Sub_h">Tickets</h5>
-                <p className="event_pra">
-                  The maximum number of tickets allowed per account is {event.ticket_limit || 50}.
-                </p> */}
-
-                {/* TICKETS LIST */}
-                {/* <div className="form-group ticket_all">
-                  <ul className="ps-0">
-                    {event?.tickets?.length > 0 ? (
-                      event.tickets
-                        .filter((t) => t.status == "Y" || t.hidden == "N")
-                        .map((ticket) => (
-                          <li key={ticket.id} className="list-item-none">
-                            <div className="row align-items-center">
-                              <div className="col-sm-6 col-4 price-name">
-                                <h6>{ticket.title}</h6>
-                              </div>
-                              <div className="col-sm-6 col-8 price-details">
-                                <div className="row align-items-center">
-                                  <div className="col-6 d-flex align-items-center justify-content-end">
-                                    <span className="price">₹{ticket.price}</span>
-                                  </div>
-                                  <div className="col-6">
-                                    <select className="form-select">
-                                      {Array.from({ length: 11 }, (_, i) => (
-                                        <option key={i} value={i}>
-                                          {i}
-                                        </option>
-                                      ))}
-                                    </select>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </li>
-                        ))
-                    ) : (
-                      <li>No active tickets available.</li>
-                    )}
-                  </ul>
-                </div> */}
-
-                {/* ADDONS LIST */}
-                {/* {event?.addons?.length > 0 && (
-                  <>
-                    <h5 className="event_Sub_h">Addons</h5>
-                    <div className="form-group ticket_all">
-                      <ul className="ps-0">
-                        {event.addons
-                          .filter((a) => a.status == "Y" || a.hidden == "N")
-                          .map((addon) => (
-                            <li key={addon.id} className="list-item-none">
-                              <div className="row align-items-center">
-                                <div className="col-sm-6 col-4 price-name">
-                                  <h6>{addon.name}</h6>
-                                </div>
-                                <div className="col-sm-6 col-8 price-details">
-                                  <div className="row align-items-center">
-                                    <div className="col-6 d-flex align-items-center justify-content-end">
-                                      <span className="price">₹{addon.price}</span>
-                                    </div>
-                                    <div className="col-6">
-                                      <select className="form-select">
-                                        {Array.from({ length: 11 }, (_, i) => (
-                                          <option key={i} value={i}>
-                                            {i}
-                                          </option>
-                                        ))}
-                                      </select>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </li>
-                          ))}
-                      </ul>
+                {expired && (
+                  <div
+                    style={{
+                      background: "#f8d7da",
+                      border: "1px solid #f5c2c7",
+                      padding: "10px 15px",
+                      borderRadius: "6px",
+                      marginTop: "12px",
+                      color: "#842029",
+                      fontWeight: "600",
+                    }}
+                  >
+                    ⛔ This event has ended as per local event time.
+                    <div className="small mt-1">
+                      Ended on{" "}
+                      <b>
+                        {formatEventDateTime(
+                          event.date_to.utc,
+                          event.event_timezone
+                        )}
+                      </b>
                     </div>
-                  </>
-                )} */}
+                  </div>
+                )}              
+
+                
               </div>
             </div>
           </div>
@@ -476,7 +450,6 @@ const EventDetailPage = ({ event, slug }) => {
                                     const isSelected = selectedForThis.some(
                                       (s) => s.id === slot.id
                                     );
-
                                     return (
                                       <div
                                         key={slot.id}
@@ -505,10 +478,8 @@ const EventDetailPage = ({ event, slug }) => {
                                           type="checkbox"
                                           className="form-check-input me-3"
                                           checked={isSelected}
-                                          onChange={(e) => {
-                                            e.stopPropagation();
-                                            toggleSlotSelection(w.id, slot);
-                                          }}
+                                          readOnly
+                                          style={{ cursor: "pointer" }}
                                         />
 
                                         {/* DATE & TIME */}
@@ -537,7 +508,7 @@ const EventDetailPage = ({ event, slug }) => {
                                             fontSize: "16px",
                                           }}
                                         >
-                                          {w?.currencyName?.Currency_symbol}{" "}
+                                          {currency}{" "}
                                           {slot.price}
                                         </div>
                                       </div>
@@ -560,7 +531,7 @@ const EventDetailPage = ({ event, slug }) => {
                                     >
                                       <div>{selectedCount} slots selected</div>
                                       <div style={{ fontWeight: "bold" }}>
-                                        Total: {w?.currencyName?.Currency_symbol}{" "}
+                                        Total: {currency}{" "}
                                         {totalPrice}
                                       </div>
                                     </div>
@@ -650,6 +621,27 @@ const EventDetailPage = ({ event, slug }) => {
                 __html: event.desp || "No description available.",
               }}
             />
+
+            {/* 🎥 Event Video */}
+            {event.video_url && getYoutubeEmbedUrl(event.video_url) && (
+              <div className="mt-4">
+                <h6 className="mb-2">Event Preview</h6>
+
+                <div
+                  className="ratio ratio-16x9 rounded overflow-hidden shadow-sm"
+                  style={{ backgroundColor: "#000" }}
+                >
+                  <iframe
+                    src={getYoutubeEmbedUrl(event.video_url)}
+                    title="Event Video"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
+              </div>
+            )}
+
+
             <p className="mb-0">
               <i>
                 <b>Note: An 8% transaction fee applies to each purchase.</b>

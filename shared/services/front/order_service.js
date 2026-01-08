@@ -3739,7 +3739,7 @@ export async function resendOrderEmailToMember(req, res) {
               <tr>
               <td
                   style="font-size: 30px; font-family: Arial, Helvetica, sans-serif; font-weight: bold; text-align: center;">
-                  My Tickets
+                  My Orders
               </td>
               </tr>`;
           const findAllTicketsData = await BookTicket.findAll({
@@ -4333,7 +4333,7 @@ export async function resendOrderEmailToMemberSecond(existOrderId) {
   </tr>
 
         <tr>
-           <td style="font-size:30px;font-family:Arial,Helvetica,sans-serif;font-weight:bold;text-align:center">My Tickets</td>
+           <td style="font-size:30px;font-family:Arial,Helvetica,sans-serif;font-weight:bold;text-align:center">My Orders</td>
            </tr>
          <tr>
            <td style="height: 20px;"></td>
@@ -5088,7 +5088,7 @@ const sendOrderEmailToUser = async (userInfo, orderObj, cartData) => {
             <tr>
             <td
                 style="font-size: 30px; font-family: Arial, Helvetica, sans-serif; font-weight: bold; text-align: center;">
-               MY TICKETS
+               My Orders
             </td>
             </tr>`;
 

@@ -16,6 +16,11 @@ export const handleLogout = (router) => {
 
 export const handleAdminLogout = (router) => {
   // Remove all cookies
+
+
+
+  // console.log("click log outt....")
+  // return false
   Cookies.remove("userAuthToken");
   Cookies.remove("adminAuthToken");
   Cookies.remove("token");

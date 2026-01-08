@@ -15,6 +15,15 @@ const TicketDetails = ({ pendingRequests, counts, event_id }) => {
   const [eventInfo, setEventInfo] = useState(null);
   const [loading, setLoading] = useState(false);
   const [ticketQty, setTicketQty] = useState({});
+  const [members, setMembers] = useState([]);
+  const [searchText, setSearchText] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [loadingMembers, setLoadingMembers] = useState(false);
+  const [loadingSearch, setLoadingSearch] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [email, setEmail] = useState("");
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
 
   /* ---------------- TAB CHANGE ---------------- */
   const setMyActiveTab = (tab) => {
@@ -48,15 +57,6 @@ const TicketDetails = ({ pendingRequests, counts, event_id }) => {
     }
   };
 
-  const [members, setMembers] = useState([]);
-  const [searchText, setSearchText] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
-  const [loadingMembers, setLoadingMembers] = useState(false);
-  const [loadingSearch, setLoadingSearch] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [email, setEmail] = useState("");
-  const [showDropdown, setShowDropdown] = useState(false);
-
   useEffect(() => {
     if (!searchText || searchText.length < 2 || selectedUser) {
       setSearchResults([]);
@@ -83,7 +83,7 @@ const TicketDetails = ({ pendingRequests, counts, event_id }) => {
   }, [searchText, selectedUser]);
 
   /* ---------------- TICKET PUSH SUBMIT ---------------- */
-  const [loadingSubmit, setLoadingSubmit] = useState(false);
+
   const handleSubmit = async () => {
     if (!email) {
       Swal.fire("Error", "Please select a user", "error");
@@ -127,7 +127,6 @@ const TicketDetails = ({ pendingRequests, counts, event_id }) => {
       setLoadingSubmit(false); // ✅ End loading
     }
   };
-
 
   /* ---------------- RENDER ---------------- */
   return (
@@ -284,7 +283,7 @@ const TicketDetails = ({ pendingRequests, counts, event_id }) => {
                         <div className="custom-note rounded-xl p-3 mb-4 border">
                           <strong>Note:</strong> This tool allows you to push approvals
                           to a patron's cart using their eboxtickets email address.
-                          If the ticket is free, it will go straight to “My Tickets”.
+                          If the ticket is free, it will go straight to “My Orders”.
                           This action cannot be undone.
                         </div>
 

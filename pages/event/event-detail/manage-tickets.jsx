@@ -370,6 +370,8 @@ const MyEventsPage = () => {
                             placeholder="Price"
                             className="form-control"
                             id="price"
+                            min={0} // prevents negative values in supported browsers
+                            onChange={(e) => e.target.value = e.target.value < 0 ? 0 : e.target.value}
                         />
                     </div>
 
@@ -390,8 +392,8 @@ const MyEventsPage = () => {
                         <label htmlFor="hidden" className="form-label">Visibility</label>
                         <select name="hidden" required className="form-select" id="hidden">
                             <option value="">Choose One</option>
-                            <option value="Y">Visible</option>
-                            <option value="N">Hidden</option>
+                            <option value="N">Visible</option>
+                            <option value="Y">Hidden</option>
                         </select>
                     </div>
                 </div>

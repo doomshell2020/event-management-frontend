@@ -12,24 +12,24 @@ const PaymentSummary = ({ orderData }) => {
 
             <div className="d-flex justify-content-between mb-2">
                 <span>Total Amount</span>
-                <span className="fw-bold">{currency} {orderData.sub_total}</span>
+                <span>{currency}{orderData.sub_total}</span>
             </div>
 
             <div className="d-flex justify-content-between mb-2">
                 <span>Discount</span>
-                <span className="fw-bold">{currency} {orderData.discount_amount}</span>
+                <span>{currency}{orderData.discount_amount}</span>
             </div>
 
             <div className="d-flex justify-content-between mb-2">
                 <span>Tax</span>
-                <span className="fw-bold">{currency} {orderData.tax_total}</span>
+                <span>{currency}{orderData.tax_total}</span>
             </div>
 
            <hr className="custom-hr" />
 
             <div className="d-flex justify-content-between fw-bold text-success">
-                <span className="text-14">Total Paid</span>
-                <span className="text-14">{currency} {formatPrice(orderData.grand_total)}</span>
+                <span>Total Paid</span>
+                <span>{currency}{formatPrice(orderData.grand_total)}</span>
             </div>
         </div>
     );

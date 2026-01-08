@@ -432,7 +432,7 @@ export default function Cart({ isActiveNow, makeModalOff, profile = {}, event_id
                     icon: "success",
                     showCancelButton: true,
                     confirmButtonText: "Okay",
-                    cancelButtonText: "Go to My Ticket",
+                    cancelButtonText: "Go to My Orders",
                     reverseButtons: true,
                 }).then((result) => {
                     if (result.isConfirmed) {

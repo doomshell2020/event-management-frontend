@@ -1,280 +1,211 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import SummernoteLite from "react-summernote-lite";
-import 'react-summernote-lite/dist/summernote-lite.min.css';
-import 'filepond/dist/filepond.min.css';
-import $ from 'jquery'; // Summernote uses jQuery
+import "react-summernote-lite/dist/summernote-lite.min.css";
+import $ from "jquery";
 import Swal from "sweetalert2";
+import api from "@/utils/api";
 
-
-const HtmlEditor = ({ editorRef, onChange, initialContent = "", placeholder = "Enter text here...", height = 200 }) => {
+const HtmlEditor = ({ editorRef, onChange, initialContent = "", height = 500 }) => {
     const [isClient, setIsClient] = useState(false);
     const selectedImageRef = useRef(null);
 
-    useEffect(() => {
-        setIsClient(true);
-    }, []);
+    useEffect(() => setIsClient(true), []);
 
-    // Set initial content after mount
+    // ✅ Set initial content
     useEffect(() => {
-        if (isClient && initialContent) {
-            const editableDiv = document.querySelector('.note-editable');
-            if (editableDiv && editableDiv.innerHTML !== initialContent) {
-                editableDiv.innerHTML = initialContent;
-            }
-        }
+        if (!isClient || !initialContent) return;
+        $(".note-editable").html(initialContent);
     }, [isClient, initialContent]);
 
-    // Store reference to clicked image
+
     useEffect(() => {
         if (!isClient) return;
 
-        const handleImageClick = (e) => {
-            const image = e.target.closest('.note-editable img');
-            if (image) {
-                selectedImageRef.current = image;
-            }
+        const captureImageClick = (e) => {
+            const img = e.target.closest('.note-editable img');
+            if (!img) return;
+
+            // 🔒 capture before toolbar blur
+            selectedImageRef.current = img;
+
+            document
+                .querySelectorAll('.note-editable img')
+                .forEach(i => i.classList.remove('selected-image'));
+
+            img.classList.add('selected-image');
+
+            console.log('IMAGE CAPTURED:', img.src);
         };
 
-        document.addEventListener('click', handleImageClick);
+        // 👇 capture phase = TRUE
+        document.addEventListener('mousedown', captureImageClick, true);
 
         return () => {
-            document.removeEventListener('click', handleImageClick);
+            document.removeEventListener('mousedown', captureImageClick, true);
         };
     }, [isClient]);
 
 
-    // Replace selected image
-    const handleReplaceImage = () => {
-        const selectedImage = selectedImageRef.current;
 
-        if (selectedImage) {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            input.onchange = async (event) => {
-                const file = event.target.files[0];
-                if (file) {
-                    try {
-                        // Show SweetAlert loading
-                        Swal.fire({
-                            title: 'Uploading...',
-                            text: 'Please wait while the image is being uploaded.',
-                            allowOutsideClick: false,
-                            customClass: {
-                                popup: "add-tckt-dtlpop",
-                            },
-                            didOpen: () => {
-                                Swal.showLoading();
-                            }
-                        });
+    // ✅ MOST IMPORTANT PART (Image selection)
+    useEffect(() => {
+        if (!isClient) return;
 
-                        // Upload the file to your server
-                        const formData = new FormData();
-                        formData.append('ImageURL', file);
+        const bindImageClick = () => {
+            $(".note-editable")
+                .off("click", "img")
+                .on("click", "img", function () {
+                    selectedImageRef.current = this;
 
-                        const response = await fetch(`/api/v1/updateImageS3`, {
-                            method: 'POST',
-                            body: formData,
-                        });
+                    $(".note-editable img").removeClass("selected-image");
+                    $(this).addClass("selected-image");
+                });
+        };
 
-                        const data = await response.json();
-                        const imageUrl = data?.filePath || data?.url || `/uploads/profiles/${data}`;
-                        selectedImage.src = imageUrl;
-                        selectedImageRef.current = null;
-                        // Trigger onChange with updated HTML
-                        const editableDiv = document.querySelector('.note-editable');
-                        if (editableDiv && onChange) {
-                            onChange(editableDiv.innerHTML);
-                        }
+        // bind after editor render
+        setTimeout(bindImageClick, 500);
 
-                        Swal.close();
-
-                    } catch (error) {
-                        Swal.close(); // Ensure it closes even on error
-                        console.error("Image upload failed:", error);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'Image upload failed. Please try again.',
-                            customClass: {
-                                popup: "add-tckt-dtlpop"
-                            }
-                        });
-
-                    }
-                }
-            };
-            input.click();
-        } else {
-            selectedImageRef.current = null;
-            // Swal.fire('No Image Selected', 'Please click on an image inside the editor to replace it.', 'warning');
-            Swal.fire({
-                icon: 'warning',
-                title: 'Warning',
-                text: 'Please click on an image inside the editor to replace it.',
-                customClass: {
-                    popup: "add-tckt-dtlpop"
-                }
-            });
-
-        }
-    };
-
-    const customButton = function (context) {
-        const ui = $.summernote.ui;
-        const button = ui.button({
-            contents: '<i class="note-icon-picture" /> Replace Image',
-            tooltip: 'Replace selected image',
-            container: context.layoutInfo.editor[0],
-            click: handleReplaceImage
-        });
-        return button.render();
-    };
-
-    const handleImageUpload = async (files) => {
-        const fileList = Array.from(files);
-        for (let file of fileList) {
-            await uploadImageToServer(file);
-        }
-    };
-
-    const uploadImageToServer = async (file) => {
-        const formData = new FormData();
-        formData.append('ImageURL', file);
-
-        try {
-            // Show SweetAlert loading
-            Swal.fire({
-                title: 'Uploading...',
-                text: 'Please wait while the image is being uploaded.',
-                allowOutsideClick: false,
-                customClass: {
-                    popup: "add-tckt-dtlpop",
-                },
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-
-            const response = await fetch(`/api/v1/updateImageS3`, {
-                method: 'POST',
-                body: formData,
-            });
-
-            const data = await response.json();
-            const imageUrl = data?.filePath || data?.url || `/uploads/profiles/${data}`;
-
-            Swal.close();
-
-            // ✅ Replace the selected image's src
-            if (selectedImageRef.current) {
-                selectedImageRef.current.src = imageUrl;
-            } else {
-                // Fallback if no image selected
-                editorRef.current.summernote("insertImage", imageUrl);
-            }
-
-        } catch (error) {
-            Swal.close();
-            console.error("Image upload failed:", error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Image upload failed. Please try again.',
-                customClass: {
-                    popup: "add-tckt-dtlpop"
-                }
-            });
-        }
-    };
+        return () => {
+            $(".note-editable").off("click", "img");
+        };
+    }, [isClient]);
 
     if (!isClient) return null;
+
+    // ✅ Replace Image
+    const handleReplaceImage = () => {
+        const selectedImage = selectedImageRef.current;
+        if (!selectedImage) {
+            Swal.fire({
+                icon: "warning",
+                title: "Warning",
+                text: "Please click on an image inside the editor to replace it.",
+            });
+            return;
+        }
+
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = "image/*";
+
+        input.onchange = async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            try {
+                const formData = new FormData();
+                formData.append("image", file);
+
+                const res = await api.post(
+                    "/api/v1/admin/static/upload-image",
+                    formData,
+                    { headers: { "Content-Type": "multipart/form-data" } }
+                );
+                const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
+                console.log("API_BASE_URL", API_BASE_URL)
+                const imageUrl = `${API_BASE_URL}/uploads/static/${res.data.filename}` || `${API_BASE_URL}/uploads/static/${res.data.filename}`;
+                selectedImage.src = imageUrl;
+
+                selectedImageRef.current = null;
+                $(".note-editable img").removeClass("selected-image");
+
+                onChange?.($(".note-editable").html());
+            } catch {
+                Swal.fire("Error", "Image upload failed", "error");
+            }
+        };
+
+        input.click();
+    };
+
+    // ✅ Toolbar Button
+    const customButton = (context) => {
+        const ui = $.summernote.ui;
+        return ui.button({
+            contents: '<i class="note-icon-picture"></i> Replace Image',
+            tooltip: "Replace selected image",
+            container: context.layoutInfo.editor[0],
+            click: handleReplaceImage,
+        }).render();
+    };
+
+
+    const bindImageSelection = () => {
+        $(document)
+            .off('mousedown', '.note-editable img')
+            .on('mousedown', '.note-editable img', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                selectedImageRef.current = this;
+
+                $('.note-editable img').removeClass('selected-image');
+                $(this).addClass('selected-image');
+
+                console.log('IMAGE SELECTED:', this.src);
+            });
+    };
+
+
+
+
+
+
+
+
+
+
+
+
 
     return (
         <SummernoteLite
             ref={editorRef}
-            placeholder={placeholder}
-            tabsize={2}
             height={height}
             dialogsInBody={true}
-            blockquoteBreakingLevel={0}
-            codeviewFilter={false}          // 👈 Allow full HTML
-            codeviewIframeFilter={false}    // 👈 Specifically allow iframes
+            codeviewFilter={false}
+            codeviewIframeFilter={false}
+            onInit={() => {
+                setTimeout(() => {
+                    bindImageSelection();
+                }, 500);
+            }}
+
             toolbar={[
                 ['style', ['style']],
-                ['font', ['bold', 'underline', 'clear', 'strikethrough', 'superscript', 'subscript']],
+                ['font', ['bold', 'underline', 'clear', 'superscript', 'subscript']],
                 ['fontsize', ['fontsize']],
                 ['fontname', ['fontname']],
                 ['color', ['color']],
                 ['para', ['ul', 'ol', 'paragraph']],
                 ['table', ['table']],
-                ['insert', ['link', 'picture', 'video', 'hr']],
                 ['view', ['fullscreen', 'codeview', 'help']],
-                // ['custom', ['replaceImage']]
+                ['custom', ['replaceImage']]
+                // ["style", ["style"]],
+                // ["font", ["bold", "underline"]],
+                // ["para", ["ul", "ol"]],
+                // ["view", ["fullscreen", "codeview"]],
+                // ["custom", ["replaceImage"]],
             ]}
-            // buttons={{
-            //     replaceImage: customButton
-            // }}
             fontNames={[
-                'Arial', 'Georgia', 'Verdana', 'Didot-Ragular', 'Didot-Italic',
-                'Satoshi', 'Satoshi-Bold', 'Satoshi-Italic', 'Satoshi-Light'
+                'Arial', 'Georgia', 'Verdana',
+                'Satoshi', 'Satoshi-Bold', 'Satoshi-Italic'
             ]}
-            fontNamesIgnoreCheck={[
-                'Arial', 'Georgia', 'Verdana', 'Didot-Ragular', 'Didot-Italic',
-                'Satoshi', 'Satoshi-Bold', 'Satoshi-Italic', 'Satoshi-Light'
-            ]}
+
             fontSizes={[
-                "8",
-                "9",
-                "10",
-                "11",
-                "12",
-                "14",
-                "16",
-                "18",
-                "20",
-                "22",
-                "24",
-                "28",
-                "32",
-                "36",
-                "40",
-                "44",
-                "48",
-                "54",
-                "60",
-                "66",
-                "72",
-                "78",
-                "80",
-                "82",
-                "84",
-                "86",
-                "92",
-                "98",
-                "100",
-                "102",
-                "106",
-                "108",
-                "110",
-                "116",
-                "120",
+                '10', '12', '14', '16', '18',
+                '20', '24', '28', '32', '36',
+                '48', '60', '72'
             ]}
-            onChange={(content) => {
-                if (onChange) onChange(content);
-            }}
-            callbacks={{
-                onImageUpload: handleImageUpload
-            }}
+            buttons={{ replaceImage: customButton }}
+            onChange={(content) => onChange?.(content)}
         />
     );
 };
-
-// Optional helper
-export const getHtmlEditorContent = () => {
-  if (typeof document === "undefined") return ""; // SSR safe
-  const editableDiv = document.querySelector(".note-editable");
-  return editableDiv?.innerHTML || "";
+export const getHtmlEditorContent = (ref) => {
+    if (ref?.current && typeof ref.current.summernote == 'function') {
+        return ref.current.summernote('code');
+    }
+    return '';
 };
-
 export default HtmlEditor;

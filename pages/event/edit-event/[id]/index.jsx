@@ -38,7 +38,6 @@ const MyEventsPage = () => {
     const [loading, setLoading] = useState(true);
 
     const noteRef = useRef(null);
-    const content = getHtmlEditorContent(noteRef);
     const [editorData, setEditorData] = useState({ content: "" });
 
     const [isFormSubmit, setIsFormSubmit] = useState(false);
@@ -61,12 +60,12 @@ const MyEventsPage = () => {
         desp: "",
         is_free: "",
         allow_register: "",
+        entry_type: "multi"
     });
 
     const [image, setImage] = useState(null);
     const [isFree, setIsFree] = useState(false);
     const [slugError, setSlugError] = useState("");
-
 
     useEffect(() => {
         if (id) {
@@ -100,8 +99,10 @@ const MyEventsPage = () => {
                     approve_timer: event.approve_timer || "",
                     is_free: event.is_free == "Y" ? "Y" : "N",
                     allow_register: event.allow_register == "Y" ? "Y" : "N",
+                    entry_type: event.entry_type
                 });
 
+                // console.log('entry_type :', formData);
                 setEditorData({ content: event.desp || "" });
                 // ✅ Set checkbox states if applicable
                 setIsFree(event.is_free == "Y");
@@ -193,30 +194,32 @@ const MyEventsPage = () => {
             return;
         }
 
+        // console.log('formData :', formData);
         try {
             const fd = new FormData();
 
             // ✅ Append only non-empty fields
             Object.entries(formData).forEach(([key, value]) => {
                 if (
-                    value !== null &&
-                    value !== undefined &&
-                    value !== "" &&
-                    !(typeof value === "object" && Object.keys(value).length === 0)
+                    value != null &&
+                    value != undefined &&
+                    value != "" &&
+                    !(typeof value == "object" && Object.keys(value).length == 0)
                 ) {
                     fd.append(key, value);
                 }
             });
-
+            const content = getHtmlEditorContent(noteRef).trim();
             // ✅ Append image only if present
             if (image) fd.append("feat_image", image);
-            fd.append("desp", content.trim());
+            fd.append("desp", content);
 
             const endpoint =
                 formData.is_free == "Y"
                     ? `/api/v1/events/update/${id}`
                     : `/api/v2/events/update/${id}`;
 
+            // console.log('endpoint :', endpoint);
             const response = await api.put(endpoint, fd, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
@@ -289,7 +292,65 @@ const MyEventsPage = () => {
         });
     };
 
+
     const [backgroundImage, setIsMobile] = useState('/assets/front-images/about-slider_bg.jpg');
+    const [dateErrors, setDateErrors] = useState({});
+    const validatePaidEventDates = (data) => {
+        const errors = {};
+
+        const {
+            date_from,
+            date_to,
+            sale_start,
+            sale_end
+        } = data;
+
+        // Event Start < Event End
+        if (date_from && date_to && new Date(date_to) < new Date(date_from)) {
+            errors.date_to = "Event End must be after Event Start";
+        }
+
+        // Sale Start < Sale End
+        if (sale_start && sale_end && new Date(sale_end) < new Date(sale_start)) {
+            errors.sale_end = "Sale End must be after Sale Start";
+        }
+
+        // Sale Start <= Event Start
+        if (sale_start && date_from && new Date(date_from) < new Date(sale_start)) {
+            errors.date_from = "Event Start cannot be before Sale Start";
+        }
+
+        // Sale End <= Event End
+        if (sale_end && date_to && new Date(sale_end) > new Date(date_to)) {
+            errors.sale_end = "Sale End cannot be after Event End";
+        }
+
+        return errors;
+    };
+
+    const handleDateChange = (e) => {
+        const { name, value } = e.target;
+
+        let updatedForm = {
+            ...formData,
+            [name]: value
+        };
+
+        // 🔁 If Event dates change → reset Sale dates
+        if (name == "date_from" || name == "date_to") {
+            updatedForm.sale_start = "";
+            updatedForm.sale_end = "";
+        }
+
+        setFormData(updatedForm);
+
+        // ✅ Validate only for PAID events
+        if (!isFree) {
+            const errors = validatePaidEventDates(updatedForm);
+            setDateErrors(errors); // replaces old errors (no stuck red)
+        }
+    };
+
 
     return (
         <>
@@ -405,7 +466,7 @@ const MyEventsPage = () => {
                                                         </select>
                                                     </div>
 
-                                                    <div className="col-md-6">
+                                                    <div className="col-md-3">
                                                         <label className="form-label">
                                                             Country <span className="text-danger">*</span>
                                                         </label>
@@ -424,23 +485,49 @@ const MyEventsPage = () => {
                                                         </select>
                                                     </div>
 
-                                                    <div className="col-md-6">
-                                                        <label className="form-label">
-                                                            Currency <span className="text-danger">*</span>
-                                                        </label>
-                                                        <select
-                                                            className="form-select rounded-0"
-                                                            name="payment_currency"
-                                                            value={formData.payment_currency}
+                                                    {/* Checkboxes */}
+                                                    <div className="col-md-3 d-flex align-items-center">
+                                                        <CFormCheck
+                                                            type="checkbox"
+                                                            id="is_free"
+                                                            name="is_free"
+                                                            checked={isFree}
                                                             onChange={handleChange}
-                                                        >
-                                                            <option value="">Payment Type</option>
-                                                            <option value="1">INR</option>
-                                                            <option value="2">USD</option>
-                                                        </select>
+                                                            label="This event is free"
+                                                        />
                                                     </div>
 
-                                                    <div className="col-md-6">
+                                                    {/* <div className="col-md-3 d-flex align-items-center">
+                                                        <CFormCheck
+                                                            type="checkbox"
+                                                            id="allow_register"
+                                                            name="allow_register"
+                                                            checked={formData.allow_register == "Y"}
+                                                            onChange={handleChange}
+                                                            label="Allowed Registration"
+                                                        />
+                                                    </div> */}
+
+                                                    {!isFree && (
+                                                        <div className="col-md-3">
+                                                            <label className="form-label">
+                                                                Currency <span className="text-danger">*</span>
+                                                            </label>
+                                                            <select
+                                                                className="form-select rounded-0"
+                                                                name="payment_currency"
+                                                                value={formData.payment_currency}
+                                                                onChange={handleChange}
+                                                            >
+                                                                <option value="">Payment Type</option>
+                                                                <option value="1">INR</option>
+                                                                <option value="2">USD</option>
+                                                            </select>
+                                                        </div>
+
+                                                    )}
+
+                                                    <div className={`col-md-${!isFree ? 3 : 6}`}>
                                                         <label className="form-label">
                                                             URL Slug <span className="text-danger">*</span>
                                                         </label>
@@ -456,6 +543,7 @@ const MyEventsPage = () => {
                                                     </div>
 
 
+<<<<<<< HEAD
                                                     {/* Checkboxes */}
                                                     <div className="col-md-3 d-flex align-items-end only-eventfree-check">
                                                         <CFormCheck
@@ -478,6 +566,9 @@ const MyEventsPage = () => {
                                                             label="Allowed Registration"
                                                         />
                                                     </div>
+=======
+
+>>>>>>> main
 
                                                     <div className="col-md-6">
                                                         <label className="form-label">
@@ -485,13 +576,24 @@ const MyEventsPage = () => {
                                                             {formatDateTimeShort(eventDetails?.date_from?.local)}
                                                             ) <span className="text-danger">*</span>
                                                         </label>
-                                                        <input
+                                                        {/* <input
                                                             type="datetime-local"
                                                             className="form-control rounded-0"
                                                             name="date_from"
                                                             onChange={handleChange}
                                                             value={formData.date_from}
+                                                        /> */}
+                                                        <input
+                                                            type="datetime-local"
+                                                            className={`form-control rounded-0 ${dateErrors.date_from ? "is-invalid" : ""}`}
+                                                            name="date_from"
+                                                            value={formData.date_from}
+                                                            onChange={handleDateChange}
                                                         />
+                                                        {dateErrors.date_from && (
+                                                            <div className="invalid-feedback">{dateErrors.date_from}</div>
+                                                        )}
+
                                                     </div>
 
                                                     <div className="col-md-6">
@@ -500,13 +602,26 @@ const MyEventsPage = () => {
                                                             {formatDateTimeShort(eventDetails?.date_to?.local)}
                                                             ) <span className="text-danger">*</span>
                                                         </label>
-                                                        <input
+                                                        {/* <input
                                                             type="datetime-local"
                                                             className="form-control rounded-0"
                                                             name="date_to"
                                                             onChange={handleChange}
                                                             value={formData.date_to}
+                                                        /> */}
+
+                                                        <input
+                                                            type="datetime-local"
+                                                            className={`form-control rounded-0 ${dateErrors.date_to ? "is-invalid" : ""}`}
+                                                            name="date_to"
+                                                            value={formData.date_to}
+                                                            onChange={handleDateChange}
+                                                            min={formData.date_from}
                                                         />
+                                                        {dateErrors.date_to && (
+                                                            <div className="invalid-feedback">{dateErrors.date_to}</div>
+                                                        )}
+
                                                     </div>
 
                                                     {!isFree && (
@@ -517,13 +632,26 @@ const MyEventsPage = () => {
                                                                     {formatDateTimeShort(eventDetails?.sale_start?.local)}
                                                                     ) <span className="text-danger">*</span>
                                                                 </label>
-                                                                <input
+                                                                {/* <input
                                                                     type="datetime-local"
                                                                     className="form-control rounded-0"
                                                                     name="sale_start"
                                                                     onChange={handleChange}
                                                                     value={formData.sale_start}
+                                                                /> */}
+
+                                                                <input
+                                                                    type="datetime-local"
+                                                                    className="form-control rounded-0"
+                                                                    name="sale_start"
+                                                                    value={formData.sale_start}
+                                                                    onChange={handleDateChange}
+                                                                    disabled={!formData.date_from || !formData.date_to}
                                                                 />
+
+
+
+
                                                             </div>
 
                                                             <div className="col-md-6">
@@ -532,13 +660,29 @@ const MyEventsPage = () => {
                                                                     {formatDateTimeShort(eventDetails?.sale_end?.local)}
                                                                     ) <span className="text-danger">*</span>
                                                                 </label>
-                                                                <input
+                                                                {/* <input
                                                                     type="datetime-local"
                                                                     className="form-control rounded-0"
                                                                     name="sale_end"
                                                                     onChange={handleChange}
                                                                     value={formData.sale_end}
+                                                                /> */}
+
+                                                                <input
+                                                                    type="datetime-local"
+                                                                    className={`form-control rounded-0 ${dateErrors.sale_end ? "is-invalid" : ""}`}
+                                                                    name="sale_end"
+                                                                    value={formData.sale_end}
+                                                                    onChange={handleDateChange}
+                                                                    min={formData.sale_start}
+                                                                    max={formData.date_to}
+                                                                    disabled={!formData.sale_start}
                                                                 />
+                                                                {dateErrors.sale_end && (
+                                                                    <div className="invalid-feedback">{dateErrors.sale_end}</div>
+                                                                )}
+
+
                                                             </div>
                                                         </>)}
 
@@ -586,8 +730,10 @@ const MyEventsPage = () => {
 
                                                     <div className="col-md-6">
                                                         <label htmlFor="formFile" className="form-label">
-                                                            Update Image{" "}
-                                                            <small className="text-danger">(Size 550×550 JPG, JPEG, PNG Max 2MB)</small>
+                                                            Upload Image{" "}
+                                                            <small className="text-danger" style={{ fontSize: "11px" }}>
+                                                                (1200×800 min · 1920×800 max · JPG/PNG · ≤2MB)
+                                                            </small>
                                                             <span
                                                                 className="preview_img fw-normal text-primary ms-2"
                                                                 role="button"
@@ -601,31 +747,171 @@ const MyEventsPage = () => {
                                                         <input
                                                             type="file"
                                                             className="form-control rounded-0"
-                                                            accept=".jpg, .jpeg, .png" // ✅ HTML-level validation
+                                                            accept=".jpg,.jpeg,.png"
+                                                            // required
                                                             onChange={(e) => {
                                                                 const file = e.target.files[0];
                                                                 if (!file) return;
 
-                                                                // ✅ Allowed extensions
+                                                                // ================= FILE TYPE VALIDATION =================
                                                                 const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
                                                                 if (!allowedTypes.includes(file.type)) {
-                                                                    Swal.fire("Invalid File", "Only JPG, JPEG, and PNG files are allowed.", "error");
-                                                                    e.target.value = ""; // clear file input
-                                                                    return;
-                                                                }
-
-                                                                // ✅ Max size 2MB
-                                                                const maxSize = 2 * 1024 * 1024; // 2 MB
-                                                                if (file.size > maxSize) {
-                                                                    Swal.fire("File Too Large", "Maximum file size is 2 MB.", "warning");
+                                                                    Swal.fire({
+                                                                        icon: "error",
+                                                                        title: "Invalid File Format",
+                                                                        html: `
+                                                                            <p style="color:red;font-weight:600">
+                                                                                Only JPG, JPEG, and PNG images are allowed.
+                                                                            </p>
+                                                                        `
+                                                                    });
                                                                     e.target.value = "";
                                                                     return;
                                                                 }
 
-                                                                handleFileChange(e); // ✅ proceed with your handler
+                                                                // ================= FILE SIZE VALIDATION =================
+                                                                const maxSize = 2 * 1024 * 1024;
+                                                                if (file.size > maxSize) {
+                                                                    Swal.fire({
+                                                                        icon: "warning",
+                                                                        title: "File Size Exceeded",
+                                                                        html: `
+                                                                            <p style="color:red;font-weight:600">
+                                                                                Maximum allowed file size is 2 MB.
+                                                                            </p>
+                                                                            <p>Your file size: ${(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                                                                        `
+                                                                    });
+                                                                    e.target.value = "";
+                                                                    return;
+                                                                }
+
+                                                                // ================= IMAGE DIMENSION VALIDATION =================
+                                                                const img = new Image();
+                                                                const objectUrl = URL.createObjectURL(file);
+
+                                                                img.onload = () => {
+                                                                    const width = img.width;
+                                                                    const height = img.height;
+
+                                                                    URL.revokeObjectURL(objectUrl);
+
+                                                                    const minWidth = 1200;
+                                                                    const maxWidth = 1920;
+                                                                    const requiredHeight = 800;
+
+                                                                    if (
+                                                                        height !== requiredHeight ||
+                                                                        width < minWidth ||
+                                                                        width > maxWidth
+                                                                    ) {
+                                                                        Swal.fire({
+                                                                            icon: "error",
+                                                                            title: "Invalid Image Dimensions",
+                                                                            html: `
+                                                                                <div style="text-align:left">
+                                                                                    <p style="color:red;font-weight:700">
+                                                                                        Image size does not meet the required dimensions.
+                                                                                    </p>
+                                                                                    <p><b style="color:red">Recommended:</b> 1200 × 800 px</p>
+                                                                                    <p><b style="color:red">Maximum allowed:</b> 1920 × 800 px</p>
+                                                                                    <p><b>Your image:</b> ${width} × ${height} px</p>
+                                                                                </div>
+                                                                            `
+                                                                        });
+
+                                                                        e.target.value = "";
+                                                                        return;
+                                                                    }
+
+                                                                    // ✅ ALL VALIDATIONS PASSED
+                                                                    Swal.fire({
+                                                                        icon: "success",
+                                                                        title: "Image Valid",
+                                                                        html: `
+                                                                                <p style="color:green;font-weight:600">
+                                                                                    Image uploaded successfully!
+                                                                                </p>
+                                                                                <p>Your image size: ${width} × ${height} px</p>
+                                                                            `,
+                                                                        timer: 1500,
+                                                                        showConfirmButton: false
+                                                                    });
+
+                                                                    handleFileChange(e);
+                                                                };
+
+                                                                img.onerror = () => {
+                                                                    Swal.fire({
+                                                                        icon: "error",
+                                                                        title: "Invalid Image",
+                                                                        html: `
+                                                                            <p style="color:red;font-weight:600">
+                                                                                Unable to read the uploaded image file.
+                                                                            </p>
+                                                                        `
+                                                                    });
+                                                                    e.target.value = "";
+                                                                };
+
+                                                                img.src = objectUrl;
                                                             }}
                                                         />
+
                                                     </div>
+
+                                                    {!isFree && (
+                                                        <div className="col-lg-6">
+                                                            <label className="form-label d-flex align-items-center gap-2">
+                                                                Type of Event
+
+                                                                <i
+                                                                    className="bi bi-info-circle-fill text-primary"
+                                                                    style={{ cursor: "pointer", fontSize: "14px" }}
+                                                                    onClick={() => {
+                                                                        Swal.fire({
+                                                                            icon: "info",
+                                                                            title: "Event Type Guide",
+                                                                            html: `
+                                                                            <div style="text-align:left;font-size:14px">
+                                                                                <p><b>Event:</b> One-time entry for a single event.</p>
+                                                                                <p><b>Multi:</b> One ticket gives access to multiple events or days.</p>
+                                                                            </div>
+                                                                        `
+                                                                        });
+                                                                    }}
+                                                                ></i>
+                                                            </label>
+
+                                                            <select
+                                                                className="form-select rounded-0"
+                                                                name="entry_type"
+                                                                value={formData.entry_type || ""}
+                                                                onChange={handleChange}
+                                                            >
+                                                                <option value="">Choose Type</option>
+                                                                <option value="event">Event</option>
+                                                                <option value="multi">Multi</option>
+                                                                {/* <option value="slot">Slot</option>
+                                                                <option value="single">Single</option> */}
+                                                            </select>
+
+                                                        </div>
+                                                    )}
+
+                                                    {/* Youtube URL */}
+                                                    <div className="col-lg-6">
+                                                        <label className="form-label">Youtube URL</label>
+                                                        <input
+                                                            type="text"
+                                                            className="form-control rounded-0"
+                                                            name="video_url"
+                                                            value={formData.video_url}
+                                                            onChange={handleChange}
+                                                            placeholder="Youtube URL"
+                                                        />
+                                                    </div>
+
 
                                                     <div className="col-md-12 mb-3">
                                                         <label className="form-label">
@@ -634,7 +920,7 @@ const MyEventsPage = () => {
                                                         <HtmlEditor
                                                             editorRef={noteRef}
                                                             initialContent={editorData.content}
-                                                            onChange={(content) => editorData({ ...editorData, content })}
+                                                            onChange={(content) => editorData({ content })}
                                                         />
                                                     </div>
 

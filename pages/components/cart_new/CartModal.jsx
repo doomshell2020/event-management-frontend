@@ -40,10 +40,12 @@ const LoadingComponent = ({ isActive }) => {
 };
 
 export default function CartModal({ show, handleClose, eventId }) {
-    const { cart, refreshCart, eventData, normalCart, addonCart, slotCart, loadingCart, setEventId } = useCart();
 
-    if (eventData)
-        eventId = eventData.id;
+    const { cart, refreshCart, eventData, normalCart, addonCart, slotCart, loadingCart, setEventId } = useCart();
+    // console.log('cart :', cart);
+
+    const finalEventId = eventId || eventData?.id;
+
 
     const [isLoading, setIsLoading] = useState(true);
     const [cartLoading, setCartLoading] = useState(false);
@@ -60,11 +62,12 @@ export default function CartModal({ show, handleClose, eventId }) {
     }, [loadingCart]);
 
     useEffect(() => {
-        if (eventId) {
-            setEventId(eventId);
-            refreshCart(eventId);
+        if (finalEventId) {
+            setEventId(finalEventId);
+            refreshCart(finalEventId);
         }
-    }, []);
+    }, [finalEventId]);
+
 
     const [addCartParams, setAddCartParams] = useState({
         event_id: eventId,
@@ -77,7 +80,7 @@ export default function CartModal({ show, handleClose, eventId }) {
 
     const getTotalTicketCountInCart = () => {
         return cart.reduce((total, item) => {
-            if (item.item_type === "ticket") {
+            if (item.item_type == "ticket") {
                 return total + (item.count || 0);
             }
             return total;
@@ -130,14 +133,14 @@ export default function CartModal({ show, handleClose, eventId }) {
                 await increaseCart(existing.cartId);
             } else {
                 await addToCart({
-                    event_id: eventId,
+                    event_id: finalEventId,
                     item_type: "ticket_price",
                     ticket_price_id: pricingId,
                     count: 1
                 });
             }
 
-            await refreshCart(eventId || undefined);
+            await refreshCart(finalEventId || undefined);
 
         } catch (err) {
 
@@ -146,7 +149,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                 const result = await Swal.fire({
                     title: "Items from another event found!",
                     text: err?.response?.data?.message ||
-                        "Your cart has products from another event. Clear it?",
+                        "Your cart has tickets or addons from another event. Clear it?",
                     icon: "warning",
                     showCancelButton: true,
                     confirmButtonText: "Yes, Clear Cart",
@@ -184,13 +187,13 @@ export default function CartModal({ show, handleClose, eventId }) {
                 // ➍ RETRY ADDING ITEM AUTOMATICALLY
                 try {
                     await addToCart({
-                        event_id: eventId,
+                        event_id: finalEventId,
                         item_type: "ticket_price",
                         ticket_price_id: pricingId,
                         count: 1
                     });
 
-                    await refreshCart(eventId || undefined);
+                    await refreshCart(finalEventId || undefined);
 
                     Swal.fire({
                         icon: "success",
@@ -234,7 +237,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                 await deleteCart(existing.cartId);
             }
 
-            await refreshCart(eventId || undefined);
+            await refreshCart(finalEventId || undefined);
 
         } catch (err) {
             if (err?.response?.status == 409) {
@@ -292,8 +295,29 @@ export default function CartModal({ show, handleClose, eventId }) {
 
     const increaseTicket = async (ticket) => {
         const ticketId = ticket?.id;
-        // 🚫 TICKET LIMIT VALIDATION
-        if (!checkTicketLimit()) return;
+
+        if (!ticket_limit || ticket_limit <= 0 || !ticketId) return true; // no limit
+
+        const questionAnswers = buildQuestionAnswers(ticketId);
+
+        // TICKET LIMIT VALIDATION
+        const inCart = cart.reduce((total, item) => {
+            if (item.item_type == "ticket" && item.uniqueId == ticketId) {
+                return total + (item.count || 0);
+            }
+            return total;
+        }, 0);
+
+        // TICKET LIMIT VALIDATION
+        if (ticket_limit > 0 && inCart >= ticket_limit) {
+            Swal.fire({
+                icon: "warning",
+                title: "Ticket Limit Reached",
+                text: `You can add maximum ${ticket_limit} tickets for this event.`,
+                confirmButtonText: "OK"
+            });
+            return false;
+        }
 
         try {
             setLoadingId(ticketId);
@@ -304,14 +328,15 @@ export default function CartModal({ show, handleClose, eventId }) {
                 await increaseCart(existing.cartId);
             } else {
                 await addToCart({
-                    event_id: eventId,
+                    event_id: finalEventId,
                     item_type: "ticket",
                     ticket_id: ticketId,
-                    count: 1
+                    count: 1,
+                    questionAnswers
                 });
             }
 
-            await refreshCart(eventId);
+            await refreshCart(finalEventId);
 
         } catch (err) {
 
@@ -320,7 +345,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                 const result = await Swal.fire({
                     title: "Items from another event found!",
                     text: err?.response?.data?.message ||
-                        "Your cart has products from another event. Clear it?",
+                        "Your cart has tickets or addons from another event. Clear it?",
                     icon: "warning",
                     showCancelButton: true,
                     confirmButtonText: "Yes, Clear Cart",
@@ -359,13 +384,13 @@ export default function CartModal({ show, handleClose, eventId }) {
                 // ➍ RETRY ADDING ITEM AUTOMATICALLY
                 try {
                     await addToCart({
-                        event_id: eventId,
+                        event_id: finalEventId,
                         item_type: "ticket",
                         ticket_id: ticketId,
                         count: 1
                     });
 
-                    await refreshCart(eventId);
+                    await refreshCart(finalEventId);
 
                     Swal.fire({
                         icon: "success",
@@ -411,7 +436,7 @@ export default function CartModal({ show, handleClose, eventId }) {
             else {
                 await deleteCart(existing.cartId);
             }
-            await refreshCart(eventId);
+            await refreshCart(finalEventId);
         } catch (err) {
             if (err?.response?.status == 409) {
 
@@ -456,7 +481,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                 });
                 await decreaseCart(existing.cartId);
                 // No retry for decrease (because item doesn't exist anymore)
-                // await refreshCart(eventId);
+                // await refreshCart(finalEventId);
             }
 
             console.log("Decrease error:", err);
@@ -479,14 +504,14 @@ export default function CartModal({ show, handleClose, eventId }) {
                 await increaseCart(existing.cartId);
             } else {
                 await addToCart({
-                    event_id: eventId,
+                    event_id: finalEventId,
                     item_type: "addon",
                     addons_id: addonId,
                     count: 1
                 });
             }
 
-            await refreshCart(eventId);
+            await refreshCart(finalEventId);
 
         } catch (err) {
 
@@ -496,7 +521,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                     title: "Items from another event found!",
                     text:
                         err?.response?.data?.message ||
-                        "Your cart has products from another event. Clear it?",
+                        "Your cart has tickets or addons from another event. Clear it?",
                     icon: "warning",
                     showCancelButton: true,
                     confirmButtonText: "Yes, Clear Cart",
@@ -533,13 +558,13 @@ export default function CartModal({ show, handleClose, eventId }) {
                 // Retry add addon
                 try {
                     await addToCart({
-                        event_id: eventId,
+                        event_id: finalEventId,
                         item_type: "addon",
                         addon_id: addonId,
                         count: 1
                     });
 
-                    await refreshCart(eventId);
+                    await refreshCart(finalEventId);
 
                     Swal.fire({
                         icon: "success",
@@ -586,7 +611,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                 await deleteCart(existing.cartId);
             }
 
-            await refreshCart(eventId);
+            await refreshCart(finalEventId);
 
         } catch (err) {
 
@@ -642,9 +667,25 @@ export default function CartModal({ show, handleClose, eventId }) {
     const increasePackage = async (pkg) => {
         const packageId = pkg?.id;
         if (!packageId) return;
+        const packageLimit = pkg?.package_limit;
 
-        // 🚫 TICKET LIMIT VALIDATION
-        if (!checkTicketLimit()) return;
+        const inCart = cart.reduce((total, item) => {
+            if (item.item_type == "package" && item.uniqueId == packageId) {
+                return total + (item.count || 0);
+            }
+            return total;
+        }, 0);
+
+        // 🚫 PACKAGE LIMIT VALIDATION
+        if (packageLimit > 0 && inCart >= packageLimit) {
+            Swal.fire({
+                icon: "warning",
+                title: "Package limit reached",
+                text: `You can only purchase up to ${packageLimit} of this package.`,
+                confirmButtonText: "Okay",
+            });
+            return false; // stop further execution
+        }
 
 
         try {
@@ -671,14 +712,14 @@ export default function CartModal({ show, handleClose, eventId }) {
                 await increaseCart(existing.id);
             } else {
                 await addToCart({
-                    event_id: eventId,
+                    event_id: finalEventId,
                     item_type: "package",
                     package_id: packageId,
                     count: 1
                 });
             }
 
-            await refreshCart(eventId);
+            await refreshCart(finalEventId);
 
         } catch (err) {
 
@@ -699,13 +740,13 @@ export default function CartModal({ show, handleClose, eventId }) {
                 Swal.close();
 
                 await addToCart({
-                    event_id: eventId,
+                    event_id: finalEventId,
                     item_type: "package",
                     package_id: packageId,
                     count: 1
                 });
 
-                await refreshCart(eventId);
+                await refreshCart(finalEventId);
             }
 
         } finally {
@@ -716,8 +757,25 @@ export default function CartModal({ show, handleClose, eventId }) {
     const decreasePackage = async (pkg) => {
         const packageId = pkg?.id;
         if (!packageId) return;
-        // 🚫 TICKET LIMIT VALIDATION
-        if (!checkTicketLimit()) return;
+
+        // Count package in cart
+        const inCart = cart.reduce((total, item) => {
+            if (item.item_type == "package" && item.uniqueId == packageId) {
+                return total + (item.count || 0);
+            }
+            return total;
+        }, 0);
+
+        // NOTHING TO DECREASE
+        if (inCart <= 0) {
+            Swal.fire({
+                icon: "info",
+                title: "Nothing to remove",
+                text: "This package is not added to your cart yet.",
+                confirmButtonText: "Okay",
+            });
+            return false;
+        }
 
         try {
             setLoadingId(`package-${packageId}`);
@@ -779,7 +837,7 @@ export default function CartModal({ show, handleClose, eventId }) {
         return
         try {
             // const res = await api.post("/api/v1/orders/create", {
-            //     event_id: eventId,
+            //     event_id: finalEventId,
             //     total_amount: grand_total,
             //     payment_method: "Online"
             // });
@@ -795,7 +853,7 @@ export default function CartModal({ show, handleClose, eventId }) {
 
             // console.log("Order created:", res.data);
 
-            // await refreshCart(eventId || undefined);
+            // await refreshCart(finalEventId || undefined);
 
             // OPTIONAL: redirect to payment page
             // navigate("/payment");
@@ -844,7 +902,7 @@ export default function CartModal({ show, handleClose, eventId }) {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 await deleteCart(id); // your API function
-                await refreshCart(eventId || undefined);
+                await refreshCart(finalEventId || undefined);
 
                 Swal.fire({
                     icon: "success",
@@ -907,7 +965,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                 }
             });
             const cartData = {
-                event_id: eventId,
+                event_id: finalEventId,
                 item_type: "committesale",
                 ticket_id: ticket.id,
                 count: 1,
@@ -1244,7 +1302,7 @@ export default function CartModal({ show, handleClose, eventId }) {
 
                                                                 {/* 🎟️ TICKETS */}
                                                                 {eventData.tickets
-                                                                    ?.filter(ticket => ticket.hidden !== "Y")
+                                                                    ?.filter(ticket => ticket.hidden != "Y")
                                                                     .map((ticket, i) => {
                                                                         const cartItem = normalCart.find(item => item.uniqueId == ticket.id);
                                                                         const isLoading = loadingId == ticket.id;
@@ -1252,9 +1310,10 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                         const isCommittee = ticket.type == "committee_sales";
                                                                         const committeeStatus = ticket.committee_status || null;
 
+                                                                        // console.log('ticket.committeeAssignedTickets :', ticket.committeeAssignedTickets);
                                                                         const committeeMembers = isCommittee
-                                                                            ? ticket.committeeAssignedTickets
-                                                                                ?.filter(ct =>
+                                                                        ? ticket.committeeAssignedTickets
+                                                                        ?.filter(ct =>
                                                                                     ct.status == "Y" &&
                                                                                     ct.committeeMember?.status == "Y" &&
                                                                                     ct.committeeMember?.user
@@ -1265,7 +1324,8 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                                     email: ct.committeeMember.user.email
                                                                                 })) || []
                                                                             : [];
-
+                                                                            
+                                                                            // console.log('committeeMembers :', committeeMembers);
                                                                         // ✅ Filter questions that belong to this ticket
                                                                         const ticketQuestions = eventData.questions?.filter(q =>
                                                                             q.ticket_type_id
@@ -1332,15 +1392,8 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                                                 <button
                                                                                                     className="btn btn-sm primery-button"
                                                                                                     onClick={() => {
-                                                                                                        const ticketQuestions = eventData.questions?.filter(q =>
-                                                                                                            q.ticket_type_id
-                                                                                                                .split(",")
-                                                                                                                .map(id => id.trim())
-                                                                                                                .includes(ticket.id.toString())
-                                                                                                        ) || [];
 
                                                                                                         const validation = validateTicketQuestions(ticket.id, ticketQuestions);
-                                                                                                        // console.log('validation :', validation);
 
                                                                                                         if (!validation.valid) {
                                                                                                             Swal.fire({
@@ -1365,7 +1418,18 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                                         <Counter
                                                                                             count={cartItem?.count || 0}
                                                                                             loading={isLoading}
-                                                                                            onInc={() => increaseTicket(ticket)}
+                                                                                            onInc={() => {
+                                                                                                const validation = validateTicketQuestions(ticket.id, ticketQuestions);
+                                                                                                if (!validation.valid) {
+                                                                                                    Swal.fire({
+                                                                                                        icon: "warning",
+                                                                                                        title: "Incomplete Information",
+                                                                                                        text: validation.message,
+                                                                                                    });
+                                                                                                    return;
+                                                                                                }
+                                                                                                increaseTicket(ticket);
+                                                                                            }}
                                                                                             onDec={() => decreaseTicket(ticket)}
                                                                                         />
                                                                                     )}
@@ -1422,8 +1486,8 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                                         {q.type == "Text" && (
                                                                                             <input
                                                                                                 type="text"
-                                                                                                className="form-control text-14 height: auto; border-radius: 5px;"
-                                                                                                placeholder={q.question}
+                                                                                                className="form-control"
+                                                                                                placeholder={`Type your answer`}
                                                                                                 value={ticketAnswers?.[ticket.id]?.[q.id] || ""}
                                                                                                 onChange={(e) => handleQuestionChange(ticket.id, q.id, e.target.value)}
                                                                                             />
@@ -1641,7 +1705,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                 </>
             ) : (
                 <CheckoutForm
-                    eventId={eventId}
+                    eventId={finalEventId}
                     handleModalClose={handleClose}
                     showNextStep={setShowNextStep}
                     adminFees={adminFees}

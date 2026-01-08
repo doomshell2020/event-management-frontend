@@ -16,125 +16,125 @@ import {
 } from "@coreui/react";
 import Seo from "@/shared/layout-components/seo/seo";
 import { useRouter } from 'next/router'
-
-
+import api from "@/utils/api";
+import Cookies from "js-cookie";
+import Swal from "sweetalert2";
 const ProfileEdit = () => {
   //DefaultValidation
-  const [Default, setDefault] = useState("");
-  const [FirstName, setFirstname] = useState("")
-  const [Email, setEmail] = useState("");
-  const [PhoneNumber, setPhonenumber] = useState("");
-  const [AddressLine1, SetAddressLine1] = useState("");
-  const [ImageURL, setImageURL] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [validatedCustom, setValidatedCustom] = useState(false);
-  const [CompanyName, setCompanyName] = useState("");
-  const [CompanyTitle, setCompanyTitle] = useState("");
-  const [country_group, setCountry_group] = useState("");
-  const [AddressLine2, setAddressLine2] = useState("");
-  const [LastName, setLastName] = useState("");
-  const handleOnchangedefault = () => {
-    setDefault(Default);
-  };
+  const router = useRouter();
+  const [id, setId] = useState('');
+  const [name, setName] = useState("");
+  const [mobile, setMobile] = useState("");
+  const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState("");
 
-
-  const [validateddefault, setValidateddefault] = useState(false);
-  const handleSubmitdefault = (event) => {
-    const form = event.currentTarget;
-    if (form.checkValidity() === false) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-    setValidateddefault(true);
-  };
-  //DefaultValidation
-
-  const [profile, setProfile] = useState("")
-  const [domLoaded, setDomLoaded] = useState(false);
+  const [facebookUrl, setFacebookUrl] = useState("");
+  const [instagramUrl, setInstagramUrl] = useState("");
+  const [twitterUrl, setTwitterUrl] = useState("");
+  const [googlePlusUrl, setGooglePlusUrl] = useState("");
+  const [linkedinUrl, setLinkedinUrl] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [googlePlayStore, setGooglePlayStore] = useState("");
+  const [appleStore, setAppleStore] = useState("");
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      var storeToken = localStorage.getItem('accessToken_');
-      var option = {
-        headers: {
-          Authorization: storeToken,
-        },
-      };
-      const profileUrl = '/api/v1/users'
-      fetch(profileUrl, option)
-        .then((response) => response.json())
-        .then((value) => {
-          // console.log("Valueeeeeeee", value)
-          setProfile(value.data);
-          setFirstname(value.data.FirstName)
-          setEmail(value.data.Email);
-          setPhonenumber(value.data.PhoneNumber)
-          SetAddressLine1(value.data.AddressLine1);
-          setCompanyName(value.data.CompanyName);
-          setCompanyTitle(value.data.CompanyTitle);
-          setCountry_group(value.data.country_group);
-          setAddressLine2(value.data.AddressLine2);
-          setLastName(value.data.LastName);
-
-        });
-    }
-  }, []);
-
-
-  let navigate = useRouter();
-  const routeChange = () => {
-    let path = `/admin/profile/`;
-    navigate.push(path);
-  }
-
-  if (typeof window !== 'undefined') {
-    var storeToken = localStorage.getItem('accessToken_');
-    var options = {
-      headers: {
-        Authorization: storeToken,
-      },
+    const fetchUser = async () => {
+      try {
+        const token = Cookies.get("adminAuthToken");
+        if (!token) {
+          router.push("/login");
+          return;
+        }
+        // ✅ Fetch user details from API
+        const res = await api.get("/api/v1/admin/auth/me");
+        if (res.data?.success) {
+          const userData = res.data.data;
+          setId(userData.id);
+          setName(userData.first_name);
+          setMobile(userData.mobile);
+          setEmail(userData.email);
+          setFacebookUrl(userData.fburl);
+          setInstagramUrl(userData.instaurl);
+          setTwitterUrl(userData.Twitterurl);
+          setGooglePlusUrl(userData.googleplusurl);
+          setLinkedinUrl(userData.linkdinurl);
+          setGooglePlayStore(userData.googleplaystore);
+          setAppleStore(userData.applestore);
+        } else {
+          router.push("/admin/auth");
+        }
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+        router.push("/admin/auth");
+      } finally {
+        setLoading(false);
+      }
     };
-  }
+    fetchUser();
+  }, [router]);
 
+  const [validatedCustom, setValidatedCustom] = useState(false);
   const UpdateProfile = async (event) => {
-    setIsLoading(true);
-    const form = event.currentTarget;
     event.preventDefault();
-    if (form.checkValidity() === false) {
-      setIsLoading(false);
-      event.preventDefault();
+    const form = event.currentTarget;
+    // Frontend validation
+    if (!form.checkValidity()) {
       event.stopPropagation();
-    } else {
-      const apiUrl = '/api/v1/users/';
-      const body = new FormData();
-      body.append("Email", Email);
-      body.append("ImageURL", ImageURL);
-      body.append("FirstName", FirstName);
-      body.append("PhoneNumber", PhoneNumber);
-      body.append("AddressLine1", AddressLine1);
-      body.append("country_group", country_group);
-      body.append("CompanyName", CompanyName);
-      body.append("CompanyTitle", CompanyTitle);
-      body.append("AddressLine2", AddressLine2);
-      body.append("LastName", LastName);
+      setValidatedCustom(true);
 
-      await axios.put(apiUrl, body, options)
-        .then((res) => {
-          // console.log("res", res)
-          setIsLoading(false);
-          const msg = res.data.message;
-          localStorage.setItem("staticAdded", msg);
-          routeChange()
-        }).catch((err) => {
-          const message = err.response.data.message
-          console.log("message", message)
-          setIsLoading(false);
-
-          // setError(message);
-        });
+      Swal.fire({
+        icon: "warning",
+        title: "Validation Error",
+        text: "Please fill all required fields correctly.",
+      });
+      return;
     }
-    setValidatedCustom(true);
-  }
+    setIsLoading(true);
+    try {
+      const payload = {
+        first_name: name?.trim(),
+        email: email?.trim(),
+        mobile: mobile?.trim(),
+        fburl: facebookUrl?.trim(),
+        instaurl: instagramUrl?.trim(),
+        Twitterurl: twitterUrl?.trim(),
+        linkdinurl: linkedinUrl?.trim(),
+        googleplaystore: googlePlayStore?.trim(),
+        applestore: appleStore?.trim(),
+        googleplusurl: googlePlusUrl?.trim(),
+      };
+      const res = await api.patch(`/api/v1/admin/auth/${id}/update-profile`, payload);
+      if (res.data?.success) {
+        const result = await Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: "Admin profile updated successfully!",
+          confirmButtonText: "OK",
+        });
+        if (result.isConfirmed) {
+          router.push("/admin/profile");
+        }
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Failed",
+          text: res.data?.message || "Something went wrong. Please try again.",
+        });
+      }
+    } catch (err) {
+      // console.log("object",err?.response?.data?.error?.details[0])
+      Swal.fire({
+        icon: "error",
+        title: "Server Error",
+        text:
+          err?.response?.data?.error?.details[0]?.msg ||
+          "Internal server error",
+      });
+    } finally {
+      setIsLoading(false);
+      setValidatedCustom(true);
+    }
+  };
 
 
   return (
@@ -188,182 +188,136 @@ const ProfileEdit = () => {
                 onSubmit={UpdateProfile}
               >
                 <Row className="gy-4">
-                  <CCol md={4}>
-                    <CFormLabel htmlFor="validationDefault01">Name</CFormLabel>
+
+                  {/* Name */}
+                  <CCol md={3}>
+                    <CFormLabel>Name<span style={{ color: "red" }}>*</span></CFormLabel>
                     <CFormInput
                       type="text"
-                      id="validationDefault01"
                       required
-                      value={FirstName}
-                      onChange={(e) => {
-                        console.log(e.target.value);
-                        setFirstname(e.target.value);
-                      }}
-
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
                     />
                   </CCol>
-                  <CCol md={4}>
-                    <CFormLabel htmlFor="validationDefault01">Name</CFormLabel>
+
+                  {/* Mobile */}
+                  <CCol md={3}>
+                    <CFormLabel>Mobile<span style={{ color: "red" }}>*</span></CFormLabel>
                     <CFormInput
                       type="text"
-                      id="validationDefault01"
                       required
-                      value={LastName}
-                      onChange={(e) => {
-                        setLastName(e.target.value);
-                      }}
-
+                      value={mobile}
+                      onChange={(e) => setMobile(e.target.value)}
                     />
                   </CCol>
-                  <CCol md={4}>
-                    <CFormLabel htmlFor="validationCustomUsername">Username</CFormLabel>
-                    <CInputGroup className="has-validation">
-                      <CInputGroupText id="inputGroupPrepend">@</CInputGroupText>
+
+                  {/* Email */}
+                  <CCol md={3}>
+                    <CFormLabel>Contact Email<span style={{ color: "red" }}>*</span></CFormLabel>
+                    <CInputGroup>
+                      <CInputGroupText>@</CInputGroupText>
                       <CFormInput
                         type="email"
-                        id="validationCustomUsername"
-                        defaultValue=""
-                        aria-describedby="inputGroupPrepend"
                         required
                         readOnly
-                        value={Email}
-                        onChange={(e) => {
-                          console.log(e.target.value);
-                          setEmail(e.target.value);
-                        }}
+                        value={email}
                       />
-                      <CFormFeedback invalid>Please choose a username.</CFormFeedback>
                     </CInputGroup>
                   </CCol>
-                  <CCol md={4}>
-                    <CFormLabel htmlFor="validationDefault02">Mobile </CFormLabel>
-                    <CFormInput
-                      type="text"
-                      id="validationDefault02"
-                      // maxLength="10"
-                      // minLength="10"
-                      required
-                      value={PhoneNumber}
-                      onChange={(e) => {
-                        console.log(e.target.value);
-                        setPhonenumber(e.target.value);
-                      }}
-                    />
-                  </CCol>
-                  <CCol md={4}>
-                    <CFormLabel htmlFor="validationDefault02">Company Name </CFormLabel>
-                    <CFormInput
-                      type="text"
-                      id="validationDefault02"
-                      required
-                      value={CompanyName}
-                      onChange={(e) => {
-                        console.log(e.target.value);
-                        setCompanyName(e.target.value);
-                      }}
-                    />
-                  </CCol>
-                  <CCol md={4}>
-                    <CFormLabel htmlFor="validationDefault02">Company Title </CFormLabel>
-                    <CFormInput
-                      type="text"
-                      id="validationDefault02"
-                      required
-                      value={CompanyTitle}
-                      onChange={(e) => {
-                        console.log(e.target.value);
-                        setCompanyTitle(e.target.value);
-                      }}
-                    />
-                  </CCol>
-                  <CCol md={4}>
-                    <CFormLabel htmlFor="validationDefault02">Address1 </CFormLabel>
-                    <CFormInput
-                      type="text"
-                      id="validationDefault02"
-                      required
-                      value={AddressLine1}
-                      onChange={(e) => {
-                        console.log(e.target.value);
-                        SetAddressLine1(e.target.value);
-                      }}
-                    />
-                  </CCol>
-                  <CCol md={4}>
-                    <CFormLabel htmlFor="validationDefault02">Address2 </CFormLabel>
-                    <CFormInput
-                      type="text"
-                      id="validationDefault02"
-                      value={AddressLine2}
-                      onChange={(e) => {
-                        console.log(e.target.value);
-                        setAddressLine2(e.target.value);
-                      }}
-                    />
-                  </CCol>
-                  <CCol md={4}>
-                    <CFormLabel htmlFor="validationDefault02">Country</CFormLabel>
-                    <select
-                      className="form-control"
-                      aria-label="Default select example"
-                      placeholder="Country"
-                      required
-                      value={country_group}
-                      onChange={(e) => {
-                        setCountry_group(e.target.value);
-                      }}
-                    >
-                      <option value=""> Select Location</option>
-                      <option value="0">N/A</option>
-                      <option value="1">Europe</option>
-                      <option value="2">Africa</option>
-                      <option value="3">Mexico</option>
-                      <option value="4">South America</option>
-                      <option value="5">USA</option>
-                      <option value="6">Australia</option>
 
-                    </select>
-                  </CCol>
-                  <CCol md={4}>
-                    <CFormLabel htmlFor="validationDefault02">Image </CFormLabel>
+                  {/* Facebook */}
+                  <CCol md={3}>
+                    <CFormLabel>Facebook URL<span style={{ color: "red" }}>*</span></CFormLabel>
                     <CFormInput
-                      type="file"
-                      onChange={(e) => {
-                        console.log(e.target.value);
-                        setImageURL(e.target.files[0]);
-                      }}
+                      type="url"
+                      required
+                      value={facebookUrl}
+                      onChange={(e) => setFacebookUrl(e.target.value)}
                     />
                   </CCol>
 
-                  <CCol md={10} className=" col-6">
+                  {/* Instagram */}
+                  <CCol md={3}>
+                    <CFormLabel>Instagram URL</CFormLabel>
+                    <CFormInput
+                      type="url"
+                      value={instagramUrl}
+                      onChange={(e) => setInstagramUrl(e.target.value)}
+                    />
+                  </CCol>
+
+                  {/* Twitter */}
+                  <CCol md={3}>
+                    <CFormLabel>Twitter URL<span style={{ color: "red" }}>*</span></CFormLabel>
+                    <CFormInput
+                      type="url"
+                      required
+                      value={twitterUrl}
+                      onChange={(e) => setTwitterUrl(e.target.value)}
+                    />
+                  </CCol>
+
+                  {/* Google Plus */}
+                  <CCol md={3}>
+                    <CFormLabel>Google Plus URL<span style={{ color: "red" }}>*</span></CFormLabel>
+                    <CFormInput
+                      type="url"
+                      required
+                      value={googlePlusUrl}
+                      onChange={(e) => setGooglePlusUrl(e.target.value)}
+                    />
+                  </CCol>
+
+                  {/* LinkedIn */}
+                  <CCol md={3}>
+                    <CFormLabel>LinkedIn URL<span style={{ color: "red" }}>*</span></CFormLabel>
+                    <CFormInput
+                      type="url"
+                      required
+                      value={linkedinUrl}
+                      onChange={(e) => setLinkedinUrl(e.target.value)}
+                    />
+                  </CCol>
+
+                  {/* Google Play Store */}
+                  <CCol md={3}>
+                    <CFormLabel>Google Play Store<span style={{ color: "red" }}>*</span></CFormLabel>
+                    <CFormInput
+                      type="url"
+                      value={googlePlayStore}
+                      onChange={(e) => setGooglePlayStore(e.target.value)}
+                    />
+                  </CCol>
+
+                  {/* Apple Store */}
+                  <CCol md={3}>
+                    <CFormLabel>Apple Store<span style={{ color: "red" }}>*</span></CFormLabel>
+                    <CFormInput
+                      type="url"
+                      value={appleStore}
+                      onChange={(e) => setAppleStore(e.target.value)}
+                    />
+                  </CCol>
+
+                  {/* Buttons */}
+                  <CCol md={10} className="col-6">
                     <Link href="/admin/profile/">
-                      <CButton color="primary" >
-                        Back
-                      </CButton>
+                      <CButton color="primary">Back</CButton>
                     </Link>
                   </CCol>
+
                   <CCol md={2} className="text-end col-6">
-                    {/* <CButton color="primary" type="submit">
-                    Submit
-                  </CButton> */}
-                    <CButton
-                      color="primary" type="submit"
-                      disabled={isLoading}
-                    >
+                    <CButton color="primary" type="submit" disabled={isLoading}>
                       {isLoading ? (
-                        <Spinner
-                          as="span"
-                          animation="border"
-                          size="sm"
-                          role="status"
-                          aria-hidden="true"
-                        />
+                        <Spinner size="sm" />
                       ) : (
                         "Submit"
                       )}
                     </CButton>
                   </CCol>
+
                 </Row>
+
               </CForm>
 
             </Card.Body>

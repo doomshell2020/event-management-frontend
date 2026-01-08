@@ -35,20 +35,31 @@ export async function getServerSideProps(context) {
 
         const list = json?.data?.list || [];
         const assets = json?.data?.assets || {};
+        const completedData = Array.isArray(json?.data?.completedData)
+            ? json.data.completedData
+            : [];
 
-        const counts = { pending: 0, approved: 0, ignored: 0 };
+        const counts = {
+            pending: 0,
+            approved: 0,
+            ignored: 0,
+            completed: 0,
+        };
+        // ✅ Set completed count safely
+        counts.completed = completedData.length;
 
         list.forEach(item => {
-            if (item.status === "N") counts.pending++;
-            if (item.status === "Y") counts.approved++;
-            if (item.status === "I") counts.ignored++;
+            if (item.status == "N") counts.pending++;
+            if (item.status == "Y") counts.approved++;
+            if (item.status == "I") counts.ignored++;
         });
 
         return {
             props: {
-                ignoredRequests: list,
+                completedRequests: list,
                 counts,
                 assets,
+                completedData,
             },
         };
 
@@ -64,6 +75,82 @@ export async function getServerSideProps(context) {
         };
     }
 }
+
+const showQuestions = (questionsList = []) => {
+    if (!questionsList.length) return;
+
+    const html = `
+        <div style="max-height:55vh;overflow-y:auto;">
+            ${questionsList.map((q, index) => {
+        const options = q.question.questionItems?.length
+            ? `
+                        <span style="font-size:11px;color:#6b7280;">
+                            | ${q.question.questionItems.map(i => i.items).join(", ")}
+                        </span>
+                    `
+            : "";
+
+        return `
+                    <div style="
+                        border-bottom:1px solid #e5e7eb;
+                        padding:6px 4px;
+                    ">
+                        <div style="
+                            display:flex;
+                            align-items:flex-start;
+                            gap:6px;
+                        ">
+                            <div style="
+                                font-size:11px;
+                                font-weight:600;
+                                color:#2563eb;
+                                min-width:18px;
+                            ">
+                                ${index + 1}.
+                            </div>
+
+                            <div style="flex:1;">
+                                <div style="
+                                    font-size:13px;
+                                    font-weight:600;
+                                    line-height:1.3;
+                                ">
+                                    ${q.question.question}
+                                </div>
+
+                                <div style="
+                                    font-size:11px;
+                                    color:#6b7280;
+                                ">
+                                    ${q.question.type}${options}
+                                </div>
+
+                                <div style="
+                                    font-size:12px;
+                                    margin-top:2px;
+                                ">
+                                    <span style="color:#6b7280;">Reply:</span>
+                                    <span style="font-weight:500;">
+                                        ${q.user_reply ?? "-"}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+    }).join("")}
+        </div>
+    `;
+
+    Swal.fire({
+        title: `Questions (${questionsList.length})`,
+        html,
+        width: "520px",
+        showCloseButton: true,
+        confirmButtonText: "Close",
+        padding: "12px",
+    });
+};
 
 const CommitteeIgnored = ({ ignoredRequests, counts, assets }) => {
     const [activeTab, setMyActiveTab] = useState("ignored");
@@ -207,12 +294,28 @@ const CommitteeIgnored = ({ ignoredRequests, counts, assets }) => {
                                                     <td>
                                                         <div>{ticket.title}</div>
                                                         <div className="text-muted fs-13">
-                                                            ₹{ticket.price} × {item.no_tickets}
+                                                            {item?.events?.currencyName?.Currency_symbol}{ticket.price} × {item.no_tickets}
                                                         </div>
                                                     </td>
 
                                                     {/* ACTION */}
                                                     <td>
+
+                                                        <span className="me-2">
+                                                            {item.questionsList?.length > 0 ? (
+                                                                <i
+                                                                    className="bi bi-question-circle-fill text-primary"
+                                                                    style={{ fontSize: "18px", cursor: "pointer" }}
+                                                                    title="View Questions"
+                                                                    onClick={() => showQuestions(item.questionsList)}
+                                                                ></i>
+                                                            ) : (
+                                                                <span className="text-muted">—</span>
+                                                            )}
+
+                                                        </span>
+
+
                                                         <button
                                                             className="btn btn-success btn-sm me-2"
                                                             onClick={() => handleAction(item.id, "approve")}

@@ -98,9 +98,17 @@ export async function getServerSideProps(context) {
         const apiData = json?.data?.list || [];
         const eventsList = json?.data?.events || [];
         const assets = json?.data?.assets || {};
+        const completedData = Array.isArray(json?.data?.completedData)
+            ? json.data.completedData
+            : [];
 
         // ✅ counts
-        const counts = { pending: 0, approved: 0, ignored: 0 };
+        const counts = {
+            pending: 0,
+            approved: 0,
+            ignored: 0,
+            completed: 0,
+        };
 
         apiData.forEach(item => {
             if (item.status == "N") counts.pending++;
@@ -108,11 +116,16 @@ export async function getServerSideProps(context) {
             if (item.status == "I") counts.ignored++;
         });
 
+        // ✅ Set completed count safely
+        counts.completed = completedData.length;
+
+
         return {
             props: {
                 counts,
                 eventsList,
-                assets
+                assets,
+                completedData,
             },
         };
 
@@ -121,7 +134,7 @@ export async function getServerSideProps(context) {
 
         return {
             props: {
-                counts: { pending: 0, approved: 0, ignored: 0 },
+                counts: { pending: 0, approved: 0, ignored: 0, completed: 0 },
                 eventsList: [],
                 assets: {}
             },
@@ -130,7 +143,7 @@ export async function getServerSideProps(context) {
 }
 
 const CommitteePage = ({ counts, eventsList, assets }) => {
-console.log('eventsList :', eventsList);
+    // console.log('eventsList :', eventsList);
 
     const [activeTab, setMyActiveTab] = useState("ticket");
     const router = useRouter()

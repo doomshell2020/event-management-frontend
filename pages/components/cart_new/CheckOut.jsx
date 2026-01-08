@@ -7,10 +7,11 @@ import CheckoutForm from "./CheckoutForm";
 import api from "@/utils/api";
 import { useCart } from "@/shared/layout-components/layout/CartContext";
 import { useAuth } from "@/shared/layout-components/layout/AuthContext";
+import Swal from "sweetalert2";
 
 /* Stripe Init */
 const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+  process.env.STRIPE_PUBLIC_KEY
 );
 
 /* Round Helper */
@@ -26,6 +27,7 @@ export default function CheckOutComponents({
   sub_total,
 }) {
   const { cart, eventData, loginUserId } = useCart();
+  // console.log('cart :', cart);
 
   const router = useRouter();
   const [clientSecret, setClientSecret] = useState("");
@@ -46,9 +48,11 @@ export default function CheckOutComponents({
       ticketType: item.item_type,  // ticket | addon | package
       ticketId: item.uniqueId,     // backend expects this as real item id
       quantity: item.count || 1,
+      committee_user_id: item.committee_member_id || null,
       price: roundAmount(item.ticket_price),
     }));
   }, [cart]);
+  // console.log('cartData :', cartData);
 
 
   /* Fetch User */
@@ -93,6 +97,23 @@ export default function CheckOutComponents({
         });
       } catch (err) {
         intentCreatedRef.current = false;
+        // 🔥 Extract backend message safely
+        const errorMessage =
+          err?.response?.data?.error?.message ||
+          err?.message ||
+          "Something went wrong while creating payment";
+
+        Swal.fire({
+          icon: "error",
+          title: "Payment Failed",
+          text: errorMessage,
+        }).then((result) => {
+          if (result.isConfirmed) {
+            showNextStep(false);
+          }
+        });
+
+
         console.error("Payment intent error:", err);
       } finally {
         setIsLoading(false);

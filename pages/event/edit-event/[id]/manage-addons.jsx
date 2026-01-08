@@ -23,6 +23,9 @@ const ManageAddons = () => {
     const [isOpenWiggins, setIsOpenWiggins] = useState(false);
     const [eventDetails, setEventDetails] = useState(null);
 
+    const currencyName = eventDetails?.currencyName.Currency_symbol;
+    // console.log('currencyName :', currencyName);
+
     const [addonForm, setAddonForm] = useState({
         name: "",
         price: "",
@@ -231,140 +234,139 @@ const ManageAddons = () => {
                                         </div>
                                     ) : addonsList.length == 0 ? (
                                         <p className="text-muted">No addons found for this event.</p>
-                                    ) : addonsList.map((addon) => (
-                                        <div
-                                            key={addon.id}
-                                            className="row item_bg m-0 p-2 px-3 mb-2 align-items-center"
-                                        >
-                                            {/* Left Section: Addon Info */}
-                                            <div className="col-sm-8">
-                                                <p className="body-text mb-1">
-                                                    <strong>{addon.name}</strong>
-                                                </p>
-                                                <p className="mb-1 text-muted">{addon.description || "No description"}</p>
-                                                <div className="row">
-                                                    <div className="col-md-4">
-                                                        <p className="body-text mb-0 d-flex align-items-center">
-                                                            <Package size={16} className="me-2 text-primary" />
-                                                            ₹{addon.price} / {addon.count} available
-                                                        </p>
-                                                    </div>
-                                                    <div className="col-md-4">
-                                                        <p className="body-text mb-0 d-flex align-items-center">
-                                                            {addon.hidden === "Y" ? (
-                                                                <>
-                                                                    <EyeOff size={16} className="me-2 text-danger" /> Hidden
-                                                                </>
-                                                            ) : (
-                                                                <>
-                                                                    <Eye size={16} className="me-2 text-success" /> Visible
-                                                                </>
+                                    ) : (
+                                        addonsList.map((addon) => {
+                                            const soldCount = addon.sold_count || 0;
+                                            const availableCount = Math.max(addon.count - soldCount, 0);
+                                            const isSoldOut = availableCount <= 0;
+
+                                            return (
+                                                <div
+                                                    key={addon.id}
+                                                    className="row item_bg m-0 p-2 px-3 mb-2 align-items-center"
+                                                >
+                                                    {/* Left Section: Addon Info */}
+                                                    <div className="col-sm-8">
+                                                        <p className="body-text mb-1">
+                                                            <strong>{addon.name}</strong>
+                                                            {isSoldOut && (
+                                                                <span className="badge bg-danger ms-2">
+                                                                    Sold Out
+                                                                </span>
                                                             )}
                                                         </p>
+
+                                                        <p className="mb-1 text-muted">
+                                                            {addon.description || "No description"}
+                                                        </p>
+
+                                                        <div className="row">
+                                                            <div className="col-md-6">
+                                                                <p className="body-text mb-0 d-flex align-items-center flex-wrap">
+                                                                    <Package size={16} className="me-2 text-primary" />
+                                                                    {currencyName}{addon.price}
+
+                                                                    <span className="ms-2 text-muted">
+                                                                        | Sold: <strong>{soldCount}</strong>
+                                                                    </span>
+
+                                                                    <span className="ms-2 text-muted">
+                                                                        | Available:{" "}
+                                                                        <strong>{availableCount}</strong>
+                                                                    </span>
+                                                                </p>
+                                                            </div>
+
+                                                            <div className="col-md-6">
+                                                                <p className="body-text mb-0 d-flex align-items-center">
+                                                                    {addon.hidden == "Y" ? (
+                                                                        <>
+                                                                            <EyeOff
+                                                                                size={16}
+                                                                                className="me-2 text-danger"
+                                                                            />
+                                                                            Hidden
+                                                                        </>
+                                                                    ) : (
+                                                                        <>
+                                                                            <Eye
+                                                                                size={16}
+                                                                                className="me-2 text-success"
+                                                                            />
+                                                                            Visible
+                                                                        </>
+                                                                    )}
+                                                                </p>
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </div>
 
-                                            {/* Right Section: Dropdown Actions */}
-                                            <div className="col-sm-4 text-end">
-                                                <div className="dropdown d-inline position-relative">
-                                                    <button
-                                                        className="btn btn-primary btn-sm rounded-pill"
-                                                        type="button"
-                                                        onClick={() =>
-                                                            setOpenDropdown(openDropdown === addon.id ? null : addon.id)
-                                                        }
-                                                    >
-                                                        <Settings size={16} />
-                                                    </button>
+                                                    {/* Right Section: Dropdown Actions */}
+                                                    <div className="col-sm-4 text-end">
+                                                        <div className="dropdown d-inline position-relative">
+                                                            <button
+                                                                className="btn btn-primary btn-sm rounded-pill"
+                                                                type="button"
+                                                                onClick={() =>
+                                                                    setOpenDropdown(
+                                                                        openDropdown == addon.id ? null : addon.id
+                                                                    )
+                                                                }
+                                                            >
+                                                                <Settings size={16} />
+                                                            </button>
 
-                                                    {openDropdown === addon.id && (
-                                                        <ul
-                                                            className="dropdown-menu show position-absolute"
-                                                            style={{
-                                                                display: "block",
-                                                                zIndex: 999,
-                                                                left: "-120px", top: "24px"
-                                                            }}
-                                                        >
-                                                            {/* Edit */}
-                                                            <li>
-                                                                <button
-                                                                    className="dropdown-item"
-                                                                    onClick={() => {
-                                                                        setAddonId(addon.id);
-                                                                        setAddonForm({
-                                                                            name: addon.name,
-                                                                            price: addon.price,
-                                                                            count: addon.count,
-                                                                            hidden: addon.hidden,
-                                                                            description: addon.description,
-                                                                        });
-                                                                        setShow(true);
-                                                                        setOpenDropdown(null);
+                                                            {openDropdown == addon.id && (
+                                                                <ul
+                                                                    className="dropdown-menu show position-absolute"
+                                                                    style={{
+                                                                        display: "block",
+                                                                        zIndex: 999,
+                                                                        left: "-120px",
+                                                                        top: "24px",
                                                                     }}
                                                                 >
-                                                                    Edit
-                                                                </button>
-                                                            </li>
-
-                                                            {/* Hide / Show */}
-                                                            <li>
-                                                                <button
-                                                                    className="dropdown-item"
-                                                                    onClick={() => {
-                                                                        const newHidden = addon.hidden === "Y" ? "N" : "Y";
-                                                                        api
-                                                                            .put(`/api/v1/addons/update/${addon.id}`, {
-                                                                                hidden: newHidden,
-                                                                            })
-                                                                            .then(() => {
-                                                                                Swal.fire({
-                                                                                    icon: "success",
-                                                                                    title:
-                                                                                        newHidden === "Y"
-                                                                                            ? "Addon Hidden"
-                                                                                            : "Addon Visible",
-                                                                                    timer: 1200,
-                                                                                    showConfirmButton: false,
+                                                                    {/* Edit */}
+                                                                    <li>
+                                                                        <button
+                                                                            className="dropdown-item"
+                                                                            onClick={() => {
+                                                                                setAddonId(addon.id);
+                                                                                setAddonForm({
+                                                                                    name: addon.name,
+                                                                                    price: addon.price,
+                                                                                    count: addon.count,
+                                                                                    hidden: addon.hidden,
+                                                                                    description: addon.description,
                                                                                 });
-                                                                                handleGetAddonsList();
-                                                                            })
-                                                                            .catch(() =>
-                                                                                Swal.fire(
-                                                                                    "Error",
-                                                                                    "Failed to update visibility.",
-                                                                                    "error"
-                                                                                )
-                                                                            );
-                                                                        setOpenDropdown(null);
-                                                                    }}
-                                                                >
-                                                                    {addon.hidden === "Y" ? "Show Addon" : "Hide Addon"}
-                                                                </button>
-                                                            </li>
+                                                                                setShow(true);
+                                                                                setOpenDropdown(null);
+                                                                            }}
+                                                                        >
+                                                                            Edit
+                                                                        </button>
+                                                                    </li>
 
-                                                            {/* Delete */}
-                                                            <li>
-                                                                <button
-                                                                    className="dropdown-item text-danger"
-                                                                    onClick={() => {
-                                                                        Swal.fire({
-                                                                            icon: "warning",
-                                                                            title: "Are you sure?",
-                                                                            text: "This addon will be deleted.",
-                                                                            showCancelButton: true,
-                                                                            confirmButtonColor: "#e62d56",
-                                                                            confirmButtonText: "Delete",
-                                                                        }).then((result) => {
-                                                                            if (result.isConfirmed) {
+                                                                    {/* Hide / Show */}
+                                                                    <li>
+                                                                        <button
+                                                                            className="dropdown-item"
+                                                                            onClick={() => {
+                                                                                const newHidden =
+                                                                                    addon.hidden == "Y" ? "N" : "Y";
                                                                                 api
-                                                                                    .delete(`/api/v1/addons/delete/${addon.id}`)
+                                                                                    .put(
+                                                                                        `/api/v1/addons/update/${addon.id}`,
+                                                                                        { hidden: newHidden }
+                                                                                    )
                                                                                     .then(() => {
                                                                                         Swal.fire({
                                                                                             icon: "success",
-                                                                                            title: "Addon Deleted",
-                                                                                            timer: 1000,
+                                                                                            title:
+                                                                                                newHidden == "Y"
+                                                                                                    ? "Addon Hidden"
+                                                                                                    : "Addon Visible",
+                                                                                            timer: 1200,
                                                                                             showConfirmButton: false,
                                                                                         });
                                                                                         handleGetAddonsList();
@@ -372,24 +374,72 @@ const ManageAddons = () => {
                                                                                     .catch(() =>
                                                                                         Swal.fire(
                                                                                             "Error",
-                                                                                            "Failed to delete addon.",
+                                                                                            "Failed to update visibility.",
                                                                                             "error"
                                                                                         )
                                                                                     );
-                                                                            }
-                                                                        });
-                                                                        setOpenDropdown(null);
-                                                                    }}
-                                                                >
-                                                                    Delete
-                                                                </button>
-                                                            </li>
-                                                        </ul>
-                                                    )}
+                                                                                setOpenDropdown(null);
+                                                                            }}
+                                                                        >
+                                                                            {addon.hidden == "Y"
+                                                                                ? "Show Addon"
+                                                                                : "Hide Addon"}
+                                                                        </button>
+                                                                    </li>
+
+                                                                    {/* Delete */}
+                                                                    <li>
+                                                                        <button
+                                                                            className="dropdown-item text-danger"
+                                                                            onClick={() => {
+                                                                                Swal.fire({
+                                                                                    icon: "warning",
+                                                                                    title: "Are you sure?",
+                                                                                    text: "This addon will be deleted.",
+                                                                                    showCancelButton: true,
+                                                                                    confirmButtonColor: "#e62d56",
+                                                                                    confirmButtonText: "Delete",
+                                                                                }).then((result) => {
+                                                                                    if (result.isConfirmed) {
+                                                                                        api
+                                                                                            .delete(
+                                                                                                `/api/v1/addons/delete/${addon.id}`
+                                                                                            )
+                                                                                            .then(() => {
+                                                                                                Swal.fire({
+                                                                                                    icon: "success",
+                                                                                                    title:
+                                                                                                        "Addon Deleted",
+                                                                                                    timer: 1000,
+                                                                                                    showConfirmButton:
+                                                                                                        false,
+                                                                                                });
+                                                                                                handleGetAddonsList();
+                                                                                            })
+                                                                                            .catch(() =>
+                                                                                                Swal.fire(
+                                                                                                    "Error",
+                                                                                                    "Failed to delete addon.",
+                                                                                                    "error"
+                                                                                                )
+                                                                                            );
+                                                                                    }
+                                                                                });
+                                                                                setOpenDropdown(null);
+                                                                            }}
+                                                                        >
+                                                                            Delete
+                                                                        </button>
+                                                                    </li>
+                                                                </ul>
+                                                            )}
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </div>
-                                    ))}
+                                            );
+                                        })
+                                    )}
+
 
                                     {/* <div className="next_prew_btn d-flex justify-content-between mt-4">
                                         <a

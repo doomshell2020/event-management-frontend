@@ -55,7 +55,7 @@ const TicketCountTabs = ({ active, onChange, counts }) => {
                 style={getStyle("ticket", 1)}
                 onClick={() => handleClick("ticket", 1)}
             >
-                Ticket Count
+                Tickets
             </li>
 
             <li

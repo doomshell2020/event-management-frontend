@@ -11,7 +11,6 @@ const ProfilePage = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [backgroundImage] = useState("/assets/front-images/about-slider_bg.jpg");
-
   // console.log('>>>>>>>>>>', user);
 
   useEffect(() => {

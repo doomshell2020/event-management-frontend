@@ -23,6 +23,7 @@ const AnalyticsIndexPage = () => {
     /* ---------------- STATES ---------------- */
     const [eventDetails, setEventDetails] = useState(null);
     const [dashboardData, setDashboardData] = useState(null);
+    // console.log('dashboardData :', dashboardData);
     const [loading, setLoading] = useState(true);
     const [isClient, setIsClient] = useState(false);
 
@@ -45,6 +46,7 @@ const AnalyticsIndexPage = () => {
                 // Dashboard analytics
                 const dashRes = await api.get(`/api/v1/orders/event-dashboard-analytics?event_id=${id}`);
                 if (dashRes.data.success) {
+                    console.log('dashRes.data.data :', dashRes.data.data);
                     setDashboardData(dashRes.data.data);
                 }
             } catch (err) {
@@ -57,36 +59,51 @@ const AnalyticsIndexPage = () => {
         fetchEventData();
     }, [id]);
 
-    /* ---------------- DYNAMIC CHART DATA ---------------- */
+
+    // ---------------- SANITIZE DASHBOARD DATA ----------------
+    const salesOverTime = Array.isArray(dashboardData?.sales_over_time)
+        ? dashboardData.sales_over_time.filter(item => item && item.month != null && item.revenue != null)
+        : [];
+
+    const salesByItem = Array.isArray(dashboardData?.sales_by_item)
+        ? dashboardData.sales_by_item.filter(item => item && item.name != null && item.sold != null)
+        : [];
+
+    const salesByPayment = Array.isArray(dashboardData?.sales_by_payment_method)
+        ? dashboardData.sales_by_payment_method.filter(item => item && item.paymenttype != null && item.method_revenue != null)
+        : [];
+
+    // ---------------- CHART OPTIONS ----------------
     const salesChartOptions = {
         chart: { type: "line", height: 350 },
-        xaxis: { categories: dashboardData?.sales_over_time?.map(item => item.month) || [] },
+        xaxis: { categories: salesOverTime.map(item => item.month) },
         stroke: { curve: "smooth" },
         markers: { size: 5 },
         colors: ["#600e7d"]
     };
 
     const salesChartSeries = [
-        { name: "Total Sales", data: dashboardData?.sales_over_time?.map(item => item.revenue) || [] }
+        { name: "Total Sales", data: salesOverTime.map(item => item.revenue) }
     ];
 
     const ticketChartOptions = {
         chart: { type: "bar", height: 350 },
-        xaxis: { categories: dashboardData?.sales_by_item?.map(item => item.name) || [] },
+        xaxis: { categories: salesByItem.map(item => item.name) },
         colors: ["#2b7cff"]
     };
 
     const ticketChartSeries = [
-        { name: "Tickets Sold", data: dashboardData?.sales_by_item?.map(item => item.sold) || [] }
+        { name: "Tickets Sold", data: salesByItem.map(item => item.sold) }
     ];
 
     const paymentChartOptions = {
         chart: { type: "donut", height: 350 },
-        labels: dashboardData?.sales_by_payment_method?.map(item => item.paymenttype) || [],
+        labels: salesByPayment.map(item => item.paymenttype),
         colors: ["#28a745", "#ffc107", "#17a2b8"]
     };
 
-    const paymentChartSeries = dashboardData?.sales_by_payment_method?.map(item => item.method_revenue) || [];
+    const paymentChartSeries = salesByPayment.map(item => item.method_revenue);
+
 
     /* ---------------- RENDER ---------------- */
     return (

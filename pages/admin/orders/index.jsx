@@ -18,7 +18,7 @@ import api from "@/utils/api";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import moment from "moment";
-
+import AsyncSelect from "react-select/async";
 
 export const OrdersList = () => {
     const [COLUMNS, setCOLUMNS] = useState([
@@ -49,16 +49,37 @@ export const OrdersList = () => {
             accessor: "OrderDetails",
             className: "borderrigth",
             Cell: ({ row }) => {
+                const { paymenttype, RRN } = row.original;
+
+                // 👇 FREE order case
+                if (paymenttype === "free") {
+                    return (
+                        <span
+                            className="badge ms-2"
+                            style={{
+                                backgroundColor: "#28a745",
+                                color: "#fff",
+                                fontSize: "12px",
+                                padding: "4px 8px",
+                                borderRadius: "4px",
+                                fontWeight: 600,
+                            }}
+                        >
+                            Free Ticket
+                        </span>
+                    );
+                }
+
+                // 👇 Paid / other cases
                 return (
                     <div>
-                        <div>
-                            <strong>OrderIdentifier : </strong>
-                            {row.original.RRN ? row.original.RRN : "-"}
-                        </div>
+                        <strong>Order Identifier: </strong>
+                        {RRN || "-"}
                     </div>
                 );
             },
         },
+
 
         {
             Header: "Event",
@@ -154,7 +175,8 @@ export const OrdersList = () => {
     const [toDate, setToDate] = useState(null);
     const [event, setEvent] = useState("");
     const [customer, setCustomer] = useState("");
-
+    const [selectedCustomer, setSelectedCustomer] = useState(null);
+    const [selectedEvent, setSelectedEvent] = useState(null);
     const getOrdersList = async () => {
         try {
             setIsLoading(true);
@@ -235,11 +257,14 @@ export const OrdersList = () => {
     const handleReset = () => {
         setEvent("");
         setCustomer("");
+        setSelectedCustomer(null);   // 👈 THIS WAS MISSING
+        setSelectedEvent(null);   // 👈 THIS WAS MISSING
         setFromDate(null);
         setToDate(null);
         setOrdersList([]);
         getOrdersList();
     };
+
 
     const pageTotals = React.useMemo(() => {
         return page.reduce(
@@ -258,7 +283,163 @@ export const OrdersList = () => {
         })}`;
     };
 
+    const loadUserOptions = async (inputValue) => {
+        if (inputValue.length < 2) return [];
+        try {
+            const response = await api.get(
+                "/api/v1/admin/customers/first-name/search",
+                {
+                    params: {
+                        search: inputValue, // 👈 backend expects this
+                    },
+                }
+            );
+            const data = response.data;
+            if (data?.success) {
+                return data.data.customers.map((user) => ({
+                    value: user.id,
+                    label: user.first_name, // 👈 correct key
+                    user,
+                }));
+            }
 
+            return [];
+        } catch (error) {
+            console.error("Error fetching users:", error);
+            return [];
+        }
+    };
+
+    const handleUserSelect = (selectedOption) => {
+        setSelectedCustomer(selectedOption); // 👈 dropdown control
+
+        if (selectedOption) {
+            setCustomer(selectedOption.user.first_name);
+        } else {
+            setCustomer("");
+        }
+    };
+
+    const loadEventOptions = async (inputValue) => {
+        if (inputValue.length < 2) return [];
+
+        try {
+            const response = await api.get(
+                "/api/v1/admin/events/search/search",
+                {
+                    params: {
+                        search: inputValue, // backend expects this
+                    },
+                }
+            );
+
+            const data = response.data;
+
+            if (data?.success) {
+                return data.data.events.map((event) => ({
+                    value: event.id,
+                    label: event.name,
+                    event, // full event object if needed later
+                }));
+            }
+
+            return [];
+        } catch (error) {
+            console.error("Error fetching events:", error);
+            return [];
+        }
+    };
+    const handleEventSelect = (selectedOption) => {
+        setSelectedEvent(selectedOption); // 👈 dropdown control
+
+        if (selectedOption) {
+            setEvent(selectedOption.event?.name);
+        } else {
+            setEvent("");
+        }
+    };
+
+
+    const getCurrentDate = () => {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    };
+
+    const formatDateTime = (date) => {
+        if (!date) return "---";
+        return moment(date).format("DD MMM, YYYY hh:mm A");
+    };
+
+    const headers = [
+        "S.No",
+        "Order Date",
+        "Order Details",
+        "Event",
+        "Customer",
+        "Mobile",
+        "Qty",
+        "Customer Pay",
+        "Admin Commission",
+    ];
+
+    const calculateCommission = (amount, percent = 8) => {
+        if (!amount) return "0";
+        return ((Number(amount) * percent) / 100).toFixed(2);
+    };
+    const csvData = orderList.map((order, index) => {
+        const user = order?.user || {};
+        const event = order?.event || {};
+        const items = order?.orderItems || [];
+
+        const totalQty = items.reduce(
+            (sum, item) => sum + (item.count || 0),
+            0
+        );
+
+        const customerName =
+            [user.first_name, user.last_name].filter(Boolean).join(" ") || "-";
+
+        const orderDetails =
+            order.paymenttype === "free"
+                ? "Free Ticket"
+                : order.RRN || "-";
+
+        return {
+            "S.No": index + 1,
+            "Order Date": formatDateTime(order.created),
+            "Order Details": orderDetails,
+            "Event": event?.name || "-",
+            "Customer": customerName,
+            "Mobile": user?.mobile || "-",
+            "Qty": totalQty || "-",
+            "Customer Pay": formatCurrencyAmount(order, "sub_total"),
+            "Admin Commission": formatCurrencyAmount(order, "tax_total"),
+        };
+    });
+
+    const onExportLinkPress = () => {
+        const rows = [
+            headers,
+            ...csvData.map((row) =>
+                headers.map((header) => {
+                    const value = row[header] ?? "";
+                    return `"${String(value).replace(/"/g, '""')}"`;
+                })
+            ),
+        ];
+
+        const csvContent =
+            "data:text/csv;charset=utf-8,\uFEFF" +
+            rows.map((e) => e.join(",")).join("\n");
+
+        const link = document.createElement("a");
+        link.href = encodeURI(csvContent);
+        link.download = `orders_${getCurrentDate()}.csv`;
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
 
 
 
@@ -271,6 +452,7 @@ export const OrdersList = () => {
                         <Card.Header>
                             <div className="d-flex justify-content-between">
                                 <h4 className="card-title mg-b-0">Filters</h4>
+
                             </div>
                         </Card.Header>
                         <Card.Body className="p-2">
@@ -278,22 +460,64 @@ export const OrdersList = () => {
 
                                 <Form.Group className="mb-3" controlId="formName">
                                     <Form.Label>Customer</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="Customer"
-                                        value={customer}
-                                        onChange={(e) => setCustomer(e.target.value)}
+
+                                    <AsyncSelect
+                                        className="search-dropdown"
+                                        cacheOptions
+                                        loadOptions={loadUserOptions}
+                                        value={selectedCustomer}
+                                        onChange={handleUserSelect}
+                                        placeholder="Search by name"
+                                        isClearable
+                                        getOptionLabel={(option) => option.user.first_name}
+                                        getOptionValue={(option) => option.value}
+                                        formatOptionLabel={(option, { context }) => {
+                                            if (context === "menu") {
+                                                return (
+                                                    <div>
+                                                        <strong>{option.user.first_name}</strong>
+                                                    </div>
+                                                );
+                                            }
+                                            return option.user.first_name;
+                                        }}
+                                        styles={{
+                                            menu: (provided) => ({
+                                                ...provided,
+                                                zIndex: 1050,
+                                            }),
+                                        }}
                                     />
                                 </Form.Group>
 
                                 <Form.Group className="mb-3" controlId="formName">
                                     <Form.Label>Event</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="Event Name"
-                                        value={event}
-                                        onChange={(e) => setEvent(e.target.value)}
-
+                                    <AsyncSelect
+                                        className="search-dropdown"
+                                        cacheOptions
+                                        loadOptions={loadEventOptions}
+                                        value={selectedEvent}
+                                        onChange={handleEventSelect}
+                                        placeholder="Search by event"
+                                        isClearable
+                                        getOptionLabel={(option) => option.event?.name}
+                                        getOptionValue={(option) => option.value}
+                                        formatOptionLabel={(option, { context }) => {
+                                            if (context === "menu") {
+                                                return (
+                                                    <div>
+                                                        <strong>{option.event?.name}</strong>
+                                                    </div>
+                                                );
+                                            }
+                                            return option.event?.name;
+                                        }}
+                                        styles={{
+                                            menu: (provided) => ({
+                                                ...provided,
+                                                zIndex: 1050,
+                                            }),
+                                        }}
                                     />
                                 </Form.Group>
 
@@ -359,7 +583,9 @@ export const OrdersList = () => {
                         <Card.Header className="">
                             <div className="d-flex justify-content-between">
                                 <h4 className="card-title mg-b-0">Order Manager</h4>
-
+                                <Button onClick={onExportLinkPress}>
+                                    Export CSV
+                                </Button>
                             </div>
                         </Card.Header>
                         <div className="table-responsive mt-4">
@@ -440,8 +666,8 @@ export const OrdersList = () => {
                                                 </tr>
                                             );
                                         })}
-                                         {/* TOTAL ROW */}
-                                        <tr style={{ fontWeight: "bold", background: "#f8f9fa" }}>
+                                        {/* TOTAL ROW */}
+                                        {/* <tr style={{ fontWeight: "bold", background: "#f8f9fa" }}>
                                             <td colSpan={6} className="text-end">
                                                 Total Amount :
                                             </td>
@@ -451,7 +677,7 @@ export const OrdersList = () => {
                                             <td>
                                                 {formatCurrency(pageTotals.taxTotal)}
                                             </td>
-                                        </tr>
+                                        </tr> */}
                                     </tbody>
                                 </table>
                             )}

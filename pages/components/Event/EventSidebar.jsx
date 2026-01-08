@@ -98,7 +98,7 @@ const EventSidebar = ({ eventId }) => {
                                     <li>
                                         <Link className="dropdown-item" href="/orders">
                                             <i className="fas fa-ticket-alt"></i>
-                                            <span> My Tickets </span>
+                                            <span> My Orders </span>
                                         </Link>
                                     </li>
                                     <li>

@@ -15,7 +15,7 @@ const CreateAppointmentPage = () => {
     const today = new Date().toISOString().split("T")[0];
     const [name, setName] = useState("");
     const [location, setLocation] = useState("");
-    const [paymentCurrency, setPaymentCurrency] = useState("");
+    // const [paymentCurrency, setPaymentCurrency] = useState("");
     const [isTaxApplied, setIsTaxApplied] = useState("Y");
     const [image, setImage] = useState(null);
     const noteRef = useRef(null);
@@ -86,7 +86,7 @@ const CreateAppointmentPage = () => {
             // ✅ FormData object
             const body = new FormData();
             body.append("name", name.trim());
-            body.append("currency", paymentCurrency);
+            // body.append("currency", paymentCurrency);
             body.append("event_id", EventId);
             body.append("location", location || "");
             body.append("description", content.trim());
@@ -197,6 +197,7 @@ const CreateAppointmentPage = () => {
                                                     <input
                                                         type="text"
                                                         className="form-control rounded-0"
+                                                        required
                                                         name="location"
                                                         value={location}
                                                         onChange={(e) => setLocation(e.target.value)}
@@ -205,11 +206,12 @@ const CreateAppointmentPage = () => {
                                                 </div>
 
                                                 {/* Currency */}
-                                                <div className="col-lg-2 col-md-6 mb-3">
-                                                    <label className="form-label">Currency</label>
+                                                {/* <div className="col-lg-2 col-md-6 mb-3">
+                                                    <label className="form-label">Currency <span className="text-danger">*</span></label>
                                                     <select
                                                         className="form-select rounded-0"
                                                         name="payment_currency"
+                                                        required
                                                         value={paymentCurrency}
                                                         onChange={(e) => setPaymentCurrency(e.target.value)}
                                                     >
@@ -217,7 +219,7 @@ const CreateAppointmentPage = () => {
                                                         <option value="1">INR</option>
                                                         <option value="2">USD</option>
                                                     </select>
-                                                </div>
+                                                </div> */}
 
 
                                                 {/* NEW – Include Tax Option */}
@@ -229,6 +231,7 @@ const CreateAppointmentPage = () => {
                                                     <select
                                                         className="form-select rounded-0"
                                                         name="is_tax_applied"
+                                                        required
                                                         value={isTaxApplied}
                                                         onChange={(e) => setIsTaxApplied(e.target.value)}
                                                     >
@@ -336,9 +339,11 @@ const CreateAppointmentPage = () => {
                                                             </label>
                                                             <DatePicker
                                                                 selected={slot.date ? new Date(slot.date) : null}
-                                                                onChange={(date) =>
-                                                                    handleChange(index, "date", date.toISOString().split("T")[0])
-                                                                }
+                                                                onChange={(date) => {
+                                                                    const formattedDate = date.toLocaleDateString("en-CA"); // yyyy-mm-dd
+                                                                    handleChange(index, "date", formattedDate);
+                                                                }}
+                                                                required
                                                                 className="form-control"
                                                                 style={formControlStyle}
                                                                 minDate={new Date()}
@@ -369,6 +374,7 @@ const CreateAppointmentPage = () => {
                                                                 }}
                                                                 showTimeSelect
                                                                 showTimeSelectOnly
+                                                                required
                                                                 timeIntervals={5}
                                                                 timeCaption="Start Time"
                                                                 dateFormat="h:mm aa"
@@ -398,6 +404,7 @@ const CreateAppointmentPage = () => {
                                                                     });
                                                                     handleChange(index, "slot_end_time", dbTime);
                                                                 }}
+                                                                required
                                                                 showTimeSelect
                                                                 showTimeSelectOnly
                                                                 timeIntervals={5}
@@ -421,7 +428,11 @@ const CreateAppointmentPage = () => {
                                                                 className="form-control"
                                                                 style={formControlStyle}
                                                                 value={slot.price}
-                                                                onChange={(e) => handleChange(index, "price", e.target.value)}
+                                                                // onChange={(e) => handleChange(index, "price", e.target.value)}
+                                                                onChange={(e) => {
+                                                                    const value = e.target.value.replace(/[^0-9]/g, "");
+                                                                    handleChange(index, "price", value);
+                                                                }}
                                                             />
                                                         </div>
 
@@ -437,7 +448,11 @@ const CreateAppointmentPage = () => {
                                                                 className="form-control"
                                                                 style={formControlStyle}
                                                                 value={slot.count}
-                                                                onChange={(e) => handleChange(index, "count", e.target.value)}
+                                                                onChange={(e) => {
+                                                                    const value = e.target.value.replace(/[^0-9]/g, "");
+                                                                    handleChange(index, "count", value);
+                                                                }}
+                                                            // onChange={(e) => handleChange(index, "count", e.target.value)}
                                                             />
                                                         </div>
 

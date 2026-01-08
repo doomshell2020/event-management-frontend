@@ -8,6 +8,7 @@ import {
     Spinner,
     Alert,
     Collapse,
+    Form
 } from "react-bootstrap";
 import {
     useTable,
@@ -21,7 +22,7 @@ import Link from "next/link";
 import api from "@/utils/api";
 import Moment from "react-moment";
 import Swal from "sweetalert2";
-
+import AsyncSelect from "react-select/async";
 import { useRouter } from "next/router";
 
 export const EventOrganizersList = () => {
@@ -61,6 +62,30 @@ export const EventOrganizersList = () => {
                 </div>
             ),
         },
+
+        {
+            Header: "Events",
+            accessor: "events",
+            className: "borderrigth",
+            Cell: ({ row }) => {
+                const events = row.original.events || [];
+                if (!events.length) return <span  style={{ fontSize: "12px" }}>
+                    No events organized
+                </span>;
+                return (
+                    <div style={{ fontSize: "13px", color: "#374151" }}>
+                        {events.map((e, i) => (
+                            <div key={e.id}>
+                                {i + 1}. {e.name}
+                            </div>
+                        ))}
+                    </div>
+                );
+
+            },
+        },
+
+
         {
             Header: "Status",
             accessor: "status",
@@ -105,33 +130,13 @@ export const EventOrganizersList = () => {
             ),
         },
     ]);
-
-
     let navigate = useRouter();
     const [OrganizerList, setOrganizerList] = useState([]);
+    console.log("----", OrganizerList);
     const [isLoading, setIsLoading] = useState(true);
-    // Alert messages
-    const [openAlert, setOpenAlert] = useState(false);
-    const [staticAdded, setStaticAdded] = useState("");
-
-    var StaticMessage = "";
-    useEffect(() => {
-        if (typeof window !== "undefined") {
-            var StaticMessage = localStorage.getItem("staticAdded");
-
-            if (StaticMessage != null && StaticMessage !== "") {
-                setOpenAlert(true);
-                setStaticAdded(StaticMessage);
-                setTimeout(() => {
-                    localStorage.setItem("staticAdded", "");
-                    setOpenAlert(false);
-                }, 5000);
-            } else {
-                setOpenAlert(false);
-                setStaticAdded("");
-            }
-        }
-    }, [StaticMessage]);
+    const [selectedCustomer, setSelectedCustomer] = useState(null);
+    const [email, setEmail] = useState("");
+    const [firstName, setFirstName] = useState("");
     const handleStatusToggle = async (id, currentStatus) => {
         const newStatus = currentStatus === "Y" ? "N" : "Y";
         const statusText = newStatus === "Y" ? "Activate" : "Deactivate";
@@ -242,31 +247,161 @@ export const EventOrganizersList = () => {
         navigate.push(`/admin/event-organizers/${id}`);
     };
 
+    const handleSearch = async (e) => {
+        e.preventDefault();
+        try {
+            // Format dates as YYYY-MM-DD for API
+            const formattedFromDate = formatDate(fromDate);
+            const formattedToDate = formatDate(toDate);
+            const response = await api.get("/api/v1/admin/orders/search", {
+                params: {
+                    customer,
+                    event,
+                    orderFrom: formattedFromDate,
+                    orderTo: formattedToDate,
+                },
+            });
+
+            // console.log("0-response.data", response?.data?.data?.events)
+            setOrdersList(response?.data?.data?.orders); // Save API results in state
+        } catch (error) {
+            console.error("Error fetching orders:", error);
+            setOrdersList([]);
+        }
+    };
+
+    const handleReset = () => {
+        setEvent("");
+        setCustomer("");
+        setSelectedCustomer(null);   // 👈 THIS WAS MISSING
+        setSelectedEvent(null);   // 👈 THIS WAS MISSING
+        setFromDate(null);
+        setToDate(null);
+        setOrdersList([]);
+        getOrdersList();
+    };
+
+
+    const loadUserOptions = async (inputValue) => {
+        if (inputValue.length < 2) return [];
+        try {
+            const response = await api.get(
+                "/api/v1/admin/customers/first-name/search",
+                {
+                    params: {
+                        search: inputValue, // 👈 backend expects this
+                    },
+                }
+            );
+            const data = response.data;
+            if (data?.success) {
+                return data.data.customers.map((user) => ({
+                    value: user.id,
+                    label: user.first_name, // 👈 correct key
+                    user,
+                }));
+            }
+
+            return [];
+        } catch (error) {
+            console.error("Error fetching users:", error);
+            return [];
+        }
+    };
+
+    const handleUserSelect = (selectedOption) => {
+        setSelectedCustomer(selectedOption); // 👈 dropdown control
+
+        if (selectedOption) {
+            setFirstName(selectedOption.user.first_name);
+        } else {
+            setFirstName("");
+        }
+    };
     return (
         <div>
             <Seo title={"Event Organizer Manager"} />
             <Row className="row-sm mt-4">
-                <Col xl={12}>
-                    <Card>
-                        {staticAdded != null && openAlert === true && (
-                            <Collapse in={openAlert}>
-                                <Alert aria-hidden={true} severity="success">
-                                    {staticAdded}
-                                </Alert>
-                            </Collapse>
-                        )}
 
+                <Col xl={2}>
+                    <Card className="member-fltr-hid">
+                        <Card.Header>
+                            <div className="d-flex justify-content-between">
+                                <h4 className="card-title mg-b-0">Filters</h4>
+                            </div>
+                        </Card.Header>
+                        <Card.Body className="p-2">
+                            <Form onSubmit={handleSearch}>
+                                <Form.Group className="mb-3" controlId="formName">
+                                    <Form.Label>First Name</Form.Label>
+                                    <AsyncSelect
+                                        className="search-dropdown"
+                                        cacheOptions
+                                        loadOptions={loadUserOptions}
+                                        value={selectedCustomer}
+                                        onChange={handleUserSelect}
+                                        placeholder="Search by name"
+                                        isClearable
+                                        getOptionLabel={(option) => option.user.first_name}
+                                        getOptionValue={(option) => option.value}
+                                        formatOptionLabel={(option, { context }) => {
+                                            if (context === "menu") {
+                                                return (
+                                                    <div>
+                                                        <strong>{option.user.first_name}</strong>
+                                                    </div>
+                                                );
+                                            }
+                                            return option.user.first_name;
+                                        }}
+                                        styles={{
+                                            menu: (provided) => ({
+                                                ...provided,
+                                                zIndex: 1050,
+                                            }),
+                                        }}
+                                    />
+                                </Form.Group>
+
+                                <Form.Group className="mb-3" controlId="formName">
+                                    <Form.Label>Email</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Email"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value.trim())}
+                                    />
+                                </Form.Group>
+
+                                <div className="d-flex align-items-end justify-content-between">
+                                    <Button
+                                        variant="primary "
+                                        className="me-2 w-50"
+                                        type="submit"
+                                    >
+                                        Submit
+                                    </Button>
+                                    <Button variant="secondary" className="w-50" type="reset" onClick={handleReset}>
+                                        Reset
+                                    </Button>
+                                </div>
+                            </Form>
+                        </Card.Body>
+                    </Card>
+                </Col>
+
+
+                <Col xl={10}>
+                    <Card>
                         <Card.Header className="">
                             <div className="d-flex justify-content-between">
                                 <h4 className="card-title mg-b-0">Event Organizer Manager</h4>
                                 <div>
-
-
                                     <Link
                                         className="btn ripple btn-info btn-sm"
                                         href="/admin/event-organizers/create"
                                     >
-                                       + ADD
+                                        + ADD
                                     </Link>
                                 </div>
                             </div>

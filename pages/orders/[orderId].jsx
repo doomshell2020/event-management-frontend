@@ -15,12 +15,11 @@ export default function MyOrdersDetails() {
     );
 
     const [orderData, setOrderData] = useState(null);
+    console.log('orderData :', orderData);
     const [baseUrls, setBaseUrls] = useState(null);
+    console.log('baseUrls :', baseUrls?.event_image_url);
     const [loading, setLoading] = useState(true);
 
-    // ===============================
-    // FETCH ORDER DETAILS
-    // ===============================
     const fetchOrders = useCallback(async () => {
         if (!orderId) return;
 
@@ -43,11 +42,8 @@ export default function MyOrdersDetails() {
 
     useEffect(() => {
         fetchOrders();
-    }, [fetchOrders]);
+    }, [orderId]);
 
-    // ===============================
-    // CANCEL APPOINTMENT
-    // ===============================
     const handleCancelAppointment = async (order_item_id) => {
         const result = await Swal.fire({
             title: "Are you sure?",

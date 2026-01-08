@@ -6,11 +6,86 @@ import FrontendFooter from "@/shared/layout-components/frontelements/frontendfoo
 import TicketCountTabs from "@/pages/components/Event/TicketCountTabs";
 import api from "@/utils/api";
 
+const showQuestions = (questionsList = []) => {
+    if (!questionsList.length) return;
+
+    const html = `
+        <div style="max-height:55vh;overflow-y:auto;">
+            ${questionsList.map((q, index) => {
+        const options = q.question.questionItems?.length
+            ? `
+                        <span style="font-size:11px;color:#6b7280;">
+                            | ${q.question.questionItems.map(i => i.items).join(", ")}
+                        </span>
+                    `
+            : "";
+
+        return `
+                    <div style="
+                        border-bottom:1px solid #e5e7eb;
+                        padding:6px 4px;
+                    ">
+                        <div style="
+                            display:flex;
+                            align-items:flex-start;
+                            gap:6px;
+                        ">
+                            <div style="
+                                font-size:11px;
+                                font-weight:600;
+                                color:#2563eb;
+                                min-width:18px;
+                            ">
+                                ${index + 1}.
+                            </div>
+
+                            <div style="flex:1;">
+                                <div style="
+                                    font-size:13px;
+                                    font-weight:600;
+                                    line-height:1.3;
+                                ">
+                                    ${q.question.question}
+                                </div>
+
+                                <div style="
+                                    font-size:11px;
+                                    color:#6b7280;
+                                ">
+                                    ${q.question.type}${options}
+                                </div>
+
+                                <div style="
+                                    font-size:12px;
+                                    margin-top:2px;
+                                ">
+                                    <span style="color:#6b7280;">Reply:</span>
+                                    <span style="font-weight:500;">
+                                        ${q.user_reply ?? "-"}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+    }).join("")}
+        </div>
+    `;
+
+    Swal.fire({
+        title: `Questions (${questionsList.length})`,
+        html,
+        width: "520px",
+        showCloseButton: true,
+        confirmButtonText: "Close",
+        padding: "12px",
+    });
+};
+
 
 const CommitteePending = ({ pendingRequests, counts, assets }) => {
     const [activeTab, setMyActiveTab] = useState("pending");
     const [requests, setRequests] = useState(pendingRequests); // local state to update list
-    // console.log('requests :', requests);
     const router = useRouter();
 
     const setActiveTab = (tab) => {
@@ -114,6 +189,7 @@ const CommitteePending = ({ pendingRequests, counts, assets }) => {
                                                 ? `${assets.profile_image_path}/${user.profile_image}`
                                                 : "/assets/front-images/no-image.png";
 
+
                                             return (
                                                 <tr key={item.id}>
                                                     <td>{index + 1}</td>
@@ -139,10 +215,25 @@ const CommitteePending = ({ pendingRequests, counts, assets }) => {
                                                     <td>
                                                         <div>{ticket.title}</div>
                                                         <div className="text-muted fs-13">
-                                                            ₹{ticket.price} × {item.no_tickets}
+                                                            {item?.events?.currencyName?.Currency_symbol}{ticket.price} × {item.no_tickets}
                                                         </div>
                                                     </td>
-                                                    <td>
+                                                    <td className="text-center">
+
+                                                        <span className="me-2">
+                                                            {item.questionsList?.length > 0 ? (
+                                                                <i
+                                                                    className="bi bi-question-circle-fill text-primary"
+                                                                    style={{ fontSize: "18px", cursor: "pointer" }}
+                                                                    title="View Questions"
+                                                                    onClick={() => showQuestions(item.questionsList)}
+                                                                ></i>
+                                                            ) : (
+                                                                <span className="text-muted">—</span>
+                                                            )}
+
+                                                        </span>
+
                                                         <button
                                                             className="btn btn-success btn-sm me-2"
                                                             onClick={() => handleAction(item.id, "approve")}
@@ -205,9 +296,14 @@ export async function getServerSideProps(context) {
 
         const json = await res.json();
         const list = json?.data?.list || [];
+        const completedData = Array.isArray(json?.data?.completedData)
+            ? json.data.completedData
+            : [];
         const assets = json?.data?.assets || {};
 
         const counts = { pending: 0, approved: 0, ignored: 0 };
+        // ✅ Set completed count safely
+        counts.completed = completedData.length;
 
         list.forEach(item => {
             if (item.status == "N") counts.pending++;
@@ -229,7 +325,7 @@ export async function getServerSideProps(context) {
         return {
             props: {
                 pendingRequests: [],
-                counts: { pending: 0, approved: 0, ignored: 0 },
+                counts: { pending: 0, approved: 0, ignored: 0, completed: 0 },
                 assets: {},
             },
         };
