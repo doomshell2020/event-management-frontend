@@ -728,7 +728,7 @@ const MyEventsPage = () => {
 
                                                     )}
 
-                                                    <div className="col-md-6">
+                                                    <div className="col-md-8">
                                                         <label htmlFor="formFile" className="form-label">
                                                             Upload Image{" "}
                                                             <small className="text-danger" style={{ fontSize: "11px" }}>

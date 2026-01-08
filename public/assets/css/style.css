@@ -6135,6 +6135,15 @@ font-size: 14px;
     margin: 25px 0px 60px;
 }
 .table-mobile-width{min-width: 800px;}
+    #myevent-deshbord .event-sidebar {
+        margin-right: 15px;
+    }
+    #myevent-deshbord .contant_bg {
+    padding: 25px 15px;
+}
+    #myevent-deshbord .event_names {
+        flex-wrap: wrap;
+    }
 }
 
 @media (max-width: 663px) {
@@ -6152,6 +6161,12 @@ font-size: 14px;
   .accomo-flw-prptyId-ctr {
     max-width: 95%;
   }
+  #myevent-deshbord .event_names a, #myevent-deshbord .event_names button {
+    font-size: 13px;
+}
+#myevent-deshbord .event_names .event_Heading {
+    font-size: 15px !important;
+}
 
 }
 
@@ -6364,6 +6379,15 @@ p.des_h {
 }
 .freeEventCheck .form-check-input {
     margin-top: 1px;
+}
+#myevent-deshbord .event_names {
+    flex-direction: column;
+}
+.text-24 {
+    font-size: 18px !important;
+}
+#myevent-deshbord .dsa_contant ul.tabes {
+    margin-top: 22px;
 }
 
 }
