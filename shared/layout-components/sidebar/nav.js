@@ -195,7 +195,7 @@ export const MENUITEMS = [
   {
     Items: [
       {
-        title: "Static",
+        title: "Cms",
         icon: (
           <svg
             className="side-menu__icon"
@@ -243,7 +243,7 @@ export const MENUITEMS = [
   {
     Items: [
       {
-        title: "Email Templates",
+        title: "Emails",
         icon: (
           <svg
             className="side-menu__icon"

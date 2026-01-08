@@ -274,19 +274,23 @@ export const CustomerList = () => {
             });
         }
     };
-    const getCustomers = async () => {
-        const { data } = await api.get("/api/v1/admin/customers");
-        return data?.data?.customers || [];
+
+ const getCustomers = async () => {
+        try {
+           setIsLoading(true);
+            const { data } = await api.get("/api/v1/admin/customers");
+            setCustomers(data?.data?.customers || []);
+        } catch (err) {
+            console.error("Error fetching event organizers:", err);
+        } finally {
+            setIsLoading(false);
+        }
     };
+
     useEffect(() => {
-        setIsLoading(true);
-        getCustomers()
-            .then(setCustomers)
-            .catch(err =>
-                console.error("Error fetching event organizers:", err)
-            )
-            .finally(() => setIsLoading(false));
+        getCustomers();
     }, []);
+
     const tableInstance = useTable(
         {
             columns: COLUMNS,
@@ -317,24 +321,28 @@ export const CustomerList = () => {
 
     const { globalFilter, pageIndex, pageSize } = state;
     useEffect(() => { setPageSize(50) }, []);
-
+    const formatDate = (date) => {
+        if (!date) return "";
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+    };
 
     const handleSearch = async (e) => {
         e.preventDefault();
         try {
             const formattedFromDate = formatDate(fromDate);
             const formattedToDate = formatDate(toDate);
-            const response = await api.get("/api/v1/admin/events/search", {
+            const response = await api.get("/api/v1/admin/customers/search", {
                 params: {
-                    organizer,
-                    eventName,
+                    first_name:firstName,
+                    email,
                     fromDate: formattedFromDate,
                     toDate: formattedToDate,
                 },
             });
-
-            // console.log("0-response.data", response?.data?.data?.events)
-            setCustomers(response?.data?.data?.events); // Save API results in state
+            setCustomers(response?.data?.data?.customers); // Save API results in state
         } catch (error) {
             console.error("Error fetching events:", error);
             setCustomers([]);
@@ -343,6 +351,7 @@ export const CustomerList = () => {
 
     const handleReset = () => {
         setFirstName("");
+        setEmail("");
         setFromDate(null);
         setToDate(null);
         setCustomers([]);
@@ -371,7 +380,7 @@ export const CustomerList = () => {
                                         type="text"
                                         placeholder="First Name"
                                         value={firstName}
-                                        onChange={(e) => setFirstName(e.target.value)}
+                                        onChange={(e) => setFirstName(e.target.value.trim())}
 
                                     />
                                 </Form.Group>
@@ -382,7 +391,7 @@ export const CustomerList = () => {
                                         type="text"
                                         placeholder="Email"
                                         value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
+                                        onChange={(e) => setEmail(e.target.value.trim())}
                                     />
                                 </Form.Group>
 

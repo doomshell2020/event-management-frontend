@@ -15,7 +15,7 @@ const CreateAppointmentPage = () => {
     const today = new Date().toISOString().split("T")[0];
     const [name, setName] = useState("");
     const [location, setLocation] = useState("");
-    const [paymentCurrency, setPaymentCurrency] = useState("");
+    // const [paymentCurrency, setPaymentCurrency] = useState("");
     const [isTaxApplied, setIsTaxApplied] = useState("Y");
     const [image, setImage] = useState(null);
     const noteRef = useRef(null);
@@ -86,7 +86,7 @@ const CreateAppointmentPage = () => {
             // ✅ FormData object
             const body = new FormData();
             body.append("name", name.trim());
-            body.append("currency", paymentCurrency);
+            // body.append("currency", paymentCurrency);
             body.append("event_id", EventId);
             body.append("location", location || "");
             body.append("description", content.trim());
@@ -206,7 +206,7 @@ const CreateAppointmentPage = () => {
                                                 </div>
 
                                                 {/* Currency */}
-                                                <div className="col-lg-2 col-md-6 mb-3">
+                                                {/* <div className="col-lg-2 col-md-6 mb-3">
                                                     <label className="form-label">Currency <span className="text-danger">*</span></label>
                                                     <select
                                                         className="form-select rounded-0"
@@ -219,7 +219,7 @@ const CreateAppointmentPage = () => {
                                                         <option value="1">INR</option>
                                                         <option value="2">USD</option>
                                                     </select>
-                                                </div>
+                                                </div> */}
 
 
                                                 {/* NEW – Include Tax Option */}

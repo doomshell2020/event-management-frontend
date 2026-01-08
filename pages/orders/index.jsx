@@ -69,10 +69,6 @@ export default function MyOrders({ userId }) {
 
                                     const eventCurrency = order.event?.currencyName?.Currency_symbol
                                     // console.log('eventCurrency :', eventCurrency);
-
-                                    const currencySymbol =
-                                        order?.orderItems?.[0]?.appointment?.wellnessList?.currencyName?.Currency_symbol || "";
-
                                     return (
                                         <div key={order.id} className="col-lg-6 col-md-12 mb-4">
 
@@ -134,9 +130,7 @@ export default function MyOrders({ userId }) {
 
                                                                         <p className="time m-0 p-0">
                                                                             <strong style={{ width: "70px", display: "inline-block" }}>Amount</strong>
-                                                                            <span style={{ width: "10px", display: "inline-block", fontWeight: "bold" }}>:</span>{order?.orderItems?.[0]?.type == "appointment"
-                                                                                ? currencySymbol
-                                                                                : eventCurrency}{order.grand_total}
+                                                                            <span style={{ width: "10px", display: "inline-block", fontWeight: "bold" }}>:</span>{eventCurrency}{order.grand_total}
                                                                         </p>
                                                                     </div>
 

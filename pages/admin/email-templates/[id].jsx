@@ -10,10 +10,12 @@ import {
     CFormLabel,
     CFormInput,
     CButton,
+    CFormSelect,
+    CFormFeedback
 } from "@coreui/react";
 import Seo from "@/shared/layout-components/seo/seo";
 import Swal from "sweetalert2";
-import HtmlEditor, { getHtmlEditorContent } from "@/pages/components/HtmlEditor/HtmlEditor";
+import HtmlEditor, { getHtmlEditorContent } from "@/pages/components/HtmlEditor/EmailHtmlEditor";
 
 const StaticEdit = () => {
     const router = useRouter();
@@ -38,6 +40,7 @@ const StaticEdit = () => {
                 setTitle(templateData.title || "");
                 setSubject(templateData.subject || "");
                 setEditorData({ content: templateData.description })
+                setSelectedEvent(templateData.eventId || "")
             }
         } catch (error) {
             console.error("Failed to fetch templateData details:", error);
@@ -45,9 +48,19 @@ const StaticEdit = () => {
             setIsLoading(false);
         }
     };
-
+    const [events, setEvents] = useState([]);
+    const [selectedEvent, setSelectedEvent] = useState("");
+    const getEvents = async () => {
+        try {
+            const { data } = await api.get("/api/v1/admin/email-templates/events");
+            setEvents(data?.data.events || []);
+        } catch (err) {
+            console.error("Error fetching event organizers:", err);
+        }
+    };
     useEffect(() => {
         fetchTemplateDetails(id);
+        getEvents();
     }, [id]);
     const isEditorEmpty = (html = "") => {
         const text = html
@@ -63,7 +76,7 @@ const StaticEdit = () => {
         event.stopPropagation();
         // ✅ Frontend validation
         const content = getHtmlEditorContent(noteRef).trim();
-        if (!title.trim() || !subject.trim() || isEditorEmpty(content)) {
+        if (!title.trim() || !subject.trim() || !selectedEvent || isEditorEmpty(content)) {
             setValidateDefault(true);
             Swal.fire({
                 icon: "warning",
@@ -78,6 +91,7 @@ const StaticEdit = () => {
                 title: title.trim(),
                 subject: subject.trim(),
                 description: content,
+                eventId:selectedEvent
             };
             const res = await api.put(`/api/v1/admin/email-templates/${id}`, payload);
             if (res?.data?.success) {
@@ -162,6 +176,31 @@ const StaticEdit = () => {
                                         }}
                                     />
                                 </CCol>
+
+                                <CCol md={4}>
+                                    <CFormLabel>
+                                        Events <span style={{ color: "red" }}>*</span>
+                                    </CFormLabel>
+
+                                    <CFormSelect
+                                        required
+                                        value={selectedEvent}
+                                        onChange={(e) => setSelectedEvent(e.target.value)}
+                                    >
+                                        <option value="">--Select Event--</option>
+                                        {events &&
+                                            events.map((item) => (
+                                                <option key={item.id} value={item.id}>
+                                                    {item.name}
+                                                </option>
+                                            ))}
+                                    </CFormSelect>
+                                </CCol>
+
+
+
+
+
                                 <CCol md={12}>
                                     <b>Format Description</b><span style={{ color: "Red" }}>*</span><br />
 
@@ -171,8 +210,6 @@ const StaticEdit = () => {
                                             initialContent={editorData.content}
                                             onChange={(content) => setEditorData({ ...editorData, content })}
                                         />
-
-
                                     </div>
                                 </CCol>
                                 {/* ACTION BUTTONS */}
