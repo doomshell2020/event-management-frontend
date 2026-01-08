@@ -584,7 +584,7 @@ const MyEventsPage = () => {
 
                                                     )}
 
-                                                    <div className="col-md-6">
+                                                    <div className="col-md-8">
                                                         <label htmlFor="formFile" className="form-label">
                                                             Update Image{" "}
                                                             <small className="text-danger">(Size 550×550 JPG, JPEG, PNG Max 2MB)</small>
