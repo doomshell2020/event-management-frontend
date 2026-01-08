@@ -21,6 +21,7 @@ const ManageTicketPricing = () => {
     const [ticketsList, setTicketsList] = useState([]);
     const [slotsList, setSlotsList] = useState([]);
     const [pricingList, setPricingList] = useState([]);
+    console.log('pricingList :', pricingList);
     const [loading, setLoading] = useState(false);
 
 
@@ -296,7 +297,7 @@ const ManageTicketPricing = () => {
                                                                 const value = e.target.value; // YYYY-MM-DD
                                                                 setSelectedDate(value);
                                                                 const realDate = new Date(`${value}T00:00:00Z`);
-                                                                console.log("Converted Date:", realDate);
+                                                                // console.log("Converted Date:", realDate);
                                                             }}
                                                         />
 
