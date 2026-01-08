@@ -10,6 +10,7 @@ const OrderItemCard = ({
 }) => {
     const type = item?.type;
 
+    console.log('item :', item);
     const isTicket = type == "ticket";
     const isAppointment = type == "appointment";
     const isAddon = type == "addon";
@@ -20,14 +21,17 @@ const OrderItemCard = ({
     // Complimentary / Free logic
     const isFreeTicket = isComps;
 
+    // const isFreeTicket =
+    //     isComps ||
+    //     isCommitteeSale ||
+    //     ((isTicket || isComps) && Number(item?.price) == 0);
+
     // Currency
     const currency =
         orderData?.event?.currencyName?.Currency_symbol || "";
-
-    const currencySymbol =
-        isAppointment || isPackage
-            ? currency
-            : currencyInfo?.Currency_symbol || "";
+    const currencySymbol = isAppointment
+        ? currency
+        : currencyInfo?.Currency_symbol || "";
 
     // Title
     const title =
@@ -37,9 +41,7 @@ const OrderItemCard = ({
                 ? "Appointment"
                 : isAddon
                     ? "Addon"
-                    : isPackage
-                        ? "Package"
-                        : "Unknown Item";
+                    : "Unknown Item";
 
     // Item Name
     const itemName =
