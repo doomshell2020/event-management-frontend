@@ -6142,8 +6142,12 @@ font-size: 14px;
     padding: 25px 15px;
 }
     #myevent-deshbord .event_names {
-        flex-wrap: wrap;
+        flex-wrap: wrap;gap: 5px;
     }
+      .resistor-content .only-eventfree-check label {
+    margin-top: 2px;
+}
+  .resistor-content .only-eventfree-check{margin-top: 10px;}
 }
 
 @media (max-width: 663px) {
@@ -6380,16 +6384,27 @@ p.des_h {
 .freeEventCheck .form-check-input {
     margin-top: 1px;
 }
-#myevent-deshbord .event_names {
-    flex-direction: column;
-}
+
 .text-24 {
     font-size: 18px !important;
 }
 #myevent-deshbord .dsa_contant ul.tabes {
     margin-top: 22px;
 }
-
+    #myevent-deshbord .event_names .edit-event-dropdown {
+        width: 100%;
+        order: 3;
+    }
+    #myevent-deshbord .event_names .edit-view-event {
+        width: 100%;
+        order: 2;
+    }
+#myevent-deshbord .event_names .edit-view-event a, #myevent-deshbord .event_names .edit-event-dropdown button{width: 100%;}
+    #myevent-deshbord .event_names .edit-event-header-title {
+        order: 2;
+        margin-bottom: 3px;
+    }
+  
 }
 
 @media (max-width: 480px) {
