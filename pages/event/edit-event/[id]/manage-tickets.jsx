@@ -61,6 +61,7 @@ const ManageTickets = () => {
         try {
             setLoading(true);
             const res = await api.get(`/api/v1/tickets/list/${id}`);
+            console.log('res :', res);
             if (res.data.success) {
                 setTicketList(res.data.data || []);
             } else {
