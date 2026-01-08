@@ -224,7 +224,7 @@ export default function OrganizerEvents({ userId }) {
                             <div className="my-ticket-box">
                                 <div className="event-list">
                                     <div className="table-responsive">
-                                        <table className="table table-hover mb-0">
+                                        <table className="table table-hover mb-0 table-mobile-width">
                                             <thead className="table-dark table_bg">
                                                 <tr>
                                                     <th style={{ width: "2%" }} scope="col">#</th>
