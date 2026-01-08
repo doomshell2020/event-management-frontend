@@ -69,7 +69,7 @@ export const EventOrganizersList = () => {
             className: "borderrigth",
             Cell: ({ row }) => {
                 const events = row.original.events || [];
-                if (!events.length) return <span  style={{ fontSize: "12px" }}>
+                if (!events.length) return <span style={{ fontSize: "12px" }}>
                     No events organized
                 </span>;
                 return (
@@ -137,6 +137,7 @@ export const EventOrganizersList = () => {
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [email, setEmail] = useState("");
     const [firstName, setFirstName] = useState("");
+    const [mobile, setMobile] = useState("");
     const handleStatusToggle = async (id, currentStatus) => {
         const newStatus = currentStatus === "Y" ? "N" : "Y";
         const statusText = newStatus === "Y" ? "Activate" : "Deactivate";
@@ -250,35 +251,27 @@ export const EventOrganizersList = () => {
     const handleSearch = async (e) => {
         e.preventDefault();
         try {
-            // Format dates as YYYY-MM-DD for API
-            const formattedFromDate = formatDate(fromDate);
-            const formattedToDate = formatDate(toDate);
-            const response = await api.get("/api/v1/admin/orders/search", {
+            const response = await api.get("/api/v1/admin/event-organizer/search", {
                 params: {
-                    customer,
-                    event,
-                    orderFrom: formattedFromDate,
-                    orderTo: formattedToDate,
+                    first_name: firstName,
+                    email: email,
+                    mobile: mobile
                 },
             });
-
-            // console.log("0-response.data", response?.data?.data?.events)
-            setOrdersList(response?.data?.data?.orders); // Save API results in state
+            setOrganizerList(response?.data?.data?.eventOrganizers); // Save API results in state
         } catch (error) {
             console.error("Error fetching orders:", error);
-            setOrdersList([]);
+            setOrganizerList([]);
         }
     };
 
     const handleReset = () => {
-        setEvent("");
-        setCustomer("");
+        setFirstName("");
+        setEmail("");
+        setMobile("");
         setSelectedCustomer(null);   // 👈 THIS WAS MISSING
-        setSelectedEvent(null);   // 👈 THIS WAS MISSING
-        setFromDate(null);
-        setToDate(null);
-        setOrdersList([]);
-        getOrdersList();
+        setOrganizerList([]);
+        getEventOrganizers();
     };
 
 
@@ -372,6 +365,19 @@ export const EventOrganizersList = () => {
                                         onChange={(e) => setEmail(e.target.value.trim())}
                                     />
                                 </Form.Group>
+
+                                <Form.Group className="mb-3" controlId="phone">
+                                    <Form.Label>Phone</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Phone"
+                                        value={mobile}
+                                        onChange={(e) => setMobile(e.target.value)}
+                                    />
+                                </Form.Group>
+
+
+
 
                                 <div className="d-flex align-items-end justify-content-between">
                                     <Button
