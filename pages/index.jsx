@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { format } from "date-fns";
 import React, { useMemo, useState, useRef, useEffect } from "react";
+import CalculateFees from "./components/CalculateFees";
 
 export async function getServerSideProps() {
   try {
@@ -524,54 +525,7 @@ const Home = ({ events }) => {
       </section>
 
       {/*  */}
-      <div id="calculator">
-        <div className="container">
-
-          <div className="row">
-            <div className="col-md-8 order-content">
-              <div className="section-heading">
-                <h2 className="text-start">Calculate Your Fees</h2>
-                <p>Ticket Price</p>
-
-                <div className="range-slider">
-                  <input
-                    className="range-slider__range"
-                    type="range"
-                    defaultValue="100"
-                    min="0"
-                    max="500"
-                    style={{ background: "linear-gradient(90deg, rgb(26, 188, 156) 20%, rgb(215, 220, 223) 20.1%)" }}
-                  />
-                  <span className="range-slider__value text-center position-relative d-inline-block text-white">100</span>
-                </div>
-
-                <form className="row g-3 mt-1">
-
-                  <div className="col-sm-4 rang_f mt-0 mt-sm-2">
-                    <label htmlFor="customerpays" className="form-label">Customer Pays</label>
-                    <input type="text" className="form-control" id="customerpays" placeholder="$ 107" />
-                  </div>
-                  <div className="col-sm-4 rang_f mt-0 mt-sm-2">
-                    <label htmlFor="youreceive" className="form-label">You Receive</label>
-                    <input type="text" className="form-control" id="youreceive" placeholder="$ 100" />
-                  </div>
-                  <div className="col-sm-4 rang_f mt-0 mt-sm-2">
-                    <label htmlFor="ourcost" className="form-label">Our Cost</label>
-                    <input type="text" className="form-control" id="ourcost" placeholder="8%" />
-                  </div>
-
-                </form>
-              </div>
-            </div>
-
-            <div className="col-md-4">
-              <div className="container_img">
-                <img src="/assets/front-images/Calculate_Fees_img.png" alt="Calculate Fees" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <CalculateFees />
 
       {/*  */}
       <div id="down_app">

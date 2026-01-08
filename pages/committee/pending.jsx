@@ -173,26 +173,35 @@ const CommitteePending = ({ pendingRequests, counts, assets }) => {
                                 <thead className="bg-dark text-white">
                                     <tr>
                                         <th>Sr No.</th>
-                                        <th>Image</th>
-                                        <th>Name</th>
+                                        <th>User</th>
+                                        <th>User Info</th>
+                                        <th>Event</th>
                                         <th>Ticket</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
+
 
                                 <tbody>
                                     {pendingList.length > 0 ? (
                                         pendingList.map((item, index) => {
                                             const user = item.user || {};
                                             const ticket = item.TicketType || {};
+                                            const event = item.events || {};
+
                                             const profileImage = user.profile_image
                                                 ? `${assets.profile_image_path}/${user.profile_image}`
                                                 : "/assets/front-images/no-image.png";
 
+                                            const eventImage = event.feat_image
+                                                ? `${assets.event_image_path}/${event.feat_image}`
+                                                : "/assets/front-images/no-image.png";
 
                                             return (
                                                 <tr key={item.id}>
                                                     <td>{index + 1}</td>
+
+                                                    {/* USER IMAGE */}
                                                     <td>
                                                         <img
                                                             src={profileImage}
@@ -206,20 +215,53 @@ const CommitteePending = ({ pendingRequests, counts, assets }) => {
                                                             }}
                                                         />
                                                     </td>
+
+                                                    {/* USER DETAILS */}
                                                     <td>
-                                                        <div style={{ fontWeight: 600 }}>
+                                                        <div className="fw-semibold">
                                                             {user.first_name} {user.last_name}
                                                         </div>
-                                                        <div className="text-muted fs-13">{user.email}</div>
+                                                        <div className="text-muted fs-13">
+                                                            {user.email}
+                                                        </div>
                                                     </td>
+
+                                                    {/* EVENT DETAILS */}
+                                                    <td>
+                                                        <div className="d-flex gap-2 align-items-center">
+                                                            <img
+                                                                src={eventImage}
+                                                                alt="Event"
+                                                                style={{
+                                                                    width: "50px",
+                                                                    height: "50px",
+                                                                    objectFit: "cover",
+                                                                    borderRadius: "6px",
+                                                                    border: "1px solid #ddd",
+                                                                }}
+                                                            />
+                                                            <div>
+                                                                <div className="fw-semibold">
+                                                                    {event.name}
+                                                                </div>
+                                                                <div className="text-muted fs-13">
+                                                                    {event.location}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+
+                                                    {/* TICKET */}
                                                     <td>
                                                         <div>{ticket.title}</div>
                                                         <div className="text-muted fs-13">
-                                                            {item?.events?.currencyName?.Currency_symbol}{ticket.price} × {item.no_tickets}
+                                                            {event?.currencyName?.Currency_symbol}
+                                                            {ticket.price} × {item.no_tickets}
                                                         </div>
                                                     </td>
-                                                    <td className="text-center">
 
+                                                    {/* ACTION */}
+                                                    <td className="text-center">
                                                         <span className="me-2">
                                                             {item.questionsList?.length > 0 ? (
                                                                 <i
@@ -231,7 +273,6 @@ const CommitteePending = ({ pendingRequests, counts, assets }) => {
                                                             ) : (
                                                                 <span className="text-muted">—</span>
                                                             )}
-
                                                         </span>
 
                                                         <button
@@ -252,12 +293,13 @@ const CommitteePending = ({ pendingRequests, counts, assets }) => {
                                         })
                                     ) : (
                                         <tr>
-                                            <td colSpan="5" className="text-center py-4">
+                                            <td colSpan="6" className="text-center py-4">
                                                 No pending requests found
                                             </td>
                                         </tr>
                                     )}
                                 </tbody>
+
                             </table>
                         </div>
                     </div>
@@ -301,7 +343,12 @@ export async function getServerSideProps(context) {
             : [];
         const assets = json?.data?.assets || {};
 
-        const counts = { pending: 0, approved: 0, ignored: 0 };
+        const counts = {
+            pending: 0,
+            approved: 0,
+            ignored: 0,
+            completed: 0,
+        };
         // ✅ Set completed count safely
         counts.completed = completedData.length;
 

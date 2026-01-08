@@ -80,6 +80,8 @@ export async function getServerSideProps(context) {
 }
 
 const CommitteeCompleted = ({ counts, assets, completedData }) => {
+// console.log('assets :', assets);
+    // console.log('completedData :', completedData);
 
     const [activeTab, setMyActiveTab] = useState("completed");
     const router = useRouter();
@@ -117,11 +119,13 @@ const CommitteeCompleted = ({ counts, assets, completedData }) => {
                                     <tr>
                                         <th>Sr No.</th>
                                         <th>Image</th>
-                                        <th>Name</th>
+                                        <th>User</th>
+                                        <th>Event</th>
                                         <th>Ticket</th>
                                         <th>Status</th>
                                     </tr>
                                 </thead>
+
 
                                 <tbody>
                                     {completedData?.length > 0 ? (
@@ -131,11 +135,15 @@ const CommitteeCompleted = ({ counts, assets, completedData }) => {
                                                 ? `${assets.profile_image_path}/${item["user.profile_image"]}`
                                                 : "/assets/front-images/no-image.png";
 
+                                            const eventImage = item["event.feat_image"]
+                                                ? `${assets.event_image_path}/${item["event.feat_image"]}`
+                                                : "/assets/front-images/no-image.png";
+
                                             return (
                                                 <tr key={item.order_id || index}>
                                                     <td>{index + 1}</td>
 
-                                                    {/* IMAGE */}
+                                                    {/* USER IMAGE */}
                                                     <td>
                                                         <img
                                                             src={profileImage}
@@ -150,9 +158,9 @@ const CommitteeCompleted = ({ counts, assets, completedData }) => {
                                                         />
                                                     </td>
 
-                                                    {/* USER */}
+                                                    {/* USER INFO */}
                                                     <td>
-                                                        <div style={{ fontWeight: 600 }}>
+                                                        <div className="fw-semibold">
                                                             {item["user.first_name"]} {item["user.last_name"]}
                                                         </div>
                                                         <div className="text-muted fs-13">
@@ -160,11 +168,37 @@ const CommitteeCompleted = ({ counts, assets, completedData }) => {
                                                         </div>
                                                     </td>
 
+                                                    {/* EVENT INFO */}
+                                                    <td>
+                                                        <div className="d-flex gap-2 align-items-center">
+                                                            <img
+                                                                src={eventImage}
+                                                                alt="Event"
+                                                                style={{
+                                                                    width: "50px",
+                                                                    height: "50px",
+                                                                    objectFit: "cover",
+                                                                    borderRadius: "6px",
+                                                                    border: "1px solid #ddd",
+                                                                }}
+                                                            />
+                                                            <div>
+                                                                <div className="fw-semibold">
+                                                                    {item["event.name"]}
+                                                                </div>
+                                                                <div className="text-muted fs-13">
+                                                                    {item["event.location"]}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+
                                                     {/* TICKET */}
                                                     <td>
                                                         <div>{item["ticketType.title"]}</div>
                                                         <div className="text-muted fs-13">
-                                                            ₹{item["ticketType.price"]}
+                                                            {item["event.currencyName.Currency_symbol"]}
+                                                            {item["ticketType.price"]}
                                                         </div>
                                                     </td>
 
@@ -179,12 +213,13 @@ const CommitteeCompleted = ({ counts, assets, completedData }) => {
                                         })
                                     ) : (
                                         <tr>
-                                            <td colSpan="5" className="text-center py-4">
+                                            <td colSpan="6" className="text-center py-4">
                                                 No completed requests found
                                             </td>
                                         </tr>
                                     )}
                                 </tbody>
+
 
                             </table>
                         </div>

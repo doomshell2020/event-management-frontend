@@ -20,6 +20,7 @@ const CommitteeTicketsPage = () => {
     /* ---------------- STATES ---------------- */
     const [eventDetails, setEventDetails] = useState(null);
     const [ticketsList, setTicketList] = useState([]);
+    // console.log('ticketsList :', ticketsList);
     const [assignedList, setAssignedList] = useState([]);
     const [currencySymbol, setCurrencySymbol] = useState('$'); //Currency_symbol
 

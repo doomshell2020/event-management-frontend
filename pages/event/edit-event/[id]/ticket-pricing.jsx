@@ -18,10 +18,13 @@ const ManageTicketPricing = () => {
     const { id } = router.query;
 
     const [eventDetails, setEventDetails] = useState(null);
+    // console.log('eventDetails :', eventDetails);
     const [ticketsList, setTicketsList] = useState([]);
     const [slotsList, setSlotsList] = useState([]);
     const [pricingList, setPricingList] = useState([]);
     const [loading, setLoading] = useState(false);
+    const currencyName = eventDetails?.currencyName?.Currency_symbol || null;
+    // console.log('currencyName :', currencyName);
 
 
     const eventStart = eventDetails?.date_from?.local
@@ -244,7 +247,7 @@ const ManageTicketPricing = () => {
                                         <div className="row g-3">
                                             {/* Ticket Type */}
                                             <div className="col-md-4">
-                                                <Form.Label className="fw-semibold">Select Ticket Type:</Form.Label>
+                                                <Form.Label className="fw-semibold">Select Ticket Type: <span className="text-danger">*</span></Form.Label>
                                                 <Form.Select
                                                     required
                                                     value={selectedTicket?.id || ""}
@@ -269,7 +272,7 @@ const ManageTicketPricing = () => {
 
                                             {/* Price */}
                                             <div className="col-md-4">
-                                                <Form.Label className="fw-semibold">Price:</Form.Label>
+                                                <Form.Label className="fw-semibold">Price: <span className="text-danger">*</span></Form.Label>
                                                 <Form.Control
                                                     type="number"
                                                     placeholder="Enter price"
@@ -363,7 +366,7 @@ const ManageTicketPricing = () => {
                                                     {pricingList.map((row, index) => (
                                                         <tr key={index}>
                                                             <td>{row?.ticket?.title || "-"}</td>
-                                                            <td>{row.currency == "INR" ? "₹" : "$"}{row.price}</td>
+                                                            <td>{currencyName}{row.price}</td>
                                                             <td>{row.date || "-"}</td>
                                                             <td>{row.slot ? `${row.slot.slot_name} (${row.slot.start_time.slice(0, 5)} - ${row.slot.end_time.slice(0, 5)})` : "-"}</td>
                                                         </tr>
