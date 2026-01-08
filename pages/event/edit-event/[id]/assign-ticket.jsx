@@ -112,6 +112,7 @@ const AssignTicket = () => {
         }
     }, [id]);
 
+
     useEffect(() => {
         if (!searchText || searchText.length < 2) {
             setSearchResults([]);
@@ -135,43 +136,63 @@ const AssignTicket = () => {
         return () => clearTimeout(timer);
     }, [searchText]);
 
-    const addMember = async (userId, userName) => {
-        // console.log('>>>>>>>>>>>>',id);
-        // return false
-
+    const generateSingleComplimentaryTicket = async (userId, userName) => {
         try {
+            // 1️⃣ Confirmation
             const result = await Swal.fire({
-                title: `Add ${userName} to the committee?`,
+                title: `Generate complimentary ticket for ${userName}?`,
+                text: "This will generate a free ticket and send confirmation email.",
                 icon: "question",
                 showCancelButton: true,
-                confirmButtonText: "Yes, add",
+                confirmButtonText: "Yes, generate",
                 cancelButtonText: "Cancel",
             });
 
             if (!result.isConfirmed) return;
 
+            // 2️⃣ Loading
             Swal.fire({
-                title: 'Adding member...',
+                title: "Generating ticket...",
+                text: "Please wait",
                 allowOutsideClick: false,
                 didOpen: () => Swal.showLoading(),
             });
 
-            const res = await api.post(`/api/v1/committee/member/add-member`, {
+            // 3️⃣ API Call
+            const res = await api.post("/api/v1/tickets/generate-single-comps", {
                 event_id: id,
                 user_id: userId,
             });
 
             Swal.close();
 
+            // 4️⃣ Success
             if (res.data.success) {
-                setMembers(res.data.data);
+                Swal.fire({
+                    icon: "success",
+                    title: "Ticket Generated",
+                    text: "Complimentary ticket generated and email sent successfully",
+                });
+
+                // setMembers(res.data.data);
                 setSearchText("");
                 setSearchResults([]);
-                Swal.fire("Success", "Member added successfully", "success");
+                // 🔄 Refresh generated users list (important)
+                fetchGeneratedUsers();
+            } else {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Skipped",
+                    text: res.data.message || "Ticket already generated for this user",
+                });
             }
         } catch (err) {
             Swal.close();
-            Swal.fire("Error", err.response?.data?.message || "Failed", "error");
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: err.response?.data?.message || "Failed to generate ticket",
+            });
         }
     };
 
@@ -207,78 +228,168 @@ const AssignTicket = () => {
         }
     };
 
+    const [excelFile, setExcelFile] = useState(null);
+
     const handleImportExcel = async (e) => {
         e.preventDefault();
-        return false
 
-        if (!selectedImportEvent) {
+        if (!id) {
             Swal.fire({
                 icon: "warning",
                 title: "Select Event",
-                text: "Please select an event to import committee members from"
+                text: "Please select an event to import committee members from",
             });
             return;
         }
 
-        try {
-            // 🔄 Show loading swal
+        if (!excelFile) {
             Swal.fire({
-                title: "Importing committee members...",
-                text: "Please wait",
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
+                icon: "warning",
+                title: "Select File",
+                text: "Please select an Excel file to import",
+            });
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("uploadFiles", excelFile); // Ensure backend expects 'excel'
+        formData.append("event_id", id);
+
+        try {
+            setLoading(true); // show loader
+
+            const res = await api.post("/api/v1/tickets/import-comps", formData, {
+                headers: { "Content-Type": "multipart/form-data" },
             });
 
-            const payload = {
-                from_event_id: selectedImportEvent.id,
-                to_event_id: id // 🔥 current event id
-            };
-
-            const res = await api.post(
-                "/api/v1/committee/import-committee-members",
-                payload
-            );
-
-            Swal.close();
-
             if (res.data.success) {
-                await fetchMembers(id);
                 Swal.fire({
                     icon: "success",
-                    title: "Imported Successfully",
-                    text: `${res.data.data.imported} committee members imported`
+                    title: "Import Completed",
+                    html: `
+          ✅ Total Rows: ${res.data.data.total} <br/>
+          ✅ Created Users: ${res.data.data.created_users} <br/>
+          ✅ Existing Users: ${res.data.data.existing_users} <br/>
+          ✅ Tickets Generated: ${res.data.data.tickets_generated} <br/>
+          ⚠ Skipped Users: ${res.data.data.skipped_users || 0} <br/>
+          ${res.data.data.failed.length > 0 ? `❌ Failed Rows: ${res.data.data.failed.map(f => f.row).join(', ')}` : ''}
+        `,
                 });
 
-                // Optional: reset state
-                setEventSearchText("");
-                setSelectedImportEvent(null);
-                setIsEventSelected(false);
+                await fetchGeneratedUsers(1);
 
             } else {
                 Swal.fire({
-                    icon: "info",
-                    title: "No Changes",
-                    text: res.data.message || "Nothing to import"
+                    icon: "error",
+                    title: "Import Failed",
+                    text: res.data.error?.message || res.data.message || "Something went wrong",
                 });
             }
+        } catch (err) {
+            console.error(err);
 
-        } catch (error) {
-            Swal.close();
-            console.error(error);
+            // Try to extract meaningful server error
+            const errMsg =
+                err.response?.data?.error?.message ||
+                err.response?.data?.message ||
+                err.message ||
+                "Failed to import Excel";
 
             Swal.fire({
                 icon: "error",
-                title: "Import Failed",
-                text: "Something went wrong while importing committee members"
+                title: "Error",
+                text: `❌ ${errMsg}`,
             });
+        } finally {
+            setLoading(false); // hide loader
         }
     };
 
     const [backgroundImage] = useState("/assets/front-images/about-slider_bg.jpg");
     const showLoader = loading || processing;
+
+    const [generatedUsers, setGeneratedUsers] = useState([]);
+    // console.log('generatedUsers :', generatedUsers);
+    const [loadingGeneratedUsers, setLoadingGeneratedUsers] = useState(false);
+    const [pagination, setPagination] = useState({
+        page: 1,
+        limit: 10,
+        totalPages: 1,
+        total: 0
+    });
+
+    useEffect(() => {
+        if (id) {
+            fetchGeneratedUsers(pagination.page);
+        }
+    }, [id, pagination.page]);
+
+    const fetchGeneratedUsers = async (page = 1) => {
+        if (!id) return;
+
+        try {
+            setLoadingGeneratedUsers(true);
+
+            const res = await api.get(`/api/v1/tickets/generated-users/${id}?page=${page}&limit=${pagination.limit}`);
+            if (res.data.success) {
+                setGeneratedUsers(res.data.data);
+                setPagination(res.data.pagination);
+            }
+        } catch (err) {
+            console.error("Error fetching generated users:", err);
+        } finally {
+            setLoadingGeneratedUsers(false);
+        }
+    };
+
+    const [deletingId, setDeletingId] = useState(null);
+
+    const handleDeleteConfirm = (user) => {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: `Do you want to delete the complimentary ticket for ${user.first_name} ${user.last_name}?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                handleDeleteTicket(user.order_item_id);
+            }
+        });
+    };
+
+    const handleDeleteTicket = async (orderItemId) => {
+        try {
+            setDeletingId(orderItemId);
+
+            const res = await api.delete(`/api/v1/tickets/delete-generated-comps/${orderItemId}`);
+
+            if (res.data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Deleted!',
+                    text: 'Complimentary ticket deleted successfully',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+
+                fetchGeneratedUsers(pagination.page);
+            }
+
+        } catch (error) {
+            console.error("Delete ticket error:", error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: error?.response?.data?.message || 'Failed to delete complimentary ticket'
+            });
+        } finally {
+            setDeletingId(null);
+        }
+    };
 
     return (
         <>
@@ -358,10 +469,10 @@ const AssignTicket = () => {
                                                 {/* Committee Section */}
                                                 <div className="col-lg-8 col-md-12">
                                                     <div className="Committee">
-                                                        <h6>Current Users ({loadingMembers ? "Loading..." : members.length})</h6>
+                                                        <h6>Users with Generated Tickets ({loadingGeneratedUsers ? "Loading..." : pagination.total})</h6>
 
                                                         <div className="row">
-                                                            <div className="col-md-10 col-sm-8 col-8">
+                                                            <div className="col-md-12 col-sm-8 col-8">
                                                                 <div className="position-relative">
                                                                     <div className="input-group">
                                                                         <span className="input-group-text">
@@ -390,13 +501,14 @@ const AssignTicket = () => {
                                                                                 <div className="text-center p-2 text-muted">No users found</div>
                                                                             ) : (
                                                                                 searchResults.map((user) => {
-                                                                                    const alreadyAdded = members.some(m => m.user.id == user.id);
+                                                                                    const alreadyAdded = generatedUsers.some(m => m.user_id == user.id);
+                                                                                    // console.log('alreadyAdded :', alreadyAdded);
                                                                                     return (
                                                                                         <div
                                                                                             key={user.id}
                                                                                             className={`d-flex align-items-center gap-3 px-3 py-2 user-suggestion-item ${alreadyAdded ? "bg-light text-muted" : "hover-bg"}`}
                                                                                             style={{ cursor: alreadyAdded ? "not-allowed" : "pointer" }}
-                                                                                            title={alreadyAdded ? "Already added" : ""}
+                                                                                            title={alreadyAdded ? "Already generated" : ""}
                                                                                         >
                                                                                             <div
                                                                                                 className={`rounded-circle d-flex align-items-center justify-content-center ${alreadyAdded ? "bg-secondary text-white" : "bg-primary text-white"}`}
@@ -413,9 +525,9 @@ const AssignTicket = () => {
                                                                                                 {!alreadyAdded && (
                                                                                                     <button
                                                                                                         className="btn btn-sm text-14 btn-primary"
-                                                                                                        onClick={() => addMember(user.id, `${user.first_name} ${user.last_name}`)}
+                                                                                                        onClick={() => generateSingleComplimentaryTicket(user.id, `${user.first_name} ${user.last_name}`)}
                                                                                                     >
-                                                                                                        Add
+                                                                                                        Generate Ticket
                                                                                                     </button>
                                                                                                 )}
                                                                                             </div>
@@ -427,142 +539,117 @@ const AssignTicket = () => {
                                                                     )}
                                                                 </div>
                                                             </div>
-                                                            <div className="col-md-2 col-sm-8 col-8">
+                                                            {/* <div className="col-md-2 col-sm-8 col-8">
                                                                 <button
                                                                     className="btn next primery-button h-100 text-14">
                                                                     Add
                                                                 </button>
-                                                            </div>
+                                                            </div> */}
                                                         </div>
 
                                                         <hr className="custom-hr" />
-                                                        {/* Members Table with Serial Number */}
-                                                        <div className="table-responsive">
-                                                            <table className="table table-bordered table-striped mb-1 table-sm">
 
+                                                        {/* Members Table */}
+                                                        <div className="table-responsive mt-4">
+                                                            <table className="table table-bordered table-striped mb-1 table-sm">
                                                                 <thead className="text-white table-detail">
                                                                     <tr>
-                                                                        <th >S.No.</th>
-                                                                        <th >Name</th>
-                                                                        <th >Email</th>
+                                                                        <th>S.No.</th>
+                                                                        <th>Name</th>
+                                                                        <th>Email</th>
                                                                         <th className="text-center">Mobile</th>
-                                                                        <th className="text-center">Status</th>
-                                                                        <th className="text-center">Remove</th>
+                                                                        <th className="text-center">Ticket</th>
+                                                                        <th className="text-center">Generated At</th>
+                                                                        <th className="text-center">Action</th>
                                                                     </tr>
                                                                 </thead>
-
                                                                 <tbody>
-                                                                    {/* LOADER */}
-                                                                    {loadingMembers && (
+                                                                    {loadingGeneratedUsers && (
                                                                         <tr>
                                                                             <td colSpan="6" className="text-center py-5">
-                                                                                <div
-                                                                                    className="spinner-border text-primary"
-                                                                                    role="status"
-                                                                                />
+                                                                                <div className="spinner-border text-primary" role="status" />
                                                                                 <div className="mt-2 fw-semibold">
-                                                                                    Loading...
+                                                                                    Loading generated users...
                                                                                 </div>
                                                                             </td>
                                                                         </tr>
                                                                     )}
 
-                                                                    {/* NO DATA */}
-                                                                    {!loadingMembers && members.length == 0 && (
+                                                                    {!loadingGeneratedUsers && generatedUsers.length == 0 && (
                                                                         <tr>
                                                                             <td colSpan="6" className="text-center">
-                                                                                No members found
+                                                                                No generated users found
                                                                             </td>
                                                                         </tr>
                                                                     )}
 
-                                                                    {/* DATA */}
-                                                                    {!loadingMembers &&
-                                                                        members.map((member, index) => (
-                                                                            <tr key={member.id}>
-                                                                                <td>{index + 1}</td>
+                                                                    {!loadingGeneratedUsers &&
+                                                                        generatedUsers.map((user, index) => (
+                                                                            <tr key={user.order_item_id}>
                                                                                 <td>
-                                                                                    {member.user.first_name} {member.user.last_name}
+                                                                                    {(pagination.page - 1) * pagination.limit + index + 1}
                                                                                 </td>
-                                                                                <td>{member.user.email}</td>
+                                                                                <td>{user.first_name} {user.last_name}</td>
+                                                                                <td>{user.email}</td>
+                                                                                <td className="text-center">{user.mobile}</td>
+                                                                                <td className="text-center">{user.ticket_title}</td>
                                                                                 <td className="text-center">
-                                                                                    {member.user.mobile}
+                                                                                    {new Date(user.generated_at).toLocaleString()}
                                                                                 </td>
-
-                                                                                <td className="text-center">
-                                                                                    <div className="form-check form-switch p-0 text-center m-0 d-flex justify-content-center">
-                                                                                        <input
-                                                                                            className="form-check-input m-0"
-                                                                                            type="checkbox"
-                                                                                            style={{ minWidth: "40px" }}
-                                                                                            id={`statusSwitch-${member.id}`}
-                                                                                            checked={member.status == "Y"}
-                                                                                            onChange={async () => {
-                                                                                                try {
-                                                                                                    Swal.fire({
-                                                                                                        title: "Updating status...",
-                                                                                                        allowOutsideClick: false,
-                                                                                                        didOpen: () => {
-                                                                                                            Swal.showLoading();
-                                                                                                        },
-                                                                                                    });
-
-                                                                                                    const res = await api.put(
-                                                                                                        `/api/v1/committee/member/status/${member.id}`,
-                                                                                                        {
-                                                                                                            status: member.status == "Y" ? "N" : "Y",
-                                                                                                        }
-                                                                                                    );
-
-                                                                                                    Swal.close();
-
-                                                                                                    if (res.data.success) {
-                                                                                                        setMembers((prev) =>
-                                                                                                            prev.map((m) =>
-                                                                                                                m.id == member.id
-                                                                                                                    ? {
-                                                                                                                        ...m,
-                                                                                                                        status: m.status == "Y" ? "N" : "Y",
-                                                                                                                    }
-                                                                                                                    : m
-                                                                                                            )
-                                                                                                        );
-
-                                                                                                        Swal.fire(
-                                                                                                            "Success",
-                                                                                                            "Status updated successfully",
-                                                                                                            "success"
-                                                                                                        );
-                                                                                                    }
-                                                                                                } catch (err) {
-                                                                                                    Swal.close();
-                                                                                                    Swal.fire(
-                                                                                                        "Error",
-                                                                                                        err.response?.data?.message ||
-                                                                                                        "Failed to update status",
-                                                                                                        "error"
-                                                                                                    );
-                                                                                                }
-                                                                                            }}
-                                                                                        />
-
-                                                                                    </div>
-                                                                                </td>
-
                                                                                 <td className="text-center">
                                                                                     <button
                                                                                         className="btn btn-sm btn-danger"
-                                                                                        onClick={() => removeMember(member.id)}
+                                                                                        onClick={() => handleDeleteConfirm(user)}
+                                                                                        disabled={deletingId == user.order_item_id}
                                                                                     >
-                                                                                        Remove
+                                                                                        {deletingId == user.order_item_id ? "Deleting..." : "Delete"}
                                                                                     </button>
                                                                                 </td>
+
                                                                             </tr>
-                                                                        ))}
+                                                                        ))
+                                                                    }
                                                                 </tbody>
-
-
                                                             </table>
+                                                            {pagination.totalPages > 1 && (
+                                                                <div className="d-flex justify-content-center mt-3 gap-2 flex-wrap">
+                                                                    <button
+                                                                        className="btn btn-sm btn-outline-primary"
+                                                                        disabled={pagination.page == 1}
+                                                                        onClick={() =>
+                                                                            setPagination(prev => ({ ...prev, page: prev.page - 1 }))
+                                                                        }
+                                                                    >
+                                                                        Previous
+                                                                    </button>
+
+                                                                    {[...Array(pagination.totalPages)].map((_, idx) => (
+                                                                        <button
+                                                                            key={idx}
+                                                                            className={`btn btn-sm ${pagination.page == idx + 1
+                                                                                ? "btn-primary"
+                                                                                : "btn-outline-primary"
+                                                                                }`}
+                                                                            onClick={() =>
+                                                                                setPagination(prev => ({ ...prev, page: idx + 1 }))
+                                                                            }
+                                                                        >
+                                                                            {idx + 1}
+                                                                        </button>
+                                                                    ))}
+
+                                                                    <button
+                                                                        className="btn btn-sm btn-outline-primary"
+                                                                        disabled={pagination.page == pagination.totalPages}
+                                                                        onClick={() =>
+                                                                            setPagination(prev => ({ ...prev, page: prev.page + 1 }))
+                                                                        }
+                                                                    >
+                                                                        Next
+                                                                    </button>
+                                                                </div>
+                                                            )}
+
                                                         </div>
 
                                                     </div>
@@ -572,38 +659,52 @@ const AssignTicket = () => {
                                                 <div className="col-lg-4 col-md-12">
                                                     <div className="import_committee">
                                                         <h6 className="mt-1">Import Users List</h6>
-                                                        <form className="row g-3 align-items-center" onSubmit={handleImportExcel} >
 
+                                                        <a
+                                                            href="/uploads/excel/import-users-template.xlsx"
+                                                            download
+                                                            className="btn btn-outline-success btn-sm mb-2"
+                                                        >
+                                                            ⬇️ Download Excel Template
+                                                        </a>
+
+                                                        <form
+                                                            className="row g-3 align-items-center"
+                                                            onSubmit={handleImportExcel}
+                                                        >
                                                             <div className="col-12">
                                                                 <div className="input-group">
-
                                                                     <div className="input-group-text">
-                                                                        <i className="bi bi-search"></i>
+                                                                        <i className="bi bi-file-earmark-excel"></i>
                                                                     </div>
 
-                                                                    <div className="position-relative">
-                                                                        <input
-                                                                            type="file"
-                                                                            placeholder="Search Events by name"
-                                                                            className="form-control eventserach"
-
-                                                                            autoComplete="off"
-                                                                        />
-
-                                                                    </div>
-
-
+                                                                    <input
+                                                                        type="file"
+                                                                        className="form-control"
+                                                                        accept=".xlsx,.xls"
+                                                                        onChange={(e) => setExcelFile(e.target.files[0])}
+                                                                        required
+                                                                    />
                                                                 </div>
+
+                                                                <small className="text-muted">
+                                                                    Upload Excel (.xlsx / .xls) – Do not change headers
+                                                                </small>
                                                             </div>
 
                                                             <div className="col-12">
-                                                                <button type="submit" className="btn save next primery-button fw-normal w-100">
-                                                                    Import
+                                                                <button
+                                                                    type="submit"
+                                                                    className="btn save next primery-button fw-normal w-100"
+                                                                    disabled={loading}
+                                                                >
+                                                                    {loading ? "Importing & Generating Tickets... ⏳" : "Import Users & Generate Tickets"}
                                                                 </button>
                                                             </div>
                                                         </form>
                                                     </div>
                                                 </div>
+
                                             </div>
                                         </div>
 

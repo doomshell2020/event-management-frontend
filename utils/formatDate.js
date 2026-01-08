@@ -24,6 +24,8 @@
 //     }
 // };
 
+import moment from "moment-timezone";
+
 export const formatDateTime = (
     dateString,
     timezone = null,
@@ -52,8 +54,6 @@ export const formatDateTime = (
     }
 };
 
-
-
 export const formatDateTimeShort = (dateString) => {
     if (!dateString) return "";
 
@@ -73,5 +73,35 @@ export const formatDateTimeShort = (dateString) => {
     } catch (error) {
         console.error("Invalid date:", dateString);
         return "";
+    }
+};
+
+// Use all where 
+export const formatEventDateTime = (
+    date,
+    timezone,
+    format = "ddd, DD MMM YYYY | hh:mm A"
+) => {
+    if (!date) return "N/A";
+
+    return moment(date)
+        .tz(timezone || "Asia/Kolkata")
+        .format(format);
+};
+
+
+export const isEventExpired = (event) => {
+    if (!event?.date_to?.utc || !event?.event_timezone) return false;
+
+    try {
+        const nowInEventTZ = moment().tz(event.event_timezone);
+        const eventEndInTZ = moment
+            .utc(event.date_to.utc)
+            .tz(event.event_timezone);
+
+        return nowInEventTZ.isAfter(eventEndInTZ);
+    } catch (e) {
+        console.error("Event expiry check failed:", e);
+        return false;
     }
 };

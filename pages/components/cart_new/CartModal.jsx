@@ -42,6 +42,7 @@ const LoadingComponent = ({ isActive }) => {
 export default function CartModal({ show, handleClose, eventId }) {
 
     const { cart, refreshCart, eventData, normalCart, addonCart, slotCart, loadingCart, setEventId } = useCart();
+    // console.log('cart :', cart);
 
     const finalEventId = eventId || eventData?.id;
 
@@ -1264,9 +1265,10 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                         const isCommittee = ticket.type == "committee_sales";
                                                                         const committeeStatus = ticket.committee_status || null;
 
+                                                                        // console.log('ticket.committeeAssignedTickets :', ticket.committeeAssignedTickets);
                                                                         const committeeMembers = isCommittee
-                                                                            ? ticket.committeeAssignedTickets
-                                                                                ?.filter(ct =>
+                                                                        ? ticket.committeeAssignedTickets
+                                                                        ?.filter(ct =>
                                                                                     ct.status == "Y" &&
                                                                                     ct.committeeMember?.status == "Y" &&
                                                                                     ct.committeeMember?.user
@@ -1277,7 +1279,8 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                                     email: ct.committeeMember.user.email
                                                                                 })) || []
                                                                             : [];
-
+                                                                            
+                                                                            // console.log('committeeMembers :', committeeMembers);
                                                                         // ✅ Filter questions that belong to this ticket
                                                                         const ticketQuestions = eventData.questions?.filter(q =>
                                                                             q.ticket_type_id
@@ -1438,7 +1441,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                                             <input
                                                                                                 type="text"
                                                                                                 className="form-control"
-                                                                                                placeholder={q.question}
+                                                                                                placeholder={`Type your answer`}
                                                                                                 value={ticketAnswers?.[ticket.id]?.[q.id] || ""}
                                                                                                 onChange={(e) => handleQuestionChange(ticket.id, q.id, e.target.value)}
                                                                                             />

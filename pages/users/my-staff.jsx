@@ -4,7 +4,7 @@ import Swal from "sweetalert2";
 import FrontendHeader from "@/shared/layout-components/frontelements/frontendheader";
 import FrontendFooter from "@/shared/layout-components/frontelements/frontendfooter";
 import api from "@/utils/api";
-import { formatDateTime } from "@/utils/formatDate";
+import { formatEventDateTime } from "@/utils/formatDate";
 
 
 const MyStaff = () => {
@@ -195,7 +195,7 @@ const MyStaff = () => {
                                             <td>{row.email}</td>
                                             <td>{row.mobile}</td>
                                             <td>{row.status == 'Y' ? "Active" : "Inactive"}</td>
-                                            <td>{formatDateTime(row.createdAt)}</td>
+                                            <td>{formatEventDateTime(row.createdAt)}</td>
                                             <td>
                                                 <Button
                                                     size="sm"

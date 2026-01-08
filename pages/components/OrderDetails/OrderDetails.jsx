@@ -1,12 +1,15 @@
+import { formatEventDateTime } from "@/utils/formatDate";
 import OrderItemCard from "./OrderItemCard";
 import PaymentSummary from "./PaymentSummary";
-import { format } from "date-fns";
 
-const OrderDetails = ({ orderData, handleCancelAppointment }) => {
+
+const OrderDetails = ({ orderData, handleCancelAppointment, baseUrls }) => {
     if (!orderData) return null;
 
     const { event, orderItems } = orderData;
-    const { currencyName } = event
+    const { currencyName } = event;
+    const eventTimezone = event?.event_timezone || "";
+    // console.log('eventTimezone :', eventTimezone);
 
     return (
         <div className="col-lg-8 col-md-7">
@@ -21,22 +24,27 @@ const OrderDetails = ({ orderData, handleCancelAppointment }) => {
             </div>
 
             {/* EVENT INFO BAR */}
-            <div className="row text-white p-3 rounded mb-4" style={{ background: "#3d6db5" }}>
+            <div
+                className="row text-white p-3 rounded mb-4"
+                style={{ background: "#3d6db5" }}
+            >
                 <div className="col-md-4 border-end">
                     <strong>Event Start Date</strong>
                     <div>
-                        {event?.date_from
-                            ? format(new Date(event.date_from), "EEE, dd MMM yyyy | hh:mm a")
-                            : "N/A"}
+                        {formatEventDateTime(
+                            event?.date_from,
+                            eventTimezone
+                        )}
                     </div>
                 </div>
 
                 <div className="col-md-4 border-end">
                     <strong>Event End Date</strong>
                     <div>
-                        {event?.date_to
-                            ? format(new Date(event.date_to), "EEE, dd MMM yyyy | hh:mm a")
-                            : "N/A"}
+                        {formatEventDateTime(
+                            event?.date_to,
+                            eventTimezone
+                        )}
                     </div>
                 </div>
 
@@ -57,13 +65,13 @@ const OrderDetails = ({ orderData, handleCancelAppointment }) => {
                         item={item}
                         orderData={orderData}
                         handleCancelAppointment={handleCancelAppointment}
+                        baseUrls={baseUrls}
                     />
                 ))}
             </div>
 
             {/* PAYMENT SUMMARY */}
             <PaymentSummary orderData={orderData} />
-
         </div>
     );
 };
