@@ -7,6 +7,8 @@ import { useCart } from "@/shared/layout-components/layout/CartContext";
 import { useAuth } from "../layout/AuthContext";
 import CartModal from "@/pages/components/cart_new/CartModal";
 import api from "@/utils/api";
+import { Container, Navbar } from "react-bootstrap";
+
 
 const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
   const [headerBackgroundImg, setHeaderBackgroundImg] = useState(
