@@ -122,7 +122,7 @@ const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
         <>
             <div className="event_names d-flex justify-content-between align-items-center p-2 px-3 mb-3">
                 {/* Dropdown */}
-                <div className="dropdown">
+                <div className="dropdown edit-event-dropdown">
                     <button
                         className="btn rounded-md text-sm text-white dropdown-toggle"
                         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -180,12 +180,12 @@ const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
                 </div>
 
                 {/* Title */}
-                <div className="text-center">
+                <div className="text-center edit-event-header-title">
                     <h6 className="event_Heading mb-0 fs-5 fw-bold">{eventDetails?.name || ""}</h6>
                 </div>
 
                 {/* View Event */}
-                <div className="text-right mt-1">
+                <div className="text-right mt-0 edit-view-event">
                     <Link
                         href={`/event/${eventDetails?.id}/${eventDetails?.slug}`}
                         className="btn rounded-md text-sm text-white"
