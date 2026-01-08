@@ -96,11 +96,11 @@ export default function MyOrdersDetails() {
         <>
             <FrontendHeader backgroundImage={backgroundImage} />
 
-            <section id="my-ticket-module">
+            <section id="event-detail-page" className="pt-4 pt-lg-5">
                 <div className="container">
                     <div className="section-heading">
-                        <h1>Orders</h1>
-                        <h2 className="mt-4">Order Details</h2>
+                        <h1 className="mb-3 order-detail-title">Order Details</h1>
+                        {/* <h2 className="mt-4"></h2> */}
                     </div>
 
                     {/* LOADING */}
@@ -124,22 +124,17 @@ export default function MyOrdersDetails() {
                             <div className="row g-4">
 
                                 {/* LEFT IMAGE */}
-                                <div className="col-lg-4 col-md-5">
-                                    <div className="border rounded overflow-hidden">
-                                        <img
-                                            src={
-                                                orderData?.event?.feat_image
-                                                    ? `${baseUrls?.event_image_url}${orderData.event.feat_image}`
-                                                    : "/assets/front-images/my-tacket-section.jpg"
-                                            }
-                                            alt="Event"
-                                            className="w-100"
-                                            style={{
-                                                height: "280px",
-                                                objectFit: "cover",
-                                            }}
-                                        />
-
+                                <div className="col-md-5">
+                                    <div className="ticker_img fadeInLeft position-sticky top-0">
+                                        <div className="ticker_imgmn">
+                                            <img
+                                                src={
+                                                    orderData?.event?.feat_image_url ||
+                                                    "/assets/front-images/my-tacket-section.jpg"
+                                                }
+                                                alt="Event"
+                                            />
+                                        </div>
                                     </div>
                                 </div>
 

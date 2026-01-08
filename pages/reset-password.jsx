@@ -66,17 +66,17 @@ const ResetPasswordPage = () => {
     <>
       <FrontendHeader backgroundImage={backgroundImage} />
 
-      <section id="reset-password">
+      <section id="sign-up" className="py-4">
         <div className="container">
           <div className="section-heading text-center">
-            <h1>Reset Your Password</h1>
+            <h1 className="mb-3">Reset Your Password</h1>
             <p className="body-text">Enter a new password to access your account.</p>
           </div>
 
           <div className="form-content">
             <div className="row align-items-center justify-content-center">
               {/* Left side GIF */}
-              <div className="col-md-6 col-sm-12 text-center">
+              <div className="col-md-6 col-sm-12 sig_img">
                 <img src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExOWFzMnZhZDJ6dXRxYmx5bzUycnZmdGxzMGF6Y2Rsbzhuemh2NmVkMyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/IgLIVXrBcID9cExa6r/giphy.gif" alt="Reset Password" style={{ maxWidth: "100%", marginBottom: "20px" }} />
 
               </div>

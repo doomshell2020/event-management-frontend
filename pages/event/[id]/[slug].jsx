@@ -396,12 +396,16 @@ const EventDetailPage = ({ event, slug }) => {
 
               <div className="row g-4">
                 {appointmentData.map((w) => (
-                  <div
-                    key={w.id}
-                    className={`col-md-${appointmentData.length === 1 ? "12 only-single-cart" : "6"
-                      }`}
-                  >
-                    <div className="card shadow-sm border-0 h-100">
+ <div
+  key={w.id}
+  className={
+    appointmentData.length === 1
+      ? "col-md-12 only-single-cart"
+      : "col-lg-6"
+  }
+>
+
+                    <div className="card shadow-sm border-0 h-100 mb-0">
                       {/* IMAGE */}
                       <div className="event-appo-img">
                         <img
@@ -429,7 +433,7 @@ const EventDetailPage = ({ event, slug }) => {
                           dangerouslySetInnerHTML={{ __html: w.description }}
                         />
 
-                        <div className="py-3">
+                        <div className="pb-1 pt-1">
                           <div className="appoinment-checkbtn">
                             {(() => {
                               const selectedForThis = selectedSlots[w.id] || [];
@@ -480,7 +484,7 @@ const EventDetailPage = ({ event, slug }) => {
 
                                         {/* DATE & TIME */}
                                         <div style={{ fontSize: "14px" }}>
-                                          <div className="d-flex align-items-center gap-3">
+                                          <div className="d-flex align-items-center gap-2 gap-sm-3">
                                             <span className="d-flex align-items-center">
                                               <i className="bi bi-calendar me-1"></i>
                                               <strong>
@@ -497,7 +501,7 @@ const EventDetailPage = ({ event, slug }) => {
                                         </div>
 
                                         {/* PRICE */}
-                                        <div
+                                        <div className="slot-price"
                                           style={{
                                             fontWeight: "bold",
                                             color: "rgb(33, 166, 122)",
@@ -537,16 +541,24 @@ const EventDetailPage = ({ event, slug }) => {
                                   {w.wellnessSlots?.length > 0 && (
                                     <div className="text-center">
                                       <button
-                                        className="btn mt-3 w-100"
+                                        className="btn mt-3 w-100 fw-bold"
                                         disabled={selectedCount === 0}
                                         style={{
                                           background:
                                             selectedCount > 0
-                                              ? "#21a67a"
-                                              : "#9fd6c5",
+                                              ? "linear-gradient(135deg, #af46e5 0%, #7263f1 50%, #e62d56 100%)"
+                                              : "linear-gradient(135deg, #d6c7f7, #e9c3d2)",
+                                          boxShadow:
+                                            selectedCount > 0
+                                              ? "0 7px 15px rgba(79, 70, 229, 0.5), inset 0 0 0 0px rgba(255, 255, 255, 0.15)"
+                                              : "none",
                                           color: "#fff",
                                           borderRadius: "50px",
                                           padding: "10px 30px",
+                                          border: "none",
+                                           border: "none",
+                                          cursor: selectedCount > 0 ? "pointer" : "not-allowed",
+                                          transition: "all 0.3s ease",
                                         }}
                                         onClick={() =>
                                           handleOpenAppointmentCart(
@@ -557,6 +569,7 @@ const EventDetailPage = ({ event, slug }) => {
                                       >
                                         Book Appointment
                                       </button>
+
                                     </div>
                                   )}
                                 </>

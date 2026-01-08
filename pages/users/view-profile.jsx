@@ -56,11 +56,11 @@ const ProfilePage = () => {
   return (
     <>
       <FrontendHeader backgroundImage={backgroundImage} />
-      <section id="profile" className="mt-5 mb-5">
+      <section id="profile" className="mt-4 mb-5">
         <div className="container">
           <div className="section-heading">
-            <h1>Profile</h1>
-            <h2 className="mt-4">My Profile</h2>
+            <h1 className="mb-3">My Profile</h1>
+            {/* <h2 className="mt-4"></h2> */}
             <p className="mb-4 body-text text-center">
               Your profile information is displayed below.
             </p>
@@ -70,7 +70,7 @@ const ProfilePage = () => {
             <div className="row">
               {/* Left side - avatar & edit */}
               <div className="col-md-3">
-                <div className="user-profile text-center">
+                <div className="user-profile text-center mb-3 mb-md-0">
                   <div className="user-avatar">
                     <img
                       className="mx-auto text-center rounded-full w-24 h-24 object-cover"
@@ -79,7 +79,7 @@ const ProfilePage = () => {
                     />
 
                   </div>
-                  <h5 className="user-name text-center text-16 my-3">
+                  <h5 className="user-name text-center text-16 my-2 my-lg-3">
                     {user.first_name} {user.last_name}
                   </h5>
                   <Link

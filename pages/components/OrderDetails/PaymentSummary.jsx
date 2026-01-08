@@ -2,7 +2,7 @@ import { formatPrice } from "@/utils/commonFunction";
 
 
 const PaymentSummary = ({ orderData }) => {
-console.log('orderData :', orderData);
+// console.log('orderData :', orderData);
     const currency =
         orderData?.event?.currencyName?.Currency_symbol || "";
 
@@ -25,7 +25,7 @@ console.log('orderData :', orderData);
                 <span>{currency}{orderData.tax_total}</span>
             </div>
 
-            <hr />
+           <hr className="custom-hr" />
 
             <div className="d-flex justify-content-between fw-bold text-success">
                 <span>Total Paid</span>

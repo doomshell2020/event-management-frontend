@@ -136,9 +136,9 @@ const TicketDetails = ({ pendingRequests, counts, event_id }) => {
 
         <div className="container">
           <div className="section-heading">
-            <h1>Committee</h1>
-            <h2 className="mt-4">Committee</h2>
-            <p className="mb-4 body-text text-center">
+            <h1 className="mb-2">Committee</h1>
+            {/* <h2 className="mt-4">Committee</h2> */}
+            <p className="mb-5 body-text text-center">
               If you belong to any committees for events on eboxtickets, you can manage ticket requests here.
             </p>
           </div>
@@ -186,7 +186,7 @@ const TicketDetails = ({ pendingRequests, counts, event_id }) => {
                             return (
                               <tr key={item.id}>
                                 <td className="px-3">
-                                  <span className="badge rounded-pill bg-light text-dark px-3 py-2">
+                                  <span className="badge rounded-pill bg-light text-dark px-3 py-2 text-14 fw-semibold">
                                     {available}
                                   </span>
                                 </td>
@@ -196,7 +196,7 @@ const TicketDetails = ({ pendingRequests, counts, event_id }) => {
                                 <td className="px-3 text-end fw-semibold">
                                   {eventInfo?.currencyName?.Currency_symbol}
                                   {item.ticket?.price}{" "}
-                                  <small className="text-muted">
+                                  <small className="text-muted body-text">
                                     {eventInfo?.currencyName?.Currency}
                                   </small>
                                 </td>
@@ -287,7 +287,7 @@ const TicketDetails = ({ pendingRequests, counts, event_id }) => {
                           This action cannot be undone.
                         </div>
 
-                        <div className="mb-3">
+                        <div className="mb-3 position-relative">
                           <label className="form-label text-dark">Email Address</label>
                           <input
                             type="email"
@@ -337,21 +337,27 @@ const TicketDetails = ({ pendingRequests, counts, event_id }) => {
                                     }}
                                   >
                                     <div
-                                      className="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
-                                      style={{ width: 36, height: 36, fontSize: 13 }}
+                                      className="rounded-circle text-white d-flex align-items-center justify-content-center"
+                                      style={{
+                                        width: 36,
+                                        height: 36,
+                                        fontSize: 13,
+                                        backgroundColor: "#e62d56", // 👈 custom background
+                                      }}
                                     >
                                       {user.first_name?.charAt(0)}
                                       {user.last_name?.charAt(0)}
                                     </div>
 
+
                                     <div className="flex-grow-1">
                                       <div className="fw-semibold">
                                         {user.first_name} {user.last_name}
                                       </div>
-                                      <small className="text-muted">{user.email}</small>
+                                      <small style={{fontSize: "12px",color: "#e62d56",}}>{user.email}</small>
                                     </div>
 
-                                    <span className="badge bg-success-subtle text-success">
+                                    <span className="badge bg-success-subtle text-success text-14">
                                       Select
                                     </span>
                                   </div>

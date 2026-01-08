@@ -206,8 +206,8 @@ export default function Appointments({ }) {
                                             <thead className="table-dark table_bg">
                                                 <tr>
                                                     <th style={{ width: "2%" }} scope="col">#</th>
-                                                    <th style={{ width: "14%" }} scope="col">Image</th>
-                                                    <th style={{ width: "14%" }} scope="col">Appointment Name</th>
+                                                    <th style={{ width: "7%" }} scope="col">Image</th>
+                                                    <th style={{ width: "15%" }} scope="col">Appointment Name</th>
                                                     <th style={{ width: "8%" }} scope="col">Event Name</th>
                                                     <th style={{ width: "17%" }} scope="col">Created</th>
                                                     {/* <th style={{ width: "18%" }} scope="col">Ticket Sale</th> */}
@@ -354,7 +354,7 @@ export default function Appointments({ }) {
                                                                 {/* ✅ Action Buttons */}
                                                                 <td className="Con_center">
                                                                     <div className="editIcos d-flex justify-content-between"
-                                                                        style={{ gap: "1px" }}>
+                                                                        style={{ gap: "2px" }}>
                                                                         {/* <Link
                                                                             className="edit viewIcos"
                                                                             href={`/event/${event.id}/${event.slug}`}
@@ -467,11 +467,11 @@ export default function Appointments({ }) {
                                                     // ✅ No Data Found
                                                     <tr>
                                                         <td colSpan="7" className="text-center py-4">
-                                                            <img
+                                                            {/* <img
                                                                 src="/assets/front-images/no-data.svg"
                                                                 alt="No data"
                                                                 style={{ width: "120px", opacity: 0.6 }}
-                                                            />
+                                                            /> */}
                                                             <div className="mt-2 fw-bold text-muted">No Events Found</div>
                                                         </td>
                                                     </tr>

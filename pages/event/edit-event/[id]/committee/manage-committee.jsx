@@ -94,7 +94,7 @@ const MyEventsPage = () => {
     const addMember = async (userId, userName) => {
         // console.log('>>>>>>>>>>>>',id);
         // return false
-        
+
         try {
             const result = await Swal.fire({
                 title: `Add ${userName} to the committee?`,
@@ -345,16 +345,29 @@ const MyEventsPage = () => {
                                                                                     title={alreadyAdded ? "Already added" : ""}
                                                                                 >
                                                                                     <div
-                                                                                        className={`rounded-circle d-flex align-items-center justify-content-center ${alreadyAdded ? "bg-secondary text-white" : "bg-primary text-white"}`}
-                                                                                        style={{ width: 36, height: 36, fontSize: 13, fontWeight: 600 }}
+                                                                                        className="rounded-circle d-flex align-items-center justify-content-center text-white"
+                                                                                        style={{
+                                                                                            width: 36,
+                                                                                            height: 36,
+                                                                                            minWidth: 36,
+                                                                                            fontSize: 13,
+                                                                                            fontWeight: 600,
+                                                                                            backgroundColor: alreadyAdded ? "#e62d56" : "#0d6efd" // primary fallback
+                                                                                        }}
                                                                                     >
-                                                                                        {user.first_name?.charAt(0)}{user.last_name?.charAt(0)}
+                                                                                        {user.first_name?.charAt(0)}
+                                                                                        {user.last_name?.charAt(0)}
                                                                                     </div>
+
 
                                                                                     <div className="w-100 d-flex justify-content-between align-items-center">
                                                                                         <div>
                                                                                             <div className="fw-semibold">{user.first_name} {user.last_name}</div>
-                                                                                            <small className="text-muted">{user.email} • {user.mobile}</small>
+                                                                                            <small style={{
+                                                                                                fontSize: 12,
+                                                                                                opacity: 1,
+                                                                                                color: "#e62d56",
+                                                                                            }}>{user.email} • {user.mobile}</small>
                                                                                         </div>
                                                                                         {!alreadyAdded && (
                                                                                             <button
@@ -440,7 +453,7 @@ const MyEventsPage = () => {
                                                                                 <input
                                                                                     className="form-check-input m-0"
                                                                                     type="checkbox"
-                                                                                    style={{ minWidth: "40px" }}
+                                                                                    style={{ minWidth: "40px", cursor: "pointer" }}
                                                                                     id={`statusSwitch-${member.id}`}
                                                                                     checked={member.status == "Y"}
                                                                                     onChange={async () => {
@@ -474,11 +487,18 @@ const MyEventsPage = () => {
                                                                                                     )
                                                                                                 );
 
-                                                                                                Swal.fire(
-                                                                                                    "Success",
-                                                                                                    "Status updated successfully",
-                                                                                                    "success"
-                                                                                                );
+                                                                                                // Swal.fire(
+                                                                                                //     "Success",
+                                                                                                //     "Status updated successfully",
+                                                                                                //     "success"
+                                                                                                // );
+                                                                                                Swal.fire({
+                                                                                                    title: "Success",
+                                                                                                    text: "Status updated successfully",
+                                                                                                    icon: "success",
+                                                                                                    timer: 2000, // 2 seconds
+                                                                                                    showConfirmButton: false
+                                                                                                });
                                                                                             }
                                                                                         } catch (err) {
                                                                                             Swal.close();
@@ -521,63 +541,61 @@ const MyEventsPage = () => {
                                                 <form className="row g-3 align-items-center" onSubmit={handleImportCommittee} >
 
                                                     <div className="col-12">
-                                                        <div className="input-group">
+                                                        <div className="input-group position-relative w-100">
 
-                                                            <div className="input-group-text">
+                                                            <span className="input-group-text">
                                                                 <i className="bi bi-search"></i>
-                                                            </div>
+                                                            </span>
 
-                                                            <div className="position-relative">
-                                                                <input
-                                                                    type="search"
-                                                                    placeholder="Search Events by name"
-                                                                    className="form-control eventserach"
-                                                                    value={eventSearchText}
-                                                                    onChange={(e) => {
-                                                                        setEventSearchText(e.target.value);
-                                                                        setIsEventSelected(false); // reset when user types
-                                                                    }}
-                                                                    autoComplete="off"
-                                                                />
+                                                            <input
+                                                                type="search"
+                                                                placeholder="Search Events by name"
+                                                                className="form-control eventserach"
+                                                                value={eventSearchText}
+                                                                onChange={(e) => {
+                                                                    setEventSearchText(e.target.value);
+                                                                    setIsEventSelected(false);
+                                                                }}
+                                                                autoComplete="off"
+                                                            />
 
-                                                                {/* EVENT SEARCH DROPDOWN */}
-                                                                {eventSearchText.length > 1 && !isEventSelected && (
-                                                                    <div
-                                                                        className="position-absolute w-100 bg-white border rounded shadow-sm mt-1"
-                                                                        style={{ zIndex: 999, maxHeight: "260px", overflowY: "auto" }}
-                                                                    >
-                                                                        {loadingEventSearch ? (
-                                                                            <div className="text-center p-2">Loading...</div>
-                                                                        ) : eventSearchResults.length == 0 ? (
-                                                                            <div className="text-center p-2 text-muted">
-                                                                                No events found
+                                                            {/* EVENT SEARCH DROPDOWN */}
+                                                            {eventSearchText.length > 1 && !isEventSelected && (
+                                                                <div
+                                                                    className="position-absolute top-100 start-0 w-100 bg-white border rounded shadow-sm"
+                                                                    style={{ zIndex: 1050, maxHeight: "260px", overflowY: "auto" }}
+                                                                >
+                                                                    {loadingEventSearch ? (
+                                                                        <div className="text-center p-2">Loading...</div>
+                                                                    ) : eventSearchResults.length === 0 ? (
+                                                                        <div className="text-center p-2 text-muted">
+                                                                            No events found
+                                                                        </div>
+                                                                    ) : (
+                                                                        eventSearchResults.map((event) => (
+                                                                            <div
+                                                                                key={event.id}
+                                                                                className="px-3 py-2 hover-bg"
+                                                                                style={{ cursor: "pointer" }}
+                                                                                onClick={() => {
+                                                                                    setSelectedImportEvent(event);
+                                                                                    setEventSearchText(event.name);
+                                                                                    setEventSearchResults([]);
+                                                                                    setIsEventSelected(true);
+                                                                                }}
+                                                                            >
+                                                                                <div className="fw-semibold">{event.name}</div>
+                                                                                <small className="text-muted">
+                                                                                    {event.location} • {moment(event.date_from).format("DD MMM YYYY")}
+                                                                                </small>
                                                                             </div>
-                                                                        ) : (
-                                                                            eventSearchResults.map((event) => (
-                                                                                <div
-                                                                                    key={event.id}
-                                                                                    className="px-3 py-2 hover-bg"
-                                                                                    style={{ cursor: "pointer" }}
-                                                                                    onClick={() => {
-                                                                                        setSelectedImportEvent(event);
-                                                                                        setEventSearchText(event.name);
-                                                                                        setEventSearchResults([]);
-                                                                                        setIsEventSelected(true); // ✅ STOP SEARCH
-                                                                                    }}
-                                                                                >
-                                                                                    <div className="fw-semibold">{event.name}</div>
-                                                                                    <small className="text-muted">
-                                                                                        {event.location} • {moment(event.date_from).format("DD MMM YYYY")}
-                                                                                    </small>
-                                                                                </div>
-                                                                            ))
-                                                                        )}
-                                                                    </div>
-                                                                )}
-                                                            </div>
-
+                                                                        ))
+                                                                    )}
+                                                                </div>
+                                                            )}
 
                                                         </div>
+
                                                     </div>
 
                                                     <div className="col-12">

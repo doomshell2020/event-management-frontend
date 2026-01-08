@@ -82,49 +82,55 @@ const OrderItemCard = ({
                     </button>
                 )}
             </div>
+            <div className="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                    <div className="fw-semibold fs-6">
+                        {title}
+                    </div>
 
-            <div className="row align-items-center">
+                    <div className="row align-items-center">
 
-                {/* LEFT CONTENT */}
-                <div className="col-md-8">
+                        {/* LEFT CONTENT */}
+                        <div className="col-md-8">
 
-                    {isAppointment && item?.slot?.slot_date && (
-                        <div className="mb-2 text-muted small">
-                            <strong>Date:</strong>{" "}
-                            {format(
-                                new Date(item.slot.slot_date),
-                                "EEE, dd MMM yyyy"
+                            {isAppointment && item?.slot?.slot_date && (
+                                <div className="mb-2 text-muted small">
+                                    <strong>Date:</strong>{" "}
+                                    {format(
+                                        new Date(item.slot.slot_date),
+                                        "EEE, dd MMM yyyy"
+                                    )}
+                                </div>
+                            )}
+
+                            {/* PRICE / FREE */}
+                            {isFreeTicket ? (
+                                <div className="px-3 py-2 rounded bg-light text-secondary fw-semibold d-inline-block">
+                                    Complimentary
+                                </div>
+                            ) : (
+                                <div className="px-3 py-2 rounded bg-opacity-10 text-success fw-bold d-inline-block">
+                                    {currencySymbol}{formatPrice(item?.price)}
+                                </div>
                             )}
                         </div>
-                    )}
 
-                    {/* PRICE / FREE */}
-                    {isFreeTicket ? (
-                        <div className="px-3 py-2 rounded bg-light text-secondary fw-semibold d-inline-block">
-                            Complimentary
+                        {/* QR SECTION */}
+                        <div className="col-md-4 d-flex justify-content-md-end justify-content-start mt-3 mt-md-0">
+                            {item?.qr_image && (
+                                <div className="border rounded-3 p-2 bg-light">
+                                    <img
+                                        src={`${baseUrls?.qr_image_url}${item.qr_image}`}
+                                        alt="QR Code"
+                                        style={{ width: "110px" }}
+                                    />
+                                </div>
+                            )}
                         </div>
-                    ) : (
-                        <div className="px-3 py-2 rounded bg-opacity-10 text-success fw-bold d-inline-block">
-                            {currencySymbol}{formatPrice(item?.price)}
-                        </div>
-                    )}
-                </div>
-
-                {/* QR SECTION */}
-                <div className="col-md-4 d-flex justify-content-md-end justify-content-start mt-3 mt-md-0">
-                    {item?.qr_image && (
-                        <div className="border rounded-3 p-2 bg-light">
-                            <img
-                                src={`${baseUrls?.qr_image_url}${item.qr_image}`}
-                                alt="QR Code"
-                                style={{ width: "110px" }}
-                            />
-                        </div>
-                    )}
+                    </div>
                 </div>
             </div>
         </div>
     );
 };
-
 export default OrderItemCard;

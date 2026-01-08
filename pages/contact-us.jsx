@@ -120,7 +120,7 @@ const ContactUs = () => {
         <div className="container">
           <div className="section-heading">
             <h1>Contact us</h1>
-            <h2>Contact us</h2>
+            {/* <h2>Contact us</h2> */}
             <p className="mb-4 heading_p text-center text-14 body-text">Any question or remarks? Just write us a message!</p>
           </div>
           <div className="row no-gutters">

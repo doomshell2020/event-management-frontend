@@ -426,7 +426,7 @@ const ManagePackages = () => {
                                     ) : (
                                         <div className="row g-3">
                                             {packageList.map((pkg) => (
-                                                <div key={pkg.id} className="col-md-6 col-lg-4">
+                                                <div key={pkg.id} className="col-md-12">
                                                     <div className="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
                                                         <div className="card-body p-3">
 
@@ -504,12 +504,30 @@ const ManagePackages = () => {
 
                                                                         {openDropdown === pkg.id && (
                                                                             <ul
+<<<<<<< HEAD
+                                                                                className="dropdown-menu show position-absolute end-0 mt-1 shadow-sm"
+                                                                                style={{
+                                                                                    zIndex: 999,
+                                                                                    width: "max-content",
+                                                                                    left: "-129px",
+                                                                                }}
+                                                                            >
+                                                                                <li>
+                                                                                    <button
+                                                                                        title="Edit"
+                                                                                        className="dropdown-item"
+                                                                                        style={{
+
+                                                                                            borderBottom: "1px solid #bdbdbd"
+                                                                                        }}
+=======
                                                                                 className="dropdown-menu show position-absolute end-0 mt-1 shadow-sm rounded-3"
                                                                                 style={{ zIndex: 999 }}
                                                                             >
                                                                                 <li>
                                                                                     <button
                                                                                         className="dropdown-item d-flex align-items-center gap-2"
+>>>>>>> main
                                                                                         onClick={() => {
                                                                                             setPackageId(pkg.id);
                                                                                             setPackageForm({
@@ -529,6 +547,20 @@ const ManagePackages = () => {
 
                                                                                 <li>
                                                                                     <button
+<<<<<<< HEAD
+                                                                                        className="dropdown-item"
+                                                                                        title={pkg.hidden == "Y" ? "👁 Show Package" : "🚫 Hide Package"}
+                                                                                        style={{
+
+                                                                                            borderBottom: "1px solid #bdbdbd"
+                                                                                        }}
+                                                                                        onClick={() => {
+                                                                                            const newHidden = pkg.hidden == "Y" ? "N" : "Y";
+                                                                                            api
+                                                                                                .put(`/api/v1/packages/update/${pkg.id}`, {
+                                                                                                    hidden: newHidden,
+                                                                                                })
+=======
                                                                                         className="dropdown-item d-flex align-items-center gap-2"
                                                                                         onClick={() => {
                                                                                             const newHidden = pkg.hidden === "Y" ? "N" : "Y";
@@ -536,6 +568,7 @@ const ManagePackages = () => {
                                                                                             api.put(`/api/v1/packages/update/${pkg.id}`, {
                                                                                                 hidden: newHidden,
                                                                                             })
+>>>>>>> main
                                                                                                 .then(() => {
                                                                                                     Swal.fire({
                                                                                                         icon: "success",
@@ -571,6 +604,7 @@ const ManagePackages = () => {
                                                                                     </button>
                                                                                 </li>
                                                                             </ul>
+
                                                                         )}
                                                                     </div>
                                                                 </div>

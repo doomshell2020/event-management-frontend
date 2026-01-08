@@ -12,8 +12,47 @@ const OrderDetails = ({ orderData, handleCancelAppointment, baseUrls }) => {
     // console.log('eventTimezone :', eventTimezone);
 
     return (
-        <div className="col-lg-8 col-md-7">
+        <div className="col-md-7">
+            <div className="event-ticket-box mt-0">
+                <div className="section-heading">
+                    <h2 className="text-start">{event?.name}</h2>
+                    <h6 className="mb-3">
+                        Hosted By{" "}
+                        <a href="#">
+                            #{event?.companyInfo?.name || "Company"}
+                        </a>
+                    </h6>
 
+                </div>
+
+                {/* EVENT INFO BAR */}
+                <div className="info mb-3">
+                    <ul className="d-flex ps-0 mb-0">
+                        <li className="flex-fill">
+                             <div>
+                                <h6>Event Start Date</h6>
+                                <span>{event?.date_from
+                                    ? format(new Date(event.date_from), "EEE, dd MMM yyyy | hh:mm a")
+                                    : "N/A"}</span>
+                            </div>
+                        </li>
+                        <li className="flex-fill">
+                            <div>
+                            <h6>Event End Date</h6>
+                                <span>{event?.date_to
+                                    ? format(new Date(event.date_to), "EEE, dd MMM yyyy | hh:mm a")
+                                    : "N/A"}</span>
+                            </div>
+                        </li>
+
+                        <li className="flex-fill">
+                            <div>
+                            <h6>Event Location</h6>
+                            <span>{event?.location || "--"}</span>
+
+                            </div>
+                        </li>
+                    </ul>
             {/* EVENT HEADER */}
             <h2 className="fw-bold m-0">{event?.name}</h2>
             <div className="text-muted mb-3">
@@ -47,11 +86,22 @@ const OrderDetails = ({ orderData, handleCancelAppointment, baseUrls }) => {
                         )}
                     </div>
                 </div>
+                {/* ORDER ITEMS */}
+                
+                    {orderItems.map(item => (
+                        <OrderItemCard
+                            key={item.id}
+                            item={item}
+                            orderData={orderData}
+                            handleCancelAppointment={handleCancelAppointment}
+                            baseUrls={baseUrls}
 
-                <div className="col-md-4">
-                    <strong>Event Location</strong>
-                    <div>{event?.location || "--"}</div>
-                </div>
+                        />
+                    ))}
+               
+
+                {/* PAYMENT SUMMARY */}
+                <PaymentSummary orderData={orderData} />
             </div>
 
             {/* ORDER ITEMS */}
@@ -72,6 +122,8 @@ const OrderDetails = ({ orderData, handleCancelAppointment, baseUrls }) => {
 
             {/* PAYMENT SUMMARY */}
             <PaymentSummary orderData={orderData} />
+        </div>
+        </div>
         </div>
     );
 };

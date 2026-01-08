@@ -45,11 +45,9 @@ export default function MyOrders({ userId }) {
             <section id="my-order-module">
                 <div className="container">
                     <div className="section-heading">
-                        <h1>Orders</h1>
-                        <h2 className="mt-4">My Orders</h2>
-                        <p className="text-center text-14">
-                            Here you can manage your Orders
-                        </p>
+                        <h1 className="my-3 mt-4">My Orders</h1>
+                        {/* <h2 className="mt-4"></h2> */}
+                        <p className="text-center text-14 mb-4">Here you can manage your Orders</p>
                     </div>
 
                     <div className="my-ticketcontainer">
@@ -93,10 +91,9 @@ export default function MyOrders({ userId }) {
                                     const eventCurrency = order.event?.currencyName?.Currency_symbol
                                     // console.log('eventCurrency :', eventCurrency);
                                     return (
-                                        <div
-                                            key={order.id}
-                                            className="col-lg-6 col-md-12 mb-4"
-                                        >
+                                        <div key={order.id} className="col-lg-6 col-md-12 mb-3 mb-sm-4">
+
+                                            {/* ✅ ONLY CHANGE IS HERE (class condition added) */}
                                             <div
                                                 className={`up_events position-relative ${
                                                     order?.orderItems?.[0]
@@ -110,7 +107,7 @@ export default function MyOrders({ userId }) {
                                                     href={`/orders/${order.id}`}
                                                 >
                                                     <div className="inner_box">
-                                                        <div className="row d-flex align-items-end justify-content-center g-0">
+                                                        <div className="row d-flex align-items-end justify-content-center g-3 g-sm-0">
 
                                                             {/* IMAGE + TITLE */}
                                                             <div className="col-sm-5">

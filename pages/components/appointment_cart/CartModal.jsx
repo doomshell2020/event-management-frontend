@@ -275,8 +275,8 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
             onHide={handleClose}
             backdrop="static"
             keyboard={true}
-            dialogClassName="cart-modal-size appointment-model"
-            className="careyes-chekout-new oxmonten2025EvntSec"
+            dialogClassName="cart-modal-size appointment-model cart-mdl-only"
+            className="careyes-chekout-new oxmonten2025EvntSec "
         >
             {!showNextStep ? (
                 <>
@@ -390,9 +390,9 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
 
                                         {/* RIGHT SIDE (CART SUMMARY) */}
                                         <Col lg={4} className="crys-accomo-rgt men-innr-sec monten25-rgt-pnl">
-                                            <div className="checkot-rgt">
+                                            <div className="checkot-rgt chackout-box">
                                                 {cart.length > 0 ? (
-                                                    <div className="checkot-tct-purcs monte25-tct-purcs">
+                                                    <div className="checkot-tct-purcs monte25-tct-purcs px-0 pb-0">
                                                         <div className="apply-cd mt-1">
                                                             <InputGroup className="input-group">
                                                                 <Form.Control
@@ -428,8 +428,8 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
                                                         </div>
 
                                                         <div className="tickt-ttl-prs my-3">
-                                                            <div className="tct-ttl-innr">
-                                                                <p>SUBTOTAL</p>
+                                                            <div className="d-flex justify-content-between mb-3 pb-3 border-bottom border-dark ">
+                                                                <p className="mb-0 fw-bold">SUBTOTAL</p>
                                                                 <span>
                                                                     {currencySymbol}{" "}
                                                                     {priceTotal.toFixed(2)} {" "}
@@ -437,8 +437,8 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
                                                             </div>
 
                                                             {couponDetails && (
-                                                                <div className="tct-ttl-innr">
-                                                                    <p>STAFF ID</p>
+                                                                <div className="d-flex justify-content-between mb-3 pb-3 border-bottom border-dark">
+                                                                    <p className="mb-0 fw-bold">STAFF ID</p>
                                                                     <span>
                                                                         {couponDetails.discount_type === "percentage" ? (
                                                                             <>- {Math.floor(couponDetails.discount_value)}% ({currencySymbol}{formatSmartPrice(discountAmount)})</>
@@ -453,16 +453,16 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
                                                                 </div>
                                                             )}
 
-                                                            <div className="tct-ttl-innr">
-                                                                <p>TICKETS FEES & TAXES</p>
+                                                            <div className="d-flex justify-content-between mb-3 pb-3 border-bottom border-dark">
+                                                                <p className="mb-0 fw-bold">TICKETS FEES & TAXES</p>
                                                                 <span>
                                                                     {currencySymbol}{" "}
                                                                     {feeTotal.toFixed(2)}
                                                                 </span>
                                                             </div>
 
-                                                            <div className="tct-ttl-innr">
-                                                                <p>TOTAL</p>
+                                                            <div className="d-flex justify-content-between mb-3 pb-3 border-bottom border-dark">
+                                                                <p className="mb-0 fw-bold">TOTAL</p>
                                                                 <p>
                                                                     {currencySymbol}{" "}
                                                                     {finalTotal.toFixed(2)}
@@ -471,10 +471,10 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
                                                         </div>
                                                     </div>
                                                 ) : (
-                                                    <h3 className="text-center mt-5">Cart is Empty</h3>
+                                                    <h3 className="text-center mt-2">Cart is Empty</h3>
                                                 )}
-                                            </div>
-                                            {cart.length > 0 && (
+
+{cart.length > 0 && (
                                                 <div className="by-nw-btn accomofl-ck-bt">
                                                     <Button
                                                         variant=""
@@ -507,6 +507,10 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
                                                     </Button>
                                                 </div>
                                             )}
+
+
+                                            </div>
+                                            
 
                                         </Col>
                                     </Row>

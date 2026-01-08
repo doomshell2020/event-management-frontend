@@ -28,7 +28,7 @@ const EventSidebar = ({ eventId }) => {
 
             {/* Top Buttons */}
             <ul className="listunstyl components2">
-                <li className="mb-3">
+                <li>
                     <Link
                         className="text-white fw-bold"
                         href="/event/post-event"
@@ -41,7 +41,7 @@ const EventSidebar = ({ eventId }) => {
 
                 {/* View Event only if eventId exists */}
                 {eventId && (
-                    <li className="mb-3">
+                    <li className="mt-2">
                         <Link
                             className="text-white fw-bold"
                             href="/event/my-event"

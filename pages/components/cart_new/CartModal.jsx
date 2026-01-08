@@ -1154,26 +1154,30 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                             key={`package-${i}`}
                                                                             className="ticket-item only-ticket package-box"
                                                                             style={{
-                                                                                border: "1px solid #e6e6e6",
+
                                                                                 borderRadius: "8px",
-                                                                                padding: "14px 16px",
+                                                                                padding: "20px 16px",
                                                                                 marginBottom: "12px",
-                                                                                background: "#fafafa"
+                                                                                background: "#ffffffff",
+                                                                                borderTop: "none",
+                                                                                borderRight: "none",
+                                                                                borderBottom: "none"
                                                                             }}
                                                                         >
+
                                                                             {/* HEADER */}
-                                                                            <div className="d-flex justify-content-between align-items-center mb-2">
+                                                                            <div className="d-flex justify-content-between align-items-start mb-2">
                                                                                 <div>
                                                                                     <strong style={{ fontSize: "16px" }}>
                                                                                         {pkg.name}
                                                                                         <span
                                                                                             style={{
                                                                                                 marginLeft: 8,
-                                                                                                fontSize: 11,
-                                                                                                padding: "2px 8px",
-                                                                                                background: "#6f42c1",
+                                                                                                fontSize: 10,
+                                                                                                padding: "4px 9px",
+                                                                                                background: "#2ec2b3",
                                                                                                 color: "#fff",
-                                                                                                borderRadius: 12
+                                                                                                borderRadius: 4
                                                                                             }}
                                                                                         >
                                                                                             PACKAGE
@@ -1191,7 +1195,13 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                                     </div>
 
                                                                                     {pkg.discount_amt > 0 && (
-                                                                                        <div className="text-success text-13">
+                                                                                        <div
+                                                                                            className="text-13 fw-bold"
+                                                                                            style={{
+                                                                                                color: "#2ec2b3",
+                                                                                                background: "transparent"
+                                                                                            }}
+                                                                                        >
                                                                                             Discount: −{currencySymbol}{formatPrice(pkg.discount_amt)}
                                                                                         </div>
                                                                                     )}
@@ -1210,21 +1220,56 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                                         className="d-flex justify-content-between align-items-center py-1"
                                                                                         style={{ fontSize: 14 }}
                                                                                     >
-                                                                                        <div>
+                                                                                        <div className="text-dark" style={{ fontSize: "13px" }}>
                                                                                             {item.ticketType && (
                                                                                                 <>
-                                                                                                    🎟️ {item.ticketType.title}
+                                                                                                    {/* Ticket SVG Icon */}
+                                                                                                    <svg
+                                                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                                                        width="17"
+                                                                                                        height="17"
+                                                                                                        viewBox="0 0 24 24"
+                                                                                                        fill="none"
+                                                                                                        stroke="#2ec2b3"
+                                                                                                        strokeWidth="1.8"
+                                                                                                        strokeLinecap="round"
+                                                                                                        strokeLinejoin="round"
+                                                                                                        style={{ verticalAlign: "middle", marginRight: "4px" }}
+                                                                                                    >
+                                                                                                        <path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4V7z" />
+                                                                                                        <line x1="12" y1="5" x2="12" y2="19" strokeDasharray="2 2" />
+                                                                                                    </svg>
+
+                                                                                                    {item.ticketType.title}
                                                                                                     <span className="text-muted"> × {item.qty}</span>
                                                                                                 </>
                                                                                             )}
 
                                                                                             {item.addonType && (
                                                                                                 <>
-                                                                                                    ➕ {item.addonType.name}
+                                                                                                    {/* Plus SVG Icon */}
+                                                                                                    <svg
+                                                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                                                        width="17"
+                                                                                                        height="17"
+                                                                                                        viewBox="0 0 24 24"
+                                                                                                        fill="none"
+                                                                                                        stroke="#2ec2b3"
+                                                                                                        strokeWidth="2"
+                                                                                                        strokeLinecap="round"
+                                                                                                        strokeLinejoin="round"
+                                                                                                        style={{ verticalAlign: "middle", margin: "0 4px 0 0px" }}
+                                                                                                    >
+                                                                                                        <path d="M12 5v14" />
+                                                                                                        <path d="M5 12h14" />
+                                                                                                    </svg>
+
+                                                                                                    {item.addonType.name}
                                                                                                     <span className="text-muted"> × {item.qty}</span>
                                                                                                 </>
                                                                                             )}
                                                                                         </div>
+
 
                                                                                         <div className="text-muted">
                                                                                             {currencySymbol}
@@ -1295,7 +1340,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                                 className={`ticket-item only-ticket ${isCommittee ? "committee-ticket" : ""}`}
                                                                                 style={{ display: "flex", flexDirection: "column", gap: "10px", padding: "10px 15px" }}
                                                                             >
-                                                                                <div className="d-flex justify-content-between align-items-center ticket-infobox">
+                                                                                <div className="d-flex justify-content-between align-items-start ticket-infobox">
                                                                                     {/* LEFT INFO */}
                                                                                     <div className="ticket-info" style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                                                                                         <strong style={{ fontSize: "15px" }}>
@@ -1392,7 +1437,7 @@ export default function CartModal({ show, handleClose, eventId }) {
 
                                                                                 {/* 🎯 Questions for this ticket only */}
                                                                                 {ticketQuestions.map(q => (
-                                                                                    <div key={q.id} className="ticket-question" style={{ marginTop: "10px" }}>
+                                                                                    <div key={q.id} className="ticket-question" style={{ marginTop: "5px" }}>
                                                                                         {/* ✅ Question Label */}
                                                                                         <label style={{ fontWeight: 500 }}>{q.question}</label>
 
@@ -1424,6 +1469,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                                         {q.type == "Select" && (
                                                                                             <select
                                                                                                 className="form-select"
+                                                                                                style={{ height: "auto", borderRadius: "5px" }}
                                                                                                 value={ticketAnswers?.[ticket.id]?.[q.id] || ""}
                                                                                                 onChange={(e) => handleQuestionChange(ticket.id, q.id, e.target.value)}
                                                                                             >
@@ -1561,7 +1607,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                     })}
 
 
-                                                    <h6 className="mt-4">
+                                                    <h6 className="mt-4 fw-bold">
                                                         TOTAL {totalTickets} ITEM{totalTickets > 1 ? "S" : ""}
                                                     </h6>
 
@@ -1576,18 +1622,18 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                     </div>
 
                                                     <div className="tickt-ttl-prs">
-                                                        <div className="d-flex justify-content-between">
-                                                            <p>PRICE</p>
+                                                        <div className="d-flex justify-content-between mb-3 pb-3 border-bottom border-dark">
+                                                            <p className="mb-0 fw-bold">PRICE</p>
                                                             <span>{currencySymbol}{formatPrice(sub_total)}</span>
                                                         </div>
 
-                                                        <div className="d-flex justify-content-between">
-                                                            <p>FEES ({adminFees}%)</p>
+                                                        <div className="d-flex justify-content-between mb-3 pb-3 border-bottom border-dark">
+                                                            <p className="mb-0 fw-bold">FEES ({adminFees}%)</p>
                                                             <span>{currencySymbol}{formatPrice(tax_total)}</span>
                                                         </div>
 
-                                                        <div className="d-flex justify-content-between total">
-                                                            <p>TOTAL</p>
+                                                        <div className="d-flex justify-content-between total mb-3 pb-3 border-bottom border-dark">
+                                                            <p className="mb-0 fw-bold">TOTAL</p>
                                                             <p>{currencySymbol}{formatPrice(grand_total)}</p>
                                                         </div>
                                                     </div>
@@ -1602,7 +1648,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                 type="submit"
                                                                 disabled={isBtnLoading}
                                                                 style={{
-                                                                    backgroundColor: "#fca3bb",
+                                                                    backgroundColor: "rgb(223, 59, 103)",
                                                                     color: "white",
                                                                     borderRadius: "30px",
                                                                     padding: "10px 24px",

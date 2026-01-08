@@ -543,7 +543,32 @@ const MyEventsPage = () => {
                                                     </div>
 
 
+<<<<<<< HEAD
+                                                    {/* Checkboxes */}
+                                                    <div className="col-md-3 d-flex align-items-end only-eventfree-check">
+                                                        <CFormCheck
+                                                            type="checkbox"
+                                                            id="is_free"
+                                                            name="is_free"
+                                                            checked={isFree}
+                                                            onChange={handleChange}
+                                                            label="This event is free"
+                                                        />
+                                                    </div>
 
+                                                    <div className="col-md-3 d-flex align-items-end only-eventfree-check">
+                                                        <CFormCheck
+                                                            type="checkbox"
+                                                            id="allow_register"
+                                                            name="allow_register"
+                                                            checked={formData.allow_register == "Y"}
+                                                            onChange={handleChange}
+                                                            label="Allowed Registration"
+                                                        />
+                                                    </div>
+=======
+
+>>>>>>> main
 
                                                     <div className="col-md-6">
                                                         <label className="form-label">
@@ -703,7 +728,7 @@ const MyEventsPage = () => {
 
                                                     )}
 
-                                                    <div className="col-md-6">
+                                                    <div className="col-md-8">
                                                         <label htmlFor="formFile" className="form-label">
                                                             Upload Image{" "}
                                                             <small className="text-danger" style={{ fontSize: "11px" }}>

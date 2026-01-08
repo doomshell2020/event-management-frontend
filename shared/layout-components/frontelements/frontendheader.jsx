@@ -7,6 +7,8 @@ import { useCart } from "@/shared/layout-components/layout/CartContext";
 import { useAuth } from "../layout/AuthContext";
 import CartModal from "@/pages/components/cart_new/CartModal";
 import api from "@/utils/api";
+import { Container, Navbar } from "react-bootstrap";
+
 
 const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
   const [headerBackgroundImg, setHeaderBackgroundImg] = useState(
@@ -94,8 +96,234 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
 
   return (
     <>
+
       <header className="headernav">
+        <Navbar expand="lg" className="p-0 pt-lg-0 pt-2">
+          <Container>
+            <div className="navflexbox w-100">
+              <Link href="/" className="logodiv">
+                <img
+                  src="/assets/front-images/logo.png"
+                  alt="Logo"
+                  className="headerlogo"
+                />
+              </Link>
+              {/* mobile-button-show-start */}
+              <div>
+              <div className="userMenu d-lg-none" style={{ marginRight: "60px" }}>
+                    {isLoggedIn ? (
+                      <>
+                        <button
+                          className="userwelcome-button primery-button"
+                          onClick={() => setShowDropdown(!showDropdown)}
+                        >
+                          Welcome {username} ▾
+                        </button>
+
+                        {showDropdown && (
+                          <ul className="header-dropdown">
+                            <li>
+                              <Link
+                                href="/event/myevent"
+                                className="dropdownLink active-des-link"
+                              >
+                                <i className="fas fa-tachometer-alt" /> Dashboard
+                              </Link>
+                            </li>
+                            <li>
+                              <Link
+                                href="/users/view-profile"
+                                className="dropdownLink"
+                              >
+                                <i className="fas fa-user" /> My Profile
+                              </Link>
+                            </li>
+
+                            <li>
+                              <Link href="/event/my-event" className="dropdownLink">
+                                <i className="fas fa-calendar-alt" /> My Events
+                              </Link>
+                            </li>
+                            <li>
+                              <Link href="/orders" className="dropdownLink">
+                                <i className="fas fa-shopping-cart" /> My Orders
+                              </Link>
+                            </li>
+                            <li>
+                              <Link href="/users/employee" className="dropdownLink">
+                                <i className="fas fa-users" /> My Staff
+                              </Link>
+                            </li>
+                            <li>
+                              <Link
+                                href="/event/post-event"
+                                className="dropdownLink"
+                              >
+                                <i className="fas fa-plus-circle" /> Post Event
+                              </Link>
+                            </li>
+                            <li>
+                              <button
+                                onClick={() => {
+                                  setShowDropdown(false);
+                                  handleLogout(router);
+                                }}
+                                className="dropdownLink"
+                              >
+                                <i className="fas fa-sign-out-alt" /> Logout
+                              </button>
+                            </li>
+                          </ul>
+                        )}
+                      </>
+                    ) : (
+                      <Link href="/login">
+                        <button className="userloginbtn primery-button">
+                          Login / Register
+                        </button>
+                      </Link>
+                    )}
+                  </div>
+                  {/* mobile-button-show-end */}
+              <Navbar.Toggle className="p-0" aria-controls="basic-navbar-nav"/>
+              </div>
+              <Navbar.Collapse id="basic-navbar-nav">
+                <div className="menuflexbox ms-auto">
+                  <nav className="menulistbox">
+                    <Link href="/" className="navLink">
+                      Home
+                    </Link>
+                    <Link href="/calender" className="navLink">
+                      Event Calendar
+                    </Link>
+
+                    {isLoggedIn && (
+                      <>
+                        <Link href="/orders" className="navLink">
+                          My Tickets
+                        </Link>
+
+
+                        <a
+                          href="#"
+                          className="navLink position-relative"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleOpenCart();
+                          }}
+                        >
+                          Cart
+
+                          {cartCount > 0 && (
+                            <span className="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-danger">
+                              {cartCount}
+                            </span>
+                          )}
+                        </a>
+
+                        {user?.committeeAssigned && (
+                          <Link href="/committee/ticket" className="navLink position-relative">
+                            Committee
+
+                            {user?.committeePendingCount > 0 && (
+                              <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                {user.committeePendingCount}
+                              </span>
+                            )}
+                          </Link>
+                        )}
+
+                      </>
+                    )}
+
+                    <Link href="/contact-us" className="navLink">
+                      Contact Us
+                    </Link>
+                  </nav>
+
+                  <div className="userMenu d-none d-lg-block">
+                    {isLoggedIn ? (
+                      <>
+                        <button
+                          className="userwelcome-button primery-button"
+                          onClick={() => setShowDropdown(!showDropdown)}
+                        >
+                          Welcome {username} ▾
+                        </button>
+
+                        {showDropdown && (
+                          <ul className="header-dropdown">
+                            <li>
+                              <Link
+                                href="/event/myevent"
+                                className="dropdownLink active-des-link"
+                              >
+                                <i className="fas fa-tachometer-alt" /> Dashboard
+                              </Link>
+                            </li>
+                            <li>
+                              <Link
+                                href="/users/view-profile"
+                                className="dropdownLink"
+                              >
+                                <i className="fas fa-user" /> My Profile
+                              </Link>
+                            </li>
+
+                            <li>
+                              <Link href="/event/my-event" className="dropdownLink">
+                                <i className="fas fa-calendar-alt" /> My Events
+                              </Link>
+                            </li>
+                            <li>
+                              <Link href="/orders" className="dropdownLink">
+                                <i className="fas fa-shopping-cart" /> My Orders
+                              </Link>
+                            </li>
+                            <li>
+                              <Link href="/users/employee" className="dropdownLink">
+                                <i className="fas fa-users" /> My Staff
+                              </Link>
+                            </li>
+                            <li>
+                              <Link
+                                href="/event/post-event"
+                                className="dropdownLink"
+                              >
+                                <i className="fas fa-plus-circle" /> Post Event
+                              </Link>
+                            </li>
+                            <li>
+                              <button
+                                onClick={() => {
+                                  setShowDropdown(false);
+                                  handleLogout(router);
+                                }}
+                                className="dropdownLink"
+                              >
+                                <i className="fas fa-sign-out-alt" /> Logout
+                              </button>
+                            </li>
+                          </ul>
+                        )}
+                      </>
+                    ) : (
+                      <Link href="/login">
+                        <button className="userloginbtn primery-button">
+                          Login / Register
+                        </button>
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              </Navbar.Collapse>
+            </div>
+          </Container>
+        </Navbar>
+      </header>
+      {/* <header className="headernav">
         <div className="container">
+
           <div className="navflexbox">
             <Link href="/" className="logodiv">
               <img src="/assets/front-images/logo.png" alt="Logo" className="headerlogo" />
@@ -161,11 +389,11 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
                             <i className="fas fa-user" /> My Profile
                           </Link>
                         </li>
-                        {/* <li>
+                      <li>
                           <Link href="/tickets/my-tickets" className="dropdownLink">
                             <i className="fas fa-ticket-alt" /> My Tickets
                           </Link>
-                        </li> */}
+                        </li> 
                         <li>
                           <Link href="/event/my-event" className="dropdownLink">
                             <i className="fas fa-calendar-alt" /> My Events
@@ -212,7 +440,7 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
             </div>
           </div>
         </div>
-      </header>
+      </header> */}
 
       {/* WhatsApp button */}
       <div className="whatsapp-icon">
