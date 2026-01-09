@@ -37,7 +37,7 @@ const PublishEvent = () => {
 
     const toggleEventStatus = async () => {
         if (!eventDetails) return;
-        const newStatus = eventDetails.status=='N' ? 'Y' : 'N';
+        const newStatus = eventDetails.status == 'N' ? 'Y' : 'N';
         console.log('newStatus :', newStatus);
         const confirmResult = await Swal.fire({
             title: "Are you sure?",
@@ -65,7 +65,7 @@ const PublishEvent = () => {
                 // console.log('res :', res);
 
                 // console.log('>>>>>>>>>>>>',res.data.data.event);
-                
+
 
                 if (res.data.success) {
                     setEventDetails(res.data.data.event);
@@ -117,30 +117,31 @@ const PublishEvent = () => {
                                 <div className="contant_bg mt-4">
                                     <h6>Activation Setting</h6>
                                     <hr className="custom-hr" />
-                                    <div className="d-flex align-items-center justify-content-between">
-                                        <div className="d-flex align-items-center">
+                                    <div className="d-flex align-items-center justify-content-between flex-wrap">
+                                        <div className="d-flex align-items-start mobile-widthfull">
                                             {eventDetails && eventDetails.status == 'Y' ? (
                                                 <Eye className="me-2" />
                                             ) : (
                                                 <EyeOff className="me-2" />
                                             )}
                                             <div>
-                                                <p className="text-16 mb-1">
+                                                <p className="text-14 text-13 mb-1">
                                                     {eventDetails && eventDetails.status == 'Y'
                                                         ? "Event is Active"
                                                         : "Event is Inactive"}
                                                 </p>
-                                                <p className="text-14 text-dark mb-0">
+                                                <p className="text-14 text-13 text-dark mb-0">
                                                     {eventDetails && eventDetails.status == 'Y'
                                                         ? "Your event is live and visible to attendees."
                                                         : "Your event is not visible to attendees."}
                                                 </p>
                                             </div>
                                         </div>
-                                        <div>
+                                        <div className="mobile-widthfull mt-2">
                                             {eventDetails && (
                                                 <button
-                                                    className={`btn ${eventDetails.status == 'Y' ? "btn-danger" : "btn-success"}`}
+                                                    className={`btn mobile-widthfull ${eventDetails.status === 'Y' ? 'btn-danger' : 'btn-success'
+                                                        }`}
                                                     onClick={toggleEventStatus}
                                                     disabled={statusLoading}
                                                 >

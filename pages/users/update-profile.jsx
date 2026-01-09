@@ -281,11 +281,22 @@ const UpdateProfile = () => {
                                             padding: "6px",
                                             cursor: "pointer",
                                             boxShadow: "0 0 5px rgba(0,0,0,0.3)",
-                                            zIndex: 10
+                                            zIndex: 10,
+
+                                            /* added css */
+                                            height: "38px",
+                                            width: "38px",
+                                            display: "flex",
+                                            justifyContent: "center",
+                                            alignItems: "center"
                                         }}
                                     >
-                                        <i className="bi bi-pencil" style={{ fontSize: "16px", color: "#555" }}></i>
+                                        <i
+                                            className="bi bi-pencil"
+                                            style={{ fontSize: "16px", color: "#555" }}
+                                        ></i>
                                     </span>
+
 
                                     <img
                                         src={profileImage || "https://eboxtickets.com/images/Usersprofile/noimage.jpg"}
