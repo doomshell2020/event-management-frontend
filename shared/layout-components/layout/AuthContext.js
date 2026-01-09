@@ -11,46 +11,8 @@ export const AuthProvider = ({ children }) => {
     const [loadingAuth, setLoadingAuth] = useState(true);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-    // useEffect(() => {
-    //     const storedToken = Cookies.get("userAuthToken");
-    //     const storedUser = localStorage.getItem("user") || sessionStorage.getItem("user");
-    //         // 🔹 ADMIN AUTH
-    //         const storedAdminToken = Cookies.get("adminAuthToken");
-    //         const storedAdmin = localStorage.getItem("admin");
-
-    //     if (storedToken && storedUser) {
-    //         try {
-    //             const userObj = JSON.parse(storedUser);
-    //             setUser(userObj);         // 👉 Correct user set
-    //             setToken(storedToken);    // 👉 Correct token set
-    //             setIsLoggedIn(true);
-    //         } catch (err) {
-    //             console.error("Invalid user format:", err);
-    //             setIsLoggedIn(false);
-    //         }
-    //         if (storedAdminToken && storedAdmin) {
-    //             try {
-    //                 setAdmin(JSON.parse(storedAdmin));
-    //                 setAdminToken(storedAdminToken);
-    //             } catch (e) {
-    //                 console.error("Invalid admin data");
-    //             }
-    //         }
-
-
-
-
-    //     } else {
-    //         setIsLoggedIn(false);
-    //     }
-
-    //     setLoadingAuth(false);
-    // }, []);
-
     useEffect(() => {
-        // -----------------
-        // 👤 USER AUTH
-        // -----------------
+        // ---------------- // 👤 USER AUTH // -----------------
         const storedUserToken = Cookies.get("userAuthToken");
         const storedUser =
             localStorage.getItem("user") || sessionStorage.getItem("user");
@@ -69,9 +31,7 @@ export const AuthProvider = ({ children }) => {
             setIsLoggedIn(false);
         }
 
-        // -----------------
-        // 🧑‍💼 ADMIN AUTH
-        // -----------------
+        // ----------------- // 🧑‍💼 ADMIN AUTH // -----------------
         const storedAdminToken = Cookies.get("adminAuthToken");
         const storedAdmin = localStorage.getItem("admin");
 
@@ -119,9 +79,7 @@ export const AuthProvider = ({ children }) => {
 
 
 
-    // =====================
-    // ADMIN LOGIN / LOGOUT
-    // =====================
+    // =====================    // ADMIN LOGIN / LOGOUT    // =====================
     const adminLogin = (adminData, token) => {
         setAdmin(adminData);
         setAdminToken(token);
@@ -129,7 +87,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem("admin", JSON.stringify(adminData));
         Cookies.set("adminAuthToken", token, {
             expires: 1,
-            secure: process.env.NODE_ENV === "production",
+            secure: process.env.NODE_ENV == "production",
             sameSite: "Strict",
             path: "/", // ✅ IMPORTANT
         });

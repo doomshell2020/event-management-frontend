@@ -27,7 +27,6 @@ export default function CheckOutComponents({
   sub_total,
 }) {
   const { cart, eventData, loginUserId } = useCart();
-  // console.log('cart :', cart);
 
   const router = useRouter();
   const [clientSecret, setClientSecret] = useState("");

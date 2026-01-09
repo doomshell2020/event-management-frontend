@@ -6,6 +6,8 @@ import FrontendFooter from "@/shared/layout-components/frontelements/frontendfoo
 import api from "@/utils/api";
 import Cookies from "js-cookie";
 import TicketCountTabs from "@/pages/components/Event/TicketCountTabs";
+import { useCart } from "@/shared/layout-components/layout/CartContext";
+
 
 const CommitteeEventCard = ({ event, assets }) => {
     const router = useRouter();
@@ -143,7 +145,18 @@ export async function getServerSideProps(context) {
 }
 
 const CommitteePage = ({ counts, eventsList, assets }) => {
-    // console.log('eventsList :', eventsList);
+    const { setCommitteeAssigned, setCommitteePendingCount } = useCart();
+
+    useEffect(() => {
+        if (Array.isArray(eventsList) && eventsList.length > 0) {
+            setCommitteeAssigned(true);
+            setCommitteePendingCount(Number(counts?.pending || 0));
+        } else {
+            setCommitteeAssigned(false);
+            setCommitteePendingCount(0);
+        }
+    }, [eventsList, counts, setCommitteeAssigned, setCommitteePendingCount]);
+
 
     const [activeTab, setMyActiveTab] = useState("ticket");
     const router = useRouter()

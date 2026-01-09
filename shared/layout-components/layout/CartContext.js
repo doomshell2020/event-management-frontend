@@ -13,15 +13,17 @@ export const CartProvider = ({ children }) => {
     const [addonCart, setAddonCart] = useState([]);
     const [eventId, setEventId] = useState(null); // ✔ store eventId globally
     const [loginUserId, setLoginUserId] = useState(null); // ✔ store eventId globally
-    // console.log('eventId :', eventId);
+
+    /* 🔥 NEW: COMMITTEE STATES */
+    const [committeeAssigned, setCommitteeAssigned] = useState(false);
+    const [committeePendingCount, setCommitteePendingCount] = useState(0);
+
 
     // 🟢 MAIN CART LOADER (Uses internal eventId when nothing passed)
     const fetchCart = async (passedEventId = null) => {
         try {
             setLoadingCart(true);
-
             const token = localStorage.getItem("userAuthToken");
-            // console.log('token :', token);
             if (!token) {
                 setLoadingCart(false);
                 return;
@@ -34,6 +36,11 @@ export const CartProvider = ({ children }) => {
             const userInfoId = data?.user_id;
             const event = data.event || null;
             const cartItems = data.cart || [];
+
+            /* 🔥 COMMITTEE DATA */
+            const committee = data?.committee || {};
+            setCommitteeAssigned(!!committee.assigned);
+            setCommitteePendingCount(Number(committee.pending_count || 0));
 
             setLoginUserId(userInfoId);
 
@@ -98,6 +105,13 @@ export const CartProvider = ({ children }) => {
                 addonCart,
                 eventId,
                 loginUserId,
+
+                /* 🔥 COMMITTEE EXPORT */
+                committeeAssigned,
+                committeePendingCount,
+                setCommitteeAssigned,
+                setCommitteePendingCount,
+
                 refreshCart: fetchCart, // refreshCart(eventId)
                 setCart,
                 setCartCount,

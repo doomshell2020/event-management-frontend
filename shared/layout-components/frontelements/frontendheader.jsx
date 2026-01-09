@@ -14,8 +14,7 @@ const DEFAULT_BG = "/assets/front-images/slider_bg9.jpg";
 const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
   const router = useRouter();
   const dropdownRef = useRef(null);
-
-  const { cartCount, eventId } = useCart();
+  const { cartCount, eventId, committeeAssigned, committeePendingCount } = useCart();
   const { user } = useAuth();
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -129,15 +128,15 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
                           )}
                         </button>
 
-                        {user?.committeeAssigned && (
+                        {committeeAssigned && (
                           <Link
                             href="/committee/ticket"
                             className="navLink position-relative"
                           >
                             Committee
-                            {user?.committeePendingCount > 0 && (
+                            {committeePendingCount > 0 && (
                               <span className="badge bg-danger ms-1">
-                                {user.committeePendingCount}
+                                {committeePendingCount}
                               </span>
                             )}
                           </Link>

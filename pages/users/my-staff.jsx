@@ -9,6 +9,7 @@ import { formatEventDateTime } from "@/utils/formatDate";
 
 const MyStaff = () => {
     const [staff, setStaff] = useState([]);
+    // console.log('staff :', staff);
     const [events, setEvents] = useState([]);
     const [loading, setLoading] = useState(false);
 

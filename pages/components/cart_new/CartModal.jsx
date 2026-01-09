@@ -42,7 +42,6 @@ const LoadingComponent = ({ isActive }) => {
 export default function CartModal({ show, handleClose, eventId }) {
 
     const { cart, refreshCart, eventData, normalCart, addonCart, slotCart, loadingCart, setEventId } = useCart();
-    // console.log('cart :', cart);
 
     const finalEventId = eventId || eventData?.id;
 
@@ -493,11 +492,42 @@ export default function CartModal({ show, handleClose, eventId }) {
 
     const increaseAddon = async (addon) => {
         const addonId = addon?.id;
+        const totalSale = Number(addon?.sales_count || 0);
+        const totalAddon = Number(addon?.count || 0);
+
         try {
             setLoadingId(addonId);
 
+            /* ------------------ CART COUNT ------------------ */
+            const inAddonCart = addonCart.reduce((total, item) => {
+                return item.uniqueId == addonId
+                    ? total + (item.count || 0)
+                    : total;
+            }, 0);
+
+            /* ------------------ SOLD OUT CHECK ------------------ */
+            if (totalSale + inAddonCart >= totalAddon) {
+                const remaining = Math.max(
+                    totalAddon - (totalSale + inAddonCart),
+                    0
+                );
+
+                await Swal.fire({
+                    icon: "warning",
+                    title: "Booking Limit Reached",
+                    text:
+                        remaining == 0
+                            ? "This addon has reached its booking limit."
+                            : `Only ${remaining} addon(s) left. Please reduce quantity.`,
+                    confirmButtonText: "OK"
+                });
+
+                return;
+            }
+
+            /* ------------------ ADD / UPDATE CART ------------------ */
             const existing = addonCart.find(
-                item => item.uniqueId == addonId
+                item => item.uniqueId === addonId
             );
 
             if (existing) {
@@ -506,7 +536,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                 await addToCart({
                     event_id: finalEventId,
                     item_type: "addon",
-                    addons_id: addonId,
+                    addon_id: addonId, // ✅ FIXED
                     count: 1
                 });
             }
@@ -515,13 +545,13 @@ export default function CartModal({ show, handleClose, eventId }) {
 
         } catch (err) {
 
+            /* ------------------ CART CONFLICT ------------------ */
             if (err?.response?.status == 409) {
-
                 const result = await Swal.fire({
                     title: "Items from another event found!",
                     text:
                         err?.response?.data?.message ||
-                        "Your cart has tickets or addons from another event. Clear it?",
+                        "Your cart has items from another event. Clear it?",
                     icon: "warning",
                     showCancelButton: true,
                     confirmButtonText: "Yes, Clear Cart",
@@ -531,62 +561,44 @@ export default function CartModal({ show, handleClose, eventId }) {
                     reverseButtons: true
                 });
 
-                if (!result.isConfirmed) {
-                    setLoadingId(null);
-                    return;
-                }
+                if (!result.isConfirmed) return;
 
-                // Loader
                 Swal.fire({
                     title: "Clearing Cart...",
-                    text: "Please wait",
                     allowOutsideClick: false,
                     allowEscapeKey: false,
                     didOpen: () => Swal.showLoading()
                 });
 
                 await clearCart();
+                Swal.close();
+
+                /* 🔁 Retry */
+                await addToCart({
+                    event_id: finalEventId,
+                    item_type: "addon",
+                    addon_id: addonId,
+                    count: 1
+                });
+
+                await refreshCart(finalEventId);
 
                 Swal.fire({
-                    title: "Cart Cleared",
-                    text: "You can add items now.",
                     icon: "success",
+                    title: "Added Successfully",
                     timer: 1200,
                     showConfirmButton: false
                 });
 
-                // Retry add addon
-                try {
-                    await addToCart({
-                        event_id: finalEventId,
-                        item_type: "addon",
-                        addon_id: addonId,
-                        count: 1
-                    });
-
-                    await refreshCart(finalEventId);
-
-                    Swal.fire({
-                        icon: "success",
-                        title: "Added Successfully",
-                        timer: 1200,
-                        showConfirmButton: false
-                    });
-
-                } catch (retryError) {
-                    console.log("Retry addon error:", retryError);
-                    Swal.fire({
-                        icon: "error",
-                        title: "Failed",
-                        text: "Could not add the addon after clearing cart."
-                    });
-                }
-
-                setLoadingId(null);
                 return;
             }
 
-            console.log("Increase addon error:", err);
+            console.error("Increase addon error:", err);
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Unable to add addon. Please try again."
+            });
 
         } finally {
             setLoadingId(null);
@@ -615,8 +627,7 @@ export default function CartModal({ show, handleClose, eventId }) {
 
         } catch (err) {
 
-            if (err?.response?.status == 409) {
-
+            if (err?.response?.status === 409) {
                 const result = await Swal.fire({
                     title: "Items from another event found!",
                     text:
@@ -631,21 +642,16 @@ export default function CartModal({ show, handleClose, eventId }) {
                     reverseButtons: true
                 });
 
-                if (!result.isConfirmed) {
-                    setLoadingId(null);
-                    return;
-                }
+                if (!result.isConfirmed) return;
 
                 Swal.fire({
-                    title: "Clearing...",
-                    text: "Please wait...",
+                    title: "Clearing Cart...",
                     allowOutsideClick: false,
                     allowEscapeKey: false,
                     didOpen: () => Swal.showLoading()
                 });
 
                 await clearCart();
-
                 Swal.close();
 
                 Swal.fire({
@@ -655,9 +661,11 @@ export default function CartModal({ show, handleClose, eventId }) {
                     timer: 1200,
                     showConfirmButton: false
                 });
+
+                return;
             }
 
-            console.log("Decrease addon error:", err);
+            console.error("Decrease addon error:", err);
 
         } finally {
             setLoadingId(null);
@@ -1312,8 +1320,8 @@ export default function CartModal({ show, handleClose, eventId }) {
 
                                                                         // console.log('ticket.committeeAssignedTickets :', ticket.committeeAssignedTickets);
                                                                         const committeeMembers = isCommittee
-                                                                        ? ticket.committeeAssignedTickets
-                                                                        ?.filter(ct =>
+                                                                            ? ticket.committeeAssignedTickets
+                                                                                ?.filter(ct =>
                                                                                     ct.status == "Y" &&
                                                                                     ct.committeeMember?.status == "Y" &&
                                                                                     ct.committeeMember?.user
@@ -1324,8 +1332,8 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                                     email: ct.committeeMember.user.email
                                                                                 })) || []
                                                                             : [];
-                                                                            
-                                                                            // console.log('committeeMembers :', committeeMembers);
+
+                                                                        // console.log('committeeMembers :', committeeMembers);
                                                                         // ✅ Filter questions that belong to this ticket
                                                                         const ticketQuestions = eventData.questions?.filter(q =>
                                                                             q.ticket_type_id
@@ -1528,36 +1536,62 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                         );
                                                                     })}
 
-                                                                {/* ⏰ SLOTS */}
-                                                                {eventData.slots
-                                                                    ?.filter(slot => slot.hidden !== "Y")
-                                                                    .map((slot, i) => {
-                                                                        const pricingId = slot.pricings?.[0]?.id;
+                                                                {/* 🎟️ Ticket Prices */}
+                                                                {eventData.ticketPrices
+                                                                    .map((tp, i) => {
+                                                                        const pricingId = tp.id; // ✅ ticketPrice ID
                                                                         const cartItem = slotCart.find(item => item.uniqueId == pricingId);
                                                                         const isLoading = loadingId == pricingId;
-                                                                        const isSoldOut = slot.sold_out == "Y";
+                                                                        const isSoldOut = tp.ticket?.sold_out == "Y";
 
                                                                         return (
-                                                                            <div key={`slot-${i}`} className="ticket-item only-ticket">
+                                                                            <div key={`ticket-price-${i}`} className="ticket-item only-ticket">
                                                                                 <div className="d-flex justify-content-between align-items-start ticket-infobox">
                                                                                     <div className="ticket-info">
-                                                                                        <strong>{slot.slot_name}</strong>
-                                                                                        <p className="mt-2">{formatReadableDate(slot.slot_date)} | {slot.start_time} - {slot.end_time}</p>
+                                                                                        {/* 🎫 Ticket Title */}
+                                                                                        <strong style={{ fontSize: "15px" }}>
+                                                                                            {tp.ticket?.title}
+                                                                                            <span className="ms-2 badge bg-light text-dark">
+                                                                                                {tp.ticket?.access_type?.toUpperCase()}
+                                                                                            </span>
+                                                                                        </strong>
+
+                                                                                        {/* 📅 Date / Slot Info */}
+                                                                                        {tp.slot ? (
+                                                                                            <p className="mt-2">
+                                                                                                {formatReadableDate(tp.slot.slot_date)} |{" "}
+                                                                                                {tp.slot.start_time} - {tp.slot.end_time}
+                                                                                            </p>
+                                                                                        ) : tp.date ? (
+                                                                                            <p className="mt-2">
+                                                                                                {formatReadableDate(tp.date)}
+                                                                                            </p>
+                                                                                        ) : (
+                                                                                            <p className="mt-2">Full Event Access</p>
+                                                                                        )}
+
+                                                                                        {/* 💰 Price */}
+                                                                                        <p className="fw-bold mb-0">
+                                                                                            Price: {currencySymbol}{formatPrice(tp.price)}
+                                                                                        </p>
                                                                                     </div>
+
+                                                                                    {/* ➕ Counter / Sold Out */}
                                                                                     {isSoldOut ? (
                                                                                         <div className="sold-out-box">Sold Out</div>
                                                                                     ) : (
                                                                                         <Counter
                                                                                             count={cartItem?.count || 0}
                                                                                             loading={isLoading}
-                                                                                            onInc={() => increaseSlot(slot)}
-                                                                                            onDec={() => decreaseSlot(slot)}
+                                                                                            onInc={() => increaseSlot(tp)}   // ✅ pass ticketPrice object
+                                                                                            onDec={() => decreaseSlot(tp)}
                                                                                         />
                                                                                     )}
                                                                                 </div>
                                                                             </div>
                                                                         );
                                                                     })}
+
 
                                                             </div>
 
