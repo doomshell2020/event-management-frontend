@@ -129,7 +129,8 @@ p.des_h {
   font-size: 18px;
   padding: 7px 10px;
   color: #3d6db5;
-  position: relative;font-weight: 600;
+  position: relative;
+  font-weight: 600;
 }
 
 p.des_h::after {
@@ -156,15 +157,15 @@ p.des_h::after {
 }
 
 #progressbar {
-    margin: 0px 0px 0px !important;
-    padding-left: 0px;
-    overflow: auto;
-    display: flex;
-    flex-wrap: nowrap;
-    justify-content: space-between;
-    align-items: center;
-    counter-reset: step;
-    padding: 22px;
+  margin: 0px 0px 0px !important;
+  padding-left: 0px;
+  overflow: auto;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: center;
+  counter-reset: step;
+  padding: 22px;
 }
 
 #progressbar li {
@@ -439,8 +440,9 @@ header .navflexbox .logodiv:focus-visible {
 
 .headernav .navLink .badge {
   transform: translate(0%, -50%) !important;
-  padding: .35em .65em;
+  padding: 0.35em 0.65em;
   background-color: #dd3546 !important;
+  border-radius: 50px;
 }
 
 .headernav .userMenu {
@@ -1075,10 +1077,10 @@ footer .footer-policybox li a:hover {
 }
 
 #event-detail-page .event-ticket-box .ticktes-detail-box button {
-    background: hsl(0 65% 51% / 0.1);
-    color: hsl(0 65% 51%) !important;
-    box-shadow: none;
-    padding: 9px 20px 7px !important;
+  background: hsl(0 65% 51% / 0.1);
+  color: hsl(0 65% 51%) !important;
+  box-shadow: none;
+  padding: 9px 20px 7px !important;
 }
 
 #event-detail-page .event-ticket-box .section-heading h6 a {
@@ -1257,8 +1259,9 @@ footer .footer-policybox li a:hover {
   text-overflow: ellipsis;
   margin-bottom: 9px;
 }
-.event-appointment-sec .card .card-body .card-description p span{
-    font-size: 14px !important;
+
+.event-appointment-sec .card .card-body .card-description p span {
+  font-size: 14px !important;
 }
 
 .event-appointment-sec .card .card-body p i {
@@ -1568,8 +1571,8 @@ span.ticket-icon-circle {
   width: 100%;
   height: 100%;
   background: #ffffff;
-  border-radius: 6px;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+  border-radius: 0px;
+  box-shadow: none;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1730,6 +1733,8 @@ span.ticket-icon-circle {
 #contact-us .content_inf {
   padding: 40px 0px;
   height: 100%;
+  display: flex;
+  justify-content: center;
 }
 
 #contact-us .info li {
@@ -1973,8 +1978,8 @@ section#request-demo {
 }
 
 #post-eventpg .post-event-topprt ul .primery-button {
-    background-color: #3d6db5;
-    width: max-content;
+  background-color: #3d6db5;
+  width: max-content;
 }
 
 #post-eventpg .form-deta h2 {
@@ -2131,9 +2136,10 @@ section#request-demo {
   width: 30px;
   display: block;
 }
+
 #myevent-deshbord .event-sidebar.sideBarRightLeftClosed ul li a i {
-    display: flex;
-    justify-content: center;
+  display: flex;
+  justify-content: center;
 }
 
 li.menu_line {
@@ -2308,10 +2314,13 @@ li.menu_line {
 #my-ticket-module .paginator {
   padding: 10px 0;
 }
-.paginator .next, .prev {
-    width: auto;
-    height: auto;
+
+.paginator .next,
+.prev {
+  width: auto;
+  height: auto;
 }
+
 .paginator .pagination li a {
   position: relative;
   display: inline-block;
@@ -2434,6 +2443,14 @@ li.menu_line {
 
 .careyes-chekout-new .cart-mdl-only .cart-mdl-innercontent {
   margin-bottom: 1.5rem;
+}
+.cart-mdl-innercontent .ticket-section {
+     height: 79vh;
+    overflow-y: scroll;
+}
+.careyes-chekout-new .cart-mdl-only .care-new-check.modal-body {
+    margin-bottom: 20px;
+    max-height: calc(100vh - 63px) !important;
 }
 
 .careyes-chekout-new .cart-mdl-only .cartmdl-left-img {
@@ -2771,7 +2788,8 @@ li.menu_line {
 
 #my-order-module .inner_box .title {
   font-size: 20px;
-  margin-bottom: 8px !important;color: rgb(57, 131, 197);
+  margin-bottom: 8px !important;
+  color: rgb(57, 131, 197);
 }
 
 #my-order-module .inner_box {
@@ -2914,7 +2932,7 @@ li.menu_line {
 }
 
 #myevent-deshbord .prosection {
-  box-shadow: 0px 0px 14px 3px rgb(0 0 0 / 5%);
+  /* box-shadow: 0px 0px 14px 3px rgb(0 0 0 / 5%); */
   padding: 12px 0px;
   background-color: white;
 }
@@ -3310,11 +3328,13 @@ li.menu_line {
   padding: 10px;
   border-radius: 8px;
 }
+
 #edit-profile .edit-box .form-control {
-    font-size: 14px !important;
+  font-size: 14px !important;
 }
+
 #edit-profile .edit-box .form-control::placeholder {
-    font-size: 14px !important;
+  font-size: 14px !important;
 }
 
 /* update profile page css end */
@@ -5594,93 +5614,131 @@ input[type="date"] {
     font-size: 13px;
   }
 
-.primery-button {
-        font-size: 13px !important;
-    }
-    #myevent-deshbord .event-sidebar ul li a, #myevent-deshbord .event-sidebar ul li button {
+  .primery-button {
     font-size: 13px !important;
-}
-#myevent-deshbord .event-sidebar ul li a i {
+  }
+
+  #myevent-deshbord .event-sidebar ul li a,
+  #myevent-deshbord .event-sidebar ul li button {
+    font-size: 13px !important;
+  }
+
+  #myevent-deshbord .event-sidebar ul li a i {
     width: 22px;
+  }
+
+  #scan_section p.card-text {
+    font-size: 13px;
+    text-align: justify;
+  }
+
 }
+
+
+
+@media (min-width: 992px) and (max-width: 1201px) {
+  #my-order-module .up_events {
+    font-size: 12px;
+  }
+
+  #my-order-module .my-ticketcontainer {
+    zoom: .9;
+  }
 }
 
 
 
 
 
-@media (max-width: 1060px){
 
- /* sidebar css start responsive */
+@media (max-width: 1060px) {
 
-#myevent-deshbord .event-sidebar {
+  /* sidebar css start responsive */
+
+  #myevent-deshbord .event-sidebar {
     padding: 20px 0px;
-    width: 75px;margin-right: 25px;
-}
-         #myevent-deshbord .event-sidebar ul li a, #myevent-deshbord .event-sidebar ul li button {
-        padding: 10px 3px 10px 3px;
-        flex-direction: column;
-        font-size: 12px !important;
-        text-align: center;
-        border-radius: 0px !important;
-        gap: 3px;
-        min-height: 66px;
-        justify-content: center !important;
-        align-items: center;
-        border-bottom: 1px solid #275191;
-        text-align: center;
-    }
-#myevent-deshbord ul.listunstyl.components2, .components {
-  padding: 0px 0px !important;
-        border-radius: 0px !important;
-}
-#myevent-deshbord .side_menu_icon{display: none;}
-#myevent-deshbord button.dropdown-toggle::after{display: none}
-#myevent-deshbord ul.dropdown-munubox {
-    background: #3262ab;
-}
-#myevent-deshbord .event-sidebar span {
-    line-height: 1.2;
-}
-#myevent-deshbord .event-sidebar ul.components2 li a {
-    border-bottom: 0px;
-}
-.event-sidebar hr {
+    width: 75px;
+    margin-right: 25px;
+  }
+
+  #myevent-deshbord .event-sidebar ul li a,
+  #myevent-deshbord .event-sidebar ul li button {
+    padding: 10px 3px 10px 3px;
+    flex-direction: column;
+    font-size: 12px !important;
+    text-align: center;
+    border-radius: 0px !important;
+    gap: 3px;
+    min-height: 66px;
+    justify-content: center !important;
+    align-items: center;
+    border-bottom: 1px solid #275191;
+    text-align: center;
+  }
+
+  #myevent-deshbord ul.listunstyl.components2,
+  .components {
+    padding: 0px 0px !important;
+    border-radius: 0px !important;
+  }
+
+  #myevent-deshbord .side_menu_icon {
     display: none;
-}
-.event-righcontent {
+  }
+
+  #myevent-deshbord button.dropdown-toggle::after {
+    display: none
+  }
+
+  #myevent-deshbord ul.dropdown-munubox {
+    background: #3262ab;
+  }
+
+  #myevent-deshbord .event-sidebar span {
+    line-height: 1.2;
+  }
+
+  #myevent-deshbord .event-sidebar ul.components2 li a {
+    border-bottom: 0px;
+  }
+
+  .event-sidebar hr {
+    display: none;
+  }
+
+  .event-righcontent {
     margin: 30px 0px 30px 0;
     width: calc(100% - 100px);
     padding-right: 20px;
-}
+  }
 
 }
 
 
 @media (min-width: 992px) {
-.only-single-cart .card .event-appo-img {
-  width: 30%;
-  min-width: 30%;
-  height: 300px;
-}
+  .only-single-cart .card .event-appo-img {
+    width: 30%;
+    min-width: 30%;
+    height: 300px;
+  }
 
-.col-md-12.only-single-cart .appoinment-checkbtn button {
-  width: max-content !important;
-  margin-left: auto;
-  display: block;
-}
+  .col-md-12.only-single-cart .appoinment-checkbtn button {
+    width: max-content !important;
+    margin-left: auto;
+    display: block;
+  }
 
-.only-single-cart .card-body.py-4 {
-  padding-bottom: 0px !important;
-  padding-top: 0px !important;
-}
+  .only-single-cart .card-body.py-4 {
+    padding-bottom: 0px !important;
+    padding-top: 0px !important;
+  }
 
-.only-single-cart .card {
-  display: flex;
-  flex-direction: row;
-  padding: 20px;
-  align-items: center;
-}
+  .only-single-cart .card {
+    display: flex;
+    flex-direction: row;
+    padding: 20px;
+    align-items: center;
+  }
 
 }
 
@@ -5768,7 +5826,8 @@ input[type="date"] {
   .headernav .navbar-light .collapse:not(.show) {
     display: block !important;
   }
-  .headernav button.navbar-toggler:focus{
+
+  .headernav button.navbar-toggler:focus {
     box-shadow: none;
   }
 
@@ -5839,10 +5898,7 @@ input[type="date"] {
     font-size: 1rem;
   }
 
-  #scan_section p.card-text {
-    font-size: 13px;
-    text-align: justify;
-  }
+
 
   #scan_section .card {
     min-height: 226px;
@@ -5920,40 +5976,79 @@ input[type="date"] {
   .event_desp .structured-content-rich-text p {
     font-size: 14px !important;
   }
-.profil_deaile {
+
+  .profil_deaile {
     width: 100%;
-}
-#my-order-module .section-heading h1 {
-        margin-bottom: 11px !important;
-    }
-   .section-heading .order-detail-title{
-      margin-bottom: 5px !important;
-    }
-    .table-deta-no-wrap th, .table-deta-no-wrap td {
-white-space: nowrap;
-    }
-    .freeEventCheck {
+  }
+
+  #my-order-module .section-heading h1 {
+    margin-bottom: 11px !important;
+  }
+
+  .section-heading .order-detail-title {
+    margin-bottom: 5px !important;
+  }
+
+  .table-deta-no-wrap th,
+  .table-deta-no-wrap td {
+    white-space: nowrap;
+  }
+
+  .freeEventCheck {
     padding-left: 27px;
     padding-right: 6px;
-}
-.freeEventCheck label {
+  }
+
+  .freeEventCheck label {
     font-size: 12px !important;
-}
-.resistor-content label {
+  }
+
+  .resistor-content label {
     font-size: 13px !important;
-}
-.resistor-content .form-control, .form-select {
+  }
+
+  .resistor-content .form-control,
+  .form-select {
     font-size: 13px !important;
-}
-.resistor-content .form-control::placeholder, .form-select {
+  }
+
+  .resistor-content .form-control::placeholder,
+  .form-select {
     font-size: 13px !important;
+  }
+
+  #progressbar li {
+    width: max-content;
+    font-size: 13px;
+    min-width: 116px;
+  }
+
+  .mobile-order-one {
+    order: 1;
+  }
+
+  .payment-table .table th {
+    font-size: 13px;
+  }
+
+  .resistor .section-heading h1 {
+    margin-bottom: 10px !important;
+  }
+
+  #contact-us .content_inf {
+    justify-content: start;
+  }
+  .careyes-chekout-new .cart-mdl-only .care-new-check.modal-body {
+    max-height: calc(100vh - 88px) !important;
 }
-    #progressbar li {
-        width: max-content;
-        font-size: 13px;
-        min-width: 116px;
-    }
 }
+
+@media (min-width: 768px) and (max-width: 992px) {
+  #sign-up .container {
+    max-width: 810px;
+  }
+}
+
 
 @media (max-width: 767px) {
   .acomo-flw-prpty-dtls .whr-u-slp .pckg-boxs {
@@ -6101,53 +6196,89 @@ white-space: nowrap;
   #event-detail-page {
     padding: 60px 0px 40px;
   }
-  #calculator .form-control::placeholder{
-font-size: 14px;
+
+  #calculator .form-control::placeholder {
+    font-size: 14px;
   }
+
   section#profile .section-heading h1 {
     margin-bottom: 10px !important;
-}
-#profile .profil_deaile .user-avatar {
+  }
+
+  #profile .profil_deaile .user-avatar {
     max-width: 50%;
     margin: auto;
-}
-.profile-image-wrapper {
-    max-width: 60%;
-}
-#my-order-module .ticket-card {
-    border-left: 7px solid #319b58;
-}
+  }
 
-#my-order-module .appointment-card {
+  .profile-image-wrapper {
+    max-width: 60%;
+  }
+
+  #my-order-module .ticket-card {
+    border-left: 7px solid #319b58;
+  }
+
+  #my-order-module .appointment-card {
     border-left: 7px solid rgb(57, 131, 197);
-}
+  }
+
   section#my-order-module .up_events .event_contant {
     font-size: 12px;
-}
-    .whatsapp-icon {
-        bottom: 0px;
-        top: inherit;
-    }
-#post-eventpg form h4{
+  }
+
+  .whatsapp-icon {
+    bottom: 0px;
+    top: inherit;
+  }
+
+  #post-eventpg form h4 {
     font-size: 18px;
-}
-.my-ticket-box {
+  }
+
+  .my-ticket-box {
     margin: 25px 0px 60px;
-}
-.table-mobile-width{min-width: 800px;}
-    #myevent-deshbord .event-sidebar {
-        margin-right: 15px;
-    }
-    #myevent-deshbord .contant_bg {
+  }
+
+  .table-mobile-width {
+    min-width: 800px;
+  }
+
+  #myevent-deshbord .event-sidebar {
+    margin-right: 15px;
+  }
+
+  #myevent-deshbord .contant_bg {
     padding: 25px 15px;
-}
-    #myevent-deshbord .event_names {
-        flex-wrap: wrap;gap: 5px;
-    }
-      .resistor-content .only-eventfree-check label {
+  }
+
+  #myevent-deshbord .event_names {
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  .resistor-content .only-eventfree-check label {
     margin-top: 2px;
+  }
+
+  .resistor-content .only-eventfree-check {
+    margin-top: 10px;
+  }
+
+  .event-righcontent {
+    margin: 20px 0px 30px 0;
+    padding-right: 10px;
+  }
+
+  .order-1-768 {
+    order: 1;
+  }
+  .cart-mdl-innercontent .ticket-section {
+    height: 30vh;
+    overflow-y: scroll;
 }
-  .resistor-content .only-eventfree-check{margin-top: 10px;}
+.event-crt-deta.mt-2.text-center {
+    margin-bottom: 30px;
+}
 }
 
 @media (max-width: 663px) {
@@ -6165,12 +6296,16 @@ font-size: 14px;
   .accomo-flw-prptyId-ctr {
     max-width: 95%;
   }
-  #myevent-deshbord .event_names a, #myevent-deshbord .event_names button {
+
+  #myevent-deshbord .event_names a,
+  #myevent-deshbord .event_names button {
     font-size: 13px;
-}
-#myevent-deshbord .event_names .event_Heading {
-    font-size: 15px !important;
-}
+  }
+
+  #myevent-deshbord .event_names .event_Heading {
+    font-size: 18px !important;
+  }
+
 
 }
 
@@ -6304,7 +6439,7 @@ font-size: 14px;
   }
 
   #inner_slider img {
-    height: 60vh;
+    height: 228px;
   }
 
   #sign-up .form-content {
@@ -6351,60 +6486,141 @@ font-size: 14px;
     text-align: justify;
     text-align-last: left;
   }
-  .event-appointment-sec .slot-btn i{
-display: none;
+
+  .event-appointment-sec .slot-btn i {
+    display: none;
   }
-  .event-appointment-sec .slot-btn span{font-size: 12px;}
-.event-appointment-sec .slot-btn .slot-price {font-size: 12px !important;}
-  .event-appointment-sec .slot-btn input.form-check-input.me-3{width: 14px;height: 14px;top: 13px;}
+
+  .event-appointment-sec .slot-btn span {
+    font-size: 12px;
+  }
+
+  .event-appointment-sec .slot-btn .slot-price {
+    font-size: 12px !important;
+  }
+
+  .event-appointment-sec .slot-btn input.form-check-input.me-3 {
+    width: 14px;
+    height: 14px;
+    top: 13px;
+  }
+
   .event-appointment-sec .card-body {
     padding: 12px;
-}
+  }
 
-.event-appointment-sec .slot-btn {
+  .event-appointment-sec .slot-btn {
     padding-left: 26px !important;
-}
-.event_desp h1 {
+  }
+
+  .event_desp h1 {
     font-size: 18px !important;
     margin-bottom: 10px !important;
-}
-#profile .profil_deaile .profile-details table tr td{font-size: 12px;}
-    #profile .profil_deaile .user-avatar {
-        max-width: 60%;
-    }
-    section#profile .section-heading p{margin-bottom: 15px !important;}#my-order-module .event_contant p {
-    margin-bottom: 8px !important;
-}
-#post-eventpg .form-deta h2 {
-    font-size: 14px;
-}
-p.des_h {
-    font-size: 15px;
-}
-.freeEventCheck .form-check-input {
-    margin-top: 1px;
-}
+  }
 
-.text-24 {
+  #profile .profil_deaile .profile-details table tr td {
+    font-size: 12px;
+  }
+
+  #profile .profil_deaile .user-avatar {
+    max-width: 60%;
+  }
+
+  section#profile .section-heading p {
+    margin-bottom: 15px !important;
+  }
+
+  #my-order-module .event_contant p {
+    margin-bottom: 8px !important;
+  }
+
+  #post-eventpg .form-deta h2 {
+    font-size: 14px;
+  }
+
+  p.des_h {
+    font-size: 15px;
+  }
+
+  .freeEventCheck .form-check-input {
+    margin-top: 1px;
+  }
+
+  .text-24 {
     font-size: 18px !important;
-}
-#myevent-deshbord .dsa_contant ul.tabes {
+  }
+
+  #myevent-deshbord .dsa_contant ul.tabes {
     margin-top: 22px;
+  }
+
+  #myevent-deshbord .event_names .edit-event-dropdown {
+    width: 100%;
+    order: 3;
+  }
+
+  #myevent-deshbord .event_names .edit-view-event {
+    width: 100%;
+    order: 2;
+  }
+
+  #myevent-deshbord .event_names .edit-view-event a,
+  #myevent-deshbord .event_names .edit-event-dropdown button {
+    width: 100%;
+  }
+
+  #myevent-deshbord .event_names .edit-event-header-title {
+    order: 2;
+    margin-bottom: 3px;
+  }
+
+  #myevent-deshbord,
+  #myevent-deshbord .form-select,
+  #myevent-deshbord .form-control {
+    background-color: white;
+    font-size: 13px !important;
+  }
+
+  .mobile-widthfull {
+    width: 100%;
+  }
+
+  .text-13 {
+    font-size: 13px !important;
+  }
+
+  .resistor-content .form-control,
+  .resistor-content .form-select {
+    color: #212529 !important;
+    background: #fff !important;
+  }
+
+  .resistor-content .form-control::placeholder,
+  .form-select {
+    background-color: white !important;
+  }
+
+  #contact-us .content_inf ul {
+    padding-left: 50px !important;
+  }
+
+  #contact-us .content_inf ul li h6,
+  #contact-us .content_inf ul li span {
+    font-size: 13px;
+  }
+  .header-left h2 {
+    font-size: 19px;
 }
-    #myevent-deshbord .event_names .edit-event-dropdown {
-        width: 100%;
-        order: 3;
-    }
-    #myevent-deshbord .event_names .edit-view-event {
-        width: 100%;
-        order: 2;
-    }
-#myevent-deshbord .event_names .edit-view-event a, #myevent-deshbord .event_names .edit-event-dropdown button{width: 100%;}
-    #myevent-deshbord .event_names .edit-event-header-title {
-        order: 2;
-        margin-bottom: 3px;
-    }
-  
+.careyes-chekout-new .cart-mdl-only .cartmdl-left-img {
+    height: 155px;
+}
+.careyes-chekout-new .cart-mdl-only .model-left-content {
+
+    padding: 0px 0px 25px;
+}
+.careyes-chekout-new .cart-mdl-only .cart-mdl-innercontent {
+    margin-bottom: 0px;
+}
 }
 
 @media (max-width: 480px) {
@@ -6431,21 +6647,37 @@ p.des_h {
   .headernav .dropdownLink {
     font-size: 12px;
   }
+
   #event-detail-page .event-ticket-box button {
     width: 100%;
-}
-#edit-profile .upadate-profile-check{
-  font-size: 12px;
-}
-.edit-box {
+  }
+
+  #edit-profile .upadate-profile-check {
+    font-size: 12px;
+  }
+
+  .edit-box {
     padding-left: 16px !important;
     padding-right: 16px !important;
-}
-#event-detail-page .event-ticket-box .ticktes-detail-box button {
+  }
+
+  #event-detail-page .event-ticket-box .ticktes-detail-box button {
     width: max-content;
-}
- .freeEventCheck label{
+  }
+
+  .freeEventCheck label {
     margin-left: 3px;
+  }
+
+  div#calculator .rang_f {
+    margin-top: 0px;
+  }
+
+  .mobile-talbe-width-480 {
+    width: 403px !important;
+  }
+  .calendar-wrapper {
+    padding: 17px;
 }
 }
 
@@ -6469,12 +6701,23 @@ p.des_h {
     width: 160px;
     font-size: 16px;
   }
-  .form-check-btn-group{
+
+  .form-check-btn-group {
     flex-direction: column;
     gap: 10px;
   }
+
   .freeEventCheck {
     width: 100% !important;
+  }
+
+  .import_committee {
+    padding: 10px 10px;
+  }
+  .calendar-icon {
+    width: 38px;
+    height: 38px;
+    font-size: 18px;
 }
 }
 
@@ -6492,6 +6735,16 @@ p.des_h {
   .headerlogo {
     width: 150px;
   }
+    .header-left h2 {
+        font-size: 15px;
+    }
+    .header-right button {
+    font-size: 12px;
+}
+.rbc-date-cell .rbc-button-link {
+    font-size: 13px;
+}
+
 }
 
 .ticket-type-badge {
@@ -6525,5 +6778,13 @@ p.des_h {
   .userMenu.d-lg-none {
     margin-right: 38px !important;
   }
-}
 
+  #myevent-deshbord .event-sidebar {
+    width: 61px;
+  }
+
+  #myevent-deshbord .event-sidebar ul li a,
+  #myevent-deshbord .event-sidebar ul li button {
+    font-size: 10px !important;
+  }
+}

@@ -636,7 +636,7 @@ const EventDetailsPage = () => {
                                                 {formData.is_free != "Y" && (
                                                     <>
                                                         {/* Currency */}
-                                                        <div className="col-lg-2 col-md-6 mb-3">
+                                                        <div className="col-lg-2 col-md-6 mb-3 mt-0">
                                                             <label className="form-label">Currency <span className="text-danger">*</span></label>
                                                             <select
                                                                 className="form-select rounded-0"
@@ -657,8 +657,9 @@ const EventDetailsPage = () => {
 
                                                 {/* Timezone */}
                                                 <div
-                                                    className={`col-lg-${formData.is_free == "Y" ? 4 : 2} col-md-${formData.is_free == "Y" ? 6 : 4
-                                                        } mb-3`}
+                                                    className={`col-lg-${formData.is_free == "Y" ? 6 : 2} 
+           col-md-${formData.is_free == "Y" ? 6 : 4} 
+           mb-3 mt-0`}
                                                 >
                                                     <label className="form-label">
                                                         Timezone <span className="text-danger">*</span>
@@ -680,7 +681,7 @@ const EventDetailsPage = () => {
                                                 </div>
 
                                                 {/* ===== Event Start ===== */}
-                                                <div className="col-lg-4 col-md-6 mb-3">
+                                                <div className="col-lg-6 col-md-6 mb-3 mt-0">
                                                     <label className="form-label">
                                                         Event Start <span className="text-danger">*</span>
                                                     </label>

@@ -1150,10 +1150,9 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                     </Col>
 
                                                     <Col md={7}>
+                                                    <h5 className="mb-3">Available Tickets</h5>
                                                         {(eventData.tickets?.length > 0 || eventData.addons?.length > 0 || eventData.slots?.length > 0) && (
                                                             <div className="ticket-section">
-                                                                <h5 className="mb-3">Available Tickets</h5>
-
                                                                 {/* 📦 PACKAGES */}
                                                                 {eventData.package
                                                                     ?.filter(pkg => pkg.hidden != "Y" && pkg.status == "Y")

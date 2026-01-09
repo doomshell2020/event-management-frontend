@@ -302,12 +302,12 @@ const MyEventsPage = () => {
                                 <div className="contant_bg">
                                     <div className="row ">
                                         {/* Committee Section */}
-                                        <div className="col-lg-8 col-md-12">
+                                        <div className="col-lg-8 col-md-12 mobile-order-one">
                                             <div className="Committee">
                                                 <h6>Current Committee ({loadingMembers ? "Loading..." : members.length})</h6>
 
                                                 <div className="row">
-                                                    <div className="col-md-10 col-sm-8 col-8">
+                                                    <div className="col-sm-10 mb-2 mb-sm-0">
                                                         <div className="position-relative">
                                                             <div className="input-group">
                                                                 <span className="input-group-text">
@@ -386,9 +386,9 @@ const MyEventsPage = () => {
                                                             )}
                                                         </div>
                                                     </div>
-                                                    <div className="col-md-2 col-sm-8 col-8">
+                                                    <div className="col-sm-2">
                                                         <button
-                                                            className="btn next primery-button h-100 text-14">
+                                                            className="btn next primery-button w-100 h-100 text-14 py-2">
                                                             Add
                                                         </button>
                                                     </div>
@@ -397,7 +397,7 @@ const MyEventsPage = () => {
                                                 <hr className="custom-hr" />
                                                 {/* Members Table with Serial Number */}
                                                 <div className="table-responsive">
-                                                    <table className="table table-bordered table-striped mb-1 table-sm">
+                                                    <table className="table table-bordered table-striped mb-1 table-sm table-mobile-width">
 
                                                         <thead className="text-white table-detail">
                                                             <tr>
@@ -599,7 +599,7 @@ const MyEventsPage = () => {
                                                     </div>
 
                                                     <div className="col-12">
-                                                        <button type="submit" className="btn save next primery-button fw-normal w-100">
+                                                        <button type="submit" className="btn save next primery-button h-100 py-2 fw-normal w-100">
                                                             Import
                                                         </button>
                                                     </div>
