@@ -26,28 +26,28 @@ const Sidebar = () => {
   //   }
   // }, [adminLoginId]); // This effect depends only on adminLoginId
 
-  useEffect(() => {
-    // console.log('Admin Login ID:', adminLoginId);
-    if (adminLoginId == 12492) { // This is for lulu account
-      const updatedMenuItems = menuitems.map(menu => {
-        if (menu.Items) {
-          const updatedItems = menu.Items.filter(item => item.title === "Finance");
-          return { ...menu, Items: updatedItems };
-        }
-        return menu;
-      });
-      setMenuitems(updatedMenuItems);
-    } else if (adminLoginId != 1) {
-      const updatedMenuItems = menuitems.map(menu => {
-        if (menu.Items) {
-          const updatedItems = menu.Items.filter(item => item.title !== "Finance");
-          return { ...menu, Items: updatedItems };
-        }
-        return menu;
-      });
-      setMenuitems(updatedMenuItems);
-    }
-  }, [adminLoginId]); // This effect depends only on adminLoginId
+  // useEffect(() => {
+  //   // console.log('Admin Login ID:', adminLoginId);
+  //   if (adminLoginId == 12492) { // This is for lulu account
+  //     const updatedMenuItems = menuitems.map(menu => {
+  //       if (menu.Items) {
+  //         const updatedItems = menu.Items.filter(item => item.title === "Finance");
+  //         return { ...menu, Items: updatedItems };
+  //       }
+  //       return menu;
+  //     });
+  //     setMenuitems(updatedMenuItems);
+  //   } else if (adminLoginId != 1) {
+  //     const updatedMenuItems = menuitems.map(menu => {
+  //       if (menu.Items) {
+  //         const updatedItems = menu.Items.filter(item => item.title !== "Finance");
+  //         return { ...menu, Items: updatedItems };
+  //       }
+  //       return menu;
+  //     });
+  //     setMenuitems(updatedMenuItems);
+  //   }
+  // }, [adminLoginId]); // This effect depends only on adminLoginId
 
   // location
 

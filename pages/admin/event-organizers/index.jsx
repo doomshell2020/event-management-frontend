@@ -31,14 +31,16 @@ export const EventOrganizersList = () => {
             Header: "S.No",
             accessor: (row, index) => index + 1,
             className: "borderrigth",
+            style: { width: "5%" },
         },
         {
             Header: "Name",
             accessor: "title",
             className: "borderrigth",
+            style: { width: "15%" },
             Cell: ({ row }) => (
                 <div className="d-flex align-items-center gap-2">
-                    <span>{row.original.first_name}</span></div>
+                    <span>{row.original.first_name}{" "}{row.original.last_name}</span></div>
             ),
         },
 
@@ -46,9 +48,10 @@ export const EventOrganizersList = () => {
             Header: "Email",
             accessor: "eventName",
             className: "borderrigth",
+            style: { width: "15%" },
             Cell: ({ row }) => (
                 <div>
-                    {row.original.email ? row.original.email : "---"}
+                {row.original.email ? row.original.email : "---"}
                 </div>
             ),
         },
@@ -56,6 +59,7 @@ export const EventOrganizersList = () => {
             Header: "Mobile",
             accessor: "mobile",
             className: "borderrigth",
+            style: { width: "15%" },
             Cell: ({ row }) => (
                 <div>
                     {row.original.mobile ? row.original.mobile : "---"}
@@ -63,76 +67,169 @@ export const EventOrganizersList = () => {
             ),
         },
 
+
         {
-            Header: "Events",
+            Header: "Events & Revenue",
             accessor: "events",
             className: "borderrigth",
+            style: { width: "25%" },
             Cell: ({ row }) => {
                 const events = row.original.events || [];
-                if (!events.length) return <span style={{ fontSize: "12px" }}>
-                    No events organized
-                </span>;
+
+                if (!events.length) {
+                    return (
+                        <span style={{ fontSize: "12px", color: "#010101ff" }}>
+                            No events organized
+                        </span>
+                    );
+                }
                 return (
-                    <div style={{ fontSize: "13px", color: "#374151" }}>
-                        {events.map((e, i) => (
-                            <div key={e.id}>
-                                {i + 1}. {e.name}
-                            </div>
-                        ))}
+                    <div className="d-flex flex-column gap-2">
+                        {events.map((event, index) => {
+                            const currency = event.currencyName?.Currency_symbol || "₹";
+                            return (
+                                <div
+                                    key={event.id}
+                                    style={{
+                                        border: "1px solid #E5E7EB",
+                                        borderRadius: "6px",
+                                        padding: "8px",
+                                        backgroundColor: "#F9FAFB",
+                                        fontSize: "12px"
+                                    }}
+                                >
+                                    {/* Event Name */}
+                                    <div style={{ fontWeight: "600", color: "#111827" }}>
+                                        {index + 1}. {event.name}
+                                    </div>
+
+                                    {/* Totals */}
+                                    <div
+                                        style={{
+                                            display: "flex",
+                                            gap: "12px",
+                                            marginTop: "4px",
+                                            color: "#374151"
+                                        }}
+                                    >
+                                        <span>
+                                            <strong>Total Sales:</strong>{" "}
+                                            {event.total_sales !== null
+                                                ? `${currency}${event.total_sales}`
+                                                : "0"}
+                                        </span>
+
+                                        <span>
+                                            <strong>Comm:</strong>{" "}
+                                            {event.total_tax !== null
+                                                ? `${currency}${event.total_tax}`
+                                                : "0"}
+                                        </span>
+
+                                        <span>
+                                            <strong>Total:</strong>{" "}
+                                            {event.grand_total !== null
+                                                ? `${currency}${event.grand_total}`
+                                                : "0"}
+                                        </span>
+                                    </div>
+                                </div>
+                            );
+                        })}
                     </div>
                 );
-
-            },
+            }
         },
-
 
         {
-            Header: "Status",
-            accessor: "status",
+            Header: "Created",
+            accessor: "created",
             className: "borderrigth",
-            Cell: ({ row }) => {
-                const { id, status } = row.original;
-                return (
-                    <div className="form-check form-switch d-flex justify-content-center">
-                        <input
-                            className="form-check-input"
-                            type="checkbox"
-                            style={{ cursor: "pointer" }}
-                            checked={status === "Y"}
-                            onChange={() => handleStatusToggle(id, status)}
-                        />
-                    </div>
-                );
-            },
+            style: { width: "10%" },
+            Cell: ({ row }) => (
+                <div>
+                    {row.original.createdAt ? (
+                        <Moment format="DD MMM YYYY">
+                            {row.original.createdAt}
+                        </Moment>
+                    ) : (
+                        "---"
+                    )}
+                </div>
+            ),
         },
+
+
+        // {
+        //     Header: "Events",
+        //     accessor: "events",
+        //     className: "borderrigth",
+        //     Cell: ({ row }) => {
+        //         const events = row.original.events || [];
+        //         if (!events.length) return <span style={{ fontSize: "12px" }}>
+        //             No events organized
+        //         </span>;
+        //         return (
+        //             <div style={{ fontSize: "13px", color: "#374151" }}>
+        //                 {events.map((e, i) => (
+        //                     <div key={e.id}>
+        //                         {i + 1}. {e.name}
+        //                     </div>
+        //                 ))}
+        //             </div>
+        //         );
+
+        //     },
+        // },
+
+
+
+
         {
             Header: "Action",
             accessor: "action",
             className: "borderrigth",
-            Cell: ({ row }) => (
-                <div
-                    style={{
-                        display: "flex",
-                        gap: "8px",
-                        justifyContent: "center",
-                        alignItems: "center",
-                    }}
-                >
-                    {/* Edit Button */}
-                    <button
-                        className="btn btn-sm"
-                        style={{ backgroundColor: "#20c997", color: "white" }}
-                        type="button"
-                        onClick={() => handleEdit(row.original.id)}
+            Cell: ({ row }) => {
+                const { id, status } = row.original;
+
+                return (
+                    <div
+                        style={{
+                            display: "flex",
+                            gap: "8px",
+                            justifyContent: "center",
+                            alignItems: "center",
+                        }}
                     >
-                        <i className="bi bi-pencil-square"></i>
-                    </button></div>
-            ),
-        },
+                        {/* Status Toggle */}
+                        <div className="form-check form-switch d-flex justify-content-center">
+                            <input
+                                className="form-check-input"
+                                type="checkbox"
+                                style={{ cursor: "pointer" }}
+                                checked={status === "Y"}
+                                onChange={() => handleStatusToggle(id, status)}
+                            />
+                        </div>
+
+                        {/* Edit Button */}
+                        <button
+                            className="btn btn-sm"
+                            style={{ backgroundColor: "#20c997", color: "white" }}
+                            type="button"
+                            onClick={() => handleEdit(id)}
+                        >
+                            <i className="bi bi-pencil-square"></i>
+                        </button>
+                    </div>
+                );
+            },
+        }
+
     ]);
     let navigate = useRouter();
     const [OrganizerList, setOrganizerList] = useState([]);
-    console.log("----", OrganizerList);
+    // console.log("----", OrganizerList);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [email, setEmail] = useState("");
@@ -155,12 +252,7 @@ export const EventOrganizersList = () => {
 
         if (!result.isConfirmed) return;
 
-        // Optimistic UI update
-        setOrganizerList(prev =>
-            prev.map(item =>
-                item.id === id ? { ...item, status: newStatus } : item
-            )
-        );
+
 
         try {
             Swal.fire({
@@ -176,7 +268,7 @@ export const EventOrganizersList = () => {
             await api.put(`/api/v1/admin/event-organizer/update-status/${id}`, {
                 status: newStatus,
             });
-
+            getEventOrganizers();
             Swal.fire({
                 icon: "success",
                 title: "Success",
@@ -201,18 +293,21 @@ export const EventOrganizersList = () => {
             });
         }
     };
+
     const getEventOrganizers = async () => {
-        const { data } = await api.get("/api/v1/admin/event-organizer");
-        return data?.data?.eventOrganizers || [];
+        try {
+            setIsLoading(true);
+            const { data } = await api.get("/api/v1/admin/event-organizer");
+            setOrganizerList(data?.data?.eventOrganizers || []);
+        } catch (err) {
+            console.error("Error fetching event organizers:", err);
+        } finally {
+            setIsLoading(false);
+        }
     };
+
     useEffect(() => {
-        setIsLoading(true);
-        getEventOrganizers()
-            .then(setOrganizerList)
-            .catch(err =>
-                console.error("Error fetching event organizers:", err)
-            )
-            .finally(() => setIsLoading(false));
+        getEventOrganizers();
     }, []);
     const tableInstance = useTable(
         {
@@ -449,6 +544,7 @@ export const EventOrganizersList = () => {
                                                                 column.getSortByToggleProps()
                                                             )}
                                                             className={column.className}
+                                                            style={column.style}
                                                         >
                                                             <span className="tabletitle">
                                                                 {column.render("Header")}
