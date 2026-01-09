@@ -120,14 +120,33 @@ export default function CartModal({ show, handleClose, eventId }) {
         return await api.post(`/api/v1/cart/add`, params)
     }
 
-    const increaseSlot = async (slot) => {
-        const pricingId = slot.pricings[0]?.id;
+    const increaseSlot = async (ticketPrice) => {
+        const pricingId = ticketPrice?.id;
+        if (!pricingId) return;
+        const maxLimit = Number(ticketPrice?.ticket?.count || 0);
 
         try {
             setLoadingId(pricingId);
+            // 🔍 Existing item in cart
+            const existing = slotCart.find(
+                item => item.uniqueId == pricingId
+            );
 
-            const existing = slotCart.find(item => item.uniqueId == pricingId);
+            const currentCount = existing?.count || 0;
 
+            // 🚫 MAX LIMIT VALIDATION
+            if (maxLimit > 0 && currentCount >= maxLimit) {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Limit Reached",
+                    text: `You can only book up to ${maxLimit} ticket(s) for this option.`,
+                    confirmButtonText: "OK"
+                });
+                setLoadingId(null);
+                return;
+            }
+
+            // ➕ ADD / INCREASE
             if (existing) {
                 await increaseCart(existing.cartId);
             } else {
@@ -143,11 +162,13 @@ export default function CartModal({ show, handleClose, eventId }) {
 
         } catch (err) {
 
+            // ⚠️ CART EVENT CONFLICT
             if (err?.response?.status == 409) {
 
                 const result = await Swal.fire({
                     title: "Items from another event found!",
-                    text: err?.response?.data?.message ||
+                    text:
+                        err?.response?.data?.message ||
                         "Your cart has tickets or addons from another event. Clear it?",
                     icon: "warning",
                     showCancelButton: true,
@@ -163,7 +184,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                     return;
                 }
 
-                // ➋ SHOW LOADER
+                // ⏳ Loader
                 Swal.fire({
                     title: "Clearing Cart...",
                     text: "Please wait",
@@ -172,7 +193,6 @@ export default function CartModal({ show, handleClose, eventId }) {
                     didOpen: () => Swal.showLoading()
                 });
 
-                // ➌ CLEAR CART
                 await clearCart();
 
                 Swal.fire({
@@ -183,51 +203,35 @@ export default function CartModal({ show, handleClose, eventId }) {
                     showConfirmButton: false
                 });
 
-                // ➍ RETRY ADDING ITEM AUTOMATICALLY
-                try {
-                    await addToCart({
-                        event_id: finalEventId,
-                        item_type: "ticket_price",
-                        ticket_price_id: pricingId,
-                        count: 1
-                    });
+                // 🔁 Retry add
+                await addToCart({
+                    event_id: finalEventId,
+                    item_type: "ticket_price",
+                    ticket_price_id: pricingId,
+                    count: 1
+                });
 
-                    await refreshCart(finalEventId || undefined);
-
-                    Swal.fire({
-                        icon: "success",
-                        title: "Added Successfully",
-                        timer: 1200,
-                        showConfirmButton: false
-                    });
-
-                } catch (retryError) {
-                    console.log("Retry error:", retryError);
-                    Swal.fire({
-                        icon: "error",
-                        title: "Failed",
-                        text: "Could not add the ticket after clearing cart."
-                    });
-                }
-
-                setLoadingId(null);
-                return;
+                await refreshCart(finalEventId || undefined);
             }
 
-            console.log("Increase ticket error:", err);
+            console.error("Increase ticket error:", err);
 
         } finally {
-            setLoadingId(null); // ensures loader is removed ALWAYS
+            setLoadingId(null);
         }
     };
 
-    const decreaseSlot = async (slot) => {
-        const pricingId = slot.pricings[0]?.id;
+    const decreaseSlot = async (ticketPrice) => {
+        const pricingId = ticketPrice?.id;
+        if (!pricingId) return;
 
         try {
             setLoadingId(pricingId);
 
-            const existing = slotCart.find(item => item.uniqueId == pricingId);
+            const existing = slotCart.find(
+                item => item.uniqueId == pricingId
+            );
+
             if (!existing) return;
 
             if (existing.count > 1) {
@@ -239,11 +243,13 @@ export default function CartModal({ show, handleClose, eventId }) {
             await refreshCart(finalEventId || undefined);
 
         } catch (err) {
+
             if (err?.response?.status == 409) {
 
                 const result = await Swal.fire({
                     title: "Items from another event found!",
-                    text: err.response.data?.message ||
+                    text:
+                        err?.response?.data?.message ||
                         "Your cart belongs to another event. Clear it?",
                     icon: "warning",
                     showCancelButton: true,
@@ -259,7 +265,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                     return;
                 }
 
-                // Loader
+                // ⏳ Loader
                 Swal.fire({
                     title: "Clearing...",
                     text: "Please wait...",
@@ -268,10 +274,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                     didOpen: () => Swal.showLoading()
                 });
 
-                // Clear cart
                 await clearCart();
-
-                Swal.close();
 
                 Swal.fire({
                     title: "Cart Cleared",
@@ -280,9 +283,10 @@ export default function CartModal({ show, handleClose, eventId }) {
                     timer: 1200,
                     showConfirmButton: false
                 });
-                await decreaseCart(existing.cartId);
             }
-            console.log("Decrease error:", err);
+
+            console.error("Decrease ticket error:", err);
+
         } finally {
             setLoadingId(null);
         }
@@ -1309,7 +1313,7 @@ export default function CartModal({ show, handleClose, eventId }) {
 
 
                                                                 {/* 🎟️ TICKETS */}
-                                                                {eventData.tickets
+                                                                {eventData.entry_type != 'multi' && eventData.tickets
                                                                     ?.filter(ticket => ticket.hidden != "Y")
                                                                     .map((ticket, i) => {
                                                                         const cartItem = normalCart.find(item => item.uniqueId == ticket.id);
