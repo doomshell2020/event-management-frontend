@@ -18,7 +18,7 @@ const CalculateFees = () => {
             <div className="container">
                 <div className="row">
 
-                    <div className="col-md-8 col-sm-7 col-12">
+                    <div className="col-md-8 order-1-768">
                         <div className="section-heading">
                             <h2 className="text-start">Calculate Your Fees</h2>
                             <p>Ticket Price</p>
@@ -43,7 +43,7 @@ const CalculateFees = () => {
 
                             {/* Calculated Values */}
                             <div className="row g-3 mt-3">
-                                <div className="col-md-4 col-sm-4 col-4 rang_f">
+                                <div className="col-md-4 col-sm-4 col-12 rang_f">
                                     <label className="form-label">Customer Pays</label>
                                     <input
                                         type="text"
@@ -53,7 +53,7 @@ const CalculateFees = () => {
                                     />
                                 </div>
 
-                                <div className="col-md-4 col-sm-4 col-4 rang_f">
+                                <div className="col-md-4 col-sm-4 col-12 rang_f">
                                     <label className="form-label">You Receive</label>
                                     <input
                                         type="text"
@@ -63,7 +63,7 @@ const CalculateFees = () => {
                                     />
                                 </div>
 
-                                <div className="col-md-4 col-sm-4 col-4 rang_f">
+                                <div className="col-md-4 col-sm-4 col-12 rang_f">
                                     <label className="form-label">Our Cost</label>
                                     <input
                                         type="text"
@@ -77,7 +77,7 @@ const CalculateFees = () => {
                     </div>
 
                     {/* Image */}
-                    <div className="col-md-4 col-sm-5 col-12">
+                    <div className="col-md-4 ">
                         <div className="container_img">
                             <img
                                 src="/assets/front-images/Calculate_Fees_img.png"

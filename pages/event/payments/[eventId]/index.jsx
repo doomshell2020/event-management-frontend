@@ -98,7 +98,7 @@ const ManagePayments = () => {
                                 <h4 className="text-24">Payments</h4>
                                 <hr className="custom-hr" />
 
-                                <div className="stripe-table mt-4">
+                                <div className="stripe-table mt-4 payment-table">
 
                                     <div className="d-flex justify-content-between align-items-center mt-3 mb-2">
                                         <h6 className="fw-bold">Total Records: {totalRecords}</h6>
@@ -106,7 +106,7 @@ const ManagePayments = () => {
 
                                     {/* TABLE */}
                                     <div className="table-responsive">
-                                        <table className="table table-hover align-middle">
+                                        <table className="table table-hover align-middle table-mobile-width table-deta-no-wrap">
                                             <thead className="bg-dark text-white">
                                                 <tr>
                                                     <th>Sr No.</th>
