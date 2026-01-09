@@ -247,7 +247,7 @@ const UpdateProfile = () => {
             <section id="edit-profile" className="mb-2">
                 <div className="container">
                     <div className="section-heading">
-                        <h1 className="mb-3 mt-4">Update profile</h1>
+                        <h1 className="mb-3 mt-4">Update Profile</h1>
                         {/* <h2>Profile</h2> */}
                         <p className="text-center body-text">
                             Enter your information below to update your account
@@ -263,8 +263,7 @@ const UpdateProfile = () => {
                         <div className="row justify-content-center mt-4">
                             {/* LEFT SIDE IMAGE */}
                             <div className="col-md-3 text-center">
-                                <div
-                                    className="profile-image-wrapper"
+                                <div className="profile-image-wrapper"
                                     style={{
                                         position: "relative",
                                         display: "inline-block"
@@ -297,13 +296,13 @@ const UpdateProfile = () => {
                                         }}
                                     />
 
-                                <h6 className="mt-3">
-                                    <strong>{formData.firstName} {formData.lastName}</strong>
-                                </h6>
+                                    <h6 className="mt-3">
+                                        <strong>{formData.firstName} {formData.lastName}</strong>
+                                    </h6>
+                                </div>
                             </div>
-
                             {/* RIGHT SIDE FORM */}
-                            <div className="col-md-7">
+                            <div className="col-md-9">
                                 <div className="edit-box p-4 shadow-sm">
 
                                     {/* SECTION: EDIT YOUR PROFILE */}
@@ -348,7 +347,7 @@ const UpdateProfile = () => {
 
                                         <div className="row">
                                             <div className="col-md-6 mb-3">
-                                                <label>Email</label>
+                                                <label>Email <span className="text-danger">*</span></label>
                                                 <input
                                                     type="email"
                                                     className="form-control"
@@ -396,7 +395,7 @@ const UpdateProfile = () => {
                                             </div>
 
                                             <div className="col-md-6 mb-3">
-                                                <label>Phone Number</label>
+                                                <label>Phone Number <span className="text-danger">*</span></label>
                                                 <input
                                                     type="text"
                                                     name="phone"
@@ -494,7 +493,6 @@ const UpdateProfile = () => {
                                 </div>
                             </div>
                         </div>
-                        </div>
                     )}
                 </div>
             </section>
@@ -506,8 +504,8 @@ const UpdateProfile = () => {
             >
                 <form onSubmit={handleUploadSubmit}>
                     <Modal.Header closeButton className="profile-modal-close">
-  <Modal.Title>Upload Picture</Modal.Title>
-</Modal.Header>
+                        <Modal.Title>Upload Picture</Modal.Title>
+                    </Modal.Header>
 
                     <Modal.Body>
 

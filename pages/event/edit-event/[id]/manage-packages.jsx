@@ -504,7 +504,6 @@ const ManagePackages = () => {
 
                                                                         {openDropdown === pkg.id && (
                                                                             <ul
-<<<<<<< HEAD
                                                                                 className="dropdown-menu show position-absolute end-0 mt-1 shadow-sm"
                                                                                 style={{
                                                                                     zIndex: 999,
@@ -520,14 +519,6 @@ const ManagePackages = () => {
 
                                                                                             borderBottom: "1px solid #bdbdbd"
                                                                                         }}
-=======
-                                                                                className="dropdown-menu show position-absolute end-0 mt-1 shadow-sm rounded-3"
-                                                                                style={{ zIndex: 999 }}
-                                                                            >
-                                                                                <li>
-                                                                                    <button
-                                                                                        className="dropdown-item d-flex align-items-center gap-2"
->>>>>>> main
                                                                                         onClick={() => {
                                                                                             setPackageId(pkg.id);
                                                                                             setPackageForm({
@@ -547,7 +538,6 @@ const ManagePackages = () => {
 
                                                                                 <li>
                                                                                     <button
-<<<<<<< HEAD
                                                                                         className="dropdown-item"
                                                                                         title={pkg.hidden == "Y" ? "👁 Show Package" : "🚫 Hide Package"}
                                                                                         style={{
@@ -560,15 +550,6 @@ const ManagePackages = () => {
                                                                                                 .put(`/api/v1/packages/update/${pkg.id}`, {
                                                                                                     hidden: newHidden,
                                                                                                 })
-=======
-                                                                                        className="dropdown-item d-flex align-items-center gap-2"
-                                                                                        onClick={() => {
-                                                                                            const newHidden = pkg.hidden === "Y" ? "N" : "Y";
-
-                                                                                            api.put(`/api/v1/packages/update/${pkg.id}`, {
-                                                                                                hidden: newHidden,
-                                                                                            })
->>>>>>> main
                                                                                                 .then(() => {
                                                                                                     Swal.fire({
                                                                                                         icon: "success",

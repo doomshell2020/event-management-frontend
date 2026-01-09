@@ -1,106 +1,101 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { handleLogout } from "@/utils/logout";
 import Cookies from "js-cookie";
+import { Container, Navbar } from "react-bootstrap";
+
+import { handleLogout } from "@/utils/logout";
 import { useCart } from "@/shared/layout-components/layout/CartContext";
 import { useAuth } from "../layout/AuthContext";
 import CartModal from "@/pages/components/cart_new/CartModal";
-import api from "@/utils/api";
-import { Container, Navbar } from "react-bootstrap";
 
+const DEFAULT_BG = "/assets/front-images/slider_bg9.jpg";
 
 const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
-  const [headerBackgroundImg, setHeaderBackgroundImg] = useState(
-    backgroundImage ?? "/assets/front-images/slider_bg9.jpg"
-  );
+  const router = useRouter();
+  const dropdownRef = useRef(null);
 
   const { cartCount, eventId } = useCart();
-  const { loadingAuth, user } = useAuth();
-  const router = useRouter();
+  const { user } = useAuth();
+
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState("User");
   const [showDropdown, setShowDropdown] = useState(false);
-  const [username, setUsername] = useState("");
   const [showCart, setShowCart] = useState(false);
 
-  // Payouts submenu
-  const [showPayoutsMenu, setShowPayoutsMenu] = useState(false);
-  const [payoutsData, setPayoutsData] = useState([]);
+  /* -------------------- AUTH CHECK -------------------- */
+  const checkLoginStatus = useCallback(() => {
+    const token = Cookies.get("userAuthToken");
+    const storedUser =
+      localStorage.getItem("user") || sessionStorage.getItem("user");
 
-  const dropdownRef = useRef();
+    if (!token || !storedUser) {
+      setIsLoggedIn(false);
+      return;
+    }
 
-  const handleOpenCart = () => {
-    if (cartCount === 0) return;
-    setShowCart(true);
-  };
+    try {
+      const userObj = JSON.parse(storedUser);
+      setUsername(userObj?.firstName || "User");
+      setIsLoggedIn(true);
+    } catch {
+      setIsLoggedIn(false);
+    }
+  }, []);
 
-  // Check login
   useEffect(() => {
-    const checkLoginStatus = () => {
-      const token = Cookies.get("userAuthToken");
-      const storedUser = localStorage.getItem("user") || sessionStorage.getItem("user");
-      if (storedUser && token) {
-        try {
-          const userObj = JSON.parse(storedUser);
-          setUsername(userObj.firstName || "User");
-          setIsLoggedIn(true);
-        } catch (err) {
-          console.error("Invalid user format:", err);
-          setIsLoggedIn(false);
-        }
-      }
-    };
     checkLoginStatus();
     window.addEventListener("storage", checkLoginStatus);
     return () => window.removeEventListener("storage", checkLoginStatus);
-  }, [router]);
+  }, [checkLoginStatus]);
 
-  // Sticky Header
+  /* -------------------- STICKY HEADER -------------------- */
   useEffect(() => {
     const handleScroll = () => {
-      const header = document.querySelector(".headernav");
-      if (window.scrollY > 0) header?.classList.add("scrolled");
-      else header?.classList.remove("scrolled");
+      document
+        .querySelector(".headernav")
+        ?.classList.toggle("scrolled", window.scrollY > 0);
     };
+
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close dropdown if clicked outside
+  /* -------------------- CLOSE DROPDOWN -------------------- */
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+    const closeDropdown = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setShowDropdown(false);
-        setShowPayoutsMenu(false);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+
+    document.addEventListener("mousedown", closeDropdown);
+    return () => document.removeEventListener("mousedown", closeDropdown);
   }, []);
 
-  // Fetch payouts data
-  const fetchPayoutsData = async () => {
-    try {
-      const { data } = await api.get("/api/v1/admin/payouts/list");
-      const eventsPayouts = data?.data?.events?.map(ev => ({
-        name: ev.name,
-        organizer: `${ev.Organizer.first_name} ${ev.Organizer.last_name}`,
-        totalPaid: ev.total_paid || 0,
-        currency: ev.currencyName?.Currency_symbol || "₹"
-      }));
-      setPayoutsData(eventsPayouts || []);
-    } catch (err) {
-      console.error(err);
-    }
+  /* -------------------- MENU DATA -------------------- */
+  const menuLinks = [
+    { href: "/event/myevent", icon: "fa-tachometer-alt", label: "Dashboard" },
+    { href: "/users/view-profile", icon: "fa-user", label: "My Profile" },
+    { href: "/event/my-event", icon: "fa-calendar-alt", label: "My Events" },
+    { href: "/orders", icon: "fa-shopping-cart", label: "My Orders" },
+    { href: "/users/my-staff", icon: "fa-users", label: "My Staff" },
+    { href: "/event/post-event", icon: "fa-plus-circle", label: "Post Event" },
+    { href: "/users/payouts", icon: "fa-coins", label: "Payouts" },
+  ];
+
+  const handleCartClick = () => {
+    if (cartCount > 0) setShowCart(true);
   };
 
+  /* -------------------- JSX -------------------- */
   return (
     <>
-
       <header className="headernav">
         <Navbar expand="lg" className="p-0 pt-lg-0 pt-2">
           <Container>
             <div className="navflexbox w-100">
+              {/* LOGO */}
               <Link href="/" className="logodiv">
                 <img
                   src="/assets/front-images/logo.png"
@@ -108,140 +103,53 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
                   className="headerlogo"
                 />
               </Link>
-              {/* mobile-button-show-start */}
-              <div>
-              <div className="userMenu d-lg-none" style={{ marginRight: "60px" }}>
-                    {isLoggedIn ? (
-                      <>
-                        <button
-                          className="userwelcome-button primery-button"
-                          onClick={() => setShowDropdown(!showDropdown)}
-                        >
-                          Welcome {username} ▾
-                        </button>
 
-                        {showDropdown && (
-                          <ul className="header-dropdown">
-                            <li>
-                              <Link
-                                href="/event/myevent"
-                                className="dropdownLink active-des-link"
-                              >
-                                <i className="fas fa-tachometer-alt" /> Dashboard
-                              </Link>
-                            </li>
-                            <li>
-                              <Link
-                                href="/users/view-profile"
-                                className="dropdownLink"
-                              >
-                                <i className="fas fa-user" /> My Profile
-                              </Link>
-                            </li>
+              <Navbar.Toggle aria-controls="basic-navbar-nav" />
 
-                            <li>
-                              <Link href="/event/my-event" className="dropdownLink">
-                                <i className="fas fa-calendar-alt" /> My Events
-                              </Link>
-                            </li>
-                            <li>
-                              <Link href="/orders" className="dropdownLink">
-                                <i className="fas fa-shopping-cart" /> My Orders
-                              </Link>
-                            </li>
-                            <li>
-                              <Link href="/users/employee" className="dropdownLink">
-                                <i className="fas fa-users" /> My Staff
-                              </Link>
-                            </li>
-                            <li>
-                              <Link
-                                href="/event/post-event"
-                                className="dropdownLink"
-                              >
-                                <i className="fas fa-plus-circle" /> Post Event
-                              </Link>
-                            </li>
-                            <li>
-                              <button
-                                onClick={() => {
-                                  setShowDropdown(false);
-                                  handleLogout(router);
-                                }}
-                                className="dropdownLink"
-                              >
-                                <i className="fas fa-sign-out-alt" /> Logout
-                              </button>
-                            </li>
-                          </ul>
-                        )}
-                      </>
-                    ) : (
-                      <Link href="/login">
-                        <button className="userloginbtn primery-button">
-                          Login / Register
-                        </button>
-                      </Link>
-                    )}
-                  </div>
-                  {/* mobile-button-show-end */}
-              <Navbar.Toggle className="p-0" aria-controls="basic-navbar-nav"/>
-              </div>
               <Navbar.Collapse id="basic-navbar-nav">
                 <div className="menuflexbox ms-auto">
+                  {/* MAIN MENU */}
                   <nav className="menulistbox">
-                    <Link href="/" className="navLink">
-                      Home
-                    </Link>
-                    <Link href="/calender" className="navLink">
-                      Event Calendar
-                    </Link>
+                    <Link href="/" className="navLink">Home</Link>
+                    <Link href="/calender" className="navLink">Event Calendar</Link>
 
                     {isLoggedIn && (
                       <>
-                        <Link href="/orders" className="navLink">
-                          My Tickets
-                        </Link>
+                        <Link href="/orders" className="navLink">My Orders</Link>
 
-
-                        <a
-                          href="#"
-                          className="navLink position-relative"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleOpenCart();
-                          }}
+                        <button
+                          className="navLink position-relative btn btn-link p-0"
+                          onClick={handleCartClick}
                         >
                           Cart
-
                           {cartCount > 0 && (
-                            <span className="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-danger">
+                            <span className="badge bg-danger ms-1">
                               {cartCount}
                             </span>
                           )}
-                        </a>
+                        </button>
 
                         {user?.committeeAssigned && (
-                          <Link href="/committee/ticket" className="navLink position-relative">
+                          <Link
+                            href="/committee/ticket"
+                            className="navLink position-relative"
+                          >
                             Committee
-
                             {user?.committeePendingCount > 0 && (
-                              <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                              <span className="badge bg-danger ms-1">
                                 {user.committeePendingCount}
                               </span>
                             )}
                           </Link>
                         )}
-
                       </>
                     )}
 
-                    <Link href="/contact-us" className="navLink">
-                      Contact Us
-                    </Link>
+                    <Link href="/contact-us" className="navLink">Contact Us</Link>
                   </nav>
 
-                  <div className="userMenu d-none d-lg-block">
+                  {/* USER MENU */}
+                  <div className="userMenu" ref={dropdownRef}>
                     {isLoggedIn ? (
                       <>
                         <button
@@ -253,53 +161,18 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
 
                         {showDropdown && (
                           <ul className="header-dropdown">
-                            <li>
-                              <Link
-                                href="/event/myevent"
-                                className="dropdownLink active-des-link"
-                              >
-                                <i className="fas fa-tachometer-alt" /> Dashboard
-                              </Link>
-                            </li>
-                            <li>
-                              <Link
-                                href="/users/view-profile"
-                                className="dropdownLink"
-                              >
-                                <i className="fas fa-user" /> My Profile
-                              </Link>
-                            </li>
+                            {menuLinks.map((item) => (
+                              <li key={item.href}>
+                                <Link href={item.href} className="dropdownLink">
+                                  <i className={`fas ${item.icon}`} /> {item.label}
+                                </Link>
+                              </li>
+                            ))}
 
                             <li>
-                              <Link href="/event/my-event" className="dropdownLink">
-                                <i className="fas fa-calendar-alt" /> My Events
-                              </Link>
-                            </li>
-                            <li>
-                              <Link href="/orders" className="dropdownLink">
-                                <i className="fas fa-shopping-cart" /> My Orders
-                              </Link>
-                            </li>
-                            <li>
-                              <Link href="/users/employee" className="dropdownLink">
-                                <i className="fas fa-users" /> My Staff
-                              </Link>
-                            </li>
-                            <li>
-                              <Link
-                                href="/event/post-event"
-                                className="dropdownLink"
-                              >
-                                <i className="fas fa-plus-circle" /> Post Event
-                              </Link>
-                            </li>
-                            <li>
                               <button
-                                onClick={() => {
-                                  setShowDropdown(false);
-                                  handleLogout(router);
-                                }}
                                 className="dropdownLink"
+                                onClick={() => handleLogout(router)}
                               >
                                 <i className="fas fa-sign-out-alt" /> Logout
                               </button>
@@ -321,141 +194,30 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
           </Container>
         </Navbar>
       </header>
-      {/* <header className="headernav">
-        <div className="container">
 
-          <div className="navflexbox">
-            <Link href="/" className="logodiv">
-              <img src="/assets/front-images/logo.png" alt="Logo" className="headerlogo" />
-            </Link>
-
-            <div className="menuflexbox">
-              <nav className="menulistbox">
-                <Link href="/" className="navLink">Home</Link>
-                <Link href="/calender" className="navLink">Event Calendar</Link>
-
-                {isLoggedIn && (
-                  <>
-                    <Link href="/orders" className="navLink">My Orders</Link>
-
-                    <a
-                      href="#"
-                      className="navLink position-relative"
-                      onClick={(e) => { e.preventDefault(); handleOpenCart(); }}
-                    >
-                      Cart
-                      {cartCount > 0 && (
-                        <span className="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-danger">
-                          {cartCount}
-                        </span>
-                      )}
-                    </a>
-
-                    {user?.committeeAssigned && (
-                      <Link href="/committee/ticket" className="navLink position-relative">
-                        Committee
-                        {user?.committeePendingCount > 0 && (
-                          <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                            {user.committeePendingCount}
-                          </span>
-                        )}
-                      </Link>
-                    )}
-                  </>
-                )}
-
-                <Link href="/contact-us" className="navLink">Contact Us</Link>
-              </nav>
-
-              <div className="userMenu" ref={dropdownRef}>
-                {isLoggedIn ? (
-                  <>
-                    <button
-                      className="userwelcome-button primery-button"
-                      onClick={() => setShowDropdown(!showDropdown)}
-                    >
-                      Welcome {username} ▾
-                    </button>
-
-                    {showDropdown && (
-                      <ul className="header-dropdown">
-                        <li>
-                          <Link href="/event/myevent" className="dropdownLink active-des-link">
-                            <i className="fas fa-tachometer-alt" /> Dashboard
-                          </Link>
-                        </li>
-                        <li>
-                          <Link href="/users/view-profile" className="dropdownLink">
-                            <i className="fas fa-user" /> My Profile
-                          </Link>
-                        </li>
-                      <li>
-                          <Link href="/tickets/my-tickets" className="dropdownLink">
-                            <i className="fas fa-ticket-alt" /> My Tickets
-                          </Link>
-                        </li> 
-                        <li>
-                          <Link href="/event/my-event" className="dropdownLink">
-                            <i className="fas fa-calendar-alt" /> My Events
-                          </Link>
-                        </li>
-                        <li>
-                          <Link href="/orders" className="dropdownLink">
-                            <i className="fas fa-shopping-cart" /> My Orders
-                          </Link>
-                        </li>
-                        <li>
-                          <Link href="/users/my-staff" className="dropdownLink">
-                            <i className="fas fa-users" /> My Staff
-                          </Link>
-                        </li>
-                        <li>
-                          <Link href="/event/post-event" className="dropdownLink">
-                            <i className="fas fa-plus-circle" /> Post Event
-                          </Link>
-                        </li>
-                        <li>
-                          <Link href="/users/payouts" className="dropdownLink">
-                             <i className="fas fa-coins" />Payouts
-                          </Link>
-                        </li>
-
-                        <li>
-                          <button
-                            onClick={() => { setShowDropdown(false); handleLogout(router); }}
-                            className="dropdownLink"
-                          >
-                            <i className="fas fa-sign-out-alt" /> Logout
-                          </button>
-                        </li>
-                      </ul>
-                    )}
-                  </>
-                ) : (
-                  <Link href="/login">
-                    <button className="userloginbtn primery-button">Login / Register</button>
-                  </Link>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </header> */}
-
-      {/* WhatsApp button */}
+      {/* WHATSAPP */}
       <div className="whatsapp-icon">
-        <a
+        <Link
           href="https://api.whatsapp.com/send?phone=+18687786837"
-          className="pin_trest d-flex align-items-center justify-content-center"
           target="_blank"
-          rel="noopener noreferrer"
+          className="pin_trest d-flex align-items-center justify-content-center"
         >
           <i className="fab fa-whatsapp" />
-        </a>
+        </Link>
       </div>
 
+      {/* INNER SLIDER */}
+      {/* <div id="inner_slider">
+        <img src={backgroundImage || DEFAULT_BG} alt="slider" />
+        {isStripeShowing && (
+          <div className="cheaper_con">
+            <p>Tickets are Cheaper Here (8%)</p>
+          </div>
+        )}
+      </div> */}
+
       <div id="inner_slider">
-        <img src={headerBackgroundImg} alt="slider" />
+        <img src={backgroundImage || DEFAULT_BG} alt="slider" />
         <div className="inner_slider_contant">
           <div className="slider_Cheaper">
             {isStripeShowing && (
@@ -467,8 +229,14 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
         </div>
       </div>
 
-      {/* Cart Modal */}
-      {showCart && <CartModal show={showCart} handleClose={() => setShowCart(false)} eventId={eventId} />}
+      {/* CART MODAL */}
+      {showCart && (
+        <CartModal
+          show={showCart}
+          handleClose={() => setShowCart(false)}
+          eventId={eventId}
+        />
+      )}
     </>
   );
 };

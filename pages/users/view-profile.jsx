@@ -41,7 +41,7 @@ const ProfilePage = () => {
     fetchUser();
   }, [router]);
 
-  // if (loading) {
+  // if (!user) {
   //   return (
   //     <div className="text-center mt-5 mb-5">
   //       <h3>Loading profile...</h3>
@@ -49,9 +49,9 @@ const ProfilePage = () => {
   //   );
   // }
 
-  if (!user) {
-    return null; // handled by redirect above
-  }
+  // if (!user) {
+  //   return null; // handled by redirect above
+  // }
 
   return (
     <>
@@ -66,69 +66,76 @@ const ProfilePage = () => {
             </p>
           </div>
 
-          <div className="profil_deaile mx-auto">
-            <div className="row">
-              {/* Left side - avatar & edit */}
-              <div className="col-md-3">
-                <div className="user-profile text-center mb-3 mb-md-0">
-                  <div className="user-avatar">
-                    <img
-                      className="mx-auto text-center rounded-full w-24 h-24 object-cover"
-                      src={user?.profile_image || "/default-avatar.png"}
-                      alt={`${user?.first_name || "User"} Avatar`}
-                    />
-
-                  </div>
-                  <h5 className="user-name text-center text-16 my-2 my-lg-3">
-                    {user.first_name} {user.last_name}
-                  </h5>
-                  <Link
-                    className="primery-button text-14 fw-normal"
-                    href="/users/update-profile"
-                  >
-                    <i className="fas fa-edit"></i> Edit Profile
-                  </Link>
-                </div>
+          {loading ? (
+            <div className="d-flex justify-content-center align-items-center py-5">
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Loading...</span>
               </div>
+            </div>
+          ) : (
+            <div className="profil_deaile mx-auto">
+              <div className="row">
+                {/* Left side - avatar & edit */}
+                <div className="col-md-3">
+                  <div className="user-profile text-center mb-3 mb-md-0">
+                    <div className="user-avatar">
+                      <img
+                        className="mx-auto text-center rounded-full w-24 h-24 object-cover"
+                        src={user?.profile_image || "/default-avatar.png"}
+                        alt={`${user?.first_name || "User"} Avatar`}
+                      />
 
-              {/* Right side - details */}
-              <div className="col-md-9">
-                <div className="profile-details p-4 mx-auto">
-                  <table className="table mb-0 border-0">
-                    <tbody>
-                      <tr>
-                        <td className="border-top-0">Email</td>
-                        <td className="border-top-0">{user.email}</td>
-                      </tr>
-                      <tr>
-                        <td>Name</td>
-                        <td>{`${user.first_name} ${user.last_name}`}</td>
-                      </tr>
-                      <tr>
-                        <td>Date of Birth</td>
-                        <td>
-                          {user.dob
-                            ? new Date(user.dob).toLocaleDateString("en-GB")
-                            : "N/A"}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>Gender</td>
-                        <td>{user.gender || "N/A"}</td>
-                      </tr>
-                      <tr>
-                        <td>Registered On</td>
-                        <td>
-                          {user.createdAt
-                            ? new Date(user.createdAt).toLocaleString("en-GB")
-                            : "N/A"}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>Phone Number</td>
-                        <td>
-                          {user.mobile || "Not Added"}
-                          {/* <button
+                    </div>
+                    <h5 className="user-name text-center text-16 my-2 my-lg-3">
+                      {user.first_name} {user.last_name}
+                    </h5>
+                    <Link
+                      className="primery-button text-14 fw-normal"
+                      href="/users/update-profile"
+                    >
+                      <i className="fas fa-edit"></i> Edit Profile
+                    </Link>
+                  </div>
+                </div>
+
+                {/* Right side - details */}
+                <div className="col-md-9">
+                  <div className="profile-details p-4 mx-auto">
+                    <table className="table mb-0 border-0">
+                      <tbody>
+                        <tr>
+                          <td className="border-top-0">Email</td>
+                          <td className="border-top-0">{user.email}</td>
+                        </tr>
+                        <tr>
+                          <td>Name</td>
+                          <td>{`${user.first_name} ${user.last_name}`}</td>
+                        </tr>
+                        <tr>
+                          <td>Date of Birth</td>
+                          <td>
+                            {user.dob
+                              ? new Date(user.dob).toLocaleDateString("en-GB")
+                              : "N/A"}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>Gender</td>
+                          <td>{user.gender || "N/A"}</td>
+                        </tr>
+                        <tr>
+                          <td>Registered On</td>
+                          <td>
+                            {user.createdAt
+                              ? new Date(user.createdAt).toLocaleString("en-GB")
+                              : "N/A"}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>Phone Number</td>
+                          <td>
+                            {user.mobile || "Not Added"}
+                            {/* <button
                             type="button"
                             className="btn verified_btn p-0 ms-2"
                             data-bs-toggle="tooltip"
@@ -137,23 +144,25 @@ const ProfilePage = () => {
                           >
                             <i className="bi bi-patch-check-fill"></i>
                           </button> */}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>Email Related Events</td>
-                        <td>{user?.emailRelatedEvents ? user.emailRelatedEvents : 'N'}</td>
-                      </tr>
-                      <tr>
-                        <td>Email Newsletter</td>
-                        <td>{user?.emailNewsLetter ? user.emailNewsLetter : 'N'}</td>
-                      </tr>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>Email Related Events</td>
+                          <td>{user?.emailRelatedEvents ? user.emailRelatedEvents : 'N'}</td>
+                        </tr>
+                        <tr>
+                          <td>Email Newsletter</td>
+                          <td>{user?.emailNewsLetter ? user.emailNewsLetter : 'N'}</td>
+                        </tr>
 
-                    </tbody>
-                  </table>
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
+
         </div>
       </section>
       <FrontendFooter />

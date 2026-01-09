@@ -119,7 +119,7 @@ const ContactUs = () => {
       <section id="contact-us">
         <div className="container">
           <div className="section-heading">
-            <h1>Contact us</h1>
+            <h1 className="mb-3">Contact us</h1>
             {/* <h2>Contact us</h2> */}
             <p className="mb-4 heading_p text-center text-14 body-text">Any question or remarks? Just write us a message!</p>
           </div>
@@ -170,7 +170,7 @@ const ContactUs = () => {
                 <h3 className="text-center fw-bold">
                   Get In Touch
                 </h3>
-                <form onSubmit={handleSubmit}>
+                <form className="text-left" onSubmit={handleSubmit}>
                   <input
                     type="text"
                     className="form-control mb-1"
@@ -179,7 +179,7 @@ const ContactUs = () => {
                     value={formData.name}
                     onChange={handleChange}
                   />
-                  {errors.name && <small className="text-danger">{errors.name}</small>}
+                  {errors.name && <small className="text-danger ">{errors.name}</small>}
 
                   <input
                     type="email"

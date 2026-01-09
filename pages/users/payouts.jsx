@@ -73,7 +73,7 @@ const MyPayouts = () => {
       <section className="my-staff-module py-4">
         <div className="section-heading">
           <h1 className="mb-3">My Payouts</h1>
-          <h2 className="mt-4">My Payouts</h2>
+          {/* <h2 className="mt-4">My Payouts</h2> */}
           <p className="mb-4 body-text text-center">
             View payments received for your events
           </p>
