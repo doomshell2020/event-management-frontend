@@ -120,7 +120,7 @@ const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
 
     return (
         <>
-            <div className="event_names d-flex justify-content-between align-items-center p-2 px-3 mb-3">
+            <div className="event_names d-flex justify-content-between align-items-center p-2 px-3 mb-0 mb-sm-3">
                 {/* Dropdown */}
                 <div className="dropdown edit-event-dropdown">
                     <button

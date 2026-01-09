@@ -130,11 +130,11 @@ const RegisterPage = () => {
     <>
       <FrontendHeader backgroundImage={backgroundImage} />
 
-      <section id="sign-up">
+      <section id="sign-up" className="resistor">
         <div className="container">
           <div className="section-heading">
-            <h1>Create Account</h1>
-            <h2>Register</h2>
+            <h1 className="mb-2 mb-lg-3">Create Account</h1>
+            {/* <h2>Register</h2> */}
             <p className="text-center body-text">
               Enter your information below to create your account
             </p>
@@ -225,11 +225,11 @@ const RegisterPage = () => {
                       </button>
                     </div>
 
-                    <div className="row align-items-center mt-3">
-                      <label className="col-sm-3 col-form-label">
+                    <div className="row align-items-center mt-3 ">
+                      <label className="col-sm-4 col-4 col-form-label">
                         Gender <span className="text-danger">*</span>
                       </label>
-                      <div className="col-sm-9 d-flex">
+                      <div className="col-sm-8 col-8 d-flex align-items-center">
                         <input
                           type="radio"
                           name="gender"
@@ -238,7 +238,7 @@ const RegisterPage = () => {
                           onChange={handleChange}
                           required
                         />
-                        <label className="ms-1">Male</label>
+                        <label className="ms-1 mb-0">Male</label>
 
                         <input
                           className="ms-3"
@@ -249,15 +249,15 @@ const RegisterPage = () => {
                           onChange={handleChange}
                           required
                         />
-                        <label className="ms-1">Female</label>
+                        <label className="ms-1 mb-0">Female</label>
                       </div>
                     </div>
 
                     <div className="row align-items-center mt-3">
-                      <label className="col-sm-3 col-form-label">
+                      <label className="col-sm-4 col-4 col-form-label">
                         Date of Birth <span className="text-danger">*</span>
                       </label>
-                      <div className="col-sm-9">
+                      <div className="col-sm-8 col-8">
                         <input
                           type="date"
                           name="dob"

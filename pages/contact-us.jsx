@@ -124,7 +124,7 @@ const ContactUs = () => {
             <p className="mb-4 heading_p text-center text-14 body-text">Any question or remarks? Just write us a message!</p>
           </div>
           <div className="row no-gutters">
-            <div className="col-sm-6">
+            <div className="col-lg-6 col-md-4">
               <div className="content_inf">
                 <div className="info">
                   <ul className="ps-0 mb-0">
@@ -165,7 +165,7 @@ const ContactUs = () => {
                 </div>
               </div>
             </div>
-            <div className="col-sm-6">
+            <div className="col-lg-6 col-md-8">
               <div className="contact_form">
                 <h3 className="text-center fw-bold">
                   Get In Touch

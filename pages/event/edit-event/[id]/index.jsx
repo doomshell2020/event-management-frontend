@@ -486,7 +486,7 @@ const MyEventsPage = () => {
                                                     </div>
 
                                                     {/* Checkboxes */}
-                                                    <div className="col-md-3 d-flex align-items-center">
+                                                    <div className="col-md-3 d-flex align-items-end">
                                                         <CFormCheck
                                                             type="checkbox"
                                                             id="is_free"
@@ -835,7 +835,7 @@ const MyEventsPage = () => {
                                                     </div>
 
                                                     {!isFree && (
-                                                        <div className="col-lg-6">
+                                                        <div className="col-md-4">
                                                             <label className="form-label d-flex align-items-center gap-2">
                                                                 Type of Event
 
