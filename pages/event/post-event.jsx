@@ -169,6 +169,16 @@ const EventDetailsPage = () => {
         setErrors(newErrors);
     };
 
+    const getSaleStartMinDate = () => {
+        if (!formData.date_from) return "";
+
+        const eventStart = new Date(formData.date_from);
+        eventStart.setDate(eventStart.getDate() - 30);
+
+        return eventStart.toISOString().slice(0, 16);
+    };
+
+
     const validateSlug = (slug) => {
         if (!slug || slug.trim() == "") {
             return "Slug is required";
@@ -636,7 +646,7 @@ const EventDetailsPage = () => {
                                                 {formData.is_free != "Y" && (
                                                     <>
                                                         {/* Currency */}
-                                                        <div className="col-lg-2 col-md-6 mb-3 mt-0">
+                                                        <div className="col-lg-3 col-md-6 mb-3 mt-0">
                                                             <label className="form-label">Currency <span className="text-danger">*</span></label>
                                                             <select
                                                                 className="form-select rounded-0"
@@ -657,9 +667,8 @@ const EventDetailsPage = () => {
 
                                                 {/* Timezone */}
                                                 <div
-                                                    className={`col-lg-${formData.is_free == "Y" ? 6 : 2} 
-           col-md-${formData.is_free == "Y" ? 6 : 4} 
-           mb-3 mt-0`}
+                                                    className={`col-lg-${formData.is_free == "Y" ? 6 : 3} col-md-${formData.is_free == "Y" ? 6 : 6} 
+                                                            mb-3 mt-0`}
                                                 >
                                                     <label className="form-label">
                                                         Timezone <span className="text-danger">*</span>
@@ -713,8 +722,6 @@ const EventDetailsPage = () => {
                                                     {errors.date_to && <div className="invalid-feedback">{errors.date_to}</div>}
                                                 </div>
 
-
-
                                                 {/* Conditional Fields */}
                                                 {isFree ? (
                                                     <>
@@ -740,7 +747,7 @@ const EventDetailsPage = () => {
                                                             <label className="form-label">
                                                                 Sale Start <span className="text-danger">*</span>
                                                             </label>
-                                                            <input
+                                                            {/* <input
                                                                 type="datetime-local"
                                                                 className={`form-control rounded-0 ${errors.sale_start ? "is-invalid" : ""}`}
                                                                 name="sale_start"
@@ -748,14 +755,38 @@ const EventDetailsPage = () => {
                                                                 onChange={handlePaidDateChange}
                                                                 min={new Date().toISOString().slice(0, 16)}
                                                                 required={!isFree}
+                                                            /> */}
+                                                            <input
+                                                                type="datetime-local"
+                                                                className={`form-control rounded-0 ${errors.sale_start ? "is-invalid" : ""}`}
+                                                                name="sale_start"
+                                                                value={formData.sale_start}
+                                                                onChange={handlePaidDateChange}
+                                                                min={getSaleStartMinDate()}   // ✅ 30 days before event start
+                                                                max={formData.date_from || ""} // ✅ cannot exceed event start
+                                                                required={!isFree}
                                                             />
+
                                                             {errors.sale_start && <div className="invalid-feedback">{errors.sale_start}</div>}
                                                         </div>
                                                         <div className="col-xl-4 col-lg-6 col-md-6 mb-2 mt-0">
                                                             <label className="form-label">
                                                                 Sale End <span className="text-danger">*</span>
                                                             </label>
+
                                                             <input
+                                                                type="datetime-local"
+                                                                className={`form-control rounded-0 ${errors.sale_end ? "is-invalid" : ""}`}
+                                                                name="sale_end"
+                                                                value={formData.sale_end}
+                                                                onChange={handlePaidDateChange}
+                                                                min={formData.sale_start || ""}
+                                                                max={formData.date_from || ""} // ✅ Sale must end before event start
+                                                                required={!isFree}
+                                                            />
+
+
+                                                            {/* <input
                                                                 type="datetime-local"
                                                                 className={`form-control rounded-0 ${errors.sale_end ? "is-invalid" : ""}`}
                                                                 name="sale_end"
@@ -764,7 +795,7 @@ const EventDetailsPage = () => {
                                                                 min={formData.sale_start || new Date().toISOString().slice(0, 16)}
                                                                 max={formData.date_to || ""}
                                                                 required={!isFree}
-                                                            />
+                                                            /> */}
                                                             {errors.sale_end && <div className="invalid-feedback">{errors.sale_end}</div>}
                                                         </div>
 
