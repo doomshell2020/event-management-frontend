@@ -531,7 +531,7 @@ export default function CartModal({ show, handleClose, eventId }) {
 
             /* ------------------ ADD / UPDATE CART ------------------ */
             const existing = addonCart.find(
-                item => item.uniqueId === addonId
+                item => item.uniqueId == addonId
             );
 
             if (existing) {
@@ -540,7 +540,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                 await addToCart({
                     event_id: finalEventId,
                     item_type: "addon",
-                    addon_id: addonId, // ✅ FIXED
+                    addons_id: addonId, // ✅ FIXED
                     count: 1
                 });
             }
@@ -581,7 +581,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                 await addToCart({
                     event_id: finalEventId,
                     item_type: "addon",
-                    addon_id: addonId,
+                    addons_id: addonId,
                     count: 1
                 });
 
@@ -631,7 +631,7 @@ export default function CartModal({ show, handleClose, eventId }) {
 
         } catch (err) {
 
-            if (err?.response?.status === 409) {
+            if (err?.response?.status == 409) {
                 const result = await Swal.fire({
                     title: "Items from another event found!",
                     text:
