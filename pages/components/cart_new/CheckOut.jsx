@@ -135,10 +135,10 @@ export default function CheckOutComponents({
 
         <Button
           onClick={handleModalClose}
-          className="btn-close ms-auto py-0 ps-0 paynow-close d-flex justify-content-center align-items-center"
+          className="btn-close ms-auto py-0 ps-0 pe-5 paynow-close d-flex justify-content-center align-items-center"
           variant=""
         >
-          <i className="bi bi-x-lg"></i>
+          {/* <i className="bi bi-x-lg"></i> */}
         </Button>
       </Modal.Header>
 
