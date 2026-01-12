@@ -9,8 +9,8 @@ import {
 } from "@stripe/react-stripe-js";
 import { useEffect, useState, useCallback } from "react";
 import { Button, Col, Row, Modal, Form } from "react-bootstrap";
-const stripePromise = loadStripe(process.env.STRIPE_PUBLIC_KEY);
-const stripePromiseDev = loadStripe(process.env.STRIPE_PUBLIC_KEY);
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY);
+const stripePromiseDev = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY);
 
 // Loading Component
 const LoadingComponent = ({ isActive }) =>

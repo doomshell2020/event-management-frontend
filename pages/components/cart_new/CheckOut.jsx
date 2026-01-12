@@ -11,7 +11,7 @@ import Swal from "sweetalert2";
 
 /* Stripe Init */
 const stripePromise = loadStripe(
-  process.env.STRIPE_PUBLIC_KEY
+  process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY
 );
 
 /* Round Helper */

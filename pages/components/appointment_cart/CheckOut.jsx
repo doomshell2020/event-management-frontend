@@ -26,7 +26,7 @@ export default function CheckOutComponents({
     let stripePromise;
 
     stripePromise = loadStripe(
-        process.env.STRIPE_SECRET_KEY
+        process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY
     );
     const [isLoading, setIsLoading] = useState(true);
     const [clientSecret, setClientSecret] = useState("");
