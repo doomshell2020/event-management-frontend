@@ -31,7 +31,7 @@ const ManagePackages = () => {
     // console.log('packageList :', packageList);
 
     const currencyName = eventDetails?.currencyName.Currency_symbol;
-    // console.log('currencyName :', currencyName);
+    console.log('currencyName :', currencyName);
 
     // fetch addons list
     const handleGetPackagesList = async () => {
@@ -163,6 +163,7 @@ const ManagePackages = () => {
         visibility: "",
     });
 
+    const [discountError, setDiscountError] = useState("");
 
     // ✅ Auto calculate totals on qty/discount change
     useEffect(() => {
@@ -575,8 +576,8 @@ const ManagePackages = () => {
                                                                                     >
                                                                                         <i
                                                                                             className={`bi ${pkg.hidden === "Y"
-                                                                                                    ? "bi-eye"
-                                                                                                    : "bi-eye-slash"
+                                                                                                ? "bi-eye"
+                                                                                                : "bi-eye-slash"
                                                                                                 }`}
                                                                                         ></i>
                                                                                         {pkg.hidden === "Y"
@@ -789,7 +790,7 @@ const ManagePackages = () => {
                                     <tr key={ticket.id}>
                                         <td>{index + 1}</td>
                                         <td>{ticket.title}</td>
-                                        <td>{ticket.price}</td>
+                                        <td>{currencyName}{ticket.price}</td>
                                         <td>
                                             <Form.Select
                                                 style={{ width: "100px", margin: "auto" }}
@@ -815,7 +816,7 @@ const ManagePackages = () => {
                                         </td>
 
                                         <td>
-                                            {(
+                                            {currencyName}{(
                                                 (packageForm.ticketQty?.[ticket.id] || 0) * ticket.price
                                             ).toFixed(2)}
                                         </td>
@@ -862,7 +863,7 @@ const ManagePackages = () => {
                                         </td>
 
                                         <td>
-                                            {(
+                                            {currencyName}{(
                                                 (packageForm.addonQty?.[addon.id] || 0) * addon.price
                                             ).toFixed(2)}
                                         </td>
@@ -891,7 +892,7 @@ const ManagePackages = () => {
                                     <tbody>
                                         <tr>
                                             <td className="fw-bold text-start ps-2">Total</td>
-                                            <td className="fw-bold pe-3">${total.toFixed(2)}</td>
+                                            <td className="fw-bold pe-3">{currencyName}{total.toFixed(2)}</td>
                                         </tr>
                                         <tr>
                                             <td className="fw-bold text-start ps-2">Discount</td>
@@ -901,19 +902,37 @@ const ManagePackages = () => {
                                                     min="0"
                                                     style={{ width: "100px", display: "inline-block" }}
                                                     value={packageForm.discount || ""}
-                                                    onChange={(e) =>
-                                                        setPackageForm({
-                                                            ...packageForm,
-                                                            discount: e.target.value,
-                                                        })
-                                                    }
+                                                    isInvalid={!!discountError}
+                                                    onChange={(e) => {
+                                                        const value = Number(e.target.value || 0);
+
+                                                        if (value >= total) {
+                                                            // 🔴 Error + discount empty
+                                                            setDiscountError("Discount amount cannot be greater than total");
+                                                            setPackageForm({
+                                                                ...packageForm,
+                                                                discount: "",
+                                                            });
+                                                        } else {
+                                                            setDiscountError("");
+                                                            setPackageForm({
+                                                                ...packageForm,
+                                                                discount: value,
+                                                            });
+                                                        }
+                                                    }}
                                                 />
+
+                                                <Form.Control.Feedback type="invalid">
+                                                    Discount amount cannot be greater than total
+                                                </Form.Control.Feedback>
+
                                             </td>
                                         </tr>
                                         <tr>
                                             <td className="fw-bold text-start ps-2">Grand Total</td>
                                             <td className="fw-bold pe-3">
-                                                ${grandTotal.toFixed(2)}
+                                                {currencyName}{grandTotal.toFixed(2)}
                                             </td>
                                         </tr>
                                     </tbody>
