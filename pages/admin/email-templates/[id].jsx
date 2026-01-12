@@ -27,6 +27,8 @@ const StaticEdit = () => {
     const [subject, setSubject] = useState("");
     // const content = getHtmlEditorContent(noteRef);
     const [editorData, setEditorData] = useState({ content: "" });
+    const [events, setEvents] = useState([]);
+    const [selectedEvent, setSelectedEvent] = useState("");
 
     const fetchTemplateDetails = async (id) => {
         if (!id) return;
@@ -40,7 +42,7 @@ const StaticEdit = () => {
                 setTitle(templateData.title || "");
                 setSubject(templateData.subject || "");
                 setEditorData({ content: templateData.description })
-                setSelectedEvent(templateData.eventId || "")
+                setSelectedEvent(templateData.eventId || 0)
             }
         } catch (error) {
             console.error("Failed to fetch templateData details:", error);
@@ -48,8 +50,7 @@ const StaticEdit = () => {
             setIsLoading(false);
         }
     };
-    const [events, setEvents] = useState([]);
-    const [selectedEvent, setSelectedEvent] = useState("");
+    
     const getEvents = async () => {
         try {
             const { data } = await api.get("/api/v1/admin/email-templates/events");
@@ -58,18 +59,21 @@ const StaticEdit = () => {
             console.error("Error fetching event organizers:", err);
         }
     };
+
     useEffect(() => {
         fetchTemplateDetails(id);
         getEvents();
     }, [id]);
+
     const isEditorEmpty = (html = "") => {
         const text = html
             .replace(/<[^>]*>/g, "") // remove HTML tags
             .replace(/&nbsp;/g, "")
             .trim();
 
-        return text.length === 0;
+        return text.length == 0;
     };
+
     const [validateDefault, setValidateDefault] = useState(false);
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -91,7 +95,7 @@ const StaticEdit = () => {
                 title: title.trim(),
                 subject: subject.trim(),
                 description: content,
-                eventId:selectedEvent
+                eventId: selectedEvent
             };
             const res = await api.put(`/api/v1/admin/email-templates/${id}`, payload);
             if (res?.data?.success) {
@@ -125,7 +129,6 @@ const StaticEdit = () => {
             setValidateDefault(true);
         }
     };
-
 
 
     return (
@@ -197,13 +200,8 @@ const StaticEdit = () => {
                                     </CFormSelect>
                                 </CCol>
 
-
-
-
-
                                 <CCol md={12}>
                                     <b>Format Description</b><span style={{ color: "Red" }}>*</span><br />
-
                                     <div >
                                         <HtmlEditor
                                             editorRef={noteRef}

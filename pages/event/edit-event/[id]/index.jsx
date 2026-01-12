@@ -575,14 +575,7 @@ const MyEventsPage = () => {
                                                             Event End:- (
                                                             {formatDateTimeShort(eventDetails?.date_to?.local)}
                                                             ) <span className="text-danger">*</span>
-                                                        </label>
-                                                        {/* <input
-                                                            type="datetime-local"
-                                                            className="form-control rounded-0"
-                                                            name="date_to"
-                                                            onChange={handleChange}
-                                                            value={formData.date_to}
-                                                        /> */}
+                                                        </label>                                                       
 
                                                         <input
                                                             type="datetime-local"
@@ -606,14 +599,6 @@ const MyEventsPage = () => {
                                                                     {formatDateTimeShort(eventDetails?.sale_start?.local)}
                                                                     ) <span className="text-danger">*</span>
                                                                 </label>
-                                                                {/* <input
-                                                                    type="datetime-local"
-                                                                    className="form-control rounded-0"
-                                                                    name="sale_start"
-                                                                    onChange={handleChange}
-                                                                    value={formData.sale_start}
-                                                                /> */}
-
                                                                 <input
                                                                     type="datetime-local"
                                                                     className="form-control rounded-0"
@@ -622,10 +607,6 @@ const MyEventsPage = () => {
                                                                     onChange={handleDateChange}
                                                                     // disabled={!formData.date_from || !formData.date_to}
                                                                 />
-
-
-
-
                                                             </div>
 
                                                             <div className="col-md-6">
@@ -634,14 +615,6 @@ const MyEventsPage = () => {
                                                                     {formatDateTimeShort(eventDetails?.sale_end?.local)}
                                                                     ) <span className="text-danger">*</span>
                                                                 </label>
-                                                                {/* <input
-                                                                    type="datetime-local"
-                                                                    className="form-control rounded-0"
-                                                                    name="sale_end"
-                                                                    onChange={handleChange}
-                                                                    value={formData.sale_end}
-                                                                /> */}
-
                                                                 <input
                                                                     type="datetime-local"
                                                                     className={`form-control rounded-0 ${dateErrors.sale_end ? "is-invalid" : ""}`}
