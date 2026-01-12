@@ -2,15 +2,7 @@ const ENV = process.env.NODE_ENV;
 const isDev = ENV == 'development';
 const isPWAEnabled = false; // toggle this via .env
 
-console.log(
-  '===========Running in',
-  ENV,
-  'Mode | PWA Enabled:',
-  isPWAEnabled,
-  ' | DB_NAME:',
-  process.env.DB_NAME,
-  '==================='
-);
+console.log('===========Running in',  ENV,  'Mode | PWA Enabled:',  isPWAEnabled,  '===================');
 
 const withPWA = isPWAEnabled
   ? require('next-pwa')({
@@ -31,6 +23,7 @@ const nextConfig = {
   },
   env: {
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
+    NEXT_PUBLIC_API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL,
     SITE_URL: process.env.SITE_URL,
     STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
     STRIPE_PUBLIC_KEY: process.env.STRIPE_PUBLIC_KEY,

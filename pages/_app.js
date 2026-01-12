@@ -23,7 +23,7 @@ function MyApp({ Component, pageProps }) {
 
   const router = useRouter();
   const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL;
-  const isProduction = process.env.NODE_ENV === "production";
+  const isProduction = process.env.NODE_ENV == "production";
 
   useEffect(() => {
     const handleStart = () => nprogress.start();
