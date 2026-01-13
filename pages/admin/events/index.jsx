@@ -23,6 +23,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import moment from "moment";
 import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
 import Link from "next/link";
 
 export const Events = () => {
@@ -401,6 +402,10 @@ export const Events = () => {
             // PDF DEFINITION
             // ===============================
             const docDefinition = {
+                defaultStyle: {
+                    font: "Roboto",
+                    fontSize: 9,
+                },
                 info: {
                     title: "Event Summary Tender Report"
                 },
@@ -504,21 +509,18 @@ export const Events = () => {
         }
     };
 
-
-
-
-
-
-
-
-
-
     const formatAmount = (row, key) => {
         const symbol = row?.currencyName?.Currency_symbol || "";
         const value = Number(row?.[key] || 0);
 
-        return value > 0 ? `${symbol} ${value}` : "---";
+        if (!value) return "---";
+
+        return `${symbol} ${value.toLocaleString("en-IN", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        })}`;
     };
+
     const [eventList, setEventList] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     // Alert messages

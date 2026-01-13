@@ -44,26 +44,109 @@ export const TicketList = () => {
                 );
             },
         },
+        // {
+        //     Header: "Ticket No.",
+        //     accessor: "TicketNo",
+        //     className: "borderrigth",
+        //     Cell: ({ row }) => {
+        //         const {
+        //             ticket_id,
+        //             addon_id,
+        //             appointment_id,
+        //             package_id
+        //         } = row.original;
+
+        //         const ticketNo =
+        //             ticket_id ||
+        //             addon_id ||
+        //             appointment_id ||
+        //             package_id ||
+        //             "-";
+
+        //         return (
+        //             <div>
+        //                 {ticketNo}
+        //             </div>
+        //         );
+        //     },
+        // },
         {
-            Header: "Ticket No.",
-            accessor: "TicketNo",
+            Header: "Ticket",
+            accessor: "ticket_name",
             className: "borderrigth",
             Cell: ({ row }) => {
-                const {
-                    ticket_id,
-                    addon_id,
-                    appointment_id
-                } = row.original;
+                const item = row.original;
+                const { type } = item;
 
-                const ticketNo =
-                    ticket_id ||
-                    addon_id ||
-                    appointment_id ||
-                    "-";
+                let name = "-";
+                let label = "";
+
+                switch (type) {
+                    case "ticket":
+                        name = item.ticketType?.title;
+                        label = "Ticket";
+                        break;
+
+                    case "comps":
+                        name = item.ticketType?.title;
+                        label = "Comps";
+                        break;
+
+                    case "committesale":
+                        name = item.ticketType?.title;
+                        label = "Committee";
+                        break;
+
+                    case "addon":
+                        name = item.addonType?.name;
+                        label = "Addon";
+                        break;
+
+                    case "appointment":
+                        name = item.appointment?.wellnessList?.name;
+                        label = "Appointment";
+                        break;
+
+                    case "package":
+                        name = item.package?.name;
+                        label = "Package";
+                        break;
+
+                    case "ticket_price":
+                        if (item.ticketPricing?.ticket?.title) {
+                            const slotName = item.ticketPricing?.slot?.slot_name;
+                            name = slotName
+                                ? `${item.ticketPricing.ticket.title} (${slotName})`
+                                : item.ticketPricing.ticket.title;
+                            label = "Ticket Price";
+                        }
+                        break;
+
+                    default:
+                        name = "-";
+                        label = "";
+                }
 
                 return (
-                    <div>
-                        {ticketNo}
+                    <div className="d-flex flex-column">
+                        <span className="fw-semibold">{name || "-"}</span>
+
+                        {label && (
+                            <span
+                                className="badge mt-1"
+                                style={{
+                                    backgroundColor: "#28a745",
+                                    color: "#fff",
+                                    fontSize: "12px",
+                                    padding: "4px 8px",
+                                    borderRadius: "4px",
+                                    fontWeight: 600,
+                                    width: "fit-content",
+                                }}
+                            >
+                                {label}
+                            </span>
+                        )}
                     </div>
                 );
             },
@@ -184,12 +267,14 @@ export const TicketList = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [customer, setCustomer] = useState("");
     const [mobile, setMobile] = useState("");
+    const [email, setEmail] = useState("");
     const [event, setEvent] = useState("");
     const [ticketNumber, setTicketNumber] = useState("");
     const [fromDate, setFromDate] = useState(null);
     const [toDate, setToDate] = useState(null);
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [selectedEvent, setSelectedEvent] = useState(null);
+    const [selectedEmail, setSelectedEmail] = useState(null);
     const getTicketList = async () => {
         try {
             setIsLoading(true);
@@ -247,6 +332,7 @@ export const TicketList = () => {
                 params: {
                     customer,
                     mobile,
+                    email: email,
                     event,
                     ticketNumber,
                     purchaseFrom: fromDate ? fromDate.toISOString().split("T")[0] : "",
@@ -270,6 +356,8 @@ export const TicketList = () => {
         setTicketNumber("");
         setFromDate(null);
         setToDate(null);
+        setEmail("");
+        setSelectedEmail(null);
         setTicketList([]);
         getTicketList(); // reload full list
     };
@@ -282,7 +370,7 @@ export const TicketList = () => {
     };
     const headers = [
         "Buy Date & Time",
-        "Ticket No.",
+        "Ticket",
         "Event Name",
         "Event Date & Time",
         "Customer Name",
@@ -300,6 +388,44 @@ export const TicketList = () => {
         if (!amount) return "0";
         return ((Number(amount) * percent) / 100).toFixed(2);
     };
+
+    const getTicketDisplayName = (item) => {
+        const type = item?.type;
+
+        switch (type) {
+            case "ticket":
+                return `Ticket - ${item.ticketType?.title || "-"}`;
+
+            case "comps":
+                return `Comps - ${item.ticketType?.title || "-"}`;
+
+            case "committesale":
+                return `Committee - ${item.ticketType?.title || "-"}`;
+
+            case "addon":
+                return `Addon - ${item.addonType?.name || "-"}`;
+
+            case "appointment":
+                return `Appointment - ${item.appointment?.wellnessList?.name || "-"}`;
+
+            case "package":
+                return `Package - ${item.package?.name || "-"}`;
+
+            case "ticket_price":
+                if (item.ticketPricing?.ticket?.title) {
+                    const slotName = item.ticketPricing?.slot?.slot_name;
+                    return slotName
+                        ? `Ticket - ${item.ticketPricing.ticket.title} (${slotName})`
+                        : `Ticket - ${item.ticketPricing.ticket.title}`;
+                }
+                return "-";
+
+            default:
+                return "-";
+        }
+    };
+
+
     const csvData = ticketList.map((item) => {
         const order = item?.order || {};
         const user = order?.user || {};
@@ -311,16 +437,21 @@ export const TicketList = () => {
 
         return {
             "Buy Date & Time": formatDateTime(order?.created),
-            "Ticket No.": item?.ticket_id || "----",
+
+            // ✅ Ticket name + type
+            "Ticket": getTicketDisplayName(item),
+
             "Event Name": event?.name || "----",
             "Event Date & Time": `${formatDateTime(event?.date_from)} - ${formatDateTime(event?.date_to)}`,
-            "Customer Name": `${user?.first_name || ""} ${user?.last_name || ""}`.trim() || "----",
+            "Customer Name":
+                `${user?.first_name || ""} ${user?.last_name || ""}`.trim() || "----",
             "Mobile": user?.mobile || "----",
             "Buy Ticket": item?.count || 0,
             "Amount": `${currency}${amount}`,
-            "Commission(8%)": `${currency}${commission}`,
+            "Commission (8%)": `${currency}${commission}`,
         };
     });
+
     const onExportLinkPress = () => {
         const rows = [
             headers,
@@ -421,7 +552,42 @@ export const TicketList = () => {
         }
     };
 
+    const loadUserEmailOptions = async (inputValue) => {
+        if (inputValue.length < 2) return [];
+        try {
+            const response = await api.get(
+                "/api/v1/admin/customers/email/search",
+                {
+                    params: {
+                        search: inputValue, // 👈 backend expects this
+                    },
+                }
+            );
+            const data = response.data;
+            if (data?.success) {
+                return data.data.customers.map((user) => ({
+                    value: user.id,
+                    label: user.email, // 👈 correct key
+                    user,
+                }));
+            }
 
+            return [];
+        } catch (error) {
+            console.error("Error fetching users:", error);
+            return [];
+        }
+    };
+
+    const handleUserEmailSelect = (selectedOption) => {
+        setSelectedEmail(selectedOption); // 👈 dropdown control
+
+        if (selectedOption) {
+            setEmail(selectedOption.user.email);
+        } else {
+            setEmail("");
+        }
+    };
 
 
 
@@ -439,8 +605,6 @@ export const TicketList = () => {
                         </Card.Header>
                         <Card.Body className="p-2">
                             <Form onSubmit={handleSearch}>
-
-
                                 <Form.Group className="mb-3">
                                     <Form.Label>Customer</Form.Label>
                                     <AsyncSelect
@@ -472,15 +636,36 @@ export const TicketList = () => {
                                     />
                                 </Form.Group>
 
-                                {/* <Form.Group className="mb-3">
-                                    <Form.Label>Mobile</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="Mobile"
-                                        value={mobile}
-                                        onChange={(e) => setMobile(e.target.value)}
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Email</Form.Label>
+                                    <AsyncSelect
+                                        className="search-dropdown"
+                                        cacheOptions
+                                        loadOptions={loadUserEmailOptions}
+                                        value={selectedEmail}
+                                        onChange={handleUserEmailSelect}
+                                        placeholder="Search by email"
+                                        isClearable
+                                        getOptionLabel={(option) => option.user.email}
+                                        getOptionValue={(option) => option.value}
+                                        formatOptionLabel={(option, { context }) => {
+                                            if (context === "menu") {
+                                                return (
+                                                    <div>
+                                                        <strong>{option.user.email}</strong>
+                                                    </div>
+                                                );
+                                            }
+                                            return option.user.email;
+                                        }}
+                                        styles={{
+                                            menu: (provided) => ({
+                                                ...provided,
+                                                zIndex: 1050,
+                                            }),
+                                        }}
                                     />
-                                </Form.Group> */}
+                                </Form.Group>
 
                                 <Form.Group className="mb-3">
                                     <Form.Label>Event</Form.Label>

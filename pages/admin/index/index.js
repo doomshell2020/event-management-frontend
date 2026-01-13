@@ -641,7 +641,7 @@ const Dashboard = () => {
                     <tr>
                       <th>S.No</th>
                       <th>Purchase Date</th>
-                      <th>Ticket No.</th>
+                      <th>Ticket</th>
                       <th>Event</th>
                       <th>Event Date & Time</th>
                       <th>Customer</th>
@@ -664,6 +664,58 @@ const Dashboard = () => {
                         addon_id ||
                         appointment_id ||
                         "-";
+
+                      const { type } = value;
+
+                      let name = "-";
+                      let label = "";
+
+                      switch (type) {
+                        case "ticket":
+                          name = value.ticketType?.title;
+                          label = "Ticket";
+                          break;
+
+                        case "comps":
+                          name = value.ticketType?.title;
+                          label = "Comps";
+                          break;
+
+                        case "committesale":
+                          name = value.ticketType?.title;
+                          label = "Committee";
+                          break;
+
+                        case "addon":
+                          name = value.addonType?.name;
+                          label = "Addon";
+                          break;
+
+                        case "appointment":
+                          name = value.appointment?.wellnessList?.name;
+                          label = "Appointment";
+                          break;
+
+                        case "package":
+                          name = value.package?.name;
+                          label = "Package";
+                          break;
+
+                        case "ticket_price":
+                          if (value.ticketPricing?.ticket?.title) {
+                            const slotName = value.ticketPricing?.slot?.slot_name;
+                            name = slotName
+                              ? `${value.ticketPricing.ticket.title} (${slotName})`
+                              : value.ticketPricing.ticket.title;
+                            label = "Ticket Price";
+                          }
+                          break;
+
+                        default:
+                          name = "-";
+                          label = "";
+                      }
+
                       const eventName = value?.order?.event?.name;
 
                       const event = value?.order?.event;
@@ -682,7 +734,25 @@ const Dashboard = () => {
                           <td> {value?.order
                             ? moment(value?.order?.created).format("DD MMM, YYYY hh:mm A")
                             : "---"}</td>
-                          <td> {ticketNo}</td>
+                          {/* <td> {ticketNo}</td> */}
+                          <td>  <div className="d-flex flex-column">
+                            <span className="fw-semibold">{name || "-"}</span>
+                            {label && (
+                              <span
+                                className="badge"
+                                style={{
+                                  backgroundColor: "#28a745",
+                                  color: "#fff",
+                                  fontSize: "12px",
+                                  padding: "4px 8px",
+                                  borderRadius: "4px",
+                                  fontWeight: 600,
+                                }}
+                              >
+                                {label}
+                              </span>
+                            )}
+                          </div></td>
                           <td>{eventName}</td>
                           <td>
                             <strong>From</strong> {moment(event.date_from).format("DD MMM, YYYY hh:mm A")}<br />
