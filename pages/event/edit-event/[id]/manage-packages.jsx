@@ -401,7 +401,7 @@ const ManagePackages = () => {
 
                                     <div className="col-md-5 text-end">
                                         <button
-                                            className="primery-button fw-normal px-2 text-white"
+                                            className="primery-button fw-normal px-2 text-white button-mobile-fullwidth"
                                             style={{ backgroundColor: "#00ad00" }}
                                             onClick={() => setShow(true)}
                                         >
@@ -428,11 +428,11 @@ const ManagePackages = () => {
                                         <div className="row g-3">
                                             {packageList.map((pkg) => (
                                                 <div key={pkg.id} className="col-md-12">
-                                                    <div className="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
+                                                    <div className="card h-100 shadow-sm border-0 rounded-4 overflow-hidden manage-ticket-module">
                                                         <div className="card-body p-3">
 
                                                             {/* ===== Header ===== */}
-                                                            <div className="d-flex justify-content-between align-items-start">
+                                                            <div className="d-flex justify-content-between align-items-start flex-wrap gap-3">
 
                                                                 {/* Left */}
                                                                 <div>
@@ -441,17 +441,17 @@ const ManagePackages = () => {
                                                                         {pkg.name}
                                                                     </h5>
 
-                                                                    <small className="text-muted d-block">
+                                                                   <small className="d-block text-black mb-2 mt-3" style={{ fontSize: "12px" }}>
                                                                         <i className="bi bi-stack me-1"></i>
                                                                         Total Limit: <strong>{pkg.total_package ?? 0}</strong>
                                                                     </small>
 
-                                                                    <small className="text-muted d-block">
+                                                                <small className="d-block text-black mb-2" style={{ fontSize: "12px" }}>
                                                                         <i className="bi bi-cart-check me-1"></i>
                                                                         Sold: <strong>{pkg.sold_count ?? 0}</strong>
                                                                     </small>
 
-                                                                    <small className="text-muted d-block">
+                                                                <small className="d-block text-black mb-2" style={{ fontSize: "12px" }}>
                                                                         <i className="bi bi-box-arrow-in-down me-1"></i>
                                                                         Available:{" "}
                                                                         <strong>
@@ -466,7 +466,7 @@ const ManagePackages = () => {
                                                                 <div className="text-center">
                                                                     {pkg.total_package && (
                                                                         pkg.total_package - (pkg.sold_count ?? 0) <= 0 ? (
-                                                                            <span className="badge bg-danger px-3 py-2">
+                                                                            <span className="bg-danger px-3 py-2 text-white d-flex sold-button">
                                                                                 <i className="bi bi-x-circle me-1"></i>
                                                                                 Sold Out
                                                                             </span>
@@ -480,10 +480,10 @@ const ManagePackages = () => {
                                                                 </div>
 
                                                                 {/* Right */}
-                                                                <div className="text-end">
+                                                                <div className="text-end d-flex align-items-center">
                                                                     <span
-                                                                        className={`badge ${pkg.hidden === "Y" ? "bg-danger" : "bg-success"
-                                                                            } rounded-pill px-3`}
+                                                                        className={`${pkg.hidden === "Y" ? "bg-danger" : "bg-success"
+                                                                            } rounded-pill px-3 py-1 text-white`}
                                                                     >
                                                                         <i
                                                                             className={`bi ${pkg.hidden === "Y" ? "bi-eye-slash" : "bi-eye"
@@ -532,7 +532,7 @@ const ManagePackages = () => {
                                                                                             setOpenDropdown(null);
                                                                                         }}
                                                                                     >
-                                                                                        <i className="bi bi-pencil-square text-primary"></i>
+                                                                                        <i className="bi bi-pencil-square text-primary me-2"></i>
                                                                                         Edit Package
                                                                                     </button>
                                                                                 </li>
@@ -575,9 +575,9 @@ const ManagePackages = () => {
                                                                                         }}
                                                                                     >
                                                                                         <i
-                                                                                            className={`bi ${pkg.hidden === "Y"
-                                                                                                ? "bi-eye"
-                                                                                                : "bi-eye-slash"
+                                                                                            className={`bi me-2 ${pkg.hidden === "Y"
+                                                                                                    ? "bi-eye"
+                                                                                                    : "bi-eye-slash"
                                                                                                 }`}
                                                                                         ></i>
                                                                                         {pkg.hidden === "Y"
@@ -594,7 +594,7 @@ const ManagePackages = () => {
 
 
                                                             {/* ===== Totals Section ===== */}
-                                                            <div className="mt-3 small text-muted d-flex justify-content-between">
+                                                            <div className="mt-3 d-flex justify-content-between flex-wrap gap-3">
                                                                 <div>
                                                                     <i className="bi bi-percent me-1"></i>
                                                                     <strong>Discount:</strong> {currencyName}{pkg.discount_amt || 0}
@@ -615,9 +615,9 @@ const ManagePackages = () => {
                                                                     Items
                                                                 </h6>
 
-                                                                <div className="table-responsive">
-                                                                    <table className="table table-sm align-middle mb-0">
-                                                                        <thead className="table-light text-center small">
+                                                                <div className="table-responsive pb-2">
+                                                                    <table className="table table-sm align-middle mb-0 table-mobile-width">
+                                                                        <thead className="table-light text-center">
                                                                             <tr>
                                                                                 <th>#</th>
                                                                                 <th>Type</th>
@@ -626,7 +626,7 @@ const ManagePackages = () => {
                                                                                 <th>Price</th>
                                                                             </tr>
                                                                         </thead>
-                                                                        <tbody className="text-center small">
+                                                                        <tbody className="text-center">
                                                                             {pkg.details?.length > 0 ? (
                                                                                 pkg.details.map((item, index) => {
                                                                                     const isTicket = !!item.ticketType;
@@ -638,7 +638,7 @@ const ManagePackages = () => {
                                                                                         <tr key={item.id}>
                                                                                             <td>{index + 1}</td>
                                                                                             <td>
-                                                                                                <span className="badge bg-secondary-subtle text-dark">
+                                                                                                <span className="bg-secondary-subtle">
                                                                                                     {isTicket ? "Ticket" : "Addon"}
                                                                                                 </span>
                                                                                             </td>

@@ -312,10 +312,10 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
                                                                             </h5>
 
                                                                             {/* Card */}
-                                                                            <div className="ticket-box p-3 border rounded shadow-sm">
+                                                                            <div className="ticket-box only-appo p-3 border rounded shadow-sm">
                                                                                 {w.wellnessSlots?.length > 0 ? (
                                                                                     w.wellnessSlots.map((slot) => (
-                                                                                        <div
+                                                                                        <div className="appointment-timeshadulebox"
                                                                                             key={slot.id}
                                                                                             style={{
                                                                                                 display: "flex",
@@ -329,7 +329,7 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
                                                                                             }}
                                                                                         >
                                                                                             {/* Left Side */}
-                                                                                            <div
+                                                                                            <div className="appointment-date-timebox"
                                                                                                 style={{
                                                                                                     display: "flex",
                                                                                                     alignItems: "center",
@@ -366,7 +366,7 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
                                                                                             </div>
 
                                                                                             {/* Price */}
-                                                                                            <div style={{ fontWeight: 600, fontSize: "16px" }}>
+                                                                                            <div className="apointment-price" style={{ fontWeight: 600, fontSize: "16px" }}>
                                                                                                 {currency} {slot.price}
                                                                                             </div>
                                                                                         </div>

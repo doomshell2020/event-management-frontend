@@ -184,7 +184,7 @@ const ManageAddons = () => {
                                 </p>
 
                                 <div className="row align-items-baseline">
-                                    <div className="col-md-7">
+                                    <div className="col-md-6">
                                         <ul className="tabes d-flex ps-0">
                                             <li>
                                                 <Link href={`/event/edit-event/${id}/manage-tickets`} className="text-16">
@@ -209,9 +209,9 @@ const ManageAddons = () => {
                                         </ul>
                                     </div>
 
-                                    <div className="col-md-5 text-end">
+                                    <div className="col-md-6 text-end buttons-row">
                                         <button
-                                            className="primery-button fw-normal px-2 text-white"
+                                            className="primery-button fw-normal px-2 text-white button-mobile-fullwidth"
                                             style={{ backgroundColor: "#00ad00" }}
                                             onClick={() => setShow(true)}
                                         >
@@ -247,7 +247,7 @@ const ManageAddons = () => {
                                                 >
                                                     {/* Left Section: Addon Info */}
                                                     <div className="col-sm-8">
-                                                        <p className="body-text mb-1">
+                                                        <p className="body-text mb-2">
                                                             <strong>{addon.name}</strong>
                                                             {isSoldOut && (
                                                                 <span className="badge bg-danger ms-2">
@@ -256,13 +256,13 @@ const ManageAddons = () => {
                                                             )}
                                                         </p>
 
-                                                        <p className="mb-1 text-muted">
+                                                        <p className="mb-1 text-muted mb-2">
                                                             {addon.description || "No description"}
                                                         </p>
 
-                                                        <div className="row">
+                                                        <div className="row manage-ticket-rows">
                                                             <div className="col-md-6">
-                                                                <p className="body-text mb-0 d-flex align-items-center flex-wrap">
+                                                                <p className="body-text mb-0 d-flex align-items-center flex-wrap gap-2 manage-ticket-table">
                                                                     <Package size={16} className="me-2 text-primary" />
                                                                     {currencyName}{addon.price}
 
@@ -278,7 +278,7 @@ const ManageAddons = () => {
                                                             </div>
 
                                                             <div className="col-md-6">
-                                                                <p className="body-text mb-0 d-flex align-items-center">
+                                                                <p className="body-text mb-0 d-flex align-items-center manage-ticket-table">
                                                                     {addon.hidden == "Y" ? (
                                                                         <>
                                                                             <EyeOff
@@ -305,7 +305,7 @@ const ManageAddons = () => {
                                                     <div className="col-sm-4 text-end">
                                                         <div className="dropdown d-inline position-relative">
                                                             <button
-                                                                className="btn btn-primary btn-sm rounded-pill"
+                                                                className="btn btn-primary btn-sm setting-dropdown"
                                                                 type="button"
                                                                 onClick={() =>
                                                                     setOpenDropdown(

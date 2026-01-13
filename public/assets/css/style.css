@@ -97,7 +97,9 @@ button.swal2-close.text-white.bg-transparent.position-absolute.top-2.right-2.fs-
   top: 5px;
   font-size: 31px !important;
 }
-
+.table thead th {
+    vertical-align: middle;
+}
 .swal2-popup.swal2-modal.swal2-show img.swal2-image {
   width: auto !important;
   margin: 0px auto 0px;
@@ -470,6 +472,9 @@ header .navflexbox .logodiv:focus-visible {
   gap: 6px;
 }
 
+.dropdown-item {
+    font-size: 14px;
+}
 .headernav .userwelcome-button:hover {
   background-color: #d61b46;
 }
@@ -2585,7 +2590,7 @@ li.menu_line {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #2ec2b3;
+  background-color: rgb(223, 59, 103);
 }
 
 .careyes-chekout-new .cart-mdl-only .chackout-box .chackout-detabox .delete-btn i {
@@ -2938,10 +2943,18 @@ li.menu_line {
 }
 
 #myevent-deshbord .dsa_contant ul.tabes {
-  padding-left: 0rem;
-  margin-top: 32px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #ccc;
+padding-left: 0rem;
+    margin-top: 32px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #ccc;
+    display: inline-flex;
+    width: max-content; 
+    white-space: nowrap;
+}
+
+#myevent-deshbord .dsa_contant .col-md-7:has(> ul.tabes) {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 #myevent-deshbord .dsa_contant ul.tabes li {
@@ -3025,6 +3038,9 @@ li.menu_line {
 
 .next.primery-button {
   background-color: #3d6db5;
+}
+ .setting-dropdown svg.lucide.lucide-settings {
+    margin-top: -1px;
 }
 
 /* manage ticket pg end */
@@ -3531,6 +3547,13 @@ a.active {
 
 .form-check-label {
   font-size: 12px;
+}
+
+.checkbutn-row .form-check {
+    padding-left: 16px;
+}
+.checkbutn-row .form-check label{
+    font-size: 14px;
 }
 
 .modal-content {
@@ -5581,6 +5604,9 @@ input[type="date"] {
     width: 240px;
     height: 235px;
   }
+  .checkbutn-row .form-check label{
+    font-size: 12px;
+}
 }
 
 @media (max-width: 1200px) {
@@ -5631,7 +5657,19 @@ input[type="date"] {
     font-size: 13px;
     text-align: justify;
   }
-
+  .calender-box {
+    margin-right: 20px;
+    width: 60%;
+}
+#request-demo .mettingTimingsDv {
+    width: 40%;
+}
+.manage-ticket-table {
+    font-size: 12px !important;
+}
+.manage-commitee-tiket-module .table-container-box .table thead tr th {
+    font-size: 12px;
+}
 }
 
 
@@ -5840,13 +5878,22 @@ input[type="date"] {
     overflow: hidden;
   }
 
-  .headernav .navbar-light .navbar-collapse.show {
-    height: 100vh;
-  }
+   .headernav .navbar-light .navbar-collapse.show {
+        height: auto;
+        max-height: 100vh;
+        overflow-y: scroll;
+    }
+    .headernav .header-dropdown {
+    position: static;
+}
 
   .headernav button.navbar-toggler {
-    position: relative;
-    z-index: 999;
+     position: relative;
+        z-index: 999;
+        box-shadow: none;
+        background-color: transparent;
+        outline: none;
+        border: none;
   }
 
   .headernav .menuflexbox {
@@ -6041,6 +6088,40 @@ input[type="date"] {
   .careyes-chekout-new .cart-mdl-only .care-new-check.modal-body {
     max-height: calc(100vh - 88px) !important;
 }
+.headernav .menuflexbox {
+    gap: 16px;
+}
+.demo-innerconent .col-lg-4 img.contactImg {
+    width: 60%;
+    margin: auto;
+}
+#request-demo .meattingpgRgt {
+    padding: 20px;
+}
+#request-demo .mettingTimingsDv ul {
+    padding-right: 0px;
+}
+#myevent-deshbord .dsa_contant ul.tabes li a {
+    font-size: 14px;
+}
+#myevent-deshbord .dsa_contant ul.tabes li {
+    padding-right: 1rem;
+}
+#myevent-deshbord .contant_bg {
+    padding: 25px 20px;
+}
+.onlymanage-question-page .row {
+    row-gap: 13px;
+}
+    .checkbutn-row .form-check label {
+        font-size: 13px;
+    }
+       .onlymanage-question-page .form-check-input[type=checkbox] {
+        margin-top: 3px;
+    }
+    .table-width-992{
+      min-width: 1000px !important;
+    }
 }
 
 @media (min-width: 768px) and (max-width: 992px) {
@@ -6278,6 +6359,37 @@ input[type="date"] {
 }
 .event-crt-deta.mt-2.text-center {
     margin-bottom: 30px;
+}
+    .careyes-chekout-new .cart-mdl-only .model-left-content {
+        overflow: hidden;
+    }
+   .calender-box {
+        width: 50%;
+        margin-right: 0px;
+    }
+        #request-demo .mettingTimingsDv {
+        width: 50%;
+    }
+    .input-row .form-control, .form-select {
+        color: #212529  !important;
+    }
+    #request-demo .mettingTimingsDv ul li a {
+    font-size: 14px;
+}
+.manage-ticket-table {
+    font-size: 14x !important;
+}
+.row.manage-ticket-rows {
+    gap: 10px;
+}
+    .manage-ticket-table {
+        font-size: 13px !important;
+    }
+    .checkbutn-row .form-check {
+    padding-left: 20px;
+}
+.manage-ticket-module .sold-button {
+    font-size: 12px;
 }
 }
 
@@ -6621,6 +6733,73 @@ input[type="date"] {
 .careyes-chekout-new .cart-mdl-only .cart-mdl-innercontent {
     margin-bottom: 0px;
 }
+.careyes-chekout-new .cart-mdl-only .cart-mdl-title {
+    font-size: 1rem;
+    margin-bottom: 16px;
+}
+.careyes-chekout-new .cart-mdl-only .ticket-item.package-box .count-price-deta .count-total-prize {
+    font-size: 13px !important;
+}
+.careyes-chekout-new .cart-mdl-only .ticket-item.package-box .count-price-deta .discount-price{font-size: 12px !important;}
+.careyes-chekout-new .cart-mdl-only .ticket-item.package-box .count-price-deta .pay-price{font-size: 13px !important;}
+.careyes-chekout-new .cart-mdl-only .ticket-item .family-package-heading{
+  font-size: 14px !important;
+}
+.oxmonten2025EvntSec .care-new-check .checkout-innr .checkot-lft .eventsBxSec .ticket-section h5 {
+    font-size: 15px !important;
+}
+.careyes-chekout-new .care-new-check .checkout-innr .checkot-lft .ck-event-dtl {
+        margin-top: 14px !important;
+    }
+    .oxmonten2025EvntSec .care-new-check .checkout-innr .checkot-lft .eventsBxSec {
+        margin-bottom: 8px;
+    }
+.appointment-model .men-innr-sec .ticket-box.only-appo {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    background-color: transparent;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0px !important;
+}
+.appointment-timeshadulebox {
+    padding: 10px !important;
+}
+.appointment-timeshadulebox .appointment-date-timebox {
+    gap: 8px !important;
+}
+.appointment-timeshadulebox .apointment-price {
+    font-size: 14px !important;
+}
+    .calender-box {
+        width: 100%;
+    }
+        #request-demo .mettingTimingsDv {
+        width: 100%;
+    }
+    .demo-innerconent .col-lg-4 img.contactImg {
+        width: 100%;
+    }
+    #request-demo .meattingpgLeft h1 {
+    font-size: 18px;
+}
+#request-demo .timingsMeetingUl li {
+    font-size: 14px;
+}
+.meatingForm .form-control,
+.meatingForm .form-floating > label {
+    font-size: 13px !important;
+}
+
+.meatingForm .form-control::placeholder {
+    font-size: 13px;
+}
+.flex-grow-1.phone-numberinput {
+    width: 100%;
+}
+.checkbutn-row .form-check {
+        padding-left: 30px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -6679,6 +6858,45 @@ input[type="date"] {
   .calendar-wrapper {
     padding: 17px;
 }
+.careyes-chekout-new .cart-mdl-only .only-ticket .counter-btn span {
+    font-size: 10px !important;
+    width: 6px !important;
+}
+.careyes-chekout-new .cart-mdl-only .ticket-info p {
+    margin-bottom: 7px;
+}
+.careyes-chekout-new .cart-mdl-only .ticket-info strong {
+    font-size: 13px !important;
+}
+.careyes-chekout-new .cart-mdl-only .ticket-item {
+        padding: 10px;
+    }
+    .careyes-chekout-new .cart-mdl-only .chackout-box h2 {
+    font-size: 18px;
+}
+.oxmonten2025EvntSec .care-new-check .checkout-innr .checkot-lft .eventsBxSec .appointment-date-timebox span {
+    font-size: 12px !important;
+}
+.careyes-chekout-new .cart-mdl-only .chackout-box {
+    padding: 17px 14px;
+}
+.careyes-chekout-new .care-new-check .checkout-innr .checkot-rgt .checkot-tct-purcs .apply-cd input {
+    font-size: 14px !important;
+}
+.careyes-chekout-new .care-new-check .checkout-innr .checkot-rgt .checkot-tct-purcs .apply-cd Button {
+    padding: 5px 32px !important;
+}
+.button-mobile-fullwidth{width: 100%;margin-left: 0px !important; margin-top: 5px;}
+.onlymanage-question-page .form-check-input[type=checkbox] {margin-top: 2px;font-size: 14px !important;}
+#myevent-deshbord .contant_bg h6 {font-size: 13px;}
+    #myevent-deshbord .event_names {
+padding-left: 8px !important;
+padding-right: 8px !important;
+    }
+    .committee-event-detailpg .custom-input {
+    font-size: 12px !important;
+}
+
 }
 
 @media (max-width: 420px) {
@@ -6719,6 +6937,7 @@ input[type="date"] {
     height: 38px;
     font-size: 18px;
 }
+
 }
 
 @media (max-width: 400px) {
@@ -6744,6 +6963,12 @@ input[type="date"] {
 .rbc-date-cell .rbc-button-link {
     font-size: 13px;
 }
+    .careyes-chekout-new .cart-mdl-only .ticket-item {
+        zoom: .9;
+    }
+        .appointment-timeshadulebox {
+        zoom: .9;
+    }
 
 }
 
@@ -6787,4 +7012,7 @@ input[type="date"] {
   #myevent-deshbord .event-sidebar ul li button {
     font-size: 10px !important;
   }
+      #myevent-deshbord .event_names a, #myevent-deshbord .event_names button {
+        font-size: 12px;
+    }
 }

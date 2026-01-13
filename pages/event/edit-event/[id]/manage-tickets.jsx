@@ -238,7 +238,7 @@ const ManageTickets = () => {
                                 </p>
 
                                 <div className="row align-items-baseline">
-                                    <div className="col-md-7">
+                                    <div className="col-md-6">
                                         <ul className="tabes d-flex ps-0">
                                             <li>
                                                 <Link href={`/event/edit-event/${id}/manage-tickets`} className="active text-16">
@@ -275,10 +275,10 @@ const ManageTickets = () => {
                                         </ul>
                                     </div>
 
-                                    <div className="col-md-5 text-end">
+                                    <div className="col-md-6 text-end buttons-row">
                                         {eventDetails?.is_free == 'N' && (
                                             <button
-                                                className="primery-button fw-normal px-2 text-white"
+                                                className="primery-button fw-normal px-2 text-white button-mobile-fullwidth"
                                                 style={{ backgroundColor: "#00ad00" }}
                                                 onClick={() => setShow(true)}
                                             >
@@ -287,7 +287,7 @@ const ManageTickets = () => {
                                         )}
 
                                         <button
-                                            className="primery-button fw-normal px-2 ms-1 text-white"
+                                            className="primery-button fw-normal px-2 ms-1 text-white button-mobile-fullwidth"
                                             style={{ backgroundColor: "#ff9800" }}
                                             onClick={() => setComplimentary(true)}
                                         >
@@ -313,11 +313,11 @@ const ManageTickets = () => {
                                     ) : (ticketsList.map((ticket) => (
                                         <div
                                             key={ticket.id}
-                                            className="row item_bg m-0 p-2 mb-2 align-items-center manage-ticket-type"
+                                            className="row item_bg m-0 p-2 mb-3 align-items-center manage-ticket-type"
                                         >
                                             {/* LEFT CONTENT */}
-                                            <div className="col-sm-9">
-                                                <p className="body-text mb-1">
+                                            <div className="col-sm-6 col-md-9">
+                                                <p className="body-text mb-3">
                                                     <strong>{ticket.title}</strong> ({currencyName}{ticket.price})
                                                     <br />
                                                     {ticket.type !== "comps" ? (
@@ -327,10 +327,10 @@ const ManageTickets = () => {
                                                     )}
                                                 </p>
 
-                                                <div className="row">
+                                                <div className="row manage-ticket-rows"> 
                                                     {/* TYPE */}
                                                     <div className="col-md-3">
-                                                        <p className="body-text mb-0 d-flex align-items-center">
+                                                        <p className="body-text mb-0 d-flex align-items-center manage-ticket-table">
                                                             <Ticket size={16} className="me-2 text-primary" />
                                                             {ticket.type == "open_sales"
                                                                 ? "Open Sale"
@@ -342,7 +342,7 @@ const ManageTickets = () => {
 
                                                     {/* ACCESS TYPE */}
                                                     <div className="col-md-3">
-                                                        <p className="body-text mb-0 d-flex align-items-center">
+                                                        <p className="body-text mb-0 d-flex align-items-center manage-ticket-table">
                                                             {ticket.access_type}
                                                         </p>
                                                     </div>
@@ -351,7 +351,7 @@ const ManageTickets = () => {
                                                     {ticket.type !== "comps" ? (
                                                         <>
                                                             <div className="col-md-3">
-                                                                <p className="body-text mb-0 d-flex align-items-center">
+                                                                <p className="body-text mb-0 d-flex align-items-center manage-ticket-table">
                                                                     {ticket.hidden == "Y" ? (
                                                                         <>
                                                                             <EyeOff
@@ -373,7 +373,7 @@ const ManageTickets = () => {
                                                             </div>
 
                                                             <div className="col-md-3">
-                                                                <p className="body-text mb-0 d-flex align-items-center">
+                                                                <p className="body-text mb-0 d-flex align-items-center manage-ticket-table">
                                                                     {ticket.sold_out == "Y" ? (
                                                                         <>
                                                                             <XCircle
@@ -397,7 +397,7 @@ const ManageTickets = () => {
                                                     ) : (
                                                         /* COMPS ONLY */
                                                         <div className="col-md-6">
-                                                            <p className="body-text mb-0 d-flex align-items-center text-success fw-semibold">
+                                                            <p className="body-text mb-0 d-flex align-items-center manage-ticket-table text-success fw-semibold">
                                                                 🎁 Complimentary Ticket
                                                             </p>
                                                         </div>
@@ -406,7 +406,7 @@ const ManageTickets = () => {
                                             </div>
 
                                             {/* RIGHT ACTIONS */}
-                                            <div className="col-sm-3 text-end">
+                                            <div className="col-sm-6 col-md-3 text-end">
                                                 {/* Committee badge */}
                                                 {ticket.type == "committee_sales" && (
                                                     <button
@@ -421,7 +421,7 @@ const ManageTickets = () => {
                                                 {ticket.type !== "comps" && (
                                                     <div className="dropdown d-inline position-relative">
                                                         <button
-                                                            className="btn btn-primary btn-sm"
+                                                            className="btn btn-primary btn-sm setting-dropdown"
                                                             type="button"
                                                             onClick={() =>
                                                                 setOpenDropdown(

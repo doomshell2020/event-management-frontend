@@ -275,7 +275,7 @@ const CommitteeTicketsPage = () => {
                                     {/* TABLE */}
                                     {!showLoader && (
 
-                                        <div className="card">
+                                        <div className="card manage-commitee-tiket-module">
                                             <div className="table-container-box shadow-sm mb-2 p-3">
                                                 {/* first table start*/}
                                                 <div className="card-header card-header fw-bold px-0 fs-6 pt-1 text-dark">
@@ -283,7 +283,7 @@ const CommitteeTicketsPage = () => {
                                                 </div>
                                                 {/* TABLE */}
                                                 <div className="table-responsive">
-                                                    <table className="table table-bordered text-center align-middle mb-2 table-border-dark-soft">
+                                                    <table className="table table-bordered text-center align-middle mb-2 table-border-dark-soft table-mobile-width">
                                                         <thead className="table-primary">
                                                             <tr>
                                                                 {ticketTypes.map((t) => (
@@ -312,13 +312,13 @@ const CommitteeTicketsPage = () => {
 
                                             </div>
 
-                                            <div className="table-container-box shadow-sm p-3">
+                                            <div className="table-container-box shadow-sm p-3 ">
                                                 <div className="card-header fw-semibold fw-bold  fs-6 text-dark px-0 pt-0 mb-3">
                                                     Ungrouped
                                                 </div>
 
                                                 <div className="table-responsive">
-                                                    <table className="table table-bordered mb-0">
+                                                    <table className="table table-bordered mb-0 table-mobile-width">
                                                         <thead className="table-primary">
                                                             <tr>
                                                                 <th>Sr.no</th>

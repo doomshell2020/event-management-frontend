@@ -117,8 +117,8 @@ const PublishEvent = () => {
                                 <div className="contant_bg mt-4">
                                     <h6>Activation Setting</h6>
                                     <hr className="custom-hr" />
-                                    <div className="d-flex align-items-center justify-content-between flex-wrap">
-                                        <div className="d-flex align-items-start mobile-widthfull">
+                                    <div className="row">
+                                        <div className="col-md-9 col-sm-8">
                                             {eventDetails && eventDetails.status == 'Y' ? (
                                                 <Eye className="me-2" />
                                             ) : (
@@ -137,10 +137,10 @@ const PublishEvent = () => {
                                                 </p>
                                             </div>
                                         </div>
-                                        <div className="mobile-widthfull mt-2">
+                                        <div className=" mt-2 col-md-3 col-sm-4">
                                             {eventDetails && (
                                                 <button
-                                                    className={`btn mobile-widthfull ${eventDetails.status === 'Y' ? 'btn-danger' : 'btn-success'
+                                                    className={`btn  w-100 ${eventDetails.status === 'Y' ? 'btn-danger' : 'btn-success'
                                                         }`}
                                                     onClick={toggleEventStatus}
                                                     disabled={statusLoading}

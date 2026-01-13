@@ -12,9 +12,9 @@ const RequestDemo = () => {
                 <div className="container">
                     <div className="demo-innerconent bg-white">
                         <div className="row align-items-stretch">
-                            <div className="col-md-4">
+                            <div className="col-lg-4">
                                 <div className="meattingpgLeft h-100 d-flex flex-column justify-content-between">
-                                    <div>
+                                    <div className="mobile-order-one">
                                         <h1 className="fw-bold">Schedule a Meeting</h1>
                                         <p className="body-text">For any information related to eboxtenants, Contact Us</p>
                                         <ul className="timingsMeetingUl p-0">
@@ -25,10 +25,10 @@ const RequestDemo = () => {
                                     <img src="https://eboxtickets.com/images/meetingTeamImg.svg" className="contactImg" alt="Meeting"></img>
                                 </div>
                             </div>
-                            <div className="col-md-8">
+                            <div className="col-lg-8">
                                 <div className="meattingpgRgt p-30">
 
-                                    <div className="d-flex gap-3">
+                                    <div className="d-flex gap-3 flex-wrap flex-sm-nowrap">
 
                                         <div className="calender-box">
                                             <img src="/assets/img/demo-celender.png" alt="slider" />
@@ -114,15 +114,15 @@ const RequestDemo = () => {
                                                     </div>
                                                 </div>
 
-                                                <div className="col-md-12 d-flex">
-                                                    <div className="me-2 w-25">
+                                                <div className="col-md-12 d-flex flex-wrap flex-sm-nowrap gap-3 gap-sm-0">
+                                                    <div className="me-2 w-100 w-md-25">
                                                         <select name="countryCode" className="form-select" required>
                                                             <option value="">--Select Country--</option>
                                                             <option value="93">Afghanistan (+93)</option>
                                                             <option value="355">Albania (+355)</option>
                                                         </select>
                                                     </div>
-                                                    <div className="flex-grow-1">
+                                                    <div className="flex-grow-1 phone-numberinput">
                                                         <div className="form-floating mb-3">
                                                             <input
                                                                 type="text"

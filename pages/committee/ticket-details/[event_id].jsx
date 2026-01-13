@@ -170,7 +170,7 @@ const TicketDetails = ({ pendingRequests, counts, event_id }) => {
                 {/* ---------------- TICKET TABLE ---------------- */}
                 <div className="card custom-card p-3">
                   <div className="table-responsive">
-                    <table className="table table-hover align-middle mb-0">
+                    <table className="table table-hover align-middle mb-0 mobile-talbe-width-480">
                       <thead className="table-light">
                         <tr>
                           <th className="px-3 py-2">Count</th>
@@ -238,29 +238,32 @@ const TicketDetails = ({ pendingRequests, counts, event_id }) => {
                           your friends can request tickets faster!
                         </p>
 
-                        <div className="d-flex gap-2">
-                          <input
-                            type="text"
-                            className="form-control custom-input"
-                            readOnly
-                            value={`${process.env.NEXT_PUBLIC_SITE_URL}event/${eventInfo?.id}/${eventInfo?.slug}`}
-                          />
-                          <button
-                            type="button"
-                            className="btn btn-copy px-4"
-                            onClick={() => {
-                              Swal.fire({
-                                icon: "success",
-                                title: "Link Ready",
-                                text: "Copy the link from the input field and share it with your friends.",
-                                timer: 2500,
-                                showConfirmButton: false
-                              });
-                            }}
-                          >
-                            Copy Link
-                          </button>
-
+                        <div className="row gap-2 gap-md-0">
+                          <div className="col-md-9">
+                            <input
+                              type="text"
+                              className="form-control custom-input"
+                              readOnly
+                              value={`${process.env.NEXT_PUBLIC_SITE_URL}event/${eventInfo?.id}/${eventInfo?.slug}`}
+                            />
+                          </div>
+                          <div className="col-md-3">
+                            <button
+                              type="button"
+                              className="btn btn-copy px-4 w-100 h-100"
+                              onClick={() => {
+                                Swal.fire({
+                                  icon: "success",
+                                  title: "Link Ready",
+                                  text: "Copy the link from the input field and share it with your friends.",
+                                  timer: 2500,
+                                  showConfirmButton: false
+                                });
+                              }}
+                            >
+                              Copy Link
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -354,7 +357,7 @@ const TicketDetails = ({ pendingRequests, counts, event_id }) => {
                                       <div className="fw-semibold">
                                         {user.first_name} {user.last_name}
                                       </div>
-                                      <small style={{fontSize: "12px",color: "#e62d56",}}>{user.email}</small>
+                                      <small style={{ fontSize: "12px", color: "#e62d56", }}>{user.email}</small>
                                     </div>
 
                                     <span className="badge bg-success-subtle text-success text-14">

@@ -256,9 +256,9 @@ button.fgg.text-light.p-0.btn.btn- {
   .header-new.white .link-font {
     font-size: 16px;
   }
-  .dropdown-item {
+  /* .dropdown-item {
     font-size: 12px;
-  }
+  } */
   .main-dropdwn {
     top: -32px !important;
     width: 200px;
@@ -8651,9 +8651,9 @@ position: relative;
 
   .input-row .form-control,
   .form-select {
-    color: #898989 !important;
+    /* color: #898989 !important; */
     height: 40px;
-    background: #e6dfd5;
+    /* background: #e6dfd5; */
     padding: 7px 10px;
     border-radius: 5px;
   }
