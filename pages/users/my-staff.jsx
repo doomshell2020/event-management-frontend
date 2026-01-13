@@ -104,9 +104,10 @@ const MyStaff = () => {
             setShow(false);
             fetchStaff();
         } catch (err) {
+        // console.log('err :', err.response?.data?.error?.message);
             Swal.fire(
                 "Error",
-                err.response?.data?.message || "Operation failed",
+                err.response?.data?.error?.message || "Operation failed",
                 "error"
             );
         } finally {
