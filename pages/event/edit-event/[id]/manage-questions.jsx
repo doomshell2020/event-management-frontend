@@ -335,7 +335,7 @@ const ManageQuestions = () => {
                                 </p>
 
                                 <div className="row align-items-baseline">
-                                    <div className="col-md-7">
+                                    <div className="col-md-6">
                                         <ul className="tabes d-flex ps-0">
                                             <li>
                                                 <Link href={`/event/edit-event/${id}/manage-tickets`} className="text-16">
@@ -360,9 +360,9 @@ const ManageQuestions = () => {
                                         </ul>
                                     </div>
 
-                                    <div className="col-md-5 text-end">
+                                    <div className="col-md-6 text-end">
                                         <button
-                                            className="primery-button fw-normal px-2 text-white"
+                                            className="primery-button fw-normal px-2 text-white button-mobile-fullwidth"
                                             style={{ backgroundColor: "#00ad00" }}
                                             onClick={() => setShow(true)}
                                         >
@@ -372,7 +372,7 @@ const ManageQuestions = () => {
                                     </div>
                                 </div>
 
-                                <div className="contant_bg mt-4">
+                                <div className="contant_bg mt-4 onlymanage-question-page">
                                     <h6>Link Questions With Tickets Type</h6>
                                     <hr className="custom-hr" />
 
@@ -390,10 +390,10 @@ const ManageQuestions = () => {
                                             questionsList.map((question) => (
                                                 <div
                                                     key={question.id}
-                                                    className="row bg-light m-0 p-3 mb-3 rounded align-items-center"
+                                                    className="row bg-light m-0 p-3 px-0 px-sm-3 mb-3 rounded align-items-center"
                                                 >
                                                     {/* Left Section - Question Details */}
-                                                    <div className="col-md-4">
+                                                    <div className="col-lg-4 col-md-6">
                                                         <p className="fw-bold mb-1">{question.name}</p>
                                                         <p className="mb-1">
                                                             <strong>Question:</strong> {question.question}
@@ -404,9 +404,9 @@ const ManageQuestions = () => {
                                                     </div>
 
                                                     {/* Center Section - Ticket Checkboxes */}
-                                                    <div className="col-md-5 d-flex flex-wrap gap-3">
+                                                    <div className="col-lg-4 col-md-6 d-flex flex-wrap checkbutn-row" style={{ gap: "0.5rem" }}>
                                                         {ticketsList.map((ticket) => (
-                                                            <div key={ticket.id} className="form-check me-3">
+                                                            <div key={ticket.id} className="form-check">
                                                                 <input
                                                                     type="checkbox"
                                                                     className="form-check-input"
@@ -433,7 +433,7 @@ const ManageQuestions = () => {
                                                     </div>
 
                                                     {/* Right Section - Action Buttons */}
-                                                    <div className="col-md-3 text-end">
+                                                    <div className="col-lg-4 col-md-12 text-end">
                                                         <button
                                                             className="btn btn-success me-2"
                                                             onClick={() => handleLinkTickets(question.id)}

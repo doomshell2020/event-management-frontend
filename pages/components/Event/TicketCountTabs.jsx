@@ -41,14 +41,17 @@ const TicketCountTabs = ({ active, onChange, counts }) => {
     return (
         <ul
             style={{
-                listStyle: "none",
-                display: "flex",
-                gap: "26px",
-                padding: 0,
-                margin: 0,
-                borderBottom: "1px solid #e5e5e5",
-                paddingBottom: "10px",
-            }}
+  listStyle: "none",
+  display: "flex",
+  gap: "26px",
+  padding: 0,
+  margin: 0,
+  borderBottom: "1px solid #e5e5e5",
+  paddingBottom: "10px",
+  width: "100%",
+  overflow: "auto",
+  whiteSpace: "nowrap",
+}}
         >
             {/* Ticket Count (always clickable) */}
             <li

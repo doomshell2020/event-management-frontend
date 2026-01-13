@@ -37,9 +37,9 @@ const CommitteeEventCard = ({ event, assets }) => {
             onClick={handleClick}
             className="committee-event-sec bg-white border shadow-sm rounded-3 p-3 cursor-pointer"
         >
-            <div className="row align-items-stretch">
-                <div className="col-4 d-flex">
-                    <div className="event-img-wrap w-100 d-flex align-items-center justify-content-center">
+            <div className="row align-items-stretch gap-2 gap-lg-0">
+                <div className="col-lg-4 d-flex">
+                    <div className="event-img-wrap w-100 h-100 d-flex align-items-center justify-content-center">
                         <img
                             src={eventImage}
                             alt={event.name}
@@ -47,7 +47,7 @@ const CommitteeEventCard = ({ event, assets }) => {
                         />
                     </div>
                 </div>
-                <div className="col-8 d-flex">
+                <div className="col-lg-8 d-flex">
                     <div className="w-100 d-flex flex-column justify-content-center">
                         <h6 className="fw-semibold mb-1">
                             {event.name}
@@ -190,7 +190,7 @@ const CommitteePage = ({ counts, eventsList, assets }) => {
                         {/* EVENTS GRID (6-6) */}
                         <div className="row mt-4">
                             {eventsList.map((event) => (
-                                <div key={event.id} className="col-md-6 mb-3">
+                                <div key={event.id} className="col-sm-6 mb-3">
                                     <CommitteeEventCard event={event} assets={assets} />
                                 </div>
                             ))}

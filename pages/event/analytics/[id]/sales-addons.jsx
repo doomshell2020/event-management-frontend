@@ -126,7 +126,7 @@ const SalesAddonsPage = () => {
                                             </div>
 
                                             <div className="table-responsive">
-                                                <table className="table align-middle mb-0">
+                                                <table className="table align-middle mb-0 mobile-talbe-width-480">
                                                     <thead className="table-light small text-uppercase">
                                                         <tr>
                                                             <th>Addon Type</th>

@@ -145,25 +145,29 @@ const CommitteeGroupPage = () => {
                                     )}
 
                                     {!showLoader && (
-                                        <div className="card px-3">
+                                        <div className="card px-0 px-sm-3">
                                             <div className="table-container-box shadow-sm p-3">
                                                 <h6>Add New Groups</h6>
 
-                                                <div className="d-flex justify-content-between align-items-center my-2">
-                                                    <input
-                                                        type="text"
-                                                        className="form-control me-2"
-                                                        placeholder="Enter group name"
-                                                        value={groupName}
-                                                        onChange={(e) => setGroupName(e.target.value)}
-                                                    />
-                                                    <button
-                                                        className="btn save next primery-button fw-normal"
-                                                        disabled={isSubmitting}
-                                                        onClick={handleCreateGroup}
-                                                    >
-                                                        {isSubmitting ? "Adding..." : "Add"}
-                                                    </button>
+                                                <div className="row my-2 mt-3 g-2">
+                                                    <div className="col-md-10 col-sm-8">
+                                                        <input
+                                                            type="text"
+                                                            className="form-control"
+                                                            placeholder="Enter group name"
+                                                            value={groupName}
+                                                            onChange={(e) => setGroupName(e.target.value)}
+                                                        />
+                                                    </div>
+                                                    <div className="col-md-2 col-sm-4 text-end">
+                                                        <button
+                                                            className="btn save next w-100 primery-button py-2 h-100 fw-normal"
+                                                            disabled={isSubmitting}
+                                                            onClick={handleCreateGroup}
+                                                        >
+                                                            {isSubmitting ? "Adding..." : "Add"}
+                                                        </button>
+                                                    </div>
                                                 </div>
 
                                                 <h6 className="mt-4">Existing Groups</h6>
@@ -184,7 +188,7 @@ const CommitteeGroupPage = () => {
                                                                 }}
                                                                 onClick={() =>
                                                                     router.push(
-                                                                    `/event/edit-event/${id}/committee/manage-committee-group-members?groupId=${g.id}`
+                                                                        `/event/edit-event/${id}/committee/manage-committee-group-members?groupId=${g.id}`
                                                                     )
                                                                 }
                                                             >
@@ -203,24 +207,32 @@ const CommitteeGroupPage = () => {
 
                                             </div>
 
-                                            <div className="d-flex justify-content-between align-items-center my-3">
-                                                <button className="btn primery-button fw-normal text-14">
-                                                    Previous
-                                                </button>
-                                                <button className="btn save next primery-button fw-normal text-14">
-                                                    Next
-                                                </button>
+                                            <div className="row my-3">
+                                                <div className="col-6">
+                                                    <button
+                                                        className="btn primery-button py-2 fw-normal text-14"
+                                                        style={{height:"auto"  }}
+                                                    >
+                                                        Previous
+                                                    </button>
+                                                </div>
+                                                <div className="col-6 text-end">
+                                                    <button className="btn save py-2 primery-button fw-normal text-14"
+                                                    style={{ height:"auto",backgroundColor:"#3d6db5" }}>
+                                                        Next
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     )}
+                                </div>
+                            </section>
                         </div>
-                    </section>
-                </div>
-            </div>
-        </div >
+                    </div>
+                </div >
             </section >
 
-    <FrontendFooter />
+            <FrontendFooter />
         </>
     );
 };

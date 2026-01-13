@@ -1175,7 +1175,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                             {/* HEADER */}
                                                                             <div className="d-flex justify-content-between align-items-start mb-2">
                                                                                 <div>
-                                                                                    <strong style={{ fontSize: "16px" }}>
+                                                                                    <strong className="family-package-heading" style={{ fontSize: "16px" }}>
                                                                                         {pkg.name}
                                                                                         <span
                                                                                             style={{
@@ -1196,14 +1196,14 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                                     </div> */}
                                                                                 </div>
 
-                                                                                <div className="text-end">
-                                                                                    <div style={{ fontSize: 14 }}>
+                                                                                <div className="text-end count-price-deta">
+                                                                                    <div className="count-total-prize" style={{ fontSize: 14 }}>
                                                                                         Total: <strong>{currencySymbol}{formatPrice(pkg.total)}</strong>
                                                                                     </div>
 
                                                                                     {pkg.discount_amt > 0 && (
                                                                                         <div
-                                                                                            className="text-13 fw-bold"
+                                                                                            className="text-13 fw-bold discount-price"
                                                                                             style={{
                                                                                                 color: "#2ec2b3",
                                                                                                 background: "transparent"
@@ -1213,7 +1213,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                                         </div>
                                                                                     )}
 
-                                                                                    <div style={{ fontSize: 15, fontWeight: 600 }}>
+                                                                                    <div className="pay-price" style={{ fontSize: 15, fontWeight: 600 }}>
                                                                                         Pay: {currencySymbol}{formatPrice(pkg.grandtotal)}
                                                                                     </div>
                                                                                 </div>

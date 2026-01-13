@@ -239,7 +239,7 @@ const CommitteeIgnored = ({ ignoredRequests, counts, assets }) => {
                         />
 
                         <div className="table-responsive mt-4">
-                            <table className="table table-hover align-middle">
+                            <table className="table table-hover align-middle table-width-992">
 
                                 <thead className="bg-dark text-white">
                                     <tr>
