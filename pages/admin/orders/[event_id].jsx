@@ -7,6 +7,7 @@ import {
     Spinner,
     Form
 } from "react-bootstrap";
+import { useRouter } from "next/router";
 import {
     useTable,
     useSortBy,
@@ -20,7 +21,10 @@ import "react-datepicker/dist/react-datepicker.css";
 import moment from "moment";
 import AsyncSelect from "react-select/async";
 
-export const OrdersList = () => {
+export const OrdersByEvent = () => {
+    const router = useRouter();
+    const { event_id } = router.query;
+    // console.log("event_id",event_id)
     const [COLUMNS, setCOLUMNS] = useState([
         {
             Header: "S.No",
@@ -49,7 +53,7 @@ export const OrdersList = () => {
             accessor: "OrderDetails",
             className: "borderrigth",
             Cell: ({ row }) => {
-                const { paymenttype, RRN ,order_uid} = row.original;
+                const { paymenttype, RRN } = row.original;
 
                 // 👇 FREE order case
                 if (paymenttype === "free") {
@@ -73,7 +77,6 @@ export const OrdersList = () => {
                 // 👇 Paid / other cases
                 return (
                     <div>
-                        <strong>Order Id: </strong>{order_uid || "-"}<br/>
                         <strong>Order Identifier: </strong>
                         {RRN || "-"}
                     </div>
@@ -178,10 +181,11 @@ export const OrdersList = () => {
     const [customer, setCustomer] = useState("");
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [selectedEvent, setSelectedEvent] = useState(null);
+
     const getOrdersList = async () => {
         try {
             setIsLoading(true);
-            const { data } = await api.get("/api/v1/admin/orders");
+            const { data } = await api.get(`/api/v1/admin/orders/${event_id}`);
             setOrdersList(data?.data?.orders || []);
         } catch (err) {
             console.error("Error fetching event organizers:", err);
@@ -191,8 +195,9 @@ export const OrdersList = () => {
     };
 
     useEffect(() => {
+        if (!event_id) return;
         getOrdersList();
-    }, []);
+    }, [event_id]);
     const tableInstance = useTable(
         {
             columns: COLUMNS,
@@ -232,16 +237,45 @@ export const OrdersList = () => {
         return `${year}-${month}-${day}`;
     };
 
+
+    useEffect(() => {
+        if (!event_id) return;
+
+        const fetchEventById = async () => {
+            try {
+                const response = await api.get(`/api/v1/admin/events/event-details/${event_id}`);
+                const data = response.data;
+                if (data?.success) {
+                    const eventObj = data.data.event;
+                    const option = {
+                        value: eventObj.id,
+                        label: eventObj.name,
+                        event: eventObj,
+                    };
+                    setSelectedEvent(option); // 👈 AsyncSelect default fill
+                    setEvent(eventObj.name);  // 👈 your normal state
+                }
+            } catch (error) {
+                console.error("Error fetching event by id:", error);
+            }
+        };
+
+        fetchEventById();
+    }, [event_id]);
+
+
+
+
     const handleSearch = async (e) => {
         e.preventDefault();
         try {
             // Format dates as YYYY-MM-DD for API
             const formattedFromDate = formatDate(fromDate);
             const formattedToDate = formatDate(toDate);
-            const response = await api.get("/api/v1/admin/orders/search", {
+            const response = await api.get("/api/v1/admin/orders/search-order-details", {
                 params: {
                     customer,
-                    event,
+                    event_id: event_id,
                     orderFrom: formattedFromDate,
                     orderTo: formattedToDate,
                 },
@@ -256,10 +290,8 @@ export const OrdersList = () => {
     };
 
     const handleReset = () => {
-        setEvent("");
         setCustomer("");
         setSelectedCustomer(null);   // 👈 THIS WAS MISSING
-        setSelectedEvent(null);   // 👈 THIS WAS MISSING
         setFromDate(null);
         setToDate(null);
         setOrdersList([]);
@@ -350,6 +382,7 @@ export const OrdersList = () => {
             return [];
         }
     };
+
     const handleEventSelect = (selectedOption) => {
         setSelectedEvent(selectedOption); // 👈 dropdown control
 
@@ -359,7 +392,6 @@ export const OrdersList = () => {
             setEvent("");
         }
     };
-
 
     const getCurrentDate = () => {
         const d = new Date();
@@ -495,6 +527,7 @@ export const OrdersList = () => {
                                     <Form.Label>Event</Form.Label>
                                     <AsyncSelect
                                         className="search-dropdown"
+                                        isDisabled
                                         cacheOptions
                                         loadOptions={loadEventOptions}
                                         value={selectedEvent}
@@ -757,6 +790,6 @@ export const OrdersList = () => {
     );
 };
 
-OrdersList.layout = "Contentlayout";
+OrdersByEvent.layout = "Contentlayout";
 
-export default OrdersList;
+export default OrdersByEvent;

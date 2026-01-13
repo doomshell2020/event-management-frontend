@@ -13,14 +13,16 @@ import {
     useGlobalFilter,
     usePagination,
 } from "react-table";
+import { useRouter } from "next/router";
 import Seo from "@/shared/layout-components/seo/seo";
 import api from "@/utils/api";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import moment from "moment";
 import AsyncSelect from "react-select/async";
-
-export const OrdersList = () => {
+export const OrderItemDetails = () => {
+    const router = useRouter();
+    const { type, event_id, item_id } = router.query;
     const [COLUMNS, setCOLUMNS] = useState([
         {
             Header: "S.No",
@@ -28,11 +30,11 @@ export const OrdersList = () => {
             className: "borderrigth",
         },
         {
-            Header: "Order Date",
+            Header: "Purchase Date",
             accessor: "OrderDate",
             className: "borderrigth",
             Cell: ({ row }) => {
-                const createdDate = row.original.created;
+                const createdDate = row.original?.order?.created;
                 return (
                     <div className="d-flex align-items-center gap-2">
                         <span>
@@ -45,53 +47,106 @@ export const OrdersList = () => {
             },
         },
         {
-            Header: "Order Details",
-            accessor: "OrderDetails",
+            Header: "Ticket",
+            accessor: "ticket_name",
             className: "borderrigth",
             Cell: ({ row }) => {
-                const { paymenttype, RRN ,order_uid} = row.original;
+                const { type } = row.original;
 
-                // 👇 FREE order case
-                if (paymenttype === "free") {
-                    return (
-                        <span
-                            className="badge ms-2"
-                            style={{
-                                backgroundColor: "#28a745",
-                                color: "#fff",
-                                fontSize: "12px",
-                                padding: "4px 8px",
-                                borderRadius: "4px",
-                                fontWeight: 600,
-                            }}
-                        >
-                            Free Ticket
-                        </span>
-                    );
+                let name = "-";
+                let label = "";
+
+                switch (type) {
+                    case "ticket":
+                        name = row.original.ticketType?.title;
+                        label = "Ticket";
+                        break;
+
+                    case "comps":
+                        name = row.original.ticketType?.title;
+                        label = "Comps";
+                        break;
+
+                    case "committesale":
+                        name = row.original.ticketType?.title;
+                        label = "Committee";
+                        break;
+
+                    case "addon":
+                        name = row.original.addonType?.name;
+                        label = "Addon";
+                        break;
+
+                    case "appointment":
+                        name = row.original.appointment?.wellnessList?.name;
+                        label = "Appointment";
+                        break;
+
+                    case "package":
+                        name = row.original.package?.name;
+                        label = "Package";
+                        break;
+
+                    default:
+                        name = "-";
+                        label = "";
                 }
 
-                // 👇 Paid / other cases
                 return (
-                    <div>
-                        <strong>Order Id: </strong>{order_uid || "-"}<br/>
-                        <strong>Order Identifier: </strong>
-                        {RRN || "-"}
+                    <div className="d-flex flex-column">
+                        <span className="fw-semibold">{name || "-"}</span>
+                        {label && (
+                            <span
+                                className="badge"
+                                style={{
+                                    backgroundColor: "#28a745",
+                                    color: "#fff",
+                                    fontSize: "12px",
+                                    padding: "4px 8px",
+                                    borderRadius: "4px",
+                                    fontWeight: 600,
+                                }}
+                            >
+                                {label}
+                            </span>
+                        )}
                     </div>
                 );
             },
         },
-
 
         {
             Header: "Event",
             accessor: "event",
             className: "borderrigth",
             Cell: ({ row }) => {
-                const eventName = row.original.event;
+                const eventName = row.original?.order?.event?.name;
+
+                return (
+                    <div>
+                        {eventName || "-"}
+                    </div>
+                );
+            },
+        },
+        {
+            Header: "Event Date & Time",
+            accessor: "eventDate",
+            className: "borderrigth",
+            Cell: ({ row }) => {
+                const event = row.original?.order?.event;
+
+                if (!event?.date_from || !event?.date_to) return "-";
+
                 return (
                     <div>
                         <div>
-                            {eventName?.name ? eventName?.name : "-"}
+                            <strong>From </strong>
+                            {moment(event.date_from).format("DD MMM, YYYY hh:mm A")}
+                        </div>
+                        <div>
+                            <strong>To </strong>
+                            {moment(event.date_to).format("DD MMM, YYYY hh:mm A")}
                         </div>
                     </div>
                 );
@@ -103,7 +158,7 @@ export const OrdersList = () => {
             accessor: "customer",
             className: "borderrigth",
             Cell: ({ row }) => {
-                const user = row.original.user;
+                const user = row.original?.order?.user;
 
                 if (!user) return <span>-</span>;
 
@@ -113,32 +168,28 @@ export const OrdersList = () => {
                 return (
                     <div>
                         <div>{fullName || "-"}</div>
+                        <div> {user.email || "-"}</div>
                         {user.mobile || "-"}
                     </div>
                 );
             },
         },
 
+
         {
             Header: "Qty.",
             accessor: "qty",
             className: "borderrigth",
             Cell: ({ row }) => {
-                const items = row.original.orderItems || [];
-
-                const totalQty = items.reduce(
-                    (sum, item) => sum + (item.count || 0),
-                    0
-                );
+                const qty = row.original?.count;
 
                 return (
                     <div>
-                        {totalQty || "-"}
+                        {qty ?? "-"}
                     </div>
                 );
             },
         },
-
         {
             Header: "Customer Pay",
             accessor: "CustomerPay",
@@ -161,42 +212,63 @@ export const OrdersList = () => {
         },
 
 
+
     ]);
+
     const formatCurrencyAmount = (row, key) => {
-        const symbol = row?.event?.currencyName?.Currency_symbol || "";
-        const amount = row?.[key];
+        const symbol =
+            row?.order?.event?.currencyName?.Currency_symbol || "";
+
+        const amount = row?.order?.[key];
 
         if (!amount) return "-";
 
         return `${symbol} ${Number(amount).toLocaleString("en-IN")}`;
     };
-    const [orderList, setOrdersList] = useState([]);
+    const [ticketList, setTicketList] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [customer, setCustomer] = useState("");
+    const [mobile, setMobile] = useState("");
+    const [event, setEvent] = useState("");
+    const [ticketNumber, setTicketNumber] = useState("");
     const [fromDate, setFromDate] = useState(null);
     const [toDate, setToDate] = useState(null);
-    const [event, setEvent] = useState("");
-    const [customer, setCustomer] = useState("");
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [selectedEvent, setSelectedEvent] = useState(null);
-    const getOrdersList = async () => {
+    const getTicketList = async () => {
         try {
             setIsLoading(true);
-            const { data } = await api.get("/api/v1/admin/orders");
-            setOrdersList(data?.data?.orders || []);
+
+            const payload = {
+                event_id,
+                item_id,
+                item_type: type, // ✅ correct key
+            };
+
+            const { data } = await api.post(
+                "/api/v1/admin/tickets/items/details",
+                payload
+            );
+            setTicketList(data?.data?.items || []);
         } catch (err) {
-            console.error("Error fetching event organizers:", err);
+            console.error("Error fetching tickets:", err);
         } finally {
             setIsLoading(false);
         }
     };
 
     useEffect(() => {
-        getOrdersList();
-    }, []);
+        // ✅ Wait until router is ready and all params exist
+        if (!router.isReady) return;
+        if (!type || !event_id || !item_id) return;
+
+        getTicketList();
+    }, [router.isReady, type, event_id, item_id]);
+
     const tableInstance = useTable(
         {
             columns: COLUMNS,
-            data: orderList,
+            data: ticketList,
         },
         useGlobalFilter,
         useSortBy,
@@ -223,65 +295,134 @@ export const OrdersList = () => {
 
     const { globalFilter, pageIndex, pageSize } = state;
     useEffect(() => { setPageSize(50) }, []);
+    useEffect(() => {
+        if (!event_id) return;
 
-    const formatDate = (date) => {
-        if (!date) return "";
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const day = String(date.getDate()).padStart(2, "0");
-        return `${year}-${month}-${day}`;
-    };
+        const fetchEventById = async () => {
+            try {
+                const response = await api.get(`/api/v1/admin/events/event-details/${event_id}`);
+                const data = response.data;
+                if (data?.success) {
+                    const eventObj = data.data.event;
+                    const option = {
+                        value: eventObj.id,
+                        label: eventObj.name,
+                        event: eventObj,
+                    };
+                    setSelectedEvent(option); // 👈 AsyncSelect default fill
+                    setEvent(eventObj.name);  // 👈 your normal state
+                }
+            } catch (error) {
+                console.error("Error fetching event by id:", error);
+            }
+        };
+
+        fetchEventById();
+    }, [event_id]);
+
 
     const handleSearch = async (e) => {
         e.preventDefault();
+
         try {
-            // Format dates as YYYY-MM-DD for API
-            const formattedFromDate = formatDate(fromDate);
-            const formattedToDate = formatDate(toDate);
-            const response = await api.get("/api/v1/admin/orders/search", {
+            const response = await api.get("/api/v1/admin/tickets/search", {
                 params: {
                     customer,
+                    mobile,
                     event,
-                    orderFrom: formattedFromDate,
-                    orderTo: formattedToDate,
+                    ticketNumber,
+                    purchaseFrom: fromDate ? fromDate.toISOString().split("T")[0] : "",
+                    purchaseTo: toDate ? toDate.toISOString().split("T")[0] : "",
                 },
             });
-
-            // console.log("0-response.data", response?.data?.data?.events)
-            setOrdersList(response?.data?.data?.orders); // Save API results in state
+            setTicketList(response?.data?.data.tickets || []);
         } catch (error) {
-            console.error("Error fetching orders:", error);
-            setOrdersList([]);
+            console.error("Error searching tickets:", error);
+            setTicketList([]);
         }
     };
 
+
     const handleReset = () => {
-        setEvent("");
         setCustomer("");
+        setMobile("");
         setSelectedCustomer(null);   // 👈 THIS WAS MISSING
-        setSelectedEvent(null);   // 👈 THIS WAS MISSING
+        setTicketNumber("");
         setFromDate(null);
         setToDate(null);
-        setOrdersList([]);
-        getOrdersList();
+        setTicketList([]);
+        getTicketList(); // reload full list
     };
 
 
-    const pageTotals = React.useMemo(() => {
-        return page.reduce(
-            (acc, row) => {
-                acc.subTotal += Number(row.original.sub_total || 0);
-                acc.taxTotal += Number(row.original.tax_total || 0);
-                return acc;
-            },
-            { subTotal: 0, taxTotal: 0 }
-        );
-    }, [page]);
-    const formatCurrency = (amount) => {
-        return `${Number(amount).toLocaleString("en-US", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-        })}`;
+
+    const getCurrentDate = () => {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    };
+    const headers = [
+        "Buy Date & Time",
+        "Ticket No.",
+        "Event Name",
+        "Event Date & Time",
+        "Customer Name",
+        "Mobile",
+        "Buy Ticket",
+        "Amount",
+        "Commission(8%)",
+    ];
+    const formatDateTime = (date) => {
+        if (!date) return "----";
+        const d = new Date(date);
+        return `${d.toLocaleDateString()} ${d.toLocaleTimeString()}`;
+    };
+    const calculateCommission = (amount, percent = 8) => {
+        if (!amount) return "0";
+        return ((Number(amount) * percent) / 100).toFixed(2);
+    };
+    const csvData = ticketList.map((item) => {
+        const order = item?.order || {};
+        const user = order?.user || {};
+        const event = order?.event || {};
+        const currency = event?.currencyName?.Currency_symbol || "";
+
+        const amount = order?.sub_total || 0;
+        const commission = calculateCommission(amount);
+
+        return {
+            "Buy Date & Time": formatDateTime(order?.created),
+            "Ticket No.": item?.ticket_id || "----",
+            "Event Name": event?.name || "----",
+            "Event Date & Time": `${formatDateTime(event?.date_from)} - ${formatDateTime(event?.date_to)}`,
+            "Customer Name": `${user?.first_name || ""} ${user?.last_name || ""}`.trim() || "----",
+            "Mobile": user?.mobile || "----",
+            "Buy Ticket": item?.count || 0,
+            "Amount": `${currency}${amount}`,
+            "Commission(8%)": `${currency}${commission}`,
+        };
+    });
+    const onExportLinkPress = () => {
+        const rows = [
+            headers,
+            ...csvData.map((row) =>
+                headers.map((header) => {
+                    const value = row[header] ?? "";
+                    return `"${String(value).replace(/"/g, '""')}"`;
+                })
+            ),
+        ];
+
+        const csvContent =
+            "data:text/csv;charset=utf-8,\uFEFF" +
+            rows.map((e) => e.join(",")).join("\n");
+
+        const link = document.createElement("a");
+        link.href = encodeURI(csvContent);
+        link.download = `Ticket_${getCurrentDate()}.csv`;
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     };
 
     const loadUserOptions = async (inputValue) => {
@@ -361,107 +502,27 @@ export const OrdersList = () => {
     };
 
 
-    const getCurrentDate = () => {
-        const d = new Date();
-        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-    };
 
-    const formatDateTime = (date) => {
-        if (!date) return "---";
-        return moment(date).format("DD MMM, YYYY hh:mm A");
-    };
-
-    const headers = [
-        "S.No",
-        "Order Date",
-        "Order Details",
-        "Event",
-        "Customer",
-        "Mobile",
-        "Qty",
-        "Customer Pay",
-        "Admin Commission",
-    ];
-
-    const calculateCommission = (amount, percent = 8) => {
-        if (!amount) return "0";
-        return ((Number(amount) * percent) / 100).toFixed(2);
-    };
-    const csvData = orderList.map((order, index) => {
-        const user = order?.user || {};
-        const event = order?.event || {};
-        const items = order?.orderItems || [];
-
-        const totalQty = items.reduce(
-            (sum, item) => sum + (item.count || 0),
-            0
-        );
-
-        const customerName =
-            [user.first_name, user.last_name].filter(Boolean).join(" ") || "-";
-
-        const orderDetails =
-            order.paymenttype === "free"
-                ? "Free Ticket"
-                : order.RRN || "-";
-
-        return {
-            "S.No": index + 1,
-            "Order Date": formatDateTime(order.created),
-            "Order Details": orderDetails,
-            "Event": event?.name || "-",
-            "Customer": customerName,
-            "Mobile": user?.mobile || "-",
-            "Qty": totalQty || "-",
-            "Customer Pay": formatCurrencyAmount(order, "sub_total"),
-            "Admin Commission": formatCurrencyAmount(order, "tax_total"),
-        };
-    });
-
-    const onExportLinkPress = () => {
-        const rows = [
-            headers,
-            ...csvData.map((row) =>
-                headers.map((header) => {
-                    const value = row[header] ?? "";
-                    return `"${String(value).replace(/"/g, '""')}"`;
-                })
-            ),
-        ];
-
-        const csvContent =
-            "data:text/csv;charset=utf-8,\uFEFF" +
-            rows.map((e) => e.join(",")).join("\n");
-
-        const link = document.createElement("a");
-        link.href = encodeURI(csvContent);
-        link.download = `orders_${getCurrentDate()}.csv`;
-
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    };
 
 
 
     return (
         <div>
-            <Seo title={"Order Manager"} />
+            <Seo title={"Ticket Manager"} />
             <Row className="row-sm mt-4">
                 <Col xl={2}>
                     <Card className="member-fltr-hid">
                         <Card.Header>
                             <div className="d-flex justify-content-between">
                                 <h4 className="card-title mg-b-0">Filters</h4>
-
                             </div>
                         </Card.Header>
                         <Card.Body className="p-2">
                             <Form onSubmit={handleSearch}>
 
-                                <Form.Group className="mb-3" controlId="formName">
-                                    <Form.Label>Customer</Form.Label>
 
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Customer</Form.Label>
                                     <AsyncSelect
                                         className="search-dropdown"
                                         cacheOptions
@@ -491,10 +552,11 @@ export const OrdersList = () => {
                                     />
                                 </Form.Group>
 
-                                <Form.Group className="mb-3" controlId="formName">
+                                <Form.Group className="mb-3">
                                     <Form.Label>Event</Form.Label>
                                     <AsyncSelect
                                         className="search-dropdown"
+                                        isDisabled
                                         cacheOptions
                                         loadOptions={loadEventOptions}
                                         value={selectedEvent}
@@ -524,58 +586,60 @@ export const OrdersList = () => {
 
 
 
-                                <Form.Group className="mb-3" controlId="formDateFrom">
-                                    <Form.Label>Order From</Form.Label>
-                                    <div style={{ width: "127%" }}>
-                                        <DatePicker
-                                            selected={fromDate}
-                                            onChange={(date) => {
-                                                setFromDate(date);
 
-                                                // Reset To Date if it is smaller than From Date
-                                                if (toDate && date && toDate < date) {
-                                                    setToDate(null);
-                                                }
-                                            }}
-                                            dateFormat="dd-MM-yyyy"
-                                            placeholderText="DD-MM-YY"
-                                            className="form-control"
-                                            wrapperClassName="w-100"
-                                            maxDate={toDate || null}   // optional (UX improvement)
-                                        />
-                                    </div>
+
+
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Ticket Number</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Ticket / Addon / Appointment ID"
+                                        value={ticketNumber}
+                                        onChange={(e) => setTicketNumber(e.target.value)}
+                                    />
                                 </Form.Group>
 
-                                <Form.Group className="mb-3" controlId="formDateTo">
-                                    <Form.Label>Order To</Form.Label>
-                                    <div style={{ width: "127%" }}>
-                                        <DatePicker
-                                            selected={toDate}
-                                            onChange={(date) => setToDate(date)}
-                                            dateFormat="dd-MM-yyyy"
-                                            placeholderText="DD-MM-YY"
-                                            className="form-control"
-                                            wrapperClassName="w-100"
-                                            disabled={!fromDate}      // ✅ Disable until From Date selected
-                                            minDate={fromDate}        // ✅ Cannot select smaller date
-                                        />
-                                    </div>
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Purchase From</Form.Label>
+                                    <DatePicker
+                                        selected={fromDate}
+                                        onChange={(date) => {
+                                            setFromDate(date);
+                                            if (toDate && date && toDate < date) {
+                                                setToDate(null);
+                                            }
+                                        }}
+                                        dateFormat="dd-MM-yyyy"
+                                        placeholderText="DD-MM-YYYY"
+                                        className="form-control"
+                                        maxDate={toDate || null}
+                                    />
                                 </Form.Group>
 
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Purchase To</Form.Label>
+                                    <DatePicker
+                                        selected={toDate}
+                                        onChange={(date) => setToDate(date)}
+                                        dateFormat="dd-MM-yyyy"
+                                        placeholderText="DD-MM-YYYY"
+                                        className="form-control"
+                                        disabled={!fromDate}
+                                        minDate={fromDate}
+                                    />
+                                </Form.Group>
 
-                                <div className="d-flex align-items-end justify-content-between">
-                                    <Button
-                                        variant="primary "
-                                        className="me-2 w-50"
-                                        type="submit"
-                                    >
+                                <div className="d-flex gap-2">
+                                    <Button type="submit" variant="primary" className="w-50">
                                         Submit
                                     </Button>
-                                    <Button variant="secondary" className="w-50" type="reset" onClick={handleReset}>
+                                    <Button type="button" variant="secondary" className="w-50" onClick={handleReset}>
                                         Reset
                                     </Button>
                                 </div>
+
                             </Form>
+
                         </Card.Body>
                     </Card>
                 </Col>
@@ -583,12 +647,13 @@ export const OrdersList = () => {
                     <Card>
                         <Card.Header className="">
                             <div className="d-flex justify-content-between">
-                                <h4 className="card-title mg-b-0">Order Manager</h4>
+                                <h4 className="card-title mg-b-0">Ticket Manager</h4>
                                 <Button onClick={onExportLinkPress}>
                                     Export CSV
                                 </Button>
                             </div>
                         </Card.Header>
+
                         <div className="table-responsive mt-4">
                             {isLoading ? (
                                 <div
@@ -642,6 +707,7 @@ export const OrdersList = () => {
                                                             </span>
                                                         </th>
                                                     ))}
+                                                    {/* <th>Actions</th> */}
                                                 </React.Fragment>
                                             ))}
                                         </tr>
@@ -649,6 +715,8 @@ export const OrdersList = () => {
                                     <tbody {...getTableBodyProps()}>
                                         {page.map((row) => {
                                             prepareRow(row);
+                                            const rowId = row.original.id; // Assuming `id` is present in row.original
+                                            const rowData = row.original; // Assuming `id` is present in row.original
                                             return (
                                                 <tr key={Math.random()} {...row.getRowProps()}>
 
@@ -667,18 +735,6 @@ export const OrdersList = () => {
                                                 </tr>
                                             );
                                         })}
-                                        {/* TOTAL ROW */}
-                                        {/* <tr style={{ fontWeight: "bold", background: "#f8f9fa" }}>
-                                            <td colSpan={6} className="text-end">
-                                                Total Amount :
-                                            </td>
-                                            <td>
-                                                {formatCurrency(pageTotals.subTotal)}
-                                            </td>
-                                            <td>
-                                                {formatCurrency(pageTotals.taxTotal)}
-                                            </td>
-                                        </tr> */}
                                     </tbody>
                                 </table>
                             )}
@@ -757,6 +813,6 @@ export const OrdersList = () => {
     );
 };
 
-OrdersList.layout = "Contentlayout";
+OrderItemDetails.layout = "Contentlayout";
 
-export default OrdersList;
+export default OrderItemDetails;

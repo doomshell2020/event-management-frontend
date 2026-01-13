@@ -10,25 +10,27 @@ import {
     Table,
     Spinner,
     Form,
+    Button
 } from "react-bootstrap";
 import Seo from "@/shared/layout-components/seo/seo";
 import ClipLoader from "react-spinners/ClipLoader";
 import api from "@/utils/api";
+import ExcelJS from "exceljs";
+import { saveAs } from "file-saver";
+import moment from "moment";
 
 const SalePerMonths = () => {
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
     const { eventId } = router.query; // Retrieve the event ID from the URL
     const [eventData, setEventData] = useState();
-    console.log("eventData", eventData)
-
+    const [excelLoading, setExcelLoading] = useState(false);
     useEffect(() => {
         if (eventId) {
             const fetchTicketTypes = async () => {
                 try {
                     setIsLoading(true);
                     const response = await api.get(`/api/v1/admin/finance/sales/monthly/${eventId}`);
-                    console.log("response", response.data.data)
                     setEventData(response.data.data);
                 } catch (error) {
                     console.error(error);
@@ -40,6 +42,127 @@ const SalePerMonths = () => {
         }
     }, [eventId]);
 
+
+    // download excel......
+    const handleDownloadMonthlyExcel = async (report) => {
+        try {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet("Sales Per Month");
+
+            const currency = report?.event?.currency_symbol || "";
+            const monthsArray = report?.months || [];
+
+            /* ================= NORMALIZE ================= */
+            const ordersByMonth = {};
+            monthsArray.forEach(m => {
+                ordersByMonth[m.month] = m;
+            });
+
+            const months = Object.keys(ordersByMonth);
+            const gross = report?.gross_total || {};
+
+            /* ================= TITLE ================= */
+            worksheet.mergeCells(1, 1, 1, months.length + 2);
+            worksheet.getCell("A1").value =
+                `${report?.event?.name || "Event"} - Sales By Months`;
+            worksheet.getCell("A1").font = { size: 14, bold: true };
+            worksheet.getCell("A1").alignment = { horizontal: "center" };
+            worksheet.addRow([]);
+
+            /* ================= HEADER ================= */
+            worksheet.addRow([
+                "Months",
+                "Gross Total",
+                ...months
+            ]).font = { bold: true };
+
+            /* ================= COUNT ROWS ================= */
+            const addCountRow = (label, grossKey, monthKey) => {
+                worksheet.addRow([
+                    label,
+                    gross[grossKey] || 0,
+                    ...months.map(m => ordersByMonth[m]?.[monthKey] || 0)
+                ]);
+            };
+
+            addCountRow("Tickets", "tickets", "tickets");
+            addCountRow("Addons", "addons", "addons");
+            addCountRow("Packages", "packages", "packages");
+            addCountRow("Appointments", "appointments", "appointments");
+            addCountRow("Committees", "committees", "committees");
+            addCountRow("Comps", "comps", "comps");
+
+            /* ================= AMOUNT ROWS ================= */
+            const addAmountRow = (label, grossKey, monthKey) => {
+                worksheet.addRow([
+                    `${label} (${currency})`,
+                    `${currency}${Number(gross[grossKey] || 0).toLocaleString()}`,
+                    ...months.map(
+                        m =>
+                            `${currency}${Number(
+                                ordersByMonth[m]?.[monthKey] || 0
+                            ).toLocaleString()}`
+                    )
+                ]);
+            };
+
+            addAmountRow("Face Value", "face_value", "face_value");
+            addAmountRow("Tax", "tax", "tax");
+            addAmountRow("Gross Amount", "gross_amount", "gross_amount");
+            addAmountRow("Cancellation Amount", "cancel_amount", "cancel_amount");
+
+            /* ================= NET ================= */
+            worksheet.addRow([
+                "Net Amount Received",
+                `${currency}${Number(report?.net_amount_received || 0).toLocaleString()}`
+            ]).font = { bold: true };
+
+            /* ================= STYLING ================= */
+            worksheet.eachRow(row => {
+                row.eachCell(cell => {
+                    cell.border = {
+                        top: { style: "thin" },
+                        left: { style: "thin" },
+                        bottom: { style: "thin" },
+                        right: { style: "thin" }
+                    };
+                    cell.alignment = {
+                        vertical: "middle",
+                        horizontal: "center"
+                    };
+                });
+            });
+
+            worksheet.columns.forEach(col => {
+                let max = 12;
+                col.eachCell({ includeEmpty: true }, cell => {
+                    const len = cell.value ? cell.value.toString().length : 10;
+                    max = Math.max(max, len + 2);
+                });
+                col.width = max;
+            });
+
+            /* ================= SAVE ================= */
+            const buffer = await workbook.xlsx.writeBuffer();
+            saveAs(
+                new Blob([buffer]),
+                `Sales_By_Months_${report?.event?.name || "Event"}_${moment().format(
+                    "YYYYMMDD_HHmmss"
+                )}.xlsx`
+            );
+
+        } catch (error) {
+            console.error("Excel download failed:", error);
+            alert("Something went wrong while generating the Excel file.");
+        }
+    };
+
+
+
+
+
+
+
     return (
         <>
             <Seo title={"Sales Summary Months"} />
@@ -47,6 +170,32 @@ const SalePerMonths = () => {
                 <Col xl={12}>
                     <div className="Mmbr-card">
                         <Card>
+                            <Card.Header className="ps-3 pb-2 d-flex justify-content-between align-items-center">
+                                <h4 className="card-title mg-b-5">Sales By Months</h4>
+
+                                <Button
+                                    variant="success"
+                                    className="btn-sm d-flex align-items-center"
+                                    onClick={() => handleDownloadMonthlyExcel(eventData)}
+                                    disabled={excelLoading}
+                                >
+                                    {excelLoading ? (
+                                        <>
+                                            <span
+                                                className="spinner-border spinner-border-sm me-2"
+                                                role="status"
+                                                aria-hidden="true"
+                                            ></span>
+                                            Downloading...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <i className="bi bi-file-earmark-excel-fill me-2"></i>
+                                            Download
+                                        </>
+                                    )}
+                                </Button>
+                            </Card.Header>
                             <Card.Body>
                                 <Tabs defaultActiveKey="summary" id="sales-per-months">
                                     <Tab eventKey="summary" title="Sales By Months">

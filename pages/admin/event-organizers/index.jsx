@@ -51,7 +51,7 @@ export const EventOrganizersList = () => {
             style: { width: "15%" },
             Cell: ({ row }) => (
                 <div>
-                {row.original.email ? row.original.email : "---"}
+                    {row.original.email ? row.original.email : "---"}
                 </div>
             ),
         },
@@ -114,23 +114,26 @@ export const EventOrganizersList = () => {
                                     >
                                         <span>
                                             <strong>Total Sales:</strong>{" "}
-                                            {event.total_sales !== null
+                                            {formatCurrency(event.total_sales, currency)}
+                                            {/* {event.total_sales !== null
                                                 ? `${currency}${event.total_sales}`
-                                                : "0"}
+                                                : "0"} */}
                                         </span>
 
                                         <span>
                                             <strong>Comm:</strong>{" "}
-                                            {event.total_tax !== null
+                                            {formatCurrency(event.total_tax, currency)}
+                                            {/* {event.total_tax !== null
                                                 ? `${currency}${event.total_tax}`
-                                                : "0"}
+                                                : "0"} */}
                                         </span>
 
                                         <span>
                                             <strong>Total:</strong>{" "}
-                                            {event.grand_total !== null
+                                            {formatCurrency(event.grand_total, currency)}
+                                            {/* {event.grand_total !== null
                                                 ? `${currency}${event.grand_total}`
-                                                : "0"}
+                                                : "0"} */}
                                         </span>
                                     </div>
                                 </div>
@@ -235,6 +238,18 @@ export const EventOrganizersList = () => {
     const [email, setEmail] = useState("");
     const [firstName, setFirstName] = useState("");
     const [mobile, setMobile] = useState("");
+
+
+    const formatCurrency = (value, symbol = "₹") => {
+        const num = Number(value || 0);
+        return `${symbol}${num.toLocaleString("en-IN", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        })}`;
+    };
+
+
+
     const handleStatusToggle = async (id, currentStatus) => {
         const newStatus = currentStatus === "Y" ? "N" : "Y";
         const statusText = newStatus === "Y" ? "Activate" : "Deactivate";

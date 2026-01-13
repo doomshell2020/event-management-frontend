@@ -11,15 +11,19 @@ import {
 } from "react-table";
 import Seo from "@/shared/layout-components/seo/seo";
 import Link from "next/link";
-
+import api from "@/utils/api";
 import ClipLoader from "react-spinners/ClipLoader";
+import ExcelJS from "exceljs";
+import { saveAs } from "file-saver";
+import moment from "moment";
 
 const SaleByTicketType = () => {
-  // const [DATA_TABLE, SetDATA_TABLE] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { eventId } = router.query; // Retrieve the event ID from the URL
   const [eventData, setEventData] = useState();
+  console.log("eventData", eventData)
+  const [excelLoading, setExcelLoading] = useState(false);
 
   useEffect(() => {
     if (eventId) {
@@ -27,19 +31,9 @@ const SaleByTicketType = () => {
       const fetchTicketTypes = async () => {
         try {
           setIsLoading(true);
-          const response = await fetch("/api/v1/dashboard/", {
-            method: "POST", // Use POST method
-            headers: {
-              "Content-Type": "application/json", // Specify JSON content type
-            },
-            body: JSON.stringify({
-              key: "sale_ticket_reports",
-              eventId: eventId,
-            }),
-          });
-
-          const { data } = await response.json();
-          setEventData(data);
+          const response = await api.get(`/api/v1/admin/finance/sales-ticket-types/${eventId}`);
+          //  console.log("response.data.data",response.data.data)
+          setEventData(response.data.data);
         } catch (error) {
           console.error(error);
         } finally {
@@ -104,6 +98,192 @@ const SaleByTicketType = () => {
 
   const { globalFilter, pageIndex } = state;
 
+
+  const handleDownloadOrdersExcel = async (eventName) => {
+    try {
+      setExcelLoading(true);
+
+      const currency = eventData?.event?.currency_symbol || "";
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet("Sales Report");
+
+      /* ================= TITLE ================= */
+      worksheet.mergeCells("A1:C1");
+      worksheet.getCell("A1").value = `${eventName} - Sales Report`;
+      worksheet.getCell("A1").font = { size: 14, bold: true };
+      worksheet.getCell("A1").alignment = { horizontal: "center" };
+      worksheet.addRow([]);
+
+      /* ================= HEADER ================= */
+      worksheet.addRow(["TYPE", "SOLD", "FACE VALUE"]).font = { bold: true };
+
+      /* ================= TICKETS ================= */
+      if (eventData?.ticketInfo?.tickets?.length > 0) {
+        worksheet.addRow([
+          "TOTAL TICKETS (All Tier)",
+          `${eventData.ticketInfo.summary.tickets.total_sold} / ${eventData.ticketInfo.count_summary.tickets}`,
+          `${currency}${Math.round(
+            eventData.ticketInfo.summary.tickets.total_face_value
+          ).toLocaleString()}`
+        ]).font = { bold: true };
+
+        eventData.ticketInfo.tickets.forEach(ticket => {
+          worksheet.addRow([
+            `${ticket.name} (${ticket.type})`,
+            ticket.sold,
+            `${currency}${Math.round(ticket.face_value).toLocaleString()}`
+          ]);
+        });
+
+        worksheet.addRow([]);
+      }
+
+      /* ================= ADDONS ================= */
+      if (eventData?.ticketInfo?.addons?.length > 0) {
+        worksheet.addRow(["TOTAL ADDONS", "", ""]).font = { bold: true };
+
+        worksheet.addRow([
+          "Addons Summary",
+          `${eventData.ticketInfo.summary.addons.total_sold} / ${eventData.ticketInfo.count_summary.addons}`,
+          `${currency}${Math.round(
+            eventData.ticketInfo.summary.addons.total_face_value
+          ).toLocaleString()}`
+        ]).font = { bold: true };
+
+        eventData.ticketInfo.addons.forEach(addon => {
+          worksheet.addRow([
+            addon.name,
+            addon.sold,
+            `${currency}${Math.round(addon.face_value).toLocaleString()}`
+          ]);
+        });
+
+        worksheet.addRow([]);
+      }
+
+      /* ================= PACKAGES ================= */
+      if (eventData?.ticketInfo?.packages?.length > 0) {
+        worksheet.addRow(["TOTAL PACKAGES", "", ""]).font = { bold: true };
+
+        worksheet.addRow([
+          "Packages Summary",
+          `${eventData.ticketInfo.summary.packages.total_sold} / ${eventData.ticketInfo.count_summary.packages}`,
+          `${currency}${Math.round(
+            eventData.ticketInfo.summary.packages.total_face_value
+          ).toLocaleString()}`
+        ]).font = { bold: true };
+
+        eventData.ticketInfo.packages.forEach(pkg => {
+          worksheet.addRow([
+            pkg.name,
+            pkg.sold,
+            `${currency}${Math.round(pkg.face_value).toLocaleString()}`
+          ]);
+        });
+
+        worksheet.addRow([]);
+      }
+
+      /* ================= APPOINTMENTS ================= */
+      if (eventData?.ticketInfo?.appointments?.length > 0) {
+        worksheet.addRow(["TOTAL APPOINTMENTS", "", ""]).font = { bold: true };
+
+        worksheet.addRow([
+          "Appointments Summary",
+          `${eventData.ticketInfo.summary.appointments.total_sold} / ${eventData.ticketInfo.count_summary.appointments}`,
+          `${currency}${Math.round(
+            eventData.ticketInfo.summary.appointments.total_face_value
+          ).toLocaleString()}`
+        ]).font = { bold: true };
+
+        eventData.ticketInfo.appointments.forEach(app => {
+          worksheet.addRow([
+            app.name,
+            app.sold,
+            `${currency}${Math.round(app.face_value).toLocaleString()}`
+          ]);
+        });
+
+        worksheet.addRow([]);
+      }
+
+      /* ================= FINAL TOTALS ================= */
+      worksheet.addRow([
+        "TOTAL ORDERS",
+        eventData?.totalOrdersCount || 0,
+        `${currency}${Math.round(eventData?.priceInfo?.total_amount || 0).toLocaleString()}`
+      ]).font = { bold: true };
+
+      worksheet.addRow([
+        "TAXES",
+        "",
+        `${currency}${Math.round(eventData?.priceInfo?.total_taxes || 0).toLocaleString()}`
+      ]);
+
+      worksheet.addRow([
+        "GROSS SALES",
+        "",
+        `${currency}${Math.round(eventData?.priceInfo?.gross_total || 0).toLocaleString()}`
+      ]).font = { bold: true };
+
+      worksheet.addRow([
+        "CANCEL AMOUNT",
+        "",
+        `${currency}${Math.round(eventData?.cancelAmount?.cancel_amount || 0).toLocaleString()}`
+      ]);
+
+      worksheet.addRow([
+        "NET AMOUNT",
+        "",
+        `${currency}${Math.round(
+          (eventData?.priceInfo?.gross_total || 0) -
+          (eventData?.cancelAmount?.cancel_amount || 0)
+        ).toLocaleString()}`
+      ]).font = { bold: true };
+
+      /* ================= STYLING ================= */
+      worksheet.eachRow(row => {
+        row.eachCell(cell => {
+          cell.border = {
+            top: { style: "thin" },
+            left: { style: "thin" },
+            bottom: { style: "thin" },
+            right: { style: "thin" }
+          };
+          cell.alignment = { horizontal: "center", vertical: "middle" };
+        });
+      });
+
+      worksheet.columns.forEach(col => {
+        let max = 12;
+        col.eachCell({ includeEmpty: true }, cell => {
+          max = Math.max(max, cell.value ? cell.value.toString().length + 2 : 12);
+        });
+        col.width = max;
+      });
+
+      /* ================= DOWNLOAD ================= */
+      const buffer = await workbook.xlsx.writeBuffer();
+      saveAs(
+        new Blob([buffer]),
+        `Sales_Report_${eventName}_${moment().format("YYYYMMDD_HHmmss")}.xlsx`
+      );
+
+    } catch (err) {
+      console.error("Excel download failed:", err);
+      alert("Something went wrong while downloading the Excel file.");
+    } finally {
+      setExcelLoading(false);
+    }
+  };
+
+
+
+
+
+
+
+
   return (
     <>
       <Seo title={"Sales By Ticket Type"} />
@@ -134,12 +314,32 @@ const SaleByTicketType = () => {
           <Col xl={12}>
             <div className="Mmbr-card">
               <Card>
-                <Card.Header className=" ps-3 pb-2">
+                <Card.Header className="ps-3 pb-2 d-flex justify-content-between align-items-center">
                   <h4 className="card-title card-t mg-b-0">
-                    {eventData?.event?.Name
-                      ? eventData.event.Name
-                      : "No event name available"}
+                    {eventData?.event?.name || "No event name available"}
                   </h4>
+                  <Button
+                    variant="success"
+                    className="btn-sm d-flex align-items-center"
+                    onClick={() => handleDownloadOrdersExcel(eventData?.event?.name ?? 'Event Excel')}
+                    disabled={excelLoading}
+                  >
+                    {excelLoading ? (
+                      <>
+                        <span
+                          className="spinner-border spinner-border-sm me-2"
+                          role="status"
+                          aria-hidden="true"
+                        ></span>
+                        Downloading...
+                      </>
+                    ) : (
+                      <>
+                        <i className="bi bi-file-earmark-excel-fill me-2"></i>
+                        Download
+                      </>
+                    )}
+                  </Button>
                 </Card.Header>
 
                 <Card.Body className="p-2">
@@ -244,17 +444,9 @@ const SaleByTicketType = () => {
                                     <td>
                                       <b>
                                         {/* Calculate total tickets sold and display single total ticket count */}
-                                        {
-                                          eventData?.ticketInfo
-                                            .ticket_price_info
-                                            .total_ticket_counts
-                                        }
+                                        {eventData?.ticketInfo?.summary?.tickets?.total_sold}
                                         {""} / {""}
-                                        {
-                                          eventData?.ticketInfo
-                                            .ticket_price_info
-                                            ?.total_ticket_limit
-                                        }
+                                        {eventData?.ticketInfo?.count_summary?.tickets}
                                       </b>
                                     </td>
 
@@ -263,12 +455,10 @@ const SaleByTicketType = () => {
                                       <b>
                                         {/* Calculate total ticket price for all tickets sold */}
                                         {
-                                          eventData?.event?.Currency
-                                            .Currency_symbol
+                                          eventData?.event?.currency_symbol
                                         }
                                         {Math.round(
-                                          eventData?.ticketInfo
-                                            .ticket_price_info.total_amount
+                                          eventData?.ticketInfo?.summary?.tickets?.total_face_value
                                         ).toLocaleString()}
                                       </b>
                                     </td>
@@ -279,29 +469,16 @@ const SaleByTicketType = () => {
                                     (ticket, index) => (
                                       <tr key={index}>
                                         <td>
-                                          {ticket.ticket_name &&
-                                            ticket.ticket_name}
+                                          {ticket.name &&
+                                            ticket.name}{" "}({ticket.type &&
+                                              ticket.type})
                                         </td>
 
                                         {/* Sold */}
                                         <td>
                                           <Link
                                             href={{
-                                              pathname: `/admin/orders/order-details/${encodeURIComponent(
-                                                eventData?.event?.Name || ""
-                                              )}`,
-                                              query: {
-                                                type: "ticket",
-                                                ...(ticket.discountAmount === 0
-                                                  ? {
-                                                      ticketId:
-                                                        ticket.event_ticket_id,
-                                                    }
-                                                  : {
-                                                      discountAmount:
-                                                        ticket.discountAmount,
-                                                    }),
-                                              },
+                                              pathname: `/admin/tickets/ticket/${eventData?.event?.id}/${ticket.id}`
                                             }}
                                             target="_blank"
                                             rel="noopener noreferrer"
@@ -310,18 +487,16 @@ const SaleByTicketType = () => {
                                               color: "blue",
                                             }}
                                           >
-                                            {ticket.total_sale}
+                                            {ticket.sold}
                                           </Link>
                                         </td>
 
                                         {/* Face amount */}
                                         <td >
-                                          {ticket.total_amount &&
-                                            `${
-                                              eventData?.event?.Currency
-                                                .Currency_symbol
+                                          {ticket.face_value &&
+                                            `${eventData?.event?.currency_symbol
                                             }${Math.round(
-                                              ticket.total_amount
+                                              ticket.face_value
                                             ).toLocaleString()}`}
                                         </td>
                                       </tr>
@@ -341,27 +516,19 @@ const SaleByTicketType = () => {
                                     <td>
                                       {/* Calculate total addons sold and display single total addon count */}
                                       <b>
-                                        {
-                                          eventData?.ticketInfo.addon_price_info
-                                            .total_ticket_counts
-                                        }
+                                        {eventData?.ticketInfo?.summary?.addons?.total_sold}
                                         {""} / {""}
-                                        {
-                                          eventData?.ticketInfo.addon_price_info
-                                            .total_addon_limit
-                                        }
+                                        {eventData?.ticketInfo?.count_summary?.addons}
                                       </b>
                                     </td>
                                     <td >
                                       {/* Calculate total addon price for all addons sold */}
                                       <b>
                                         {
-                                          eventData?.event?.Currency
-                                            .Currency_symbol
+                                          eventData?.event?.currency_symbol
                                         }
                                         {Math.round(
-                                          eventData?.ticketInfo.addon_price_info
-                                            .total_amount
+                                          eventData?.ticketInfo?.summary?.addons?.total_face_value
                                         ).toLocaleString()}
                                       </b>
                                     </td>
@@ -371,25 +538,12 @@ const SaleByTicketType = () => {
                                   {eventData.ticketInfo.addons.map(
                                     (addon, index) => (
                                       <tr key={index}>
-                                        <td>{addon.ticket_name}</td>
+                                        <td>{addon.name}</td>
 
                                         <td>
                                           <Link
                                             href={{
-                                              pathname: `/admin/orders/order-details/${encodeURIComponent(
-                                                eventData?.event?.Name || ""
-                                              )}`,
-                                              query: {
-                                                type: "addon",
-                                                ...(addon.discountAmount === 0
-                                                  ? {
-                                                      ticketId: addon.id,
-                                                    }
-                                                  : {
-                                                      discountAmount:
-                                                        addon.discountAmount,
-                                                    }),
-                                              },
+                                              pathname: `/admin/tickets/addon/${eventData?.event?.id}/${addon.id}`
                                             }}
                                             target="_blank"
                                             rel="noopener noreferrer"
@@ -398,17 +552,14 @@ const SaleByTicketType = () => {
                                               color: "blue",
                                             }}
                                           >
-                                            {addon.total_sale}
+                                            {addon.sold}
                                           </Link>
                                         </td>
 
                                         <td >
-                                          {
-                                            eventData?.event?.Currency
-                                              .Currency_symbol
-                                          }
+                                          {eventData?.event?.currency_symbol}
                                           {Math.round(
-                                            addon.total_amount
+                                            addon.face_value
                                           ).toLocaleString()}
                                         </td>
                                       </tr>
@@ -416,6 +567,132 @@ const SaleByTicketType = () => {
                                   )}
                                 </>
                               )}
+
+                              {/* Display packages */}
+                              {eventData?.ticketInfo.packages?.length > 0 && (
+                                <>
+                                  {/* Total Addons Row */}
+                                  <tr>
+                                    <td>
+                                      <b>TOTAL PACKAGES  TICKET</b>
+                                    </td>
+                                    <td>
+                                      {/* Calculate total addons sold and display single total addon count */}
+                                      <b>
+                                        {eventData?.ticketInfo?.summary?.packages?.total_sold}
+                                        {""} / {""}{eventData?.ticketInfo?.count_summary?.packages}
+                                      </b>
+                                    </td>
+                                    <td >
+                                      {/* Calculate total addon price for all addons sold */}
+                                      <b>
+                                        {
+                                          eventData?.event?.currency_symbol
+                                        }
+                                        {Math.round(
+                                          eventData?.ticketInfo?.summary?.packages?.total_face_value
+                                        ).toLocaleString()}
+                                      </b>
+                                    </td>
+                                  </tr>
+
+                                  {/* List Each Addon Separately */}
+                                  {eventData.ticketInfo.packages.map(
+                                    (addon, index) => (
+                                      <tr key={index}>
+                                        <td>{addon.name}</td>
+
+                                        <td>
+                                          <Link
+                                            href={{
+                                              pathname: `/admin/tickets/package/${eventData?.event?.id}/${addon.id}`
+                                            }}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            style={{
+                                              textDecoration: "underline",
+                                              color: "blue",
+                                            }}
+                                          >
+                                            {addon.sold}
+                                          </Link>
+                                        </td>
+
+                                        <td >
+                                          {eventData?.event?.currency_symbol}
+                                          {Math.round(
+                                            addon.face_value
+                                          ).toLocaleString()}
+                                        </td>
+                                      </tr>
+                                    )
+                                  )}
+                                </>
+                              )}
+
+                              {/* Display appointments */}
+                              {eventData?.ticketInfo.appointments?.length > 0 && (
+                                <>
+                                  {/* Total Addons Row */}
+                                  <tr>
+                                    <td>
+                                      <b>TOTAL APPOINTMENTS</b>
+                                    </td>
+                                    <td>
+                                      {/* Calculate total addons sold and display single total addon count */}
+                                      <b>
+                                        {eventData?.ticketInfo?.summary?.appointments?.total_sold}
+                                        {""} / {""}
+                                        {eventData?.ticketInfo?.count_summary?.appointments}
+                                      </b>
+                                    </td>
+                                    <td >
+                                      {/* Calculate total addon price for all addons sold */}
+                                      <b>
+                                        {
+                                          eventData?.event?.currency_symbol
+                                        }
+                                        {Math.round(
+                                          eventData?.ticketInfo?.summary?.appointments?.total_face_value
+                                        ).toLocaleString()}
+                                      </b>
+                                    </td>
+                                  </tr>
+
+                                  {/* List Each Addon Separately */}
+                                  {eventData.ticketInfo.appointments.map(
+                                    (addon, index) => (
+                                      <tr key={index}>
+                                        <td>{addon.name}</td>
+
+                                        <td>
+                                          <Link
+                                            href={{
+                                              pathname: `/admin/tickets/appointment/${eventData?.event?.id}/${addon.id}`
+                                            }}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            style={{
+                                              textDecoration: "underline",
+                                              color: "blue",
+                                            }}
+                                          >
+                                            {addon.sold}
+                                          </Link>
+                                        </td>
+
+                                        <td >
+                                          {eventData?.event?.currency_symbol}
+                                          {Math.round(
+                                            addon.face_value
+                                          ).toLocaleString()}
+                                        </td>
+                                      </tr>
+                                    )
+                                  )}
+                                </>
+                              )}
+
                             </>
                           )}
                         </tbody>
@@ -429,10 +706,8 @@ const SaleByTicketType = () => {
                           <td>
                             <Link
                               href={{
-                                pathname: `/admin/orders/orders-list/${encodeURIComponent(
-                                  eventData?.event?.Name || ""
-                                )}`,
-                                query: { eventId: eventData?.event?.id },
+                                pathname: `/admin/orders/${eventData?.event?.id}`,
+
                               }}
                               target="_blank"
                               rel="noopener noreferrer"
@@ -447,12 +722,9 @@ const SaleByTicketType = () => {
                           {/* Total Orders */}
                           <td >
                             <b>
-                              {eventData?.event?.Currency.Currency_symbol}
+                              {eventData?.event?.currency_symbol}
                               {Math.round(
-                                eventData?.ticketInfo.ticket_price_info
-                                  .total_amount +
-                                  eventData?.ticketInfo.addon_price_info
-                                    .total_amount
+                                eventData?.priceInfo?.total_amount
                               ).toLocaleString()}
                             </b>
                           </td>
@@ -466,7 +738,7 @@ const SaleByTicketType = () => {
                           <td></td>
                           <td >
                             <b>
-                              {eventData?.event?.Currency.Currency_symbol}
+                              {eventData?.event?.currency_symbol}
                               {Math.round(
                                 eventData?.priceInfo.total_taxes
                               ).toLocaleString()}
@@ -482,7 +754,7 @@ const SaleByTicketType = () => {
                           <td></td>
                           <td >
                             <b>
-                              {eventData?.event?.Currency.Currency_symbol}
+                              {eventData?.event?.currency_symbol}
                               {Math.round(
                                 eventData?.priceInfo.gross_total
                               ).toLocaleString()}
