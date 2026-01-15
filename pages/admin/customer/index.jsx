@@ -165,6 +165,7 @@ export const CustomerList = () => {
     const [toDate, setToDate] = useState(null);
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [selectedEmail, setSelectedEmail] = useState(null);
+    const [status, setStatus] = useState("");
     const handleSendEmail = async (id) => {
         const result = await Swal.fire({
             title: "Are you sure?",
@@ -340,6 +341,7 @@ export const CustomerList = () => {
                 params: {
                     first_name: firstName,
                     email,
+                    status:status,
                     fromDate: formattedFromDate,
                     toDate: formattedToDate,
                 },
@@ -360,6 +362,7 @@ export const CustomerList = () => {
         getCustomers();
         setSelectedEmail(null);
         setSelectedCustomer(null);
+        setStatus("");
     };
 
 
@@ -542,7 +545,17 @@ export const CustomerList = () => {
                                     />
                                 </Form.Group>
 
-
+                                <Form.Group className="mb-3" controlId="formStatus">
+                                    <Form.Label>Status</Form.Label>
+                                    <Form.Select
+                                        value={status}
+                                        onChange={(e) => setStatus(e.target.value)}
+                                    >
+                                        <option value="">Select Status</option>
+                                        <option value="Y">Active</option>
+                                        <option value="N">Inactive</option>
+                                    </Form.Select>
+                                </Form.Group>
 
 
 
