@@ -80,16 +80,16 @@ const Dashboard = () => {
         axisLabel: { fontSize: 10, color: "#5f6d7a" }
       }],
 
-      color: ["#38cab3", "#f74f75"],
+      color: ["#f74f75"],
 
       series: [
+        // {
+        //   name: "View Price",
+        //   type: "bar",
+        //   data: chartData?.view_price || []
+        // },
         {
-          name: "View Price",
-          type: "bar",
-          data: chartData?.view_price || []
-        },
-        {
-          name: "Purchased Price",
+          name: "Purchased Price(Including Tax)",
           type: "bar",
           data: chartData?.purchased_price || []
         }
@@ -372,7 +372,8 @@ const Dashboard = () => {
                 <Col style={{ flex: "1" }}>
                   <div className="mt-0">
                     <span className="text-white">Total Customers</span>
-                    <h2 className="text-white mb-0" style={{ fontSize: "20px" }}> {counts?.customers?.active || 0}/{counts?.customers?.inactive || 0}</h2>
+                    <h2 className="text-white mb-0" style={{ fontSize: "20px" }}><span title="Active Customers">
+                      {counts?.customers?.active || 0}</span>{" / "}<span title="Inactive Customers">{counts?.customers?.inactive || 0}</span></h2>
                   </div>
                 </Col>
               </Row>
@@ -391,7 +392,7 @@ const Dashboard = () => {
                 <Col style={{ flex: "1" }}>
                   <div className="mt-0">
                     <span className="text-white">Event Organizers</span>
-                    <h2 className="text-white mb-0" style={{ fontSize: "20px" }}>{counts?.organizers?.active || 0}/{counts?.organizers?.inactive || 0}</h2>
+                    <h2 className="text-white mb-0" style={{ fontSize: "20px" }}><span title="Active Event Organizers">{counts?.organizers?.active || 0}</span> {" / "} <span title="Inactive Event Organizers">{counts?.organizers?.inactive || 0}</span></h2>
                   </div>
                 </Col>
               </Row>
@@ -411,7 +412,8 @@ const Dashboard = () => {
                   <div className="mt-0">
                     <span className="text-white">Total Events</span>
                     <h2 className="text-white mb-0" style={{ fontSize: "20px" }}>
-                      {counts?.events?.active || 0}/{counts?.events?.inactive || 0}
+                      <span title="Active Events">
+                      {counts?.events?.active || 0}</span> {" / "} <span title="Inactive Events">{counts?.events?.inactive || 0}</span>
                     </h2>
                   </div>
                 </Col>
@@ -431,7 +433,7 @@ const Dashboard = () => {
                 <Col style={{ flex: "1" }}>
                   <div className="mt-0">
                     <span className="text-white">Total Sales</span>
-                    <h2 className="text-white mb-0" style={{ fontSize: "20px" }}>
+                    <h2 className="text-white mb-0" style={{ fontSize: "20px" }}  title="Total Sales Amount (Including Tax)">
                       {formatNumber(counts?.total_sales)}
                     </h2>
                   </div>
@@ -452,7 +454,7 @@ const Dashboard = () => {
                 <Col style={{ flex: "1" }}>
                   <div className="mt-0">
                     <span className="text-white">Total Earning</span>
-                    <h2 className="text-white mb-0" style={{ fontSize: "20px" }}>
+                    <h2 className="text-white mb-0" style={{ fontSize: "20px" }} title="Total Earning Admin">
                       {formatNumber(counts?.total_earning)}
                     </h2>
                   </div>

@@ -25,8 +25,12 @@ import moment from "moment";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import Link from "next/link";
+import AsyncSelect from "react-select/async";
 
 export const Events = () => {
+
+    const [selectedCustomer, setSelectedCustomer] = useState(null);
+    const [selectedEvent, setSelectedEvent] = useState(null);
 
     const [COLUMNS, setCOLUMNS] = useState([
         {
@@ -806,6 +810,8 @@ export const Events = () => {
         setToDate(null);
         setEventList([]);
         getEventList();
+        setSelectedCustomer(null)
+        setSelectedEvent(null)
     };
 
 
@@ -868,6 +874,85 @@ export const Events = () => {
     };
 
 
+    const loadUserOptions = async (inputValue) => {
+        if (inputValue.length < 2) return [];
+        try {
+            const response = await api.get(
+                "/api/v1/admin/customers/first-name/search",
+                {
+                    params: {
+                        search: inputValue, // 👈 backend expects this
+                    },
+                }
+            );
+            const data = response.data;
+            if (data?.success) {
+                return data.data.customers.map((user) => ({
+                    value: user.id,
+                    label: user.first_name, // 👈 correct key
+                    user,
+                }));
+            }
+
+            return [];
+        } catch (error) {
+            console.error("Error fetching users:", error);
+            return [];
+        }
+    };
+
+    const handleUserSelect = (selectedOption) => {
+        setSelectedCustomer(selectedOption); // 👈 dropdown control
+
+        if (selectedOption) {
+            setOrganizer(selectedOption.user.first_name);
+        } else {
+            setOrganizer("");
+        }
+    };
+
+    const loadEventOptions = async (inputValue) => {
+        if (inputValue.length < 2) return [];
+
+        try {
+            const response = await api.get(
+                "/api/v1/admin/events/search/search",
+                {
+                    params: {
+                        search: inputValue, // backend expects this
+                    },
+                }
+            );
+
+            const data = response.data;
+
+            if (data?.success) {
+                return data.data.events.map((event) => ({
+                    value: event.id,
+                    label: event.name,
+                    event, // full event object if needed later
+                }));
+            }
+
+            return [];
+        } catch (error) {
+            console.error("Error fetching events:", error);
+            return [];
+        }
+    };
+    const handleEventSelect = (selectedOption) => {
+        setSelectedEvent(selectedOption); // 👈 dropdown control
+
+        if (selectedOption) {
+            setEventName(selectedOption.event?.name);
+        } else {
+            setEventName("");
+        }
+    };
+
+
+
+
 
 
 
@@ -885,7 +970,71 @@ export const Events = () => {
                         </Card.Header>
                         <Card.Body className="p-2">
                             <Form onSubmit={handleSearch}>
+
                                 <Form.Group className="mb-3" controlId="formName">
+                                    <Form.Label>Customer</Form.Label>
+
+                                    <AsyncSelect
+                                        className="search-dropdown"
+                                        cacheOptions
+                                        loadOptions={loadUserOptions}
+                                        value={selectedCustomer}
+                                        onChange={handleUserSelect}
+                                        placeholder="Search by name"
+                                        isClearable
+                                        getOptionLabel={(option) => option.user.first_name}
+                                        getOptionValue={(option) => option.value}
+                                        formatOptionLabel={(option, { context }) => {
+                                            if (context === "menu") {
+                                                return (
+                                                    <div>
+                                                        <strong>{option.user.first_name}</strong>
+                                                    </div>
+                                                );
+                                            }
+                                            return option.user.first_name;
+                                        }}
+                                        styles={{
+                                            menu: (provided) => ({
+                                                ...provided,
+                                                zIndex: 1050,
+                                            }),
+                                        }}
+                                    />
+                                </Form.Group>
+
+                                <Form.Group className="mb-3" controlId="formName">
+                                    <Form.Label>Event</Form.Label>
+                                    <AsyncSelect
+                                        className="search-dropdown"
+                                        cacheOptions
+                                        loadOptions={loadEventOptions}
+                                        value={selectedEvent}
+                                        onChange={handleEventSelect}
+                                        placeholder="Search by event"
+                                        isClearable
+                                        getOptionLabel={(option) => option.event?.name}
+                                        getOptionValue={(option) => option.value}
+                                        formatOptionLabel={(option, { context }) => {
+                                            if (context === "menu") {
+                                                return (
+                                                    <div>
+                                                        <strong>{option.event?.name}</strong>
+                                                    </div>
+                                                );
+                                            }
+                                            return option.event?.name;
+                                        }}
+                                        styles={{
+                                            menu: (provided) => ({
+                                                ...provided,
+                                                zIndex: 1050,
+                                            }),
+                                        }}
+                                    />
+                                </Form.Group>
+
+                                {/* <Form.Group className="mb-3" controlId="formName">
                                     <Form.Label>Event Name</Form.Label>
                                     <Form.Control
                                         type="text"
@@ -904,7 +1053,7 @@ export const Events = () => {
                                         value={organizer}
                                         onChange={(e) => setOrganizer(e.target.value)}
                                     />
-                                </Form.Group>
+                                </Form.Group> */}
 
                                 <Form.Group className="mb-3" controlId="formDateFrom">
                                     <Form.Label>From Date</Form.Label>

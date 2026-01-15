@@ -19,7 +19,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import moment from "moment";
 import AsyncSelect from "react-select/async";
-
+import Link from "next/link";
 export const OrdersList = () => {
     const [COLUMNS, setCOLUMNS] = useState([
         {
@@ -49,7 +49,7 @@ export const OrdersList = () => {
             accessor: "OrderDetails",
             className: "borderrigth",
             Cell: ({ row }) => {
-                const { paymenttype, RRN ,order_uid} = row.original;
+                const { paymenttype, RRN, order_uid, id } = row.original;
 
                 // 👇 FREE order case
                 if (paymenttype === "free") {
@@ -73,7 +73,18 @@ export const OrdersList = () => {
                 // 👇 Paid / other cases
                 return (
                     <div>
-                        <strong>Order Id: </strong>{order_uid || "-"}<br/>
+                        <strong>Order Id: </strong>
+                        <Link
+                            target="_blank"
+                            href={`/admin/orders/order-detail/${id}/`}
+                            title="View Order Details"
+                            style={{
+                                color: "#0d6efd", // blue
+                                textDecoration: "underline",
+                                fontWeight: 500,
+                            }}
+                        >
+                            {order_uid || "-"}</Link><br />
                         <strong>Order Identifier: </strong>
                         {RRN || "-"}
                     </div>
