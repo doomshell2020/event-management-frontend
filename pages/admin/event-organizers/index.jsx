@@ -235,6 +235,7 @@ export const EventOrganizersList = () => {
     // console.log("----", OrganizerList);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedCustomer, setSelectedCustomer] = useState(null);
+    const [selectedEmail, setSelectedEmail] = useState(null);
     const [email, setEmail] = useState("");
     const [firstName, setFirstName] = useState("");
     const [mobile, setMobile] = useState("");
@@ -380,6 +381,7 @@ export const EventOrganizersList = () => {
         setEmail("");
         setMobile("");
         setSelectedCustomer(null);   // 👈 THIS WAS MISSING
+        setSelectedEmail(null);   // 👈 THIS WAS MISSING
         setOrganizerList([]);
         getEventOrganizers();
     };
@@ -421,6 +423,54 @@ export const EventOrganizersList = () => {
             setFirstName("");
         }
     };
+
+    const loadUserEmailOptions = async (inputValue) => {
+        if (inputValue.length < 2) return [];
+        try {
+            const response = await api.get(
+                "/api/v1/admin/customers/email/search",
+                {
+                    params: {
+                        search: inputValue, // 👈 backend expects this
+                    },
+                }
+            );
+            const data = response.data;
+            if (data?.success) {
+                return data.data.customers.map((user) => ({
+                    value: user.id,
+                    label: user.email, // 👈 correct key
+                    user,
+                }));
+            }
+
+            return [];
+        } catch (error) {
+            console.error("Error fetching users:", error);
+            return [];
+        }
+    };
+
+    const handleUserEmailSelect = (selectedOption) => {
+        setSelectedEmail(selectedOption); // 👈 dropdown control
+
+        if (selectedOption) {
+            setEmail(selectedOption.user.email);
+        } else {
+            setEmail("");
+        }
+    };
+
+
+
+
+
+
+
+
+
+
+
     return (
         <div>
             <Seo title={"Event Organizer Manager"} />
@@ -466,7 +516,44 @@ export const EventOrganizersList = () => {
                                     />
                                 </Form.Group>
 
-                                <Form.Group className="mb-3" controlId="formName">
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Email</Form.Label>
+                                    <AsyncSelect
+                                        className="search-dropdown"
+                                        cacheOptions
+                                        loadOptions={loadUserEmailOptions}
+                                        value={selectedEmail}
+                                        onChange={handleUserEmailSelect}
+                                        placeholder="Search by email"
+                                        isClearable
+                                        getOptionLabel={(option) => option.user.email}
+                                        getOptionValue={(option) => option.value}
+                                        formatOptionLabel={(option, { context }) => {
+                                            if (context === "menu") {
+                                                return (
+                                                    <div>
+                                                        <strong>{option.user.email}</strong>
+                                                    </div>
+                                                );
+                                            }
+                                            return option.user.email;
+                                        }}
+                                        styles={{
+                                            menu: (provided) => ({
+                                                ...provided,
+                                                zIndex: 1050,
+                                            }),
+                                        }}
+                                    />
+                                </Form.Group>
+
+
+
+
+
+
+
+                                {/* <Form.Group className="mb-3" controlId="formName">
                                     <Form.Label>Email</Form.Label>
                                     <Form.Control
                                         type="text"
@@ -474,7 +561,7 @@ export const EventOrganizersList = () => {
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value.trim())}
                                     />
-                                </Form.Group>
+                                </Form.Group> */}
 
                                 <Form.Group className="mb-3" controlId="phone">
                                     <Form.Label>Phone</Form.Label>
