@@ -34,9 +34,11 @@ const MyStaff = () => {
     /* ================= FETCH STAFF ================= */
     const fetchStaff = async () => {
         try {
+            setLoading(true);
             const res = await api.get("/api/v1/users/staff");
             setStaff(res.data.data.staff_list || []);
             setEvents(res.data.data.event_list || []);
+            setLoading(false);
         } catch (err) {
             Swal.fire("Error", "Failed to load staff", "error");
         }
@@ -104,7 +106,7 @@ const MyStaff = () => {
             setShow(false);
             fetchStaff();
         } catch (err) {
-        // console.log('err :', err.response?.data?.error?.message);
+            // console.log('err :', err.response?.data?.error?.message);
             Swal.fire(
                 "Error",
                 err.response?.data?.error?.message || "Operation failed",
@@ -133,13 +135,13 @@ const MyStaff = () => {
     };
 
     const openEditModal = (row) => {
-        console.log('row :', row);
+        // console.log('row :', row);
         setIsEdit(true);
         setStaffId(row.id);
 
         // Convert comma-separated string into array of strings for multi-select
         const selectedEvents = row.eventId ? row.eventId.split(',') : [];
-        console.log('selectedEvents :', selectedEvents);
+        // console.log('selectedEvents :', selectedEvents);
 
         setFormData({
             first_name: row.first_name,
@@ -188,33 +190,47 @@ const MyStaff = () => {
                                     <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                {staff.length ? (
-                                    staff.map((row, i) => (
-                                        <tr key={row.id}>
-                                            <td>{i + 1}</td>
-                                            <td>{row.first_name} {row.last_name}</td>
-                                            <td>{row.email}</td>
-                                            <td>{row.mobile}</td>
-                                            <td>{row.status == 'Y' ? "Active" : "Inactive"}</td>
-                                            <td>{formatEventDateTime(row.createdAt)}</td>
-                                            <td>
-                                                <Button
-                                                    size="sm"
-                                                    variant="outline-warning"
-                                                    onClick={() => openEditModal(row)}
-                                                >
-                                                    <i className="bi bi-pencil-square text-primary"></i>
-                                                </Button>
-                                            </td>
-                                        </tr>
-                                    ))
-                                ) : (
+                            {loading ? (
+                                <tbody>
                                     <tr>
-                                        <td colSpan="6">No records found</td>
+                                        <td colSpan="7" className="text-center">Loading...</td>
                                     </tr>
-                                )}
-                            </tbody>
+                                </tbody>
+                            ) : (
+                                <tbody>
+                                    {staff.length ? (
+                                        staff.map((row, i) => (
+                                            <tr key={row.id}>
+                                                <td>{i + 1}</td>
+                                                <td>{row.first_name} {row.last_name}</td>
+                                                <td>{row.email}</td>
+                                                <td>{row.mobile}</td>
+                                                <td>
+                                                    {row.status == 'Y' ? (
+                                                        <span className="text-success">Active</span>
+                                                    ) : (
+                                                        <span className="text-danger">Inactive</span>
+                                                    )}
+                                                </td>
+                                                <td>{formatEventDateTime(row.createdAt)}</td>
+                                                <td>
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline-warning"
+                                                        onClick={() => openEditModal(row)}
+                                                    >
+                                                        <i className="bi bi-pencil-square text-primary"></i>
+                                                    </Button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="6">No records found</td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            )}
                         </table>
                     </div>
                 </div>
