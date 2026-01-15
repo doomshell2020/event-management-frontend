@@ -32,7 +32,7 @@ export default function Header() {
       try {
         const token = Cookies.get("adminAuthToken");
         if (!token) {
-          router.push("/login");
+          router.push("/admin/auth");
           return;
         }
 
@@ -54,18 +54,6 @@ export default function Header() {
 
     fetchUser();
   }, [router]);
-
-
-
-
-
-
-
-
-
-
-
-
 
   // -------------------------
   // Cart Total

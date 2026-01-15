@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }) => {
                 setAdmin(JSON.parse(storedAdmin));
                 setAdminToken(storedAdminToken);
             } catch (err) {
-                
+
                 console.error("Invalid admin format:", err);
             }
         } else {
@@ -77,19 +77,18 @@ export const AuthProvider = ({ children }) => {
         Cookies.remove("userAuthToken");
     };
 
-
-
     // =====================    // ADMIN LOGIN / LOGOUT    // =====================
     const adminLogin = (adminData, token) => {
         setAdmin(adminData);
         setAdminToken(token);
 
         localStorage.setItem("admin", JSON.stringify(adminData));
+        localStorage.setItem("adminAuthToken", token);
         Cookies.set("adminAuthToken", token, {
             expires: 1,
             secure: process.env.NODE_ENV == "production",
             sameSite: "Strict",
-            path: "/", // ✅ IMPORTANT
+            path: "/", // ✅ correct
         });
     };
 

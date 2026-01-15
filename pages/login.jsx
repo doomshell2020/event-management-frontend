@@ -51,13 +51,13 @@ const LoginPage = () => {
       const { token, user } = res.data.data;
       loginUser(user, token);
       toast.success("Login successful!");
-      Swal.fire({
-        icon: "success",
-        title: "Welcome!",
-        text: "Login successful!",
-        timer: 1500,
-        showConfirmButton: false,
-      });
+      // Swal.fire({
+      //   icon: "success",
+      //   title: "Welcome!",
+      //   text: "Login successful!",
+      //   timer: 1500,
+      //   showConfirmButton: false,
+      // });
 
       router.push("/");
 

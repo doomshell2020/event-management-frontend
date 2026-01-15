@@ -43,7 +43,7 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    if (error.response?.status == 401) {
       const url = error.config?.url || "";
       if (url.includes("/admin")) {
         Cookies.remove("adminAuthToken");
@@ -57,7 +57,7 @@ api.interceptors.response.use(
       console.warn("⚠️ Unauthorized: Token expired or invalid");
       // Optionally redirect if needed:
       // window.location.href = "/login";
-      window.location.href = "/admin/auth";
+      // window.location.href = "/admin/auth";
     }
 
     return Promise.reject(error);
