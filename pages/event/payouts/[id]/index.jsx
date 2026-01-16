@@ -59,15 +59,10 @@ const ManagePayouts = () => {
             setLoading(false);
         }
     };
-
+    
     useEffect(() => {
         if (id) {
-            // fetchEventDetails(id); // only once
-        }
-    }, [id]);
-
-    useEffect(() => {
-        if (id) {
+            fetchEventDetails(id); // only once
             fetchOrders(id, currentPage); // only orders refresh
         }
     }, [id, currentPage]);

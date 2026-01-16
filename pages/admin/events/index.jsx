@@ -241,6 +241,7 @@ export const Events = () => {
             className: "borderrigth",
             style: { width: "10%" },
             Cell: ({ row }) => {
+                const status = row?.original?.status;
                 return (
                     <div className="d-flex flex-column align-items-center gap-1">
                         {/* Top Row: Toggle + Delete */}
@@ -568,7 +569,7 @@ export const Events = () => {
         const statusText = newStatus == "Y" ? "Activate" : "Deactivate";
 
         // ONLY if activating AND event is FREE
-        if (newStatus == "N" && is_free == "Y") {
+        if (newStatus == "Y" && is_free == "Y") {
 
             const { value: formValues } = await Swal.fire({
                 title: "Activate Free Event",
@@ -603,7 +604,7 @@ export const Events = () => {
                         return false;
                     }
 
-                    if (!amount) {
+                    if (!amount || isNaN(amount)) {
                         Swal.showValidationMessage("Please enter amount");
                         return false;
                     }
