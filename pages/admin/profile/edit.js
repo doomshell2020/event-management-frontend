@@ -13,6 +13,7 @@ import {
   CButton,
   CFormCheck,
   CFormTextarea,
+  CFormSelect
 } from "@coreui/react";
 import Seo from "@/shared/layout-components/seo/seo";
 import { useRouter } from 'next/router'
@@ -37,18 +38,25 @@ const ProfileEdit = () => {
   const [googlePlayStore, setGooglePlayStore] = useState("");
   const [appleStore, setAppleStore] = useState("");
 
+  const [paymentGatewayCharges, setPaymentGatewayCharges] = useState("");
+  const [adminApprovalRequired, setAdminApprovalRequired] = useState("");
+  const [approvalType, setApprovalType] = useState("");
+  const [defaultPlatformCharges, setDefaultPlatformCharges] = useState("");
+
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const token = Cookies.get("adminAuthToken");
         if (!token) {
-          router.push("/login");
+          router.push("/admin/auth");
           return;
         }
         // ✅ Fetch user details from API
         const res = await api.get("/api/v1/admin/auth/me");
         if (res.data?.success) {
           const userData = res.data.data;
+          console.log('userData :', userData);
           setId(userData.id);
           setName(userData.first_name);
           setMobile(userData.mobile);
@@ -60,6 +68,10 @@ const ProfileEdit = () => {
           setLinkedinUrl(userData.linkdinurl);
           setGooglePlayStore(userData.googleplaystore);
           setAppleStore(userData.applestore);
+          setPaymentGatewayCharges(userData.payment_gateway_charges);
+          setDefaultPlatformCharges(userData.default_platform_charges);
+          setAdminApprovalRequired(userData.admin_approval_required);
+          setApprovalType(userData.approval_type);
         } else {
           router.push("/admin/auth");
         }
@@ -74,6 +86,7 @@ const ProfileEdit = () => {
   }, [router]);
 
   const [validatedCustom, setValidatedCustom] = useState(false);
+
   const UpdateProfile = async (event) => {
     event.preventDefault();
     const form = event.currentTarget;
@@ -102,6 +115,10 @@ const ProfileEdit = () => {
         googleplaystore: googlePlayStore?.trim(),
         applestore: appleStore?.trim(),
         googleplusurl: googlePlusUrl?.trim(),
+        payment_gateway_charges: paymentGatewayCharges,
+        default_platform_charges: defaultPlatformCharges,
+        admin_approval_required: adminApprovalRequired,
+        approval_type: approvalType,
       };
       const res = await api.patch(`/api/v1/admin/auth/${id}/update-profile`, payload);
       if (res.data?.success) {
@@ -298,6 +315,94 @@ const ProfileEdit = () => {
                       onChange={(e) => setAppleStore(e.target.value)}
                     />
                   </CCol>
+
+
+                  {/* ===== Event Settings Section ===== */}
+                  <CCol md={12}>
+                    <hr />
+                    <h5 className="mb-3">Event Settings</h5>
+                  </CCol>
+
+                  {/* Payment Gateway Charges */}
+                  <CCol md={3}>
+                    <CFormLabel>
+                      Payment Gateway Charges (%)
+                      <span style={{ color: "red" }}>*</span>
+                    </CFormLabel>
+                    <CFormInput
+                      type="number"
+                      min="0"
+                      max="100"
+                      step="0.01"
+                      required
+                      value={paymentGatewayCharges}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/[^0-9.]/g, "");
+                        setPaymentGatewayCharges(value);
+                      }}
+                      placeholder="Enter percentage"
+                    />
+
+                  </CCol>
+
+                  {/* Payment Gateway Charges */}
+                  <CCol md={3}>
+                    <CFormLabel>
+                      Default Platform Charges (%)
+                      <span style={{ color: "red" }}>*</span>
+                    </CFormLabel>
+                    <CFormInput
+                      type="number"
+                      min="0"
+                      max="100"
+                      step="0.01"
+                      required
+                      value={defaultPlatformCharges}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/[^0-9.]/g, "");
+                        setDefaultPlatformCharges(value);
+                      }}
+                      placeholder="Enter percentage"
+                    />
+
+                  </CCol>
+
+                  {/* Admin Approval Required */}
+                  <CCol md={3}>
+                    <CFormLabel>
+                      Admin Approval Required
+                      <span style={{ color: "red" }}>*</span>
+                    </CFormLabel>
+                    <CFormSelect
+                      required
+                      value={adminApprovalRequired}
+                      onChange={(e) => setAdminApprovalRequired(e.target.value)}
+                    >
+                      <option value="">Select Option</option>
+                      <option value="Y">Yes - Approval Required</option>
+                      <option value="N">No - Direct Publish Allowed</option>
+                    </CFormSelect>
+                  </CCol>
+
+
+                  {/* Approval Required For */}
+                  <CCol md={3}>
+                    <CFormLabel>
+                      Approval Required For
+                      <span style={{ color: "red" }}>*</span>
+                    </CFormLabel>
+                    <CFormSelect
+                      required
+                      value={approvalType}
+                      onChange={(e) => setApprovalType(e.target.value)}
+                    >
+                      <option value="">Select Type</option>
+                      <option value="all">All Events</option>
+                      <option value="paid">Only Paid Events</option>
+                      <option value="free">Only Free Events</option>
+                    </CFormSelect>
+                  </CCol>
+
 
                   {/* Buttons */}
                   <CCol md={10} className="col-6">

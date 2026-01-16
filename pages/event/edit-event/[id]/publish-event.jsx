@@ -38,7 +38,7 @@ const PublishEvent = () => {
     const toggleEventStatus = async () => {
         if (!eventDetails) return;
         const newStatus = eventDetails.status == 'N' ? 'Y' : 'N';
-        console.log('newStatus :', newStatus);
+        // console.log('newStatus :', newStatus);
         const confirmResult = await Swal.fire({
             title: "Are you sure?",
             text: `You want to ${newStatus ? "activate" : "deactivate"} this event?`,
@@ -62,11 +62,6 @@ const PublishEvent = () => {
                         "Content-Type": "multipart/form-data",
                     },
                 });
-                // console.log('res :', res);
-
-                // console.log('>>>>>>>>>>>>',res.data.data.event);
-
-
                 if (res.data.success) {
                     setEventDetails(res.data.data.event);
                     Swal.fire({
@@ -104,7 +99,7 @@ const PublishEvent = () => {
 
             <section id="myevent-deshbord">
                 <div className="d-flex">
-                    <EventSidebar eventId={id} />
+                    <EventSidebar eventId={id}  eventDetails={eventDetails}/>
                     <div className="event-righcontent">
                         <div className="dsa_contant">
                             <section id="post-eventpg">

@@ -31,7 +31,7 @@ const ManagePackages = () => {
     // console.log('packageList :', packageList);
 
     const currencyName = eventDetails?.currencyName.Currency_symbol;
-    console.log('currencyName :', currencyName);
+    // console.log('currencyName :', currencyName);
 
     // fetch addons list
     const handleGetPackagesList = async () => {
@@ -359,7 +359,7 @@ const ManagePackages = () => {
             <section id="myevent-deshbord">
                 <div className="d-flex">
                     {/* Sidebar */}
-                    <EventSidebar eventId={id} />
+                    <EventSidebar eventId={id}  eventDetails={eventDetails}/>
 
                     <div className="event-righcontent">
                         <div className="dsa_contant">

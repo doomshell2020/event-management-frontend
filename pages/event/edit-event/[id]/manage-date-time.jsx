@@ -348,7 +348,7 @@ const ManageDateTime = () => {
 
             <section id="myevent-deshbord" className="py-4">
                 <div className="d-flex">
-                    <EventSidebar eventId={id} />
+                    <EventSidebar eventId={id}  eventDetails={eventDetails}/>
 
                     <div className="event-righcontent flex-grow-1">
                         <div className="dsa_contant">

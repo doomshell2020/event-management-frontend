@@ -26,11 +26,24 @@ import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import Link from "next/link";
 import AsyncSelect from "react-select/async";
+import { formatEventDateTime, formatPrice } from "@/utils/formatDate";
 
 export const Events = () => {
 
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [selectedEvent, setSelectedEvent] = useState(null);
+
+    const [eventList, setEventList] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [fromDate, setFromDate] = useState(null);
+    const [toDate, setToDate] = useState(null);
+    const [eventName, setEventName] = useState("");
+    const [organizer, setOrganizer] = useState("");
+    const [showStaffModal, setShowStaffModal] = useState(false);
+    const [staffList, setStaffList] = useState([]);
+    const [loadingStaff, setLoadingStaff] = useState(false);
+    const [selectedEventId, setSelectedEventId] = useState(null);
+
 
     const [COLUMNS, setCOLUMNS] = useState([
         {
@@ -80,36 +93,29 @@ export const Events = () => {
                 );
             },
         },
-
         {
             Header: "Date and Time",
             accessor: "DateAndTime",
             className: "borderrigth",
-            style: { width: "20%" },
+            style: { width: "16%" },
             Cell: ({ row }) => {
                 const fromDate = row?.original?.date_from;
                 const toDate = row?.original?.date_to;
-
                 return (
                     <div>
                         <div>
-                            <strong>From </strong>
-                            {fromDate
-                                ? moment(fromDate).format("DD MMM, YYYY hh:mm A")
-                                : "---"}
+                            <strong>From:</strong>
+                            {formatEventDateTime(fromDate)}
                         </div>
 
                         <div>
-                            <strong>To </strong>
-                            {toDate
-                                ? moment(toDate).format("DD MMM, YYYY hh:mm A")
-                                : "---"}
+                            <strong>To:</strong>
+                            {formatEventDateTime(toDate)}
                         </div>
                     </div>
                 );
             },
         },
-
         {
             Header: "Venue",
             accessor: "venue",
@@ -117,7 +123,7 @@ export const Events = () => {
             style: { width: "10%" },
             Cell: ({ row }) => (
                 <div>
-                    {row.original.location ? row.original.location : "---"}
+                    {row.original.location ? row.original.location : "--"}
                 </div>
             ),
         },
@@ -134,15 +140,14 @@ export const Events = () => {
                         {Array.isArray(tickets) && tickets.length > 0
                             ? tickets.map((ticket, index) => (
                                 <div key={ticket.id || index}>
-                                    {ticket.title || "---"}
+                                    {ticket.title || "--"}
                                 </div>
                             ))
-                            : "---"}
+                            : "--"}
                     </div>
                 );
             },
         },
-
         {
             Header: "Total Sales",
             accessor: "total_sales",
@@ -150,9 +155,9 @@ export const Events = () => {
             style: { width: "10%" },
             Cell: ({ row }) => {
                 const eventId = row?.original?.id;
-                const amount = formatAmount(row?.original, "total_sales");
+                const amount = formatPrice(row?.original?.total_sales);
 
-                if (!eventId || amount === "---") {
+                if (!eventId || amount == "--") {
                     return <span>{amount}</span>;
                 }
                 return (
@@ -165,7 +170,6 @@ export const Events = () => {
                 );
             },
         },
-
         {
             Header: "Comm(8%)",
             accessor: "Comm",
@@ -173,9 +177,25 @@ export const Events = () => {
             style: { width: "5%" },
             Cell: ({ row }) => (
                 <div>
-                    {formatAmount(row?.original, "total_tax")}
+                    {formatPrice(row?.original?.total_tax)}
                 </div>
             ),
+        },
+        {
+            Header: "Event Type",
+            accessor: "event_type",
+            className: "borderrigth",
+            style: { width: "8%" },
+            Cell: ({ row }) => {
+                // console.log('row :', row);
+                const isFree = row?.original?.is_free == "Y";
+
+                return (
+                    <span className={isFree ? "badge bg-success" : "badge bg-danger"}>
+                        {isFree ? "Free Event" : "Paid Event"}
+                    </span>
+                );
+            },
         },
         {
             Header: "Featured",
@@ -184,7 +204,7 @@ export const Events = () => {
             style: { width: "5%" },
             Cell: ({ row }) => {
                 const { id, featured } = row.original;
-                const isFeatured = featured === "Y";
+                const isFeatured = featured == "Y";
                 return (
                     <div className="d-flex justify-content-center gap-2">
                         {/* Featured Star */}
@@ -215,15 +235,12 @@ export const Events = () => {
                 );
             },
         },
-
         {
             Header: "Action",
             accessor: "action",
             className: "borderrigth",
             style: { width: "10%" },
             Cell: ({ row }) => {
-                const { id, status } = row.original;
-
                 return (
                     <div className="d-flex flex-column align-items-center gap-1">
                         {/* Top Row: Toggle + Delete */}
@@ -233,8 +250,8 @@ export const Events = () => {
                                     className="form-check-input"
                                     type="checkbox"
                                     style={{ cursor: "pointer" }}
-                                    checked={status === "Y"}
-                                    onChange={() => handleStatusToggle(id, status)}
+                                    checked={status == "Y"}
+                                    onChange={() => handleStatus(row.original)}
                                 />
                             </div>
 
@@ -255,51 +272,14 @@ export const Events = () => {
                         </button>
                     </div>
                 );
-            },
-
-
-
-            // Cell: ({ row }) => {
-            //     const { id, status } = row.original;
-            //     return (
-            //         <div className="form-check form-switch d-flex justify-content-center">
-            //             <div className="form-check form-switch">
-            //                 <input
-            //                     className="form-check-input"
-            //                     type="checkbox"
-            //                     style={{ cursor: "pointer" }}
-            //                     checked={status === "Y"}
-            //                     onChange={() => handleStatusToggle(id, status)}
-            //                 /></div>
-
-            //             <i
-            //                 className="bi bi-trash-fill text-danger"
-            //                 style={{ cursor: "pointer", fontSize: "16px" }}
-            //                 onClick={() => handleDeleteEvent(id)}
-            //                 title="Delete"
-            //             ></i>
-            //             <br />
-            //             {/* Payment Report Button */}
-            //             <button
-            //                 className="btn btn-success btn-sm"
-            //                 // onClick={handlePaymentReport}
-            //                 onClick={() => generatePaymentReport(id)}
-
-            //             >
-            //                 Payment Report
-            //             </button>
-            //         </div>
-            //     );
-            // },
+            }
         },
     ]);
-
-
 
     const formatCurrency = (amount, currency) => {
         const value = Number(amount || 0);
 
-        if (currency === "INR") {
+        if (currency == "INR") {
             return `₹${value.toLocaleString("en-IN")}`;
         }
 
@@ -309,6 +289,7 @@ export const Events = () => {
             minimumFractionDigits: 0,
         }).format(value);
     };
+
     const formatEventDate = (from, to) => {
         const date = new Date(from);
 
@@ -317,9 +298,9 @@ export const Events = () => {
         const month = date.toLocaleString("en-US", { month: "long" });
 
         const suffix =
-            day % 10 === 1 && day !== 11 ? "st" :
-                day % 10 === 2 && day !== 12 ? "nd" :
-                    day % 10 === 3 && day !== 13 ? "rd" : "th";
+            day % 10 == 1 && day !== 11 ? "st" :
+                day % 10 == 2 && day !== 12 ? "nd" :
+                    day % 10 == 3 && day !== 13 ? "rd" : "th";
 
         const time = date.toLocaleTimeString("en-US", {
             hour: "2-digit",
@@ -329,6 +310,7 @@ export const Events = () => {
 
         return `${month} ${day}${suffix} ${year} @${time}`;
     };
+
     const formatTableDate = (dateStr) => {
         if (!dateStr) return "-";
 
@@ -346,7 +328,6 @@ export const Events = () => {
 
         return `${day}-${month}-${year} ${time}`;
     };
-
 
     const generatePaymentReport = async (eventId) => {
         try {
@@ -379,9 +360,6 @@ export const Events = () => {
                     { text: "Contact", color: "white", bold: true },
                 ],
             ];
-
-
-
 
             event.orderItems.forEach((item, index) => {
                 const order = item.order || {};
@@ -479,7 +457,7 @@ export const Events = () => {
                             body: tableBody,
                         },
                         layout: {
-                            fillColor: (rowIndex) => (rowIndex === 0 ? "#3F4A5A" : null),
+                            fillColor: (rowIndex) => (rowIndex == 0 ? "#3F4A5A" : null),
                         },
                     },
                 ],
@@ -513,32 +491,6 @@ export const Events = () => {
         }
     };
 
-    const formatAmount = (row, key) => {
-        const symbol = row?.currencyName?.Currency_symbol || "";
-        const value = Number(row?.[key] || 0);
-
-        if (!value) return "---";
-
-        return `${symbol} ${value.toLocaleString("en-IN", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-        })}`;
-    };
-
-    const [eventList, setEventList] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
-    // Alert messages
-    const [fromDate, setFromDate] = useState(null);
-    const [toDate, setToDate] = useState(null);
-    const [eventName, setEventName] = useState("");
-    const [organizer, setOrganizer] = useState("");
-
-    const [showStaffModal, setShowStaffModal] = useState(false);
-    const [staffList, setStaffList] = useState([]);
-    const [loadingStaff, setLoadingStaff] = useState(false);
-    const [selectedEventId, setSelectedEventId] = useState(null);
-
-
     const getTicketName = (item) => {
         return (
             item.ticketType?.title?.trim() ||
@@ -547,10 +499,6 @@ export const Events = () => {
             "N/A"
         );
     };
-
-
-
-
 
     const getEventList = async () => {
         try {
@@ -567,6 +515,7 @@ export const Events = () => {
     useEffect(() => {
         getEventList();
     }, []);
+
     const handleDeleteEvent = async (id) => {
         const result = await Swal.fire({
             title: "Are you sure?",
@@ -612,58 +561,159 @@ export const Events = () => {
         }
     };
 
+    const handleStatus = async (row) => {
+        const { id, status: currentStatus, is_free } = row;
 
-    const handleStatusToggle = async (id, currentStatus) => {
-        const newStatus = currentStatus === "Y" ? "N" : "Y";
-        const statusText = newStatus === "Y" ? "Activate" : "Deactivate";
+        const newStatus = currentStatus == "Y" ? "N" : "Y";
+        const statusText = newStatus == "Y" ? "Activate" : "Deactivate";
 
-        const result = await Swal.fire({
-            title: `Are you sure?`,
-            text: `Do you want to ${statusText} this Event Organizer?`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonText: `Yes, ${statusText}`,
-            cancelButtonText: "Cancel",
-            confirmButtonColor: "#20c997",
-            reverseButtons: true,
-        });
+        // ONLY if activating AND event is FREE
+        if (newStatus == "N" && is_free == "Y") {
 
-        if (!result.isConfirmed) return;
-        try {
-            Swal.fire({
-                title: "Updating status...",
-                text: "Please wait",
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                },
+            const { value: formValues } = await Swal.fire({
+                title: "Activate Free Event",
+                html: `
+                    <div style="text-align:left;">
+
+                        <label style="font-weight:600;margin-bottom:4px;">Activation Date *</label>
+                        <input id="swal-date" type="date" class="swal2-input" style="width:100%;margin:0 0 10px 0;">
+
+                        <label style="font-weight:600;margin-bottom:4px;">Amount *</label>
+                        <input id="swal-amount" type="number" class="swal2-input" placeholder="Enter amount" style="width:100%;margin:0 0 10px 0;">
+
+                        <label style="font-weight:600;margin-bottom:4px;">Remarks</label>
+                        <textarea id="swal-remarks" class="swal2-textarea" placeholder="Enter remarks (optional)" 
+                        style="width:100%;margin:0;"></textarea>
+
+                    </div>
+                `,
+                width: "420px",
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonText: "Activate",
+                cancelButtonText: "Cancel",
+                confirmButtonColor: "#0d6efd",
+                preConfirm: () => {
+                    const date = document.getElementById("swal-date").value;
+                    const amount = document.getElementById("swal-amount").value;
+                    const remarks = document.getElementById("swal-remarks").value;
+
+                    if (!date) {
+                        Swal.showValidationMessage("Please select activation date");
+                        return false;
+                    }
+
+                    if (!amount) {
+                        Swal.showValidationMessage("Please enter amount");
+                        return false;
+                    }
+
+                    if (amount <= 0) {
+                        Swal.showValidationMessage("Amount must be greater than 0");
+                        return false;
+                    }
+
+                    return { date, amount, remarks };
+                }
             });
 
-            await api.put(`/api/v1/admin/events/update-status/${id}`, {
-                status: newStatus,
+
+            if (!formValues) return;
+
+            try {
+                Swal.fire({
+                    title: "Updating status...",
+                    text: "Please wait",
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    },
+                });
+
+                await api.put(`/api/v1/admin/events/update-status/${id}`, {
+                    status: newStatus,
+                    activation_date: formValues.date,
+                    activation_amount: formValues.amount,
+                    activation_remarks: formValues.remarks
+                });
+
+                getEventList();
+
+                Swal.fire({
+                    icon: "success",
+                    title: "Activated",
+                    text: "Free event activated successfully",
+                    timer: 1500,
+                    showConfirmButton: false,
+                });
+
+            } catch (error) {
+                console.error("Status update failed", error);
+                Swal.fire({
+                    icon: "error",
+                    title: "Failed",
+                    text: "Unable to activate event. Please try again.",
+                });
+            }
+
+        }
+        // ALL OTHER CASES (Paid event OR Deactivate) → normal confirm
+        else {
+
+            const result = await Swal.fire({
+                title: `Are you sure?`,
+                text: `Do you want to ${statusText} this Event?`,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: `Yes, ${statusText}`,
+                cancelButtonText: "Cancel",
+                confirmButtonColor: "#20c997",
+                reverseButtons: true,
             });
-            getEventList();
-            Swal.fire({
-                icon: "success",
-                title: "Success",
-                text: `Status updated successfully`,
-                timer: 1500,
-                showConfirmButton: false,
-            });
-        } catch (error) {
-            console.error("Status update failed", error);
-            Swal.fire({
-                icon: "error",
-                title: "Failed",
-                text: "Unable to update status. Please try again.",
-            });
+
+            if (!result.isConfirmed) return;
+
+            try {
+                Swal.fire({
+                    title: "Updating status...",
+                    text: "Please wait",
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    },
+                });
+
+                await api.put(`/api/v1/admin/events/update-status/${id}`, {
+                    status: newStatus
+                });
+
+                getEventList();
+
+                Swal.fire({
+                    icon: "success",
+                    title: "Success",
+                    text: `Status updated successfully`,
+                    timer: 1500,
+                    showConfirmButton: false,
+                });
+
+            } catch (error) {
+                console.error("Status update failed", error);
+                Swal.fire({
+                    icon: "error",
+                    title: "Failed",
+                    text: "Unable to update status. Please try again.",
+                });
+            }
         }
     };
 
+
     // featured status
     const handleFeaturedStatusChange = async (eventId, currentStatus) => {
-        const isCurrentlyFeatured = currentStatus === "Y";
+        const isCurrentlyFeatured = currentStatus == "Y";
         const updatedStatus = isCurrentlyFeatured ? "N" : "Y";
 
         const result = await Swal.fire({
@@ -720,12 +770,12 @@ export const Events = () => {
         }
     };
 
-
     const handleView = (eventId) => {
         setSelectedEventId(eventId);
         setShowStaffModal(true);
         fetchStaffList(eventId);
     };
+
     const fetchStaffList = async (eventId) => {
         try {
             setLoadingStaff(true);
@@ -814,11 +864,11 @@ export const Events = () => {
         setSelectedEvent(null)
     };
 
-
     const getCurrentDate = () => {
         const d = new Date();
         return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
     };
+
     const headers = [
         "Organizer",
         "Event Name",
@@ -834,18 +884,18 @@ export const Events = () => {
     const csvData = eventList.map((item) => {
         const organizer = item?.Organizer
             ? `${item.Organizer.first_name || ""} ${item.Organizer.last_name || ""}`.trim()
-            : "----";
+            : "--";
 
         return {
-            Organizer: organizer || "----",
-            "Event Name": item?.name || "----",
-            "Date From": item?.date_from || "----",
-            "Date To": item?.date_to || "----",
-            Venue: item?.location || "----",
+            Organizer: organizer || "--",
+            "Event Name": item?.name || "--",
+            "Date From": item?.date_from || "--",
+            "Date To": item?.date_to || "--",
+            Venue: item?.location || "--",
             "Total Sales": item?.total_sales ?? "0",
             "Comm(8%)": item?.total_tax ?? "0",
-            "Video Url": item?.video_url || "----",
-            Status: item?.status === "Y" ? "Active" : "Inactive",
+            "Video Url": item?.video_url || "--",
+            Status: item?.status == "Y" ? "Active" : "Inactive",
         };
     });
 
@@ -872,7 +922,6 @@ export const Events = () => {
         link.click();
         document.body.removeChild(link);
     };
-
 
     const loadUserOptions = async (inputValue) => {
         if (inputValue.length < 2) return [];
@@ -940,6 +989,7 @@ export const Events = () => {
             return [];
         }
     };
+
     const handleEventSelect = (selectedOption) => {
         setSelectedEvent(selectedOption); // 👈 dropdown control
 
@@ -949,13 +999,6 @@ export const Events = () => {
             setEventName("");
         }
     };
-
-
-
-
-
-
-
 
     return (
         <div>
@@ -985,7 +1028,7 @@ export const Events = () => {
                                         getOptionLabel={(option) => option.user.first_name}
                                         getOptionValue={(option) => option.value}
                                         formatOptionLabel={(option, { context }) => {
-                                            if (context === "menu") {
+                                            if (context == "menu") {
                                                 return (
                                                     <div>
                                                         <strong>{option.user.first_name}</strong>
@@ -1016,7 +1059,7 @@ export const Events = () => {
                                         getOptionLabel={(option) => option.event?.name}
                                         getOptionValue={(option) => option.value}
                                         formatOptionLabel={(option, { context }) => {
-                                            if (context === "menu") {
+                                            if (context == "menu") {
                                                 return (
                                                     <div>
                                                         <strong>{option.event?.name}</strong>
@@ -1325,13 +1368,6 @@ export const Events = () => {
                     </Button>
                 </Modal.Footer>
             </Modal>
-
-
-
-
-
-
-
 
         </div>
     );

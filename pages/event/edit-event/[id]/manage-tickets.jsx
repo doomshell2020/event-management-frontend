@@ -224,7 +224,7 @@ const ManageTickets = () => {
             <section id="myevent-deshbord">
                 <div className="d-flex">
                     {/* Sidebar */}
-                    <EventSidebar eventId={id} />
+                    <EventSidebar eventId={id}  eventDetails={eventDetails}/>
 
                     <div className="event-righcontent">
                         <div className="dsa_contant">
@@ -782,7 +782,7 @@ const ManageTickets = () => {
                                 setError("");
                             }}
                         >
-                            {/* <option value="">Select Ticket</option> */}
+                            <option value="">Select Ticket</option>
                             {ticketsList
                                 .filter(ticket => ticket.type == "comps")
                                 .map(ticket => (
@@ -837,7 +837,6 @@ const ManageTickets = () => {
                         variant="primary"
                         disabled={loading}
                         onClick={async () => {
-                            // console.log('selectedTicket :', selectedTicket);
                             if (!selectedTicket) {
                                 setError("Please select ticket");
                                 return;

@@ -360,7 +360,7 @@ const MyEventsPage = () => {
                 <div className="d-flex">
 
                     {/* left menu */}
-                    <EventSidebar eventId={id} />
+                    <EventSidebar eventId={id}  eventDetails={eventDetails}/>
 
                     <div className="event-righcontent">
                         <div className="dsa_contant">
