@@ -271,6 +271,9 @@ const MyStaff = () => {
                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                 isInvalid={!!errors.email}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                {errors.email}
+                            </Form.Control.Feedback>
                         </Form.Group>
 
                         <Form.Group className="mb-2">
@@ -278,9 +281,26 @@ const MyStaff = () => {
                             <Form.Control
                                 value={formData.mobile}
                                 disabled={isEdit}
-                                onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
+                                maxLength={10}
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, ""); // allow only numbers
+
+                                    if (value.length <= 10) {
+                                        setFormData({ ...formData, mobile: value });
+
+                                        setErrors({
+                                            ...errors,
+                                            mobile: value.length == 10 ? "" : "Mobile number must be 10 digits",
+                                        });
+                                    }
+                                }}
                                 isInvalid={!!errors.mobile}
                             />
+
+                            <Form.Control.Feedback type="invalid">
+                                {errors.mobile}
+                            </Form.Control.Feedback>
+
                         </Form.Group>
 
                         <Form.Group className="mb-2">

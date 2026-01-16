@@ -176,7 +176,7 @@ const UpdateProfile = () => {
                 payload.old_password = formData.old_password;
                 payload.password = formData.password;
             }
-            console.log('payload :', payload);
+            // console.log('payload :', payload);
 
             const res = await api.patch("/api/v1/auth/update-profile", payload);
 
@@ -214,19 +214,29 @@ const UpdateProfile = () => {
     /* ================= IMAGE UPLOAD ================= */
     const handleUploadSubmit = async (e) => {
         e.preventDefault();
+        // console.log('selectedImage :', selectedImage);
         setIsLoading(true);
         const body = new FormData();
         body.append("profile_image", selectedImage);
 
         try {
-            const res = await api.patch("/api/v1/auth/update-profile-image", body);
+            const res = await api.patch(
+                "/api/v1/auth/update-profile-image",
+                body,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data"
+                    }
+                }
+            );
             if (res.data.success) {
                 Swal.fire("Success", res.data.message, "success");
                 setProfileImage(URL.createObjectURL(selectedImage));
                 setShow(false);
             }
-        } catch {
-            Swal.fire("Error", "Upload failed", "error");
+        } catch (err) {
+            let errorMessage = err.response?.data?.error?.message || "Upload Failed"
+            Swal.fire("Error", errorMessage, "error");
         } finally {
             setIsLoading(false);
         }
