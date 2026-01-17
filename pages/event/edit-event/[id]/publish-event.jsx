@@ -99,7 +99,7 @@ const PublishEvent = () => {
 
             <section id="myevent-deshbord">
                 <div className="d-flex">
-                    <EventSidebar eventId={id}  eventDetails={eventDetails}/>
+                    <EventSidebar eventId={id} eventDetails={eventDetails} />
                     <div className="event-righcontent">
                         <div className="dsa_contant">
                             <section id="post-eventpg">
@@ -109,47 +109,65 @@ const PublishEvent = () => {
                                 <hr className="custom-hr" />
                                 <p className="text-14 text-dark">You can manage event status here.</p>
 
-                                <div className="contant_bg mt-4">
-                                    <h6>Activation Setting</h6>
-                                    <hr className="custom-hr" />
-                                    <div className="row">
-                                        <div className="col-md-9 col-sm-8">
-                                            {eventDetails && eventDetails.status == 'Y' ? (
-                                                <Eye className="me-2" />
-                                            ) : (
-                                                <EyeOff className="me-2" />
-                                            )}
-                                            <div>
-                                                <p className="text-14 text-13 mb-1">
-                                                    {eventDetails && eventDetails.status == 'Y'
-                                                        ? "Event is Active"
-                                                        : "Event is Inactive"}
-                                                </p>
-                                                <p className="text-14 text-13 text-dark mb-0">
-                                                    {eventDetails && eventDetails.status == 'Y'
-                                                        ? "Your event is live and visible to attendees."
-                                                        : "Your event is not visible to attendees."}
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div className=" mt-2 col-md-3 col-sm-4">
-                                            {eventDetails && (
-                                                <button
-                                                    className={`btn  w-100 ${eventDetails.status === 'Y' ? 'btn-danger' : 'btn-success'
-                                                        }`}
-                                                    onClick={toggleEventStatus}
-                                                    disabled={statusLoading}
-                                                >
-                                                    {statusLoading
-                                                        ? "Processing..."
-                                                        : eventDetails.status == 'Y'
-                                                            ? "Deactivate Event"
-                                                            : "Activate Event"}
-                                                </button>
-                                            )}
-                                        </div>
+                                <div className="contant_bg mt-4 shadow-sm rounded p-4 bg-white border">
+
+                                    <div className="d-flex align-items-center justify-content-between mb-3">
+                                        <h6 className="fw-bold mb-0">Activation Setting</h6>
+
+                                        {eventDetails?.admineventstatus == "Y" ? (
+                                            <span className="badge bg-success px-3 py-2">Admin Approved</span>
+                                        ) : (
+                                            <span className="badge bg-warning text-dark px-3 py-2">
+                                                Pending Admin Approval
+                                            </span>
+                                        )}
                                     </div>
+
+                                    <hr className="mt-2 mb-3" />
+
+                                    <div className="d-flex align-items-start">
+
+                                        <div className="me-3">
+                                            {eventDetails?.status == "Y" ? (
+                                                <div className="bg-success bg-opacity-10 p-2 rounded">
+                                                    <Eye className="text-success" size={22} />
+                                                </div>
+                                            ) : (
+                                                <div className="bg-danger bg-opacity-10 p-2 rounded">
+                                                    <EyeOff className="text-danger" size={22} />
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div>
+                                            <p className="fs-6 fw-semibold mb-1">
+                                                {eventDetails?.status == "Y"
+                                                    ? "Event is Active"
+                                                    : "Event is Inactive"}
+                                            </p>
+
+                                            <p className="text-muted small mb-0">
+                                                {eventDetails?.status == "Y"
+                                                    ? "Your event is live and visible to attendees."
+                                                    : "Your event is not visible to attendees."}
+                                            </p>
+
+                                            {/* ADMIN STATUS MESSAGE */}
+                                            {eventDetails?.admineventstatus == "N" && (
+                                                <div className="alert alert-warning mt-3 mb-0 p-2 d-flex align-items-center">
+                                                    <span className="me-2">⚠</span>
+                                                    <small>
+                                                        Admin approval is pending. You cannot activate or deactivate this event.
+                                                    </small>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                    </div>
+
                                 </div>
+
+
                             </section>
                         </div>
                     </div>

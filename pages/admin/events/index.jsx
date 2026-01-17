@@ -679,8 +679,6 @@ export const Events = () => {
                     const date = document.getElementById("swal-date").value;
                     const amount = document.getElementById("swal-amount").value;
                     const remarks = document.getElementById("swal-remarks").value;
-                    console.log('remarks :', remarks);
-                    return false
 
 
                     if (!date) {
@@ -698,10 +696,11 @@ export const Events = () => {
                         return false;
                     }
 
-                    if (remarks.length = 0 || !remarks.length) {
+                    if (!remarks || remarks.trim().length == 0) {
                         Swal.showValidationMessage("Please enter remarks");
                         return false;
                     }
+
 
                     return { date, amount, remarks };
                 }
