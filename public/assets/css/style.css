@@ -2015,7 +2015,7 @@ section#request-demo {
 }
 
 .resistor-content label {
-  font-size: 15px;
+  font-size: 14px;
   color: rgba(0, 0, 0, .87);
   margin-bottom: 7px;
 }
@@ -2024,7 +2024,9 @@ section#request-demo {
   margin-bottom: 3px;
 }
 
-
+.edit-appointment-module.resistor-content .react-datepicker-wrapper {
+    width: 100% !important;
+}
 .freeEventCheck {
   height: 33.5px;
   border-radius: 3px;
@@ -6122,6 +6124,9 @@ input[type="date"] {
     .table-width-992{
       min-width: 1000px !important;
     }
+    .headernav .userloginbtn {
+  margin-left: 0px;
+}
 }
 
 @media (min-width: 768px) and (max-width: 992px) {
