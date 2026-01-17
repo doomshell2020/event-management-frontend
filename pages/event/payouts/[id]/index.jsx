@@ -59,15 +59,10 @@ const ManagePayouts = () => {
             setLoading(false);
         }
     };
-
+    
     useEffect(() => {
         if (id) {
-            // fetchEventDetails(id); // only once
-        }
-    }, [id]);
-
-    useEffect(() => {
-        if (id) {
+            fetchEventDetails(id); // only once
             fetchOrders(id, currentPage); // only orders refresh
         }
     }, [id, currentPage]);
@@ -87,7 +82,7 @@ const ManagePayouts = () => {
                 <div className="d-flex">
 
                     {/* Sidebar */}
-                    <EventSidebar eventId={id} />
+                    <EventSidebar eventId={id}  eventDetails={eventDetails}/>
 
                     <div className="event-righcontent">
                         <div className="dsa_contant">

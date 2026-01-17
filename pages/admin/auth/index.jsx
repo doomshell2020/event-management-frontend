@@ -13,7 +13,7 @@ import { useAuth, login } from "@/shared/layout-components/layout/AuthContext";
 
 export default function Login() {
     // Firebase
-      const router = useRouter();
+    const router = useRouter();
     const [email, setEmail] = useState("admin@eboxtickets.com");
     const [password, setPassword] = useState("passw0rd!");
     const [data, setData] = useState("");
@@ -72,7 +72,7 @@ export default function Login() {
                 err.response?.data?.message ||
                 err.message ||
                 "Something went wrong. Please try again.";
-                toast.error(apiErrorMsg);
+            toast.error(apiErrorMsg);
         } finally {
             setIsLoading(false);
         }

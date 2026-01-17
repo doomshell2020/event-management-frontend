@@ -87,13 +87,13 @@ const ManagePayouts = () => {
                 <div className="d-flex">
 
                     {/* Sidebar */}
-                    <EventSidebar eventId={id} />
+                    <EventSidebar eventId={id}  eventDetails={eventDetails}/>
 
                     <div className="event-righcontent">
                         <div className="dsa_contant">
 
                             <section id="post-eventpg">
-                                {/* <EventHeaderSection eventDetails={eventDetails} isProgressBarShow={false} /> */}
+                                <EventHeaderSection eventDetails={eventDetails} isProgressBarShow={false} />
 
                                 <h4 className="text-24">Ticket Reports</h4>
                                 <hr className="custom-hr" />

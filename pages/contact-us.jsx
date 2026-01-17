@@ -6,7 +6,6 @@ import FrontendFooter from "@/shared/layout-components/frontelements/frontendfoo
 import Swal from "sweetalert2";
 import api from "@/utils/api";
 
-
 const ContactUs = () => {
   const [backgroundImage, setIsMobile] = useState('/assets/front-images/about-slider_bg.jpg');
 
@@ -21,9 +20,28 @@ const ContactUs = () => {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
+  // ---- CAPTCHA STATES (ONLY ADDITION) ----
+  const [captchaQuestion, setCaptchaQuestion] = useState("");
+  const [captchaAnswer, setCaptchaAnswer] = useState("");
+  const [captchaExpected, setCaptchaExpected] = useState(0);
+
   /* ---------- helpers ---------- */
   const isValidEmail = (email) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  // ---- CAPTCHA GENERATOR ----
+  const generateCaptcha = () => {
+    const num1 = Math.floor(Math.random() * 10) + 1;
+    const num2 = Math.floor(Math.random() * 10) + 1;
+
+    setCaptchaQuestion(`What is ${num1} + ${num2}?`);
+    setCaptchaExpected(num1 + num2);
+    setCaptchaAnswer("");
+  };
+
+  useEffect(() => {
+    generateCaptcha();
+  }, []);
 
   const validateForm = () => {
     let newErrors = {};
@@ -43,6 +61,13 @@ const ContactUs = () => {
       newErrors.description = "Description is required";
     else if (formData.description.trim().length < 10)
       newErrors.description = "Minimum 10 characters required";
+
+    // ---- CAPTCHA VALIDATION (ONLY ADDITION) ----
+    if (!captchaAnswer) {
+      newErrors.captcha = "Captcha answer is required";
+    } else if (parseInt(captchaAnswer) !== captchaExpected) {
+      newErrors.captcha = "Wrong captcha answer";
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -85,10 +110,10 @@ const ContactUs = () => {
 
     try {
       const res = await api.post("/api/v1/admin/contact-us", payload);
-      // console.log('res :', res);
 
       if (res.data?.success) {
         Swal.fire("Success", res.data?.message, "success");
+
         setFormData({
           name: "",
           email: "",
@@ -96,17 +121,16 @@ const ContactUs = () => {
           subject: "",
           description: "",
         });
+
+        // ---- RESET CAPTCHA AFTER SUCCESS ----
+        generateCaptcha();
+
       } else {
         Swal.fire("Error", res.data?.message || "Failed", "error");
       }
     } catch (err) {
       console.log("API Error:", err);
-      errorMessage =
-        err.response.data?.message ||
-        err.response.data?.errors?.[0] ||
-        "Validation error";
-
-
+      let errorMessage = err?.response?.data?.error?.message || "Validation error";
       Swal.fire("Error", errorMessage, "error");
     } finally {
       setLoading(false);
@@ -171,6 +195,7 @@ const ContactUs = () => {
                   Get In Touch
                 </h3>
                 <form className="text-left" onSubmit={handleSubmit}>
+
                   <input
                     type="text"
                     className="form-control mb-1"
@@ -225,14 +250,32 @@ const ContactUs = () => {
                     <small className="text-danger">{errors.description}</small>
                   )}
 
+                  {/* ---- SIMPLE CAPTCHA UI (NO DESIGN CHANGE) ---- */}
+                  <div className="mt-2">
+                    <label className="fw-bold">{captchaQuestion}</label>
+
+                    <input
+                      type="text"
+                      className="form-control mb-1"
+                      placeholder="Enter captcha answer *"
+                      value={captchaAnswer}
+                      onChange={(e) => setCaptchaAnswer(e.target.value)}
+                    />
+
+                    {errors.captcha && (
+                      <small className="text-danger">{errors.captcha}</small>
+                    )}
+                  </div>
+
                   <button
                     type="submit"
                     className="primery-button w-100 mt-3"
                     disabled={loading}
                   >
-                    {loading ? "Sending..." : "Submit"}{" "}
+                    {loading ? "Sending..." : "Submit"}
                     <i className="fas fa-angle-double-right"></i>
                   </button>
+
                 </form>
               </div>
             </div>

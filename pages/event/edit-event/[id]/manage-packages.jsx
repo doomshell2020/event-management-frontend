@@ -31,7 +31,7 @@ const ManagePackages = () => {
     // console.log('packageList :', packageList);
 
     const currencyName = eventDetails?.currencyName.Currency_symbol;
-    console.log('currencyName :', currencyName);
+    // console.log('currencyName :', currencyName);
 
     // fetch addons list
     const handleGetPackagesList = async () => {
@@ -359,7 +359,7 @@ const ManagePackages = () => {
             <section id="myevent-deshbord">
                 <div className="d-flex">
                     {/* Sidebar */}
-                    <EventSidebar eventId={id} />
+                    <EventSidebar eventId={id}  eventDetails={eventDetails}/>
 
                     <div className="event-righcontent">
                         <div className="dsa_contant">
@@ -441,17 +441,17 @@ const ManagePackages = () => {
                                                                         {pkg.name}
                                                                     </h5>
 
-                                                                   <small className="d-block text-black mb-2 mt-3" style={{ fontSize: "12px" }}>
+                                                                    <small className="d-block text-black mb-2 mt-3" style={{ fontSize: "12px" }}>
                                                                         <i className="bi bi-stack me-1"></i>
                                                                         Total Limit: <strong>{pkg.total_package ?? 0}</strong>
                                                                     </small>
 
-                                                                <small className="d-block text-black mb-2" style={{ fontSize: "12px" }}>
+                                                                    <small className="d-block text-black mb-2" style={{ fontSize: "12px" }}>
                                                                         <i className="bi bi-cart-check me-1"></i>
                                                                         Sold: <strong>{pkg.sold_count ?? 0}</strong>
                                                                     </small>
 
-                                                                <small className="d-block text-black mb-2" style={{ fontSize: "12px" }}>
+                                                                    <small className="d-block text-black mb-2" style={{ fontSize: "12px" }}>
                                                                         <i className="bi bi-box-arrow-in-down me-1"></i>
                                                                         Available:{" "}
                                                                         <strong>
@@ -576,8 +576,8 @@ const ManagePackages = () => {
                                                                                     >
                                                                                         <i
                                                                                             className={`bi me-2 ${pkg.hidden === "Y"
-                                                                                                    ? "bi-eye"
-                                                                                                    : "bi-eye-slash"
+                                                                                                ? "bi-eye"
+                                                                                                : "bi-eye-slash"
                                                                                                 }`}
                                                                                         ></i>
                                                                                         {pkg.hidden === "Y"
@@ -906,8 +906,16 @@ const ManagePackages = () => {
                                                     onChange={(e) => {
                                                         const value = Number(e.target.value || 0);
 
-                                                        if (value >= total) {
-                                                            // 🔴 Error + discount empty
+                                                        if (value < 0) {
+                                                            // 🔴 Negative value not allowed
+                                                            setDiscountError("Negative value not allowed");
+                                                            setPackageForm({
+                                                                ...packageForm,
+                                                                discount: "",
+                                                            });
+                                                        }
+                                                        else if (value >= total) {
+                                                            // 🔴 Discount greater than total
                                                             setDiscountError("Discount amount cannot be greater than total");
                                                             setPackageForm({
                                                                 ...packageForm,
@@ -924,8 +932,13 @@ const ManagePackages = () => {
                                                 />
 
                                                 <Form.Control.Feedback type="invalid">
-                                                    Discount amount cannot be greater than total
+                                                    {discountError}
                                                 </Form.Control.Feedback>
+
+
+                                                {/* <Form.Control.Feedback type="invalid">
+                                                    Discount amount cannot be greater than total
+                                                </Form.Control.Feedback> */}
 
                                             </td>
                                         </tr>

@@ -3,8 +3,11 @@ import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 
-const EventSidebar = ({ eventId }) => {
-    // console.log('eventId :', eventId);
+const EventSidebar = ({ eventId, eventDetails }) => {
+
+    const { is_free } = eventDetails || {};
+    console.log('is_free :', is_free);
+
     const [isLeftRight, setIsLeftRight] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     const pathname = usePathname();
@@ -64,17 +67,26 @@ const EventSidebar = ({ eventId }) => {
                         { href: `/event/export-tickets/${eventId}`, icon: "bi bi-wallet2", label: "Export Tickets" },
                         { href: `/event/analytics/${eventId}`, icon: "bi bi-bar-chart", label: "Analytics" },
                         { href: `/event/payouts/${eventId}`, icon: "bi bi-wallet2", label: "Payouts" },
-                        { href: `/event/edit-event/${eventId}/committee/manage-committee`, icon: "bi bi-people", label: "Committee" },
-                        { href: `/event/tickets/${eventId}`, icon: "fas fa-ticket-alt", label: "Tickets" },
-                        { href: `/event/ticket-reports/${eventId}`, icon: "fas fa-chart-bar", label: "Ticket Reports" },
-                    ].map((item, idx) => (
-                        <li key={idx} className={isActive(item.href) ? "active" : ""}>
-                            <Link href={item.href}>
-                                <i className={item.icon}></i>
-                                <span> {item.label} </span>
-                            </Link>
-                        </li>
-                    ))}
+
+                        // show Committee ONLY if event is NOT free
+                        is_free=='N' && {
+                            href: `/event/edit-event/${eventId}/committee/manage-committee`,
+                            icon: "bi bi-people",
+                            label: "Committee",
+                        },
+
+                        { href: `/event/edit-event/${eventId}/manage-tickets`, icon: "fas fa-ticket-alt", label: "Tickets" },
+                    ]
+                        .filter(Boolean)
+                        .map((item, idx) => (
+                            <li key={idx} className={isActive(item.href) ? "active" : ""}>
+                                <Link href={item.href}>
+                                    <i className={item.icon}></i>
+                                    <span> {item.label} </span>
+                                </Link>
+                            </li>
+                        ))}
+
                 </ul>
             ) : (
                 <hr />

@@ -19,7 +19,7 @@ import Moment from "react-moment";
 import Swal from "sweetalert2";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-
+import AsyncSelect from "react-select/async";
 export const CustomerList = () => {
     const [COLUMNS, setCOLUMNS] = useState([
         {
@@ -163,6 +163,9 @@ export const CustomerList = () => {
     const [email, setEmail] = useState("");
     const [fromDate, setFromDate] = useState(null);
     const [toDate, setToDate] = useState(null);
+    const [selectedCustomer, setSelectedCustomer] = useState(null);
+    const [selectedEmail, setSelectedEmail] = useState(null);
+    const [status, setStatus] = useState("");
     const handleSendEmail = async (id) => {
         const result = await Swal.fire({
             title: "Are you sure?",
@@ -275,9 +278,9 @@ export const CustomerList = () => {
         }
     };
 
- const getCustomers = async () => {
+    const getCustomers = async () => {
         try {
-           setIsLoading(true);
+            setIsLoading(true);
             const { data } = await api.get("/api/v1/admin/customers");
             setCustomers(data?.data?.customers || []);
         } catch (err) {
@@ -336,8 +339,9 @@ export const CustomerList = () => {
             const formattedToDate = formatDate(toDate);
             const response = await api.get("/api/v1/admin/customers/search", {
                 params: {
-                    first_name:firstName,
+                    first_name: firstName,
                     email,
+                    status:status,
                     fromDate: formattedFromDate,
                     toDate: formattedToDate,
                 },
@@ -356,7 +360,92 @@ export const CustomerList = () => {
         setToDate(null);
         setCustomers([]);
         getCustomers();
+        setSelectedEmail(null);
+        setSelectedCustomer(null);
+        setStatus("");
     };
+
+
+
+    const loadUserOptions = async (inputValue) => {
+        if (inputValue.length < 2) return [];
+        try {
+            const response = await api.get(
+                "/api/v1/admin/customers/first-name/search",
+                {
+                    params: {
+                        search: inputValue, // 👈 backend expects this
+                    },
+                }
+            );
+            const data = response.data;
+            if (data?.success) {
+                return data.data.customers.map((user) => ({
+                    value: user.id,
+                    label: user.first_name, // 👈 correct key
+                    user,
+                }));
+            }
+
+            return [];
+        } catch (error) {
+            console.error("Error fetching users:", error);
+            return [];
+        }
+    };
+
+    const handleUserSelect = (selectedOption) => {
+        setSelectedCustomer(selectedOption); // 👈 dropdown control
+
+        if (selectedOption) {
+            setFirstName(selectedOption.user.first_name);
+        } else {
+            setFirstName("");
+        }
+    };
+
+
+    const loadUserEmailOptions = async (inputValue) => {
+        if (inputValue.length < 2) return [];
+        try {
+            const response = await api.get(
+                "/api/v1/admin/customers/email/search",
+                {
+                    params: {
+                        search: inputValue, // 👈 backend expects this
+                    },
+                }
+            );
+            const data = response.data;
+            if (data?.success) {
+                return data.data.customers.map((user) => ({
+                    value: user.id,
+                    label: user.email, // 👈 correct key
+                    user,
+                }));
+            }
+
+            return [];
+        } catch (error) {
+            console.error("Error fetching users:", error);
+            return [];
+        }
+    };
+
+    const handleUserEmailSelect = (selectedOption) => {
+        setSelectedEmail(selectedOption); // 👈 dropdown control
+
+        if (selectedOption) {
+            setEmail(selectedOption.user.email);
+        } else {
+            setEmail("");
+        }
+    };
+
+
+
+
+
 
 
 
@@ -374,7 +463,7 @@ export const CustomerList = () => {
                         </Card.Header>
                         <Card.Body className="p-2">
                             <Form onSubmit={handleSearch}>
-                                <Form.Group className="mb-3" controlId="formName">
+                                {/* <Form.Group className="mb-3" controlId="formName">
                                     <Form.Label>First Name</Form.Label>
                                     <Form.Control
                                         type="text"
@@ -384,7 +473,6 @@ export const CustomerList = () => {
 
                                     />
                                 </Form.Group>
-
                                 <Form.Group className="mb-3" controlId="formName">
                                     <Form.Label>Email</Form.Label>
                                     <Form.Control
@@ -393,7 +481,86 @@ export const CustomerList = () => {
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value.trim())}
                                     />
+                                </Form.Group> */}
+
+                                <Form.Group className="mb-3">
+                                    <Form.Label>First Name</Form.Label>
+                                    <AsyncSelect
+                                        className="search-dropdown"
+                                        cacheOptions
+                                        loadOptions={loadUserOptions}
+                                        value={selectedCustomer}
+                                        onChange={handleUserSelect}
+                                        placeholder="Search by name"
+                                        isClearable
+                                        getOptionLabel={(option) => option.user.first_name}
+                                        getOptionValue={(option) => option.value}
+                                        formatOptionLabel={(option, { context }) => {
+                                            if (context === "menu") {
+                                                return (
+                                                    <div>
+                                                        <strong>{option.user.first_name}</strong>
+                                                    </div>
+                                                );
+                                            }
+                                            return option.user.first_name;
+                                        }}
+                                        styles={{
+                                            menu: (provided) => ({
+                                                ...provided,
+                                                zIndex: 1050,
+                                            }),
+                                        }}
+                                    />
                                 </Form.Group>
+
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Email</Form.Label>
+                                    <AsyncSelect
+                                        className="search-dropdown"
+                                        cacheOptions
+                                        loadOptions={loadUserEmailOptions}
+                                        value={selectedEmail}
+                                        onChange={handleUserEmailSelect}
+                                        placeholder="Search by email"
+                                        isClearable
+                                        getOptionLabel={(option) => option.user.email}
+                                        getOptionValue={(option) => option.value}
+                                        formatOptionLabel={(option, { context }) => {
+                                            if (context === "menu") {
+                                                return (
+                                                    <div>
+                                                        <strong>{option.user.email}</strong>
+                                                    </div>
+                                                );
+                                            }
+                                            return option.user.email;
+                                        }}
+                                        styles={{
+                                            menu: (provided) => ({
+                                                ...provided,
+                                                zIndex: 1050,
+                                            }),
+                                        }}
+                                    />
+                                </Form.Group>
+
+                                <Form.Group className="mb-3" controlId="formStatus">
+                                    <Form.Label>Status</Form.Label>
+                                    <Form.Select
+                                        value={status}
+                                        onChange={(e) => setStatus(e.target.value)}
+                                    >
+                                        <option value="">Select Status</option>
+                                        <option value="Y">Active</option>
+                                        <option value="N">Inactive</option>
+                                    </Form.Select>
+                                </Form.Group>
+
+
+
+
+
 
                                 <Form.Group className="mb-3" controlId="formDateFrom">
                                     <Form.Label>From Date</Form.Label>

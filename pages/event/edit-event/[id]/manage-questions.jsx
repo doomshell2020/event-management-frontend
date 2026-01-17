@@ -320,7 +320,7 @@ const ManageQuestions = () => {
             <section id="myevent-deshbord">
                 <div className="d-flex">
                     {/* Sidebar */}
-                    <EventSidebar eventId={id} />
+                    <EventSidebar eventId={id}  eventDetails={eventDetails}/>
 
                     <div className="event-righcontent">
                         <div className="dsa_contant">
