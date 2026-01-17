@@ -10,6 +10,7 @@ import EventHeaderSection from "@/pages/components/Event/EventProgressBar";
 import EventSidebar from "@/pages/components/Event/EventSidebar";
 import { Eye, EyeOff, Lock, Settings, CheckCircle, XCircle, Ticket } from "lucide-react";
 import { Form, Button, Modal } from "react-bootstrap";
+import { formatEventDateTime } from "@/utils/formatDate";
 
 const AssignTicket = () => {
     const router = useRouter();
@@ -594,7 +595,7 @@ const AssignTicket = () => {
                                                                                 <td className="text-center">{user.mobile}</td>
                                                                                 <td className="text-center">{user.ticket_title}</td>
                                                                                 <td className="text-center">
-                                                                                    {new Date(user.generated_at).toLocaleString()}
+                                                                                    {formatEventDateTime(user.generated_at)}
                                                                                 </td>
                                                                                 <td className="text-center">
                                                                                     <button

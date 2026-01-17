@@ -8,6 +8,8 @@ import FrontendHeader from "@/shared/layout-components/frontelements/frontendhea
 import FrontendFooter from "@/shared/layout-components/frontelements/frontendfooter";
 import EventHeaderSection from "@/pages/components/Event/EventProgressBar";
 import EventSidebar from "@/pages/components/Event/EventSidebar";
+import { formatEventDateTime } from "@/utils/formatDate";
+
 
 const ManagePayments = () => {
     const router = useRouter();
@@ -171,11 +173,7 @@ const ManagePayments = () => {
 
                                                                 {/* Date */}
                                                                 <td>
-                                                                    {new Date(item.createdAt).toLocaleDateString("en-GB", {
-                                                                        day: "2-digit",
-                                                                        month: "short",
-                                                                        year: "numeric",
-                                                                    })}
+                                                                    {formatEventDateTime(item.createdAt)}
                                                                 </td>
                                                             </tr>
                                                         );

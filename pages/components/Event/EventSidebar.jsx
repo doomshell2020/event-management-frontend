@@ -66,7 +66,7 @@ const EventSidebar = ({ eventId, eventDetails }) => {
                         { href: `/event/payments/${eventId}`, icon: "bi bi-credit-card", label: "Payments" },
                         { href: `/event/export-tickets/${eventId}`, icon: "bi bi-wallet2", label: "Export Tickets" },
                         { href: `/event/analytics/${eventId}`, icon: "bi bi-bar-chart", label: "Analytics" },
-                        { href: `/event/payouts/${eventId}`, icon: "bi bi-wallet2", label: "Payouts" },
+                        // { href: `/event/payouts/${eventId}`, icon: "bi bi-wallet2", label: "Payouts" },
 
                         // show Committee ONLY if event is NOT free
                         is_free=='N' && {

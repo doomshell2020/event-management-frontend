@@ -74,7 +74,7 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
 
   /* -------------------- MENU DATA -------------------- */
   const menuLinks = [
-    { href: "/event/myevent", icon: "fa-tachometer-alt", label: "Dashboard" },
+    { href: "/event/my-event", icon: "fa-tachometer-alt", label: "Dashboard" },
     { href: "/users/view-profile", icon: "fa-user", label: "My Profile" },
     { href: "/event/my-event", icon: "fa-calendar-alt", label: "My Events" },
     { href: "/orders", icon: "fa-shopping-cart", label: "My Orders" },

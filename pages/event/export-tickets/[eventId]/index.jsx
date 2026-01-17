@@ -7,12 +7,13 @@ import api from "@/utils/api";
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 import moment from "moment";
-
+import { formatEventDateTime } from "@/utils/formatDate";
 
 import FrontendHeader from "@/shared/layout-components/frontelements/frontendheader";
 import FrontendFooter from "@/shared/layout-components/frontelements/frontendfooter";
 import EventHeaderSection from "@/pages/components/Event/EventProgressBar";
 import EventSidebar from "@/pages/components/Event/EventSidebar";
+
 
 import {
     Row,
@@ -374,11 +375,7 @@ const ExportTickets = () => {
 
                                                                 {/* Purchased Date */}
                                                                 <td className="text-muted">
-                                                                    {new Date(item.createdAt).toLocaleDateString("en-GB", {
-                                                                        day: "2-digit",
-                                                                        month: "short",
-                                                                        year: "numeric",
-                                                                    })}
+                                                                    {formatEventDateTime(item.createdAt)}
                                                                 </td>
                                                             </tr>
                                                         );

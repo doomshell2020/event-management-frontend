@@ -44,46 +44,53 @@ export const Events = () => {
     const [loadingStaff, setLoadingStaff] = useState(false);
     const [selectedEventId, setSelectedEventId] = useState(null);
 
-
     const [COLUMNS, setCOLUMNS] = useState([
+
+        // ===== S.NO =====
         {
             Header: "S.No",
             accessor: (row, index) => index + 1,
-            className: "borderrigth",
+            className: "borderrigth text-center",
             style: { width: "5%" },
         },
+
+        // ===== ORGANIZER =====
         {
             Header: "Organizer",
             accessor: "organizer",
             className: "borderrigth",
-            style: { width: "10%" },
+            style: { width: "12%" },
+
             Cell: ({ row }) => {
                 const organizer = row?.original?.Organizer;
 
-                return (
-                    <div className="d-flex align-items-center gap-2">
-                        <span>
-                            {organizer
-                                ? `${organizer.first_name || ""} ${organizer.last_name || ""}`.trim()
-                                : "-"}
-                        </span>
-                    </div>
-                );
+                const name = organizer
+                    ? `${organizer.first_name || ""} ${organizer.last_name || ""}`.trim()
+                    : "-";
+
+                return <span title={name}>{name}</span>;
             },
         },
+
+        // ===== EVENT NAME =====
         {
             Header: "Event Name",
             accessor: "eventName",
             className: "borderrigth",
-            style: { width: "10%" },
+            style: { width: "14%" },
+
             Cell: ({ row }) => {
                 const eventName = row.original.name || "---";
                 const eventUrl = `/event/${row.original.id}/${row.original.slug}`;
 
                 return (
-                    <Link href={eventUrl} target="_blank" rel="noopener noreferrer"
+                    <Link
+                        href={eventUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title={eventName}
                         style={{
-                            color: "#0d6efd",        // blue
+                            color: "#0d6efd",
                             textDecoration: "underline",
                             cursor: "pointer"
                         }}
@@ -93,45 +100,52 @@ export const Events = () => {
                 );
             },
         },
+
+        // ===== DATE AND TIME =====
         {
             Header: "Date and Time",
             accessor: "DateAndTime",
             className: "borderrigth",
-            style: { width: "16%" },
+            style: { width: "18%" },
+
             Cell: ({ row }) => {
                 const fromDate = row?.original?.date_from;
                 const toDate = row?.original?.date_to;
+
                 return (
                     <div>
-                        <div>
-                            <strong>From:</strong>
-                            {formatEventDateTime(fromDate)}
+                        <div title={formatEventDateTime(fromDate)}>
+                            <strong>From:</strong> {formatEventDateTime(fromDate)}
                         </div>
 
-                        <div>
-                            <strong>To:</strong>
-                            {formatEventDateTime(toDate)}
+                        <div title={formatEventDateTime(toDate)}>
+                            <strong>To:</strong> {formatEventDateTime(toDate)}
                         </div>
                     </div>
                 );
             },
         },
+
+        // ===== VENUE =====
         {
             Header: "Venue",
             accessor: "venue",
             className: "borderrigth",
-            style: { width: "10%" },
-            Cell: ({ row }) => (
-                <div>
-                    {row.original.location ? row.original.location : "--"}
-                </div>
-            ),
+            style: { width: "12%" },
+
+            Cell: ({ row }) => {
+                const location = row.original.location || "--";
+                return <span title={location}>{location}</span>;
+            },
         },
+
+        // ===== TICKET TYPES =====
         {
             Header: "Ticket Types",
             accessor: "TicketTypes",
             className: "borderrigth",
-            style: { width: "10%" },
+            style: { width: "12%" },
+
             Cell: ({ row }) => {
                 const tickets = row?.original?.tickets;
 
@@ -139,7 +153,7 @@ export const Events = () => {
                     <div>
                         {Array.isArray(tickets) && tickets.length > 0
                             ? tickets.map((ticket, index) => (
-                                <div key={ticket.id || index}>
+                                <div key={ticket.id || index} title={ticket.title}>
                                     {ticket.title || "--"}
                                 </div>
                             ))
@@ -148,66 +162,122 @@ export const Events = () => {
                 );
             },
         },
-        {
-            Header: "Total Sales",
-            accessor: "total_sales",
-            className: "borderrigth",
-            style: { width: "10%" },
-            Cell: ({ row }) => {
-                const eventId = row?.original?.id;
-                const amount = formatPrice(row?.original?.total_sales);
 
-                if (!eventId || amount == "--") {
-                    return <span>{amount}</span>;
-                }
-                return (
-                    <Link
-                        href={`/admin/events/${eventId}`}
-                        target="_blank"
-                    >
-                        {amount}
-                    </Link>
-                );
-            },
-        },
+        // ===== SALES / COMMISSION =====
         {
-            Header: "Comm(8%)",
-            accessor: "Comm",
+            Header: "Sales / Comm",
+            accessor: "sales_comm",
             className: "borderrigth",
-            style: { width: "5%" },
-            Cell: ({ row }) => (
-                <div>
-                    {formatPrice(row?.original?.total_tax)}
-                </div>
-            ),
+            style: { width: "14%", textAlign: "center" },
+
+            Cell: ({ row }) => {
+                const event = row?.original;
+                const eventId = event?.id;
+
+                if (event?.is_free === "Y") {
+                    return <span className="text-muted">Free Event</span>;
+                }
+
+                const totalSales = formatPrice(event?.total_sales);
+                const commission = formatPrice(event?.total_tax);
+
+                return (
+                    <div className="text-center">
+                        <Link
+                            href={`/admin/events/${eventId}`}
+                            target="_blank"
+                            title="View Event Sales"
+                            className="fw-bold d-block text-primary"
+                            style={{ textDecoration: "none" }}
+                        >
+                            {totalSales}
+                        </Link>
+
+                        <div className="mt-1">
+                            <small className="text-muted" title="Platform Commission">
+                                Comm (8%): <span className="fw-semibold">{commission}</span>
+                            </small>
+                        </div>
+                    </div>
+                );
+            }
         },
+
+        // ===== EVENT TYPE =====
         {
             Header: "Event Type",
             accessor: "event_type",
-            className: "borderrigth",
-            style: { width: "8%" },
+            className: "borderrigth text-center",
+            style: { width: "10%" },
+
             Cell: ({ row }) => {
-                // console.log('row :', row);
-                const isFree = row?.original?.is_free == "Y";
+                const event = row.original;
+                const { eventActivationLogs, is_free, total_sales, total_tax } = event;
+                const isFree = is_free == "Y";
+                const hasSales = Number(total_sales) > 0; // Show commission only if sales > 0
+                const [show, setShow] = React.useState(false);
+
+                const activationLog = eventActivationLogs?.[0];
 
                 return (
-                    <span className={isFree ? "badge bg-success" : "badge bg-danger"}>
-                        {isFree ? "Free Event" : "Paid Event"}
-                    </span>
+                    <div className="position-relative text-center">
+                        {/* Event Type Badge */}
+                        <span
+                            className={isFree ? "badge bg-success" : "badge bg-danger"}
+                            title={isFree ? "This is a Free Event" : "This is a Paid Event"}
+                        >
+                            {isFree ? "Free Event" : "Paid Event"}
+                        </span>
+
+                        {/* Activation Info */}
+                        {activationLog && (
+                            <>
+                                <i
+                                    className="fas fa-info-circle text-primary ms-1"
+                                    style={{ cursor: "pointer", fontSize: "16px" }}
+                                    title="Activation Details"
+                                    onMouseEnter={() => setShow(true)}
+                                    onMouseLeave={() => setShow(false)}
+                                />
+
+                                {show && (
+                                    <div
+                                        className="position-absolute bg-white border shadow p-2 rounded text-start"
+                                        style={{
+                                            top: "24px",
+                                            right: 0,
+                                            zIndex: 1000,
+                                            width: "220px",
+                                            fontSize: "12px"
+                                        }}
+                                    >
+                                        <b>Date:</b> {formatEventDateTime(activationLog.activation_date) || "--"}<br />
+                                        <b>Amount:</b> {activationLog.activation_amount || "--"}<br />
+                                        <b>Remarks:</b> {activationLog.activation_remarks || "--"}
+                                    </div>
+                                )}
+                            </>
+                        )}
+                    </div>
                 );
             },
         },
+
+
+        // ===== FEATURED =====
         {
             Header: "Featured",
             accessor: "featured",
-            className: "borderrigth",
-            style: { width: "5%" },
+            className: "borderrigth text-center",
+            style: { width: "7%" },
+
             Cell: ({ row }) => {
                 const { id, featured } = row.original;
                 const isFeatured = featured == "Y";
+
                 return (
                     <div className="d-flex justify-content-center gap-2">
-                        {/* Featured Star */}
+
                         <i
                             className={`${isFeatured ? "fas" : "far"} fa-star`}
                             style={{
@@ -219,8 +289,6 @@ export const Events = () => {
                             onClick={() => handleFeaturedStatusChange(id, featured)}
                         />
 
-
-                        {/* View Icon */}
                         <i
                             className="fas fa-eye"
                             style={{
@@ -235,21 +303,26 @@ export const Events = () => {
                 );
             },
         },
+
+        // ===== ACTIONS =====
         {
             Header: "Action",
             accessor: "action",
-            className: "borderrigth",
-            style: { width: "10%" },
+            className: "borderrigth text-center",
+            style: { width: "12%" },
+
             Cell: ({ row }) => {
-                const status = row?.original?.status;
+                const { id, status } = row?.original;
+
                 return (
                     <div className="d-flex flex-column align-items-center gap-1">
-                        {/* Top Row: Toggle + Delete */}
+
                         <div className="d-flex align-items-center gap-2">
                             <div className="form-check form-switch m-0">
                                 <input
                                     className="form-check-input"
                                     type="checkbox"
+                                    title="Change Status"
                                     style={{ cursor: "pointer" }}
                                     checked={status == "Y"}
                                     onChange={() => handleStatus(row.original)}
@@ -259,14 +332,14 @@ export const Events = () => {
                             <i
                                 className="bi bi-trash-fill text-danger"
                                 style={{ cursor: "pointer", fontSize: "16px" }}
+                                title="Delete Event"
                                 onClick={() => handleDeleteEvent(id)}
-                                title="Delete"
                             ></i>
                         </div>
 
-                        {/* Bottom Row: Payment Report Button */}
                         <button
                             className="btn btn-success btn-sm"
+                            title="Generate Payment Report"
                             onClick={() => generatePaymentReport(id)}
                         >
                             Payment Report
@@ -274,7 +347,7 @@ export const Events = () => {
                     </div>
                 );
             }
-        },
+        }
     ]);
 
     const formatCurrency = (amount, currency) => {
@@ -563,13 +636,14 @@ export const Events = () => {
     };
 
     const handleStatus = async (row) => {
-        const { id, status: currentStatus, is_free } = row;
-
+        const { id, status: currentStatus, is_free, eventActivationLogs } = row;
         const newStatus = currentStatus == "Y" ? "N" : "Y";
         const statusText = newStatus == "Y" ? "Activate" : "Deactivate";
 
         // ONLY if activating AND event is FREE
         if (newStatus == "Y" && is_free == "Y") {
+
+            const existingLog = eventActivationLogs?.[0] || {};
 
             const { value: formValues } = await Swal.fire({
                 title: "Activate Free Event",
@@ -577,14 +651,20 @@ export const Events = () => {
                     <div style="text-align:left;">
 
                         <label style="font-weight:600;margin-bottom:4px;">Activation Date *</label>
-                        <input id="swal-date" type="date" class="swal2-input" style="width:100%;margin:0 0 10px 0;">
+                        <input id="swal-date" type="date" class="swal2-input" 
+                        value="${existingLog.activation_date ? existingLog.activation_date.split('T')[0] : ''}"
+                        style="width:100%;margin:0 0 10px 0;">
 
                         <label style="font-weight:600;margin-bottom:4px;">Amount *</label>
-                        <input id="swal-amount" type="number" class="swal2-input" placeholder="Enter amount" style="width:100%;margin:0 0 10px 0;">
+                        <input id="swal-amount" type="number" class="swal2-input" 
+                        placeholder="Enter amount"
+                        value="${existingLog.activation_amount || ''}"
+                        style="width:100%;margin:0 0 10px 0;">
 
                         <label style="font-weight:600;margin-bottom:4px;">Remarks</label>
-                        <textarea id="swal-remarks" class="swal2-textarea" placeholder="Enter remarks (optional)" 
-                        style="width:100%;margin:0;"></textarea>
+                        <textarea id="swal-remarks" class="swal2-textarea" 
+                        placeholder="Enter remarks (optional)" 
+                        style="width:100%;margin:0;">${existingLog.activation_remarks || ''}</textarea>
 
                     </div>
                 `,
@@ -594,10 +674,14 @@ export const Events = () => {
                 confirmButtonText: "Activate",
                 cancelButtonText: "Cancel",
                 confirmButtonColor: "#0d6efd",
+
                 preConfirm: () => {
                     const date = document.getElementById("swal-date").value;
                     const amount = document.getElementById("swal-amount").value;
                     const remarks = document.getElementById("swal-remarks").value;
+                    console.log('remarks :', remarks);
+                    return false
+
 
                     if (!date) {
                         Swal.showValidationMessage("Please select activation date");
@@ -614,12 +698,18 @@ export const Events = () => {
                         return false;
                     }
 
+                    if (remarks.length = 0 || !remarks.length) {
+                        Swal.showValidationMessage("Please enter remarks");
+                        return false;
+                    }
+
                     return { date, amount, remarks };
                 }
             });
 
-
+            // console.log('formValues :', formValues);
             if (!formValues) return;
+
 
             try {
                 Swal.fire({
@@ -651,10 +741,11 @@ export const Events = () => {
 
             } catch (error) {
                 console.error("Status update failed", error);
+                const message = error?.response?.data.error.message || "Unable to activate event. Please try again."
                 Swal.fire({
                     icon: "error",
                     title: "Failed",
-                    text: "Unable to activate event. Please try again.",
+                    text: message,
                 });
             }
 
@@ -710,7 +801,6 @@ export const Events = () => {
             }
         }
     };
-
 
     // featured status
     const handleFeaturedStatusChange = async (eventId, currentStatus) => {
