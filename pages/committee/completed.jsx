@@ -99,8 +99,8 @@ const CommitteeCompleted = ({ counts, assets, completedData }) => {
             <section className="mt-5 mb-5">
                 <div className="container">
                     <div className="section-heading">
-                        <h1>Committee</h1>
-                        <h2 className="mt-4">Committee</h2>
+                        <h1 className="mb-2">Committee</h1>
+                        {/* <h2 className="mt-4">Committee</h2> */}
                         <p className="mb-4 text-center">
                             Manage your committee ticket requests easily.
                         </p>
