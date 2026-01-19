@@ -15,6 +15,7 @@ const PublishEvent = () => {
     const { id } = router.query;
     const [loading, setLoading] = useState(false);
     const [eventDetails, setEventDetails] = useState(null);
+    // console.log('eventDetails :', eventDetails);
     const [statusLoading, setStatusLoading] = useState(false);
 
     const fetchEventDetails = async (eventId) => {
@@ -111,61 +112,121 @@ const PublishEvent = () => {
 
                                 <div className="contant_bg mt-4 shadow-sm rounded p-4 bg-white border">
 
+                                    {/* Header Section */}
                                     <div className="d-flex align-items-center justify-content-between mb-3">
                                         <h6 className="fw-bold mb-0">Activation Setting</h6>
 
                                         {eventDetails?.admineventstatus == "Y" ? (
-                                            <span className="badge bg-success px-3 py-2">Admin Approved</span>
+                                            <span className="badge bg-success px-3 py-2">
+                                                ✔ Admin Approved
+                                            </span>
                                         ) : (
                                             <span className="badge bg-warning text-dark px-3 py-2">
-                                                Pending Admin Approval
+                                                ⏳ Pending Admin Approval
                                             </span>
                                         )}
                                     </div>
 
                                     <hr className="mt-2 mb-3" />
 
-                                    <div className="d-flex align-items-start">
+                                    {/* Status Info Section */}
+                                    <div className="d-flex align-items-start justify-content-between flex-wrap">
 
-                                        <div className="me-3">
-                                            {eventDetails?.status == "Y" ? (
-                                                <div className="bg-success bg-opacity-10 p-2 rounded">
-                                                    <Eye className="text-success" size={22} />
-                                                </div>
-                                            ) : (
-                                                <div className="bg-danger bg-opacity-10 p-2 rounded">
-                                                    <EyeOff className="text-danger" size={22} />
-                                                </div>
-                                            )}
+                                        <div className="d-flex align-items-center">
+                                            <div className="me-3">
+
+                                                {eventDetails?.status == "Y" ? (
+                                                    <div
+                                                        className="d-flex align-items-center justify-content-center rounded-circle"
+                                                        style={{
+                                                            width: "50px",
+                                                            height: "50px",
+                                                            backgroundColor: "#e6f7ed",
+                                                        }}
+                                                    >
+                                                        <Eye className="text-success" size={26} />
+                                                    </div>
+                                                ) : (
+                                                    <div
+                                                        className="d-flex align-items-center justify-content-center rounded-circle"
+                                                        style={{
+                                                            width: "50px",
+                                                            height: "50px",
+                                                            backgroundColor: "#fdecea",
+                                                        }}
+                                                    >
+                                                        <EyeOff className="text-danger" size={26} />
+                                                    </div>
+                                                )}
+
+                                            </div>
+
+                                            <div>
+                                                <p className="fs-6 fw-semibold mb-1">
+                                                    {eventDetails?.status == "Y"
+                                                        ? "Event is Active"
+                                                        : "Event is Inactive"}
+                                                </p>
+
+                                                <p className="mb-0">
+                                                    {eventDetails?.status == "Y"
+                                                        ? "Your event is live and visible to attendees."
+                                                        : "Your event is not visible to attendees."}
+                                                </p>
+
+                                                {/* ADMIN STATUS WARNING */}
+                                                {eventDetails?.admineventstatus == "N" && (
+                                                    <div
+                                                        className="mt-3 d-flex align-items-center rounded p-3"
+                                                        style={{
+                                                            backgroundColor: "#fff3cd",
+                                                            border: "1px solid #ffecb5",
+                                                            color: "#856404",
+                                                        }}
+                                                    >
+                                                        <div
+                                                            className="me-2 d-flex align-items-center justify-content-center rounded-circle"
+                                                            style={{
+                                                                width: "28px",
+                                                                height: "28px",
+                                                                backgroundColor: "#ffecb5",
+                                                            }}
+                                                        >
+                                                            ⚠
+                                                        </div>
+
+                                                        <small className="fw-semibold">
+                                                            Admin approval is pending. You cannot activate or deactivate this event.
+                                                        </small>
+                                                    </div>
+                                                )}
+
+                                            </div>
                                         </div>
 
-                                        <div>
-                                            <p className="fs-6 fw-semibold mb-1">
-                                                {eventDetails?.status == "Y"
-                                                    ? "Event is Active"
-                                                    : "Event is Inactive"}
-                                            </p>
-
-                                            <p className="text-muted small mb-0">
-                                                {eventDetails?.status == "Y"
-                                                    ? "Your event is live and visible to attendees."
-                                                    : "Your event is not visible to attendees."}
-                                            </p>
-
-                                            {/* ADMIN STATUS MESSAGE */}
-                                            {eventDetails?.admineventstatus == "N" && (
-                                                <div className="alert alert-warning mt-3 mb-0 p-2 d-flex align-items-center">
-                                                    <span className="me-2">⚠</span>
-                                                    <small>
-                                                        Admin approval is pending. You cannot activate or deactivate this event.
-                                                    </small>
-                                                </div>
-                                            )}
+                                        {/* ACTION BUTTON */}
+                                        <div className="mt-3 mt-md-0">
+                                            <button
+                                                className={`btn px-4 fw-semibold ${eventDetails?.status == "Y"
+                                                    ? "btn-danger"
+                                                    : "btn-success"
+                                                    }`}
+                                                onClick={toggleEventStatus}
+                                                disabled={
+                                                    statusLoading || eventDetails?.admineventstatus == "N"
+                                                }
+                                            >
+                                                {statusLoading
+                                                    ? "Processing..."
+                                                    : eventDetails?.status == "Y"
+                                                        ? "Deactivate Event"
+                                                        : "Activate Event"}
+                                            </button>
                                         </div>
 
                                     </div>
-
                                 </div>
+
 
 
                             </section>

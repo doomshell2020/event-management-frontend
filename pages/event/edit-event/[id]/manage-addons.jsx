@@ -169,7 +169,7 @@ const ManageAddons = () => {
             <section id="myevent-deshbord">
                 <div className="d-flex">
                     {/* Sidebar */}
-                    <EventSidebar eventId={id}  eventDetails={eventDetails}/>
+                    <EventSidebar eventId={id} eventDetails={eventDetails} />
 
                     <div className="event-righcontent">
                         <div className="dsa_contant">
@@ -416,13 +416,15 @@ const ManageAddons = () => {
                                                                                                 });
                                                                                                 handleGetAddonsList();
                                                                                             })
-                                                                                            .catch(() =>
+                                                                                            .catch((error) => {
+                                                                                            // console.log('error :', error);
+                                                                                                const message = error.response.data.error.message || "Failed to delete addon.";
                                                                                                 Swal.fire(
                                                                                                     "Error",
-                                                                                                    "Failed to delete addon.",
+                                                                                                    message,
                                                                                                     "error"
                                                                                                 )
-                                                                                            );
+                                                                                            });
                                                                                     }
                                                                                 });
                                                                                 setOpenDropdown(null);

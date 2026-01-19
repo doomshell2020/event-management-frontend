@@ -547,7 +547,7 @@ const ManageTickets = () => {
                                                                                             }
                                                                                         })
                                                                                         .catch((err) => {
-                                                                                            console.error("Delete Ticket Error:", err);
+                                                                                            // console.error("Delete Ticket Error:", err);
                                                                                             const errorMessage =
                                                                                                 err.response?.data?.error?.message || "Something went wrong while deleting the ticket.";
                                                                                             Swal.fire("Error", errorMessage, "error");

@@ -174,7 +174,7 @@ export const Events = () => {
                 const event = row?.original;
                 const eventId = event?.id;
 
-                if (event?.is_free === "Y") {
+                if (event?.is_free == "Y") {
                     return <span className="text-muted">Free Event</span>;
                 }
 
@@ -194,7 +194,7 @@ export const Events = () => {
                         </Link>
 
                         <div className="mt-1">
-                            <small className="text-muted" title="Platform Commission">
+                            <small title="Platform Commission">
                                 Comm (8%): <span className="fw-semibold">{commission}</span>
                             </small>
                         </div>

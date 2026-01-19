@@ -20,7 +20,6 @@ const CommitteeTicketsPage = () => {
     /* ---------------- STATES ---------------- */
     const [eventDetails, setEventDetails] = useState(null);
     const [ticketsList, setTicketList] = useState([]);
-    // console.log('ticketsList :', ticketsList);
     const [assignedList, setAssignedList] = useState([]);
     const [currencySymbol, setCurrencySymbol] = useState('$'); //Currency_symbol
 
@@ -32,7 +31,7 @@ const CommitteeTicketsPage = () => {
     const [show, setShow] = useState(false);
     const [validateDefault, setValidateDefault] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-
+    const [commission, setCommission] = useState("");
     const [selectedUser, setSelectedUser] = useState(null);
     const [ticketCounts, setTicketCounts] = useState({});
 
@@ -144,7 +143,7 @@ const CommitteeTicketsPage = () => {
             });
 
             return {
-                user: item.user,
+                user: { ...item.user, commission: item.commission },
                 tickets: ticketsMap
             };
         });
@@ -165,6 +164,11 @@ const CommitteeTicketsPage = () => {
     // create / update addon
     const handleUpdateTicketSubmit = async () => {
         if (isSubmitting) return;
+        if (!selectedUser) return;
+        if (commission == "" || commission < 0 || commission > 100) {
+            setValidateDefault(true);
+            return;
+        }
 
         try {
             setIsSubmitting(true);
@@ -172,7 +176,8 @@ const CommitteeTicketsPage = () => {
             await api.post("/api/v1/committee/ticket/update", {
                 event_id: id,
                 user_id: selectedUser.user.id,
-                tickets: ticketCounts
+                tickets: ticketCounts,
+                commission: commission || 0
             });
 
             setShow(false);              // close modal
@@ -184,7 +189,6 @@ const CommitteeTicketsPage = () => {
         }
     };
 
-
     const openEditModal = (row) => {
         const counts = {};
 
@@ -193,6 +197,7 @@ const CommitteeTicketsPage = () => {
         });
 
         setSelectedUser(row);
+        setCommission(row.user.commission || "");
         setTicketCounts(counts);
         setShow(true);
     };
@@ -215,7 +220,7 @@ const CommitteeTicketsPage = () => {
 
             <section id="myevent-deshbord">
                 <div className="d-flex">
-                    <EventSidebar eventId={id}  eventDetails={eventDetails}/>
+                    <EventSidebar eventId={id} eventDetails={eventDetails} />
 
                     <div className="event-righcontent">
                         <div className="dsa_contant">
@@ -324,6 +329,7 @@ const CommitteeTicketsPage = () => {
                                                                 <th>Sr.no</th>
                                                                 <th>Action</th>
                                                                 <th>User</th>
+                                                                <th>Commission</th>
 
                                                                 {ticketTypes.map((t) => (
                                                                     <th key={t.id} className="text-center">
@@ -382,6 +388,9 @@ const CommitteeTicketsPage = () => {
                                                                             {row.user.mobile || "N/A"}
                                                                         </div>
                                                                     </td>
+                                                                    <td>
+                                                                        {row.user.commission || 0}%
+                                                                    </td>
 
                                                                     {ticketTypes.map((t) => (
                                                                         <td key={t.id} className="text-center fw-semibold">
@@ -423,6 +432,30 @@ const CommitteeTicketsPage = () => {
                 </Modal.Header>
 
                 <Modal.Body>
+
+                    {/* Commission Field - Single for All Tickets */}
+                    <div className="mb-4">
+                        <Form.Label className="fw-semibold">
+                            Commission (%)
+                        </Form.Label>
+
+                        <Form.Control
+                            type="number"
+                            min="0"
+                            max="100"
+                            placeholder="Enter commission percentage"
+                            value={commission || ""}
+                            disabled={isSubmitting}
+                            isInvalid={!commission || commission < 0 || commission > 100 && validateDefault}
+                            onChange={(e) => {
+                                let value = e.target.value.replace(/[^0-9]/g, "");
+                                if (Number(value) < 0) value = 0;
+                                if (Number(value) > 100) value = 100;
+                                setCommission(value);
+                            }}
+                        />
+                    </div>
+
                     {ticketTypes.map((t) => (
                         <div
                             key={t.id}
@@ -436,37 +469,30 @@ const CommitteeTicketsPage = () => {
                                 </div>
                             </div>
 
-                            {/* Counter */}
-                            <div className="d-flex align-items-center gap-2">
-                                <Button
-                                    variant="outline-secondary"
-                                    size="sm"
-                                    disabled={isSubmitting}
-                                    onClick={() => changeCount(t.id, "dec")}
-                                >
-                                    −
-                                </Button>
-
+                            {/* Quantity Input */}
+                            <div style={{ width: "120px" }}>
                                 <Form.Control
-                                    type="text"
-                                    value={ticketCounts[t.id] || 0}
-                                    readOnly
-                                    className="text-center"
-                                    style={{ width: "50px" }}
-                                />
-
-                                <Button
-                                    variant="outline-secondary"
-                                    size="sm"
+                                    type="number"
+                                    min="0"
+                                    placeholder="Qty"
                                     disabled={isSubmitting}
-                                    onClick={() => changeCount(t.id, "inc")}
-                                >
-                                    +
-                                </Button>
+                                    value={ticketCounts[t.id] || ""}
+                                    isInvalid={ticketCounts[t.id] == "" && validateDefault}
+                                    onChange={(e) => {
+                                        let value = e.target.value.replace(/[^0-9]/g, "");
+                                        if (Number(value) < 0) value = 0;
+                                        setTicketCounts({
+                                            ...ticketCounts,
+                                            [t.id]: value
+                                        });
+                                    }}
+                                />
                             </div>
                         </div>
                     ))}
+
                 </Modal.Body>
+
 
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShow(false)}>
