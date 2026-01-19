@@ -2069,7 +2069,7 @@ section#request-demo {
 /* post event page end */
 /* my-event page start */
 /* left-bar start*/
-#myevent-deshbord .event-sidebar {
+/* #myevent-deshbord .event-sidebar {
   padding: 20px 20px;
   background: #3d6db5;
   position: relative;
@@ -2077,8 +2077,27 @@ section#request-demo {
   color: #fff;
   margin-right: 45px;
   transition: all 0.5s 0s ease;
+} */
+
+#myevent-deshbord .event-sidebar {
+    background: #3d6db5;
+    color: #fff;
+    position: relative;
+
+    width: 280px;
+    min-width: 280px;
+    flex-shrink: 0;
+    padding: 20px;
+     transition: all 0.5s 0s ease;
 }
 
+
+#myevent-deshbord > .d-flex {
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+    overflow-x: hidden;
+}
 #myevent-deshbord .side_menu_icon {
   height: 35px;
   background: aliceblue;
@@ -2181,10 +2200,17 @@ li.menu_line {
 }
 
 /* sidebar close css*/
-#myevent-deshbord .event-sidebar.sideBarRightLeftClosed {
+/* #myevent-deshbord .event-sidebar.sideBarRightLeftClosed {
   width: 110px;
   transition: all 0.5s 0s ease;
+} */
+#myevent-deshbord .event-sidebar.sideBarRightLeftClosed {
+width: 110px;
+    min-width: 110px;
+    flex-shrink: 0;
+  transition: all 0.5s 0s ease;
 }
+
 
 #myevent-deshbord .event-sidebar.sideBarRightLeftClosed ul li {
   margin-left: 0px;
@@ -2225,9 +2251,15 @@ li.menu_line {
   margin: 40px 0px 60px;
 }
 
-.event-righcontent {
+/* .event-righcontent {
   flex: 1;
   margin: 30px 30px 30px 0px;
+} */
+
+#myevent-deshbord .event-righcontent {
+    flex: 1;
+    min-width: 0;
+    padding: 30px;
 }
 
 #myevent-deshbord .desbord-content thead {
@@ -3023,6 +3055,11 @@ padding-left: 0rem;
 }
 
 /* edit event page end */
+
+.manage-date-page .react-calendar {
+    width: 100%;
+}
+
 /* manage ticket pg start */
 #myevent-deshbord .item_bg {
   background: #f7f7f7;
@@ -5672,9 +5709,11 @@ input[type="date"] {
 .manage-commitee-tiket-module .table-container-box .table thead tr th {
     font-size: 12px;
 }
+#myevent-deshbord .event-sidebar {
+    width: 250px;
+    min-width: 250px;
 }
-
-
+}
 
 @media (min-width: 992px) and (max-width: 1201px) {
   #my-order-module .up_events {
@@ -5695,11 +5734,17 @@ input[type="date"] {
 
   /* sidebar css start responsive */
 
-  #myevent-deshbord .event-sidebar {
+  /* #myevent-deshbord .event-sidebar {
     padding: 20px 0px;
     width: 75px;
     margin-right: 25px;
-  }
+  } */
+
+      #myevent-deshbord .event-sidebar {
+        padding: 20px 0px;
+        width: 75px;
+        min-width: 75px;
+    }
 
   #myevent-deshbord .event-sidebar ul li a,
   #myevent-deshbord .event-sidebar ul li button {
@@ -5746,12 +5791,17 @@ input[type="date"] {
     display: none;
   }
 
-  .event-righcontent {
+  /* .event-righcontent {
     margin: 30px 0px 30px 0;
     width: calc(100% - 100px);
     padding-right: 20px;
-  }
+  } */
+    .event-righcontent {
+        padding-left: 25px !important;
+        padding-right: 20px !important;
+    }
 
+  
 }
 
 
@@ -6329,9 +6379,9 @@ input[type="date"] {
     min-width: 800px;
   }
 
-  #myevent-deshbord .event-sidebar {
+  /* #myevent-deshbord .event-sidebar {
     margin-right: 15px;
-  }
+  } */
 
   #myevent-deshbord .contant_bg {
     padding: 25px 15px;
@@ -6350,10 +6400,13 @@ input[type="date"] {
     margin-top: 10px;
   }
 
-  .event-righcontent {
+  /* .event-righcontent {
     margin: 20px 0px 30px 0;
     padding-right: 10px;
-  }
+  } */
+      .event-righcontent {
+        padding: 20px 10px 30px 15px !important;
+    }
 
   .order-1-768 {
     order: 1;
@@ -6669,6 +6722,8 @@ input[type="date"] {
 
   #myevent-deshbord .dsa_contant ul.tabes {
     margin-top: 22px;
+        width: 100%;
+        overflow-x: auto;
   }
 
   #myevent-deshbord .event_names .edit-event-dropdown {
@@ -6974,6 +7029,9 @@ padding-right: 8px !important;
         .appointment-timeshadulebox {
         zoom: .9;
     }
+        #myevent-deshbord .event_names a, #myevent-deshbord .event_names button {
+        font-size: 12px;
+    }
 
 }
 
@@ -7009,9 +7067,10 @@ padding-right: 8px !important;
     margin-right: 38px !important;
   }
 
-  #myevent-deshbord .event-sidebar {
-    width: 61px;
-  }
+ #myevent-deshbord .event-sidebar {
+        width: 61px;
+        min-width: 61px;
+    }
 
   #myevent-deshbord .event-sidebar ul li a,
   #myevent-deshbord .event-sidebar ul li button {

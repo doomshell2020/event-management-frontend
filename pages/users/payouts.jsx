@@ -70,9 +70,9 @@ const MyPayouts = () => {
     <>
       <FrontendHeader backgroundImage={backgroundImage} />
 
-      <section className="my-staff-module py-4">
+      <section className="my-staff-module payout-pg py-4">
         <div className="section-heading">
-          <h1 className="mb-3">My Payouts</h1>
+          <h1 className="mb-2 mb-lg-3">My Payouts</h1>
           {/* <h2 className="mt-4">My Payouts</h2> */}
           <p className="mb-4 body-text text-center">
             View payments received for your events
@@ -114,16 +114,16 @@ const MyPayouts = () => {
 
           {/* ================= TABLE ================= */}
           <div className="table-responsive my-staff-table">
-            <table className="table">
+            <table className="table table-width-992">
               <thead className="table-dark">
                 <tr>
-                  <th>S.No</th>
-                  <th>Event</th>
-                  <th>Organizer</th>
-                  <th>Paid Amount</th>
-                  <th>Txn Ref</th>
-                  <th>Remarks</th>
-                  <th>Created</th>
+                  <th style={{ width: '5%' }}>S.No</th>
+                  <th style={{ width: '10%' }}>Event</th>
+                  <th style={{ width: '10%' }}>Organizer</th>
+                  <th style={{ width: '15%' }}>Paid Amount</th>
+                  <th style={{ width: '10%' }}>Txn Ref</th>
+                  <th style={{ width: '29%' }}>Remarks</th>
+                  <th style={{ width: '11%' }}>Created</th>
                 </tr>
               </thead>
 

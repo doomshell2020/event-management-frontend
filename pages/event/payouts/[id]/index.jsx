@@ -97,7 +97,7 @@ const ManagePayouts = () => {
 
                                     {/* TABLE */}
                                     <div className="table-responsive">
-                                        <table className="table table-hover align-middle">
+                                        <table className="table table-hover align-middle table-width-992">
                                             <thead className="bg-dark text-white">
                                                 <tr >
                                                     <th>Sr No.</th>

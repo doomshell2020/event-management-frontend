@@ -291,16 +291,16 @@ const ExportTickets = () => {
                                     </div>
 
                                     <div className="table-responsive">
-                                        <table className="table table-hover align-middle shadow-sm rounded">
+                                        <table className="table table-hover align-middle shadow-sm rounded table-deta-no-wrap table-width-992">
                                             <thead className="bg-dark text-white">
                                                 <tr>
-                                                    <th style={{ width: "80px" }}>Sr No.</th>
-                                                    <th style={{ width: "150px" }}>QR Code</th>
-                                                    <th>Email</th>
-                                                    <th>Name</th>
-                                                    <th>Amount</th>
-                                                    <th>Type</th>
-                                                    <th>Purchased Date</th>
+                                                    <th style={{ width: "10%",fontWeight:"normal" }}>Sr No.</th>
+                                                    <th style={{ width: "15%",fontWeight:"normal" }}>QR Code</th>
+                                                    <th style={{ width: "15%",fontWeight:"normal" }}>Email</th>
+                                                    <th style={{ width: "15%",fontWeight:"normal" }}>Name</th>
+                                                    <th style={{ width: "10%",fontWeight:"normal" }}>Amount</th>
+                                                    <th style={{ width: "15%",fontWeight:"normal" }}>Type</th>
+                                                    <th style={{ width: "20%",fontWeight:"normal" }}>Purchased Date</th>
                                                 </tr>
                                             </thead>
 
@@ -362,7 +362,7 @@ const ExportTickets = () => {
                                                                 {/* Paid/Unpaid */}
                                                                 <td>
                                                                     <span
-                                                                        className={`badge px-3 py-2 ${item.type == "paid"
+                                                                        className={`badge px-3 pb-1 pt-2 ${item.type == "paid"
                                                                             ? "bg-success"
                                                                             : "bg-secondary"
                                                                             }`}

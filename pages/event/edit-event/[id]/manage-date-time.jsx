@@ -346,7 +346,7 @@ const ManageDateTime = () => {
         <>
             <FrontendHeader backgroundImage={"/assets/front-images/about-slider_bg.jpg"} />
 
-            <section id="myevent-deshbord" className="py-4">
+            <section id="myevent-deshbord" className="manage-date-page">
                 <div className="d-flex">
                     <EventSidebar eventId={id}  eventDetails={eventDetails}/>
 
@@ -355,11 +355,11 @@ const ManageDateTime = () => {
                             <section id="post-eventpg">
                                 <EventHeaderSection eventDetails={eventDetails} />
 
-                                <div className="d-flex align-items-start mt-3">
+                                <div className="row">
                                     {/* Left: Calendar */}
-                                    <div style={{ width: 320 }} className="me-3">
+                                    <div className="col-md-6">
                                         <div className="card p-3">
-                                            <div className="d-flex justify-content-between align-items-center mb-2">
+                                            <div className="">
                                                 <h6 className="mb-0">Calendar</h6>
                                                 <small>{calendarDate.toLocaleString("default", { month: "long", year: "numeric" })}</small>
                                             </div>
@@ -402,14 +402,14 @@ const ManageDateTime = () => {
                                     </div>
 
                                     {/* Middle: date slots list */}
-                                    <div className="flex-grow-1">
+                                    <div className=" col-md-6">
                                         <div className="card p-3">
                                             <div className="d-flex justify-content-between align-items-center">
                                                 <h4 className="text-24 mb-0">Manage dates and times</h4>
-                                                <small className="text-muted">Add dates & time slots within the event range</small>
+                                                <small className="text-14">Add dates & time slots within the event range</small>
                                             </div>
 
-                                            <div className="mt-4">
+                                            <div className="mt-2">
                                                 {Object.keys(slotsByDate).length == 0 && (
                                                     <div className="p-4 text-muted">No dates yet. Click a date on the calendar or "Add a date".</div>
                                                 )}
@@ -421,25 +421,47 @@ const ManageDateTime = () => {
                                                         return (
                                                             <div
                                                                 key={dKey}
-                                                                className="p-3 mb-3 border rounded d-flex align-items-start justify-content-between"
+                                                                className="p-3 mb-3 border rounded "
                                                             >
                                                                 {/* LEFT: Date Column */}
-                                                                <div style={{ width: 70, textAlign: "center" }}>
+                                                                <div className="d-flex align-items-start justify-content-between">
+                                                                <div className="d-flex gap-2">
+                                                                    <div style={{ fontSize: 22, fontWeight: 800 }}>
+                                                                        {String(new Date(dKey).getDate()).padStart(2, "0")}
+                                                                    </div>
+                                                                    <div>
+                                                                    <div className="text-muted" style={{ fontSize: 14 }}>
+                                                                        {new Date(dKey).toLocaleString("default", { month: "long" })}
+                                                                    </div>
                                                                     <div style={{ fontSize: 14, fontWeight: 700 }}>
                                                                         {new Date(dKey)
                                                                             .toLocaleString("default", { weekday: "short" })
                                                                             .toUpperCase()}
                                                                     </div>
-                                                                    <div style={{ fontSize: 22, fontWeight: 800 }}>
-                                                                        {String(new Date(dKey).getDate()).padStart(2, "0")}
-                                                                    </div>
-                                                                    <div className="text-muted" style={{ fontSize: 14 }}>
-                                                                        {new Date(dKey).toLocaleString("default", { month: "long" })}
                                                                     </div>
                                                                 </div>
 
+                                                                {/* RIGHT: Buttons */}
+                                                                <div className="text-end" >
+
+                                                                    <div className="text-start">
+                                                                        {arr.map((s, idx) => (
+                                                                            <div key={idx} className="d-inline-block me-1">
+
+                                                                                <button
+                                                                                    className="btn btn-sm btn-light border"
+                                                                                    title="Remove slot"
+                                                                                    onClick={() => removeLocalSlot(s.id)}
+                                                                                >
+                                                                                    ✕
+                                                                                </button>
+                                                                            </div>
+                                                                        ))}
+                                                                    </div>
+                                                                </div>
+</div>
                                                                 {/* MIDDLE: Slot Pills */}
-                                                                <div className="flex-grow-1 px-3">
+                                                                <div >
                                                                     <div style={{ fontWeight: 600 }}>
                                                                         {arr.length} time slot{arr.length > 1 ? "s" : ""}
                                                                     </div>
@@ -481,24 +503,7 @@ const ManageDateTime = () => {
                                                                     </div>
                                                                 </div>
 
-                                                                {/* RIGHT: Buttons */}
-                                                                <div className="text-end" style={{ minWidth: 120 }}>
-
-                                                                    <div className="text-start">
-                                                                        {arr.map((s, idx) => (
-                                                                            <div key={idx} className="d-inline-block me-1">
-
-                                                                                <button
-                                                                                    className="btn btn-sm btn-light border"
-                                                                                    title="Remove slot"
-                                                                                    onClick={() => removeLocalSlot(s.id)}
-                                                                                >
-                                                                                    ✕
-                                                                                </button>
-                                                                            </div>
-                                                                        ))}
-                                                                    </div>
-                                                                </div>
+                                                                
                                                             </div>
                                                         );
                                                     })}
