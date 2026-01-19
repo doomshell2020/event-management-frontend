@@ -27,6 +27,9 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 import Link from "next/link";
 import AsyncSelect from "react-select/async";
 import { formatEventDateTime, formatPrice } from "@/utils/formatDate";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+
 
 export const Events = () => {
 
@@ -990,28 +993,84 @@ export const Events = () => {
     });
 
     const onExportLinkPress = () => {
-        const rows = [
-            headers,
-            ...csvData.map((row) =>
-                headers.map((header) => {
-                    // Wrap values in quotes to handle commas and special chars
-                    const value = row[header] ?? "";
-                    return `"${String(value).replace(/"/g, '""')}"`;
-                })
-            ),
-        ];
+        const excelData = eventList.map((item, index) => {
 
-        const csvContent = "data:text/csv;charset=utf-8," + rows.map((e) => e.join(",")).join("\n");
+            // Organizer Name
+            const organizer = item?.Organizer
+                ? `${item.Organizer.first_name || ""} ${item.Organizer.last_name || ""}`.trim()
+                : "--";
 
-        const encodedUri = encodeURI(csvContent);
-        const link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", `Event_${getCurrentDate()}.csv`);
+            // Ticket Types
+            const ticketTypes = Array.isArray(item?.tickets) && item.tickets.length > 0
+                ? item.tickets.map(t => t.title).join(", ")
+                : "--";
 
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+            // Sales / Commission
+            const sales =
+                item?.is_free == "Y"
+                    ? "Free Event"
+                    : formatPrice(item?.total_sales);
+
+            const commission =
+                item?.is_free == "Y"
+                    ? "Free Event"
+                    : formatPrice(item?.total_tax);
+
+            // Event Type
+            const eventType = item?.is_free == "Y" ? "Free Event" : "Paid Event";
+
+            // Featured
+            const featured = item?.featured == "Y" ? "Yes" : "No";
+
+            // Status
+            const status = item?.status == "Y" ? "Active" : "Inactive";
+
+            return {
+                "S.No": index + 1,
+                "Organizer": organizer,
+                "Event Name": item?.name || "--",
+                "Date From": formatEventDateTime(item?.date_from),
+                "Date To": formatEventDateTime(item?.date_to),
+                "Venue": item?.location || "--",
+                "Ticket Types": ticketTypes,
+                "Total Sales": sales,
+                "Commission (8%)": commission,
+                "Event Type": eventType,
+                "Featured": featured,
+                "Status": status
+            };
+        });
+
+        // Create worksheet
+        const worksheet = XLSX.utils.json_to_sheet(excelData);
+
+        // ===== AUTO COLUMN WIDTH =====
+        const columnWidths = Object.keys(excelData[0] || {}).map((key) => {
+            const maxLength = Math.max(
+                key.length,
+                ...excelData.map((row) => (row[key] ? String(row[key]).length : 10))
+            );
+            return { wch: maxLength + 3 };
+        });
+
+        worksheet["!cols"] = columnWidths;
+
+        // Create workbook
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Events");
+
+        const excelBuffer = XLSX.write(workbook, {
+            bookType: "xlsx",
+            type: "array",
+        });
+
+        const data = new Blob([excelBuffer], {
+            type: "application/octet-stream",
+        });
+
+        saveAs(data, `Events_${getCurrentDate()}.xlsx`);
     };
+
 
     const loadUserOptions = async (inputValue) => {
         if (inputValue.length < 2) return [];
