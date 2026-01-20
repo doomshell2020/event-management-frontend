@@ -25,6 +25,7 @@ export const EventTickets = () => {
     const [eventList, setEventList] = useState([]);
     const [currencyName, setCurrencyName] = useState("");
     const [isLoading, setIsLoading] = useState(true);
+
     const COLUMNS = React.useMemo(() => [
         {
             Header: "S.No",
@@ -64,7 +65,7 @@ export const EventTickets = () => {
             Cell: ({ row }) => {
                 return (
                     <div>
-                        {row?.original?.sold_out === "Y" ? 1 : ""}
+                        {row?.original?.sold_out == "Y" ? 1 : ""}
                     </div>
                 );
             },
@@ -75,7 +76,7 @@ export const EventTickets = () => {
             className: "borderrigth",
             Cell: ({ row }) => (
                 <div>
-                    {row.original.location ? row.original.location : "---"}
+                    {row.original.location ? row.original.location : "--"}
                 </div>
             ),
         },
@@ -85,11 +86,12 @@ export const EventTickets = () => {
             className: "borderrigth",
             Cell: ({ row }) => (
                 <div>
-                    {currencyName}{' '}{row.original.price ? row.original.price : "---"}
+                    {currencyName}{' '}{row.original.price ? row.original.price : "--"}
                 </div>
             ),
         },
     ], [currencyName]);
+    
     const getEventList = async (eventId) => {
         if (!eventId) return; // ✅ safety check
 

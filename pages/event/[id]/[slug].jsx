@@ -111,6 +111,7 @@ const EventDetailPage = ({ event, slug }) => {
 
   // ⏰ Check if event is expired
   const expired = isEventExpired(event);
+  // console.log('expired :', expired);
 
   // Early return MUST come after hooks
   if (!event || Object.keys(event).length == 0) {
@@ -304,7 +305,7 @@ const EventDetailPage = ({ event, slug }) => {
                     </div>
                   )}
 
-                  {!expired && event.status == "Y" && (
+                  {!expired && event.status == "Y" && event.is_free == 'N' && (
                     <div className="mt-3 d-flex gap-2">
                       <button
                         onClick={(e) => {
@@ -503,7 +504,7 @@ const EventDetailPage = ({ event, slug }) => {
 
                                           {/* PRICE */}
                                           <div
-                                          className="slot-price"
+                                            className="slot-price"
                                             style={{
                                               fontWeight: "bold",
                                               color: "rgb(33, 166, 122)",
@@ -543,25 +544,25 @@ const EventDetailPage = ({ event, slug }) => {
                                     {w.wellnessSlots?.length > 0 && (
                                       <div className="text-center">
                                         <button
-                                        className="btn mt-3 w-100 fw-bold"
+                                          className="btn mt-3 w-100 fw-bold"
                                           disabled={selectedCount == 0}
                                           style={{
-                                          background:
-                                            selectedCount > 0
-                                              ? "linear-gradient(135deg, #af46e5 0%, #7263f1 50%, #e62d56 100%)"
-                                              : "linear-gradient(135deg, #d6c7f7, #e9c3d2)",
-                                          boxShadow:
-                                            selectedCount > 0
-                                              ? "0 7px 15px rgba(79, 70, 229, 0.5), inset 0 0 0 0px rgba(255, 255, 255, 0.15)"
-                                              : "none",
-                                          color: "#fff",
-                                          borderRadius: "50px",
-                                          padding: "10px 30px",
-                                          border: "none",
-                                           border: "none",
-                                          cursor: selectedCount > 0 ? "pointer" : "not-allowed",
-                                          transition: "all 0.3s ease",
-                                        }}
+                                            background:
+                                              selectedCount > 0
+                                                ? "linear-gradient(135deg, #af46e5 0%, #7263f1 50%, #e62d56 100%)"
+                                                : "linear-gradient(135deg, #d6c7f7, #e9c3d2)",
+                                            boxShadow:
+                                              selectedCount > 0
+                                                ? "0 7px 15px rgba(79, 70, 229, 0.5), inset 0 0 0 0px rgba(255, 255, 255, 0.15)"
+                                                : "none",
+                                            color: "#fff",
+                                            borderRadius: "50px",
+                                            padding: "10px 30px",
+                                            border: "none",
+                                            border: "none",
+                                            cursor: selectedCount > 0 ? "pointer" : "not-allowed",
+                                            transition: "all 0.3s ease",
+                                          }}
                                           onClick={() =>
                                             handleOpenAppointmentCart(
                                               w,

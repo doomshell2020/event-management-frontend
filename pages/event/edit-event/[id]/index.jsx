@@ -41,7 +41,7 @@ const MyEventsPage = () => {
     const [editorData, setEditorData] = useState({ content: "" });
 
     const [isFormSubmit, setIsFormSubmit] = useState(false);
-    // ✅ Form state (binds with input fields)
+    // Form state (binds with input fields)
     const [formData, setFormData] = useState({
         name: "",
         location: "",
@@ -292,7 +292,6 @@ const MyEventsPage = () => {
         });
     };
 
-
     const [backgroundImage, setIsMobile] = useState('/assets/front-images/about-slider_bg.jpg');
     const [dateErrors, setDateErrors] = useState({});
     const validatePaidEventDates = (data) => {
@@ -350,7 +349,6 @@ const MyEventsPage = () => {
             setDateErrors(errors); // replaces old errors (no stuck red)
         }
     };
-
 
     return (
         <>

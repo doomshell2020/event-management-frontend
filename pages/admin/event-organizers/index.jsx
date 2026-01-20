@@ -67,6 +67,44 @@ export const EventOrganizersList = () => {
             ),
         },
 
+        {
+            Header: "Platform Fee",
+            accessor: "default_platform_charges",
+            className: "borderrigth text-center",
+            style: { width: "10%" },
+            Cell: ({ row }) => {
+                const fee = row.original.default_platform_charges;
+
+                return (
+                    <div className="text-center">
+                        {fee != null && fee != undefined ? `${fee}%` : "0"}
+                    </div>
+                );
+            },
+        },
+
+        {
+            Header: "Auto Approved",
+            accessor: "admin_approval_required",
+            className: "borderrigth text-center",
+            style: { width: "10%" },
+            Cell: ({ row }) => {
+                const auto = row.original.admin_approval_required;
+
+                return (
+                    <div className="text-center">
+                        {auto == "Y" ? (
+                            <span className="badge bg-success">Yes</span>
+                        ) : (
+                            <span className="badge bg-danger">No</span>
+                        )}
+                    </div>
+                );
+            },
+        },
+
+
+
 
         {
             Header: "Events & Revenue",
@@ -210,7 +248,7 @@ export const EventOrganizersList = () => {
                                 className="form-check-input"
                                 type="checkbox"
                                 style={{ cursor: "pointer" }}
-                                checked={status === "Y"}
+                                checked={status == "Y"}
                                 onChange={() => handleStatusToggle(id, status)}
                             />
                         </div>
@@ -232,14 +270,12 @@ export const EventOrganizersList = () => {
     ]);
     let navigate = useRouter();
     const [OrganizerList, setOrganizerList] = useState([]);
-    // console.log("----", OrganizerList);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [selectedEmail, setSelectedEmail] = useState(null);
     const [email, setEmail] = useState("");
     const [firstName, setFirstName] = useState("");
     const [mobile, setMobile] = useState("");
-
 
     const formatCurrency = (value, symbol = "₹") => {
         const num = Number(value || 0);
@@ -249,11 +285,9 @@ export const EventOrganizersList = () => {
         })}`;
     };
 
-
-
     const handleStatusToggle = async (id, currentStatus) => {
-        const newStatus = currentStatus === "Y" ? "N" : "Y";
-        const statusText = newStatus === "Y" ? "Activate" : "Deactivate";
+        const newStatus = currentStatus == "Y" ? "N" : "Y";
+        const statusText = newStatus == "Y" ? "Activate" : "Deactivate";
 
         const result = await Swal.fire({
             title: `Are you sure?`,
@@ -298,7 +332,7 @@ export const EventOrganizersList = () => {
             // rollback
             setOrganizerList(prev =>
                 prev.map(item =>
-                    item.id === id ? { ...item, status: currentStatus } : item
+                    item.id == id ? { ...item, status: currentStatus } : item
                 )
             );
 
@@ -325,6 +359,7 @@ export const EventOrganizersList = () => {
     useEffect(() => {
         getEventOrganizers();
     }, []);
+
     const tableInstance = useTable(
         {
             columns: COLUMNS,
@@ -462,15 +497,6 @@ export const EventOrganizersList = () => {
     };
 
 
-
-
-
-
-
-
-
-
-
     return (
         <div>
             <Seo title={"Event Organizer Manager"} />
@@ -498,7 +524,7 @@ export const EventOrganizersList = () => {
                                         getOptionLabel={(option) => option.user.first_name}
                                         getOptionValue={(option) => option.value}
                                         formatOptionLabel={(option, { context }) => {
-                                            if (context === "menu") {
+                                            if (context == "menu") {
                                                 return (
                                                     <div>
                                                         <strong>{option.user.first_name}</strong>
@@ -529,7 +555,7 @@ export const EventOrganizersList = () => {
                                         getOptionLabel={(option) => option.user.email}
                                         getOptionValue={(option) => option.value}
                                         formatOptionLabel={(option, { context }) => {
-                                            if (context === "menu") {
+                                            if (context == "menu") {
                                                 return (
                                                     <div>
                                                         <strong>{option.user.email}</strong>
@@ -547,12 +573,6 @@ export const EventOrganizersList = () => {
                                     />
                                 </Form.Group>
 
-
-
-
-
-
-
                                 {/* <Form.Group className="mb-3" controlId="formName">
                                     <Form.Label>Email</Form.Label>
                                     <Form.Control
@@ -563,11 +583,11 @@ export const EventOrganizersList = () => {
                                     />
                                 </Form.Group> */}
 
-                                <Form.Group className="mb-3" controlId="phone">
-                                    <Form.Label>Phone</Form.Label>
+                                <Form.Group className="mb-3" controlId="Mobile">
+                                    <Form.Label>Mobile</Form.Label>
                                     <Form.Control
                                         type="text"
-                                        placeholder="Phone"
+                                        placeholder="Mobile"
                                         value={mobile}
                                         onChange={(e) => setMobile(e.target.value)}
                                     />

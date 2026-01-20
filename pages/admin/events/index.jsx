@@ -1302,6 +1302,7 @@ export const Events = () => {
                         </Card.Body>
                     </Card>
                 </Col>
+
                 <Col xl={10}>
                     <Card>
                         <Card.Header className="">
@@ -1465,6 +1466,7 @@ export const Events = () => {
                         </div>
                     </Card>
                 </Col>
+                
             </Row>
 
             <Modal

@@ -1,4 +1,3 @@
-// new page design
 import React, { useState, useEffect } from "react";
 import { Card, Spinner, Col } from "react-bootstrap";
 import Link from "next/link";
@@ -17,32 +16,41 @@ import Swal from "sweetalert2";
 const EventOrganizerEdit = () => {
     const router = useRouter();
     const { id } = router.query;
+
     const [isLoading, setIsLoading] = useState(false);
     const [btnLoading, setBtnLoading] = useState(false);
+
+    // Basic Fields
     const [firstName, setFirstName] = useState("");
     const [email, setEmail] = useState("");
     const [mobile, setMobile] = useState("");
-    const [emailError, setEmailError] = useState("");
-    const [error, setError] = useState("");
 
-    const [emailTouched, setEmailTouched] = useState(false);
-    //  Email Validation
+    // REQUIRED NEW FIELDS
+    const [platformFee, setPlatformFee] = useState("");
+    const [autoApprove, setAutoApprove] = useState("N");
+
+    // Validation States
+    const [emailError, setEmailError] = useState("");
+    const [validateDefault, setValidateDefault] = useState(false);
+
+    // Email Validation Function
     const validateEmail = (email) => {
         if (!email) {
-            setError(emailTouched ? "" : "");
-            setEmail("")
+            setEmailError("Email is required");
             return false;
         }
-        const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+        const emailPattern =
+            /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
         if (!emailPattern.test(email)) {
-            setError("Invalid email format!");
+            setEmailError("Invalid email format!");
             return false;
         }
-        setError("");
+
+        setEmailError("");
         return true;
     };
-
-
 
     const fetchOrganizersDetails = async (id) => {
         if (!id) return;
@@ -55,11 +63,16 @@ const EventOrganizerEdit = () => {
             );
 
             const organizer = data?.data;
+            // console.log('organizer :', organizer);
 
             if (organizer) {
                 setFirstName(organizer.first_name || "");
                 setEmail(organizer.email || "");
                 setMobile(organizer.mobile || "");
+
+                // ONLY REQUIRED FIELDS
+                setPlatformFee(organizer.default_platform_charges || "");
+                setAutoApprove(organizer.admin_approval_required || "N");
             }
         } catch (error) {
             console.error("Failed to fetch organizer details:", error);
@@ -72,18 +85,43 @@ const EventOrganizerEdit = () => {
         fetchOrganizersDetails(id);
     }, [id]);
 
-    const [validateDefault, setValidateDefault] = useState(false);
     const handleSubmit = async (event) => {
         event.preventDefault();
         const form = event.currentTarget;
-        // Frontend validation
-        if (
-            !form.checkValidity() ||
-            error === "Invalid email format!" ||
-            emailError === "Invalid email format!"
-        ) {
+
+        // Email Validation
+        if (!validateEmail(email)) {
+            Swal.fire({
+                icon: "warning",
+                title: "Validation Error",
+                text: "Please enter a valid email.",
+            });
+            return;
+        }
+
+        // Platform Fee Validation
+        if (platformFee == "") {
+            Swal.fire({
+                icon: "warning",
+                title: "Validation Error",
+                text: "Platform Fee is required.",
+            });
+            return;
+        }
+
+        if (Number(platformFee) < 0) {
+            Swal.fire({
+                icon: "warning",
+                title: "Validation Error",
+                text: "Platform Fee cannot be negative.",
+            });
+            return;
+        }
+
+        if (!form.checkValidity()) {
             event.stopPropagation();
             setValidateDefault(true);
+
             Swal.fire({
                 icon: "warning",
                 title: "Validation Error",
@@ -91,22 +129,35 @@ const EventOrganizerEdit = () => {
             });
             return;
         }
+
         setBtnLoading(true);
+
         try {
             const payload = {
                 first_name: firstName.trim(),
                 email: email.trim(),
                 mobile: mobile.trim(),
+                platform_fee: platformFee,
+                auto_approve_events: autoApprove,
             };
-            const res = await api.put(`/api/v1/admin/event-organizer/${id}`, payload);
+
+            const res = await api.put(
+                `/api/v1/admin/event-organizer/${id}`,
+                payload
+            );
+
             if (res.data?.success) {
                 setBtnLoading(false);
+
                 const result = await Swal.fire({
                     icon: "success",
                     title: "Success",
-                    text: res.data.message || "Event organizer update successfully!",
+                    text:
+                        res.data.message ||
+                        "Event organizer updated successfully!",
                     confirmButtonText: "OK",
                 });
+
                 if (result.isConfirmed) {
                     router.push("/admin/event-organizers");
                 }
@@ -114,14 +165,18 @@ const EventOrganizerEdit = () => {
                 Swal.fire({
                     icon: "error",
                     title: "Failed",
-                    text: res.data?.message || "Something went wrong. Please try again.",
+                    text:
+                        res.data?.message ||
+                        "Something went wrong. Please try again.",
                 });
             }
         } catch (err) {
             Swal.fire({
                 icon: "error",
                 title: "Server Error",
-                text: err?.response?.data?.error?.message || "Internal server error",
+                text:
+                    err?.response?.data?.error?.message ||
+                    "Internal server error",
             });
         } finally {
             setBtnLoading(false);
@@ -129,19 +184,19 @@ const EventOrganizerEdit = () => {
         }
     };
 
-
     return (
         <div>
             <Seo title={"Event Organizers Edit"} />
-            {/* <!--Row--> */}
+
             <div className="row">
                 <Col lg={12} md={12}>
                     <Card>
-                        {/* HEADER */}
                         <Card.Header>
-                            <h3 className="card-title mb-0">Edit Event Organizer</h3>
+                            <h3 className="card-title mb-0">
+                                Edit Event Organizer
+                            </h3>
                         </Card.Header>
-                        {/* BODY */}
+
                         <Card.Body>
                             <CForm
                                 className="row g-3 needs-validation housing-addflow"
@@ -149,67 +204,108 @@ const EventOrganizerEdit = () => {
                                 validated={validateDefault}
                                 onSubmit={handleSubmit}
                             >
-                                {/* Organizer Name */}
+                                {/* Name */}
                                 <CCol md={4}>
                                     <CFormLabel>
-                                        Event Organizer <span style={{ color: "red" }}>*</span>
+                                        Organizer Name{" "}
+                                        <span style={{ color: "red" }}>*</span>
                                     </CFormLabel>
                                     <CFormInput
                                         type="text"
-                                        placeholder="Event Organizer"
+                                        placeholder="Organizer Name"
                                         required
                                         value={firstName}
-                                        onChange={(e) => {
-                                            let inputValue = e.target.value;
-                                            inputValue = inputValue.replace(/[^a-zA-Z\s]/g, "");
-                                            setFirstName(inputValue);
-                                        }}
+                                        onChange={(e) =>
+                                            setFirstName(e.target.value)
+                                        }
                                     />
                                 </CCol>
 
                                 {/* Email */}
                                 <CCol md={4}>
                                     <CFormLabel>
-                                        Event Organizer Email <span style={{ color: "red" }}>*</span>
+                                        Email{" "}
+                                        <span style={{ color: "red" }}>*</span>
                                     </CFormLabel>
                                     <CFormInput
                                         type="email"
-                                        placeholder="Event Organizer Email"
+                                        placeholder="Email"
                                         required
                                         value={email}
                                         onChange={(e) => {
                                             setEmail(e.target.value);
-                                            setEmailTouched(true);
                                             validateEmail(e.target.value);
                                         }}
-                                        onBlur={() => {
-                                            setEmailTouched(true);
-                                            validateEmail(email);
-                                        }}
-                                        className={emailTouched && error ? "is-invalid" : ""}
-                                        feedbackInvalid={error}
+                                        className={
+                                            emailError ? "is-invalid" : ""
+                                        }
                                     />
+                                    {emailError && (
+                                        <div className="invalid-feedback">
+                                            {emailError}
+                                        </div>
+                                    )}
                                 </CCol>
 
                                 {/* Mobile */}
                                 <CCol md={4}>
                                     <CFormLabel>
-                                        Event Organizer Mobile <span style={{ color: "red" }}>*</span>
+                                        Mobile{" "}
+                                        <span style={{ color: "red" }}>*</span>
                                     </CFormLabel>
                                     <CFormInput
                                         type="number"
-                                        placeholder="Event Organizer Mobile"
+                                        placeholder="Mobile"
                                         required
                                         value={mobile}
-                                        onChange={(e) => setMobile(e.target.value)}
+                                        onChange={(e) =>
+                                            setMobile(e.target.value)
+                                        }
                                     />
                                 </CCol>
 
-                                {/* ACTION BUTTONS */}
-                                <CCol
-                                    md={12}
-                                    className="mt-4 d-flex gap-2"
-                                >
+                                {/* Platform Fee */}
+                                <CCol md={4}>
+                                    <CFormLabel>
+                                        Platform Fee (%){" "}
+                                        <span style={{ color: "red" }}>*</span>
+                                    </CFormLabel>
+                                    <CFormInput
+                                        type="number"
+                                        placeholder="Platform Fee"
+                                        required
+                                        value={platformFee}
+                                        onChange={(e) => {
+                                            const value = e.target.value.replace(/[^0-9.]/g, "")
+                                            setPlatformFee(value)
+
+                                        }
+                                        }
+                                    />
+                                </CCol>
+
+                                {/* Auto Approve */}
+                                <CCol md={4}>
+                                    <CFormLabel>
+                                        Auto Approve Events (Paid){" "}
+                                        <span style={{ color: "red" }}>*</span>
+                                    </CFormLabel>
+
+                                    <select
+                                        className="form-control"
+                                        value={autoApprove}
+                                        onChange={(e) =>
+                                            setAutoApprove(e.target.value)
+                                        }
+                                        required
+                                    >
+                                        <option value="Y">Yes</option>
+                                        <option value="N">No</option>
+                                    </select>
+                                </CCol>
+
+                                {/* Buttons */}
+                                <CCol md={12} className="mt-4 d-flex gap-2">
                                     <Link href="/admin/event-organizers">
                                         <CButton color="secondary">
                                             Back
@@ -220,38 +316,27 @@ const EventOrganizerEdit = () => {
                                         color="success"
                                         type="submit"
                                         disabled={btnLoading}
-                                        style={{ minWidth: "120px" }}
                                     >
                                         {btnLoading ? (
                                             <Spinner
                                                 as="span"
                                                 animation="border"
                                                 size="sm"
-                                                role="status"
-                                                aria-hidden="true"
                                             />
                                         ) : (
                                             "Update"
                                         )}
                                     </CButton>
                                 </CCol>
-
                             </CForm>
                         </Card.Body>
                     </Card>
                 </Col>
-
-
             </div>
-            {/* <!--/Row--> */}
-        </div >
+        </div>
     );
-}
+};
 
-EventOrganizerEdit.propTypes = {};
-
-EventOrganizerEdit.defaultProps = {};
-
-EventOrganizerEdit.layout = "Contentlayout"
+EventOrganizerEdit.layout = "Contentlayout";
 
 export default EventOrganizerEdit;
