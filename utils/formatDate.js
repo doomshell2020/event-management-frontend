@@ -116,3 +116,16 @@ export const formatPrice = (value) => {
         ? number.toLocaleString()
         : number.toFixed(2).replace(/\.00$/, "").toLocaleString();
 };
+
+// 
+export const formatDate = (
+    date,
+    timezone,
+    format = "ddd, DD MMM YYYY"
+) => {
+    if (!date) return "N/A";
+
+    return moment(date)
+        .tz(timezone || "Asia/Kolkata")
+        .format(format);
+};
