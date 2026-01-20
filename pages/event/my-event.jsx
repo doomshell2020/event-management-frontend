@@ -493,6 +493,18 @@ export default function OrganizerEvents({ userId }) {
                                                                             />
                                                                         </Link>
                                                                     </div>
+
+                                                                    <Link
+                                                                        href={`/promotioncodes/${event.id}`}
+                                                                        className="edit deleteIcos">
+                                                                        <button type="button" className="edit p-0 m-0">
+                                                                             <i className="bi bi-gift-fill pe-1"></i>{" "}
+                                                                            Promotion Codes
+                                                                        </button>
+                                                                    </Link>
+
+
+
                                                                 </td>
                                                             </tr>
                                                         );

@@ -18,9 +18,11 @@ export default function CheckOutComponents({
     taxesInfo,
     taxApplied,
     eventImage,
-    eventName
+    eventName,
+    // discountAmount
 }) {
 
+    console.log("----couponDetails--", couponDetails)
 
     const [userId, setUserId] = useState("");
     let stripePromise;
@@ -97,16 +99,6 @@ export default function CheckOutComponents({
         }
     }, [userId, taxesInfo]);
 
-
-
-    const cartData = cart.map(item => ({
-        ticketId: item.raw?.appointment_id || item.raw?.ticket_id,
-        ticketType: item.item_type,              // "appointment"
-        quantity: item.count || 1,
-        price: Number(item.ticket_price) || 0
-    }));
-
-
     function formatSmartPrice(amount) {
         if (isNaN(amount)) return "Invalid amount";
 
@@ -175,6 +167,7 @@ export default function CheckOutComponents({
     });
 
     const { ticketTotal, appointmentTotal, addonTotal, totalTicketAndAddonPrice, discountAmount, totalAfterDiscount, totalTax, finalTotalAmount, payableAmount } = breakdown;
+    console.log("discountAmount", discountAmount)
     // return
     /////////////////////////////////Cart calculation End///////////////////////////////////
 
@@ -235,7 +228,7 @@ export default function CheckOutComponents({
                         tax_total: totalTax,
                         grand_total: finalTotalAmount,
                         currency: currencyName || "usd",
-                        discount_amount: 0,
+                        discount_amount: discountAmount || 0,
                         cartData: cart.map(item => ({
                             ticketId: item.raw.appointments.id,
                             ticketType: item.item_type,
@@ -340,17 +333,17 @@ export default function CheckOutComponents({
                                     </div>
                                 </div>
                             </Col>
-                             <Col xl={5} md={6}>
-                             <div className="amnt-stl-inr">
-                             <div className="tct-amt gap-2 d-flex">
+                            <Col xl={5} md={6}>
+                                <div className="amnt-stl-inr">
+                                    <div className="tct-amt gap-2 d-flex">
                                         <p>TOTAL:</p>{" "}
                                         <span>
                                             {currencySymbol}
                                             {finalTotalAmount}
                                         </span>
                                     </div>
-                                    </div>
-                                    </Col>
+                                </div>
+                            </Col>
                         </Row>
 
                         {/* Total Price */}

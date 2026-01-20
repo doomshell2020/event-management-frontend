@@ -105,3 +105,17 @@ export const isEventExpired = (event) => {
         return false;
     }
 };
+
+
+// 
+export const formatDate = (
+    date,
+    timezone,
+    format = "ddd, DD MMM YYYY"
+) => {
+    if (!date) return "N/A";
+
+    return moment(date)
+        .tz(timezone || "Asia/Kolkata")
+        .format(format);
+};

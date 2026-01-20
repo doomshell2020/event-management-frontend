@@ -40,6 +40,7 @@ const LoadingComponent = ({ isActive }) => {
 
 export default function CartModal({ show, handleClose, eventId, slotIds }) {
     const [isLoading, setIsLoading] = useState(true);
+    const [couponLoading, setCouponLoading] = useState(false);
     const [eventDetails, setEventDetails] = useState({});
     const [currency, setCurrency] = useState('');
     const [taxAppliedStatus, setTaxAppliedStatus] = useState('');
@@ -49,6 +50,8 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
     const [cart, setCart] = useState([]);
     const [couponDetails, setCouponDetails] = useState("");
     const [ticketingFeeDetails, setTicketingFeeDetails] = useState();
+    const [couponSuccessMessage, setCouponSuccessMessage] = useState("");
+    const [couponError, setCouponError] = useState("");
     const [coupon, setCoupon] = useState("");
     const [adminFees, setAdminFees] = useState(8);
     const [showNextStep, setShowNextStep] = useState(false);
@@ -143,21 +146,52 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
     }, [show, eventId]);
 
 
+    // const currencySymbol = cart?.[0]?.currency_symbol || "";
+    // // tax_applied status
+    // const taxApplied = eventDetails?.wellness?.[0].tax_applied
+    // // Calculate Totals
+    // const totalTickets = cart.reduce((n, item) => n + item.count, 0);
+    // const priceTotal = cart.reduce((n, item) => n + item.count * item.ticket_price, 0);
+    // // const feeTotal = (priceTotal * adminFees) / 100;
+    // // If taxApplied = "Y" → apply admin fee  
+    // // If taxApplied = "N" → admin fee = 0
+    // const feeTotal = taxApplied === "Y" ? (priceTotal * adminFees) / 100 : 0;
+
+    // const finalTotal = priceTotal + feeTotal;
+
+    // let discountAmount = couponDetails?.discountAmt;
+
     const currencySymbol = cart?.[0]?.currency_symbol || "";
+
     // tax_applied status
-    const taxApplied = eventDetails?.wellness?.[0].tax_applied
+    const taxApplied = eventDetails?.wellness?.[0]?.tax_applied;
+
     // Calculate Totals
     const totalTickets = cart.reduce((n, item) => n + item.count, 0);
     const priceTotal = cart.reduce(
         (n, item) => n + item.count * item.ticket_price,
         0
     );
-    // const feeTotal = (priceTotal * adminFees) / 100;
-    // If taxApplied = "Y" → apply admin fee  
-    // If taxApplied = "N" → admin fee = 0
-    const feeTotal = taxApplied === "Y" ? (priceTotal * adminFees) / 100 : 0;
 
-    const finalTotal = priceTotal + feeTotal;
+    // Discount
+    const discountAmount = couponDetails?.discountAmt || 0;
+
+    // Price after discount
+    const discountedPriceTotal = priceTotal - discountAmount;
+
+    // Admin Fee
+    // If taxApplied = "Y" → apply admin fee
+    // If taxApplied = "N" → admin fee = 0
+    const feeTotal =
+        taxApplied === "Y"
+            ? (discountedPriceTotal * adminFees) / 100
+            : 0;
+
+    // Final Total (discount last applied)
+    const finalTotal = discountedPriceTotal + feeTotal;
+
+
+
 
 
     const formatReadableDate = (dateStr) => {
@@ -267,6 +301,65 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
             setIsBtnLoading(false);
         }, 1000);
     };
+
+    function formatSmartPrice(amount) {
+        if (isNaN(amount)) return "Invalid amount";
+
+        const isInteger = Number(amount) % 1 == 0;
+        const formatted = isInteger
+            ? Number(amount).toLocaleString()// No decimals
+            : Number(amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+        return formatted;
+    }
+
+    // Apply Coupon Code
+    const handleApplyCoupon = async () => {
+        setCouponLoading(true);
+        if (!coupon) {
+            setCouponLoading(false);
+            return;
+        }
+        try {
+            const response = await api.get(`/api/v1/coupons/check-eligibility/${eventId}`, {
+                params: { couponCode: coupon },
+            });
+            if (response.data.success) {
+                setCouponDetails(response.data.data);
+                setCouponSuccessMessage(response.data.message);
+                setCouponError("");
+                localStorage.setItem("couponCode", coupon);
+            } else {
+                setCouponError(response.data.message || "Invalid coupon code.");
+                setCouponSuccessMessage("");
+            }
+            setCouponLoading(false);
+        } catch (error) {
+            console.error("Error applying coupon:", error.message);
+            const errorMessage =
+                error.response?.data?.message ||
+                "An error occurred while applying the coupon.";
+            setCouponError(errorMessage);
+            setCouponSuccessMessage("");
+            // clearMessages();
+            setCouponLoading(false);
+        }
+    };
+
+    // Remove Coupon Code
+    const handleRemoveCoupon = async () => {
+        setCouponDetails("");
+        setCoupon("");
+        setCouponError("");
+        setCouponSuccessMessage("");
+    };
+
+
+
+
+
+
+
 
 
     return (
@@ -394,6 +487,27 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
                                                 {cart.length > 0 ? (
                                                     <div className="checkot-tct-purcs monte25-tct-purcs px-0 pb-0">
                                                         <div className="apply-cd mt-1">
+
+                                                            {couponError && (
+                                                                <p
+                                                                    style={{
+                                                                        color: "red",
+                                                                        textTransform: "uppercase",
+                                                                    }}
+                                                                >
+                                                                    {couponError}
+                                                                </p>
+                                                            )}
+                                                            {couponSuccessMessage && (
+                                                                <p
+                                                                    style={{
+                                                                        color: "#ff6d94",
+                                                                        textTransform: "uppercase",
+                                                                    }}
+                                                                >
+                                                                    {couponSuccessMessage}
+                                                                </p>
+                                                            )}
                                                             <InputGroup className="input-group">
                                                                 <Form.Control
                                                                     className="form-control"
@@ -410,7 +524,7 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
                                                                         variant=""
                                                                         className="btn"
                                                                         type="button"
-                                                                    // onClick={handleRemoveCoupon} // Function to remove the coupon
+                                                                        onClick={handleRemoveCoupon} // Function to remove the coupon
                                                                     >
                                                                         REMOVE
                                                                     </Button>
@@ -419,10 +533,19 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
                                                                         variant=""
                                                                         className="btn"
                                                                         type="button"
-                                                                    // onClick={handleApplyCoupon} // Function to apply the coupon
+                                                                        onClick={handleApplyCoupon}
+                                                                        disabled={couponLoading}   // 👈 THIS IS REQUIRED
                                                                     >
-                                                                        APPLY
+                                                                        {couponLoading ? "APPLYING..." : "APPLY"}
                                                                     </Button>
+                                                                    // <Button
+                                                                    //     variant=""
+                                                                    //     className="btn"
+                                                                    //     type="button"
+                                                                    //     onClick={handleApplyCoupon} // Function to apply the coupon
+                                                                    // >
+                                                                    //     APPLY
+                                                                    // </Button>
                                                                 )}
                                                             </InputGroup>
                                                         </div>
@@ -438,10 +561,10 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
 
                                                             {couponDetails && (
                                                                 <div className="d-flex justify-content-between mb-3 pb-3 border-bottom border-dark">
-                                                                    <p className="mb-0 fw-bold">STAFF ID</p>
+                                                                    <p className="mb-0 fw-bold">DISCOUNT</p>
                                                                     <span>
                                                                         {couponDetails.discount_type === "percentage" ? (
-                                                                            <>- {Math.floor(couponDetails.discount_value)}% ({currencySymbol}{formatSmartPrice(discountAmount)})</>
+                                                                            <> {Math.floor(couponDetails.discount_value)}% ({currencySymbol}{formatSmartPrice(discountAmount)})</>
                                                                         ) : (
                                                                             <>
                                                                                 -{" "}
@@ -474,43 +597,43 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
                                                     <h3 className="text-center mt-2">Cart is Empty</h3>
                                                 )}
 
-{cart.length > 0 && (
-                                                <div className="by-nw-btn accomofl-ck-bt">
-                                                    <Button
-                                                        variant=""
-                                                        className="btn"
-                                                        type="submit"
-                                                        style={{
-                                                            backgroundColor: "#df3b67ff",
-                                                            color: "white",
-                                                            borderRadius: "30px",
-                                                            padding: "10px 24px",
-                                                            fontWeight: "600",
-                                                            border: "none",
-                                                            width: "50%",          // full width hat gaya
-                                                            display: "block",
-                                                            margin: "20px auto 0",      // button center me aa jayega
-                                                            opacity: isBtnLoading ? 0.7 : 1,
-                                                            cursor: isBtnLoading ? "not-allowed" : "pointer"
-                                                        }}
-                                                        onClick={(e) => {
-                                                            if (finalTotal == 0) {
-                                                                e.preventDefault();
-                                                                handleFreeTicket();
-                                                            }
-                                                        }}
-                                                    >
-                                                        {finalTotal == 0
-                                                            ? "FREE TICKET"
-                                                            : "PURCHASE"}
+                                                {cart.length > 0 && (
+                                                    <div className="by-nw-btn accomofl-ck-bt">
+                                                        <Button
+                                                            variant=""
+                                                            className="btn"
+                                                            type="submit"
+                                                            style={{
+                                                                backgroundColor: "#df3b67ff",
+                                                                color: "white",
+                                                                borderRadius: "30px",
+                                                                padding: "10px 24px",
+                                                                fontWeight: "600",
+                                                                border: "none",
+                                                                width: "50%",          // full width hat gaya
+                                                                display: "block",
+                                                                margin: "20px auto 0",      // button center me aa jayega
+                                                                opacity: isBtnLoading ? 0.7 : 1,
+                                                                cursor: isBtnLoading ? "not-allowed" : "pointer"
+                                                            }}
+                                                            onClick={(e) => {
+                                                                if (finalTotal == 0) {
+                                                                    e.preventDefault();
+                                                                    handleFreeTicket();
+                                                                }
+                                                            }}
+                                                        >
+                                                            {finalTotal == 0
+                                                                ? "FREE TICKET"
+                                                                : "PURCHASE"}
 
-                                                    </Button>
-                                                </div>
-                                            )}
+                                                        </Button>
+                                                    </div>
+                                                )}
 
 
                                             </div>
-                                            
+
 
                                         </Col>
                                     </Row>
@@ -531,6 +654,7 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
                     taxApplied={taxAppliedStatus}
                     eventName={eventName}
                     eventImage={eventImage}
+                    discountAmount={discountAmount}
                 />
             )}
         </Modal>
