@@ -12,33 +12,27 @@ export default function CheckOutComponents({
     eventId,
     handleModalClose,
     showNextStep,
-    couponDetails,
     adminFees,
     donationFees,
     taxesInfo,
     taxApplied,
     eventImage,
     eventName,
-    // discountAmount
+    couponDetails
 }) {
 
-    console.log("----couponDetails--", couponDetails)
+
 
     const [userId, setUserId] = useState("");
-    let stripePromise;
-
-    stripePromise = loadStripe(
-        process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY
-    );
     const [isLoading, setIsLoading] = useState(true);
     const [clientSecret, setClientSecret] = useState("");
     const [cart, setCart] = useState([]);
-    // console.log("----cart", cart)
     const [currencySymbol, setCurrencySymbol] = useState("");
     const [currencyName, setCurrencyName] = useState("");
     const [ticketingFeeDetails, setTicketingFeeDetails] = useState();
-    // console.log('ticketingFeeDetails', ticketingFeeDetails);
     const router = useRouter();
+    const roundAmount = (val) => Math.round(Number(val) || 0);
+
 
     // Loading Component
     const LoadingComponent = ({ isActive }) =>
@@ -115,6 +109,7 @@ export default function CheckOutComponents({
         const decimal = amount - floor;
         return decimal >= threshold ? Math.ceil(amount) : floor;
     };
+
     const calculateTotalsV1 = ({
         cart = [],
         discountAmount = 0
@@ -125,7 +120,7 @@ export default function CheckOutComponents({
 
         // Calculate appointment total
         cart.forEach(item => {
-            if (item.item_type === "appointment") {
+            if (item.item_type == "appointment") {
                 const price = item.ticket_price || 0;
                 totalAppointmentPrice += price * (item.count || 1);
             }
@@ -156,8 +151,6 @@ export default function CheckOutComponents({
         };
     };
 
-
-
     const {
         breakdown
     } = calculateTotalsV1({
@@ -167,8 +160,6 @@ export default function CheckOutComponents({
     });
 
     const { ticketTotal, appointmentTotal, addonTotal, totalTicketAndAddonPrice, discountAmount, totalAfterDiscount, totalTax, finalTotalAmount, payableAmount } = breakdown;
-    console.log("discountAmount", discountAmount)
-    // return
     /////////////////////////////////Cart calculation End///////////////////////////////////
 
     // Fetch Member Profile
@@ -202,6 +193,7 @@ export default function CheckOutComponents({
         fetchCartDetails();
     }, [fetchCartDetails]);
     const intentCreatedRef = useRef(false);
+
     useEffect(() => {
         if (
             intentCreatedRef.current ||   // 🔒 already created
@@ -219,24 +211,38 @@ export default function CheckOutComponents({
                 const user = await fetchMemberProfile();
                 if (!user?.id) return;
 
+                const payload = {
+                    user_id: user.id,
+                    event_id: eventId,
+                    sub_total: appointmentTotal,
+                    tax_total: totalTax,
+                    grand_total: finalTotalAmount,
+                    currency: currencyName || "usd",
+                    discount_amount: discountAmount
+                        ? roundAmount(discountAmount || 0)
+                        : 0,
+
+                    cartData: cart.map(item => ({
+                        id: item.id,
+                        ticketId: item.raw.appointments.id,
+                        ticketType: item.item_type,
+                        quantity: item.count,
+                        price: Number(item.ticket_price),
+                    })),
+                };
+
+                // only attach coupon if valid
+                if (couponDetails?.code) {
+                    payload.appliedCoupon = {
+                        coupon_code: couponDetails.code,
+                    };
+                }
+
                 const { data } = await api.post(
                     "/api/v1/payment/create-payment-intent",
-                    {
-                        user_id: user.id,
-                        event_id: eventId,
-                        sub_total: appointmentTotal,
-                        tax_total: totalTax,
-                        grand_total: finalTotalAmount,
-                        currency: currencyName || "usd",
-                        discount_amount: discountAmount || 0,
-                        cartData: cart.map(item => ({
-                            ticketId: item.raw.appointments.id,
-                            ticketType: item.item_type,
-                            quantity: item.count,
-                            price: Number(item.ticket_price),
-                        })),
-                    }
+                    payload
                 );
+
 
                 setClientSecret(data?.data?.clientSecret);
             } catch (error) {
@@ -250,17 +256,15 @@ export default function CheckOutComponents({
         fetchClientSecret();
     }, [finalTotalAmount]); // ❗ cart dependency REMOVED
 
-
-
     return (
         <>
             <Modal.Header>
-                <Button onClick={() => showNextStep(false)}>
-                    <img
-                        alt=""
-                        className="wd-25"
-                        src={`/assets/img/front-images/caryes-ticket-lft-arow.png`}
-                    />
+                {/* BACK BUTTON (ICON) */}
+                <Button
+                    className="p-0 paynow-back"
+                    onClick={() => showNextStep(false)}
+                >
+                    <i className="bi bi-arrow-left fs-4"></i>
                 </Button>
 
                 <Button
@@ -316,7 +320,7 @@ export default function CheckOutComponents({
                                             {cart
                                                 .reduce((total, item) => {
                                                     const price =
-                                                        item.item_type === "appointment"
+                                                        item.item_type == "appointment"
                                                             ? item.ticket_price || 0
                                                             : 0;
                                                     return total + price * item.count;
@@ -380,7 +384,6 @@ export default function CheckOutComponents({
                     {clientSecret && (
                         <CheckoutForm
                             clientSecret={clientSecret}
-                            // stripePromise={stripePromise}
                             // userId={userId}
                             showNextStep={showNextStep}
                             finalPriceAfterDiscount={finalTotalAmount}

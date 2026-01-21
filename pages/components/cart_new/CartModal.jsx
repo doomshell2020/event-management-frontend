@@ -814,6 +814,7 @@ export default function CartModal({ show, handleClose, eventId }) {
 
     const [couponCode, setCouponCode] = useState("");
     const [appliedCoupon, setAppliedCoupon] = useState(null);
+    console.log('appliedCoupon :', appliedCoupon);
     const [couponLoading, setCouponLoading] = useState(false);
     const [couponError, setCouponError] = useState(null);
 
@@ -1874,7 +1875,6 @@ export default function CartModal({ show, handleClose, eventId }) {
                     handleModalClose={handleClose}
                     showNextStep={setShowNextStep}
                     adminFees={adminFees}
-                    couponDetails={null}
                     sub_total={sub_total}
                     tax_total={tax_total}
                     grand_total={grand_total}

@@ -9,9 +9,6 @@ import { useAuth } from "@/shared/layout-components/layout/AuthContext";
 import Swal from "sweetalert2";
 import CheckoutForm from "./CheckoutForm";
 
-/* Stripe Init */
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY);
-
 /* Round Helper */
 const roundAmount = (val) => Math.round(Number(val) || 0);
 
@@ -19,7 +16,6 @@ export default function CheckOutComponents({
   eventId,
   handleModalClose,
   showNextStep,
-  couponDetails,
   tax_total,
   grand_total,
   sub_total,
@@ -88,8 +84,8 @@ export default function CheckOutComponents({
           tax_total: roundAmount(tax_total),
           grand_total: roundAmount(grand_total),
           currency: currencyName,
-          discount_amount: appliedCoupon ? roundAmount(appliedCoupon?.discount || 0) : 0,
           cartData,
+          discount_amount: appliedCoupon ? roundAmount(appliedCoupon?.discount || 0) : 0,
           appliedCoupon
         }).then(res => {
           setClientSecret(res?.data?.data?.clientSecret);

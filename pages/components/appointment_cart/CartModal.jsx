@@ -55,6 +55,7 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
     const [coupon, setCoupon] = useState("");
     const [adminFees, setAdminFees] = useState(8);
     const [showNextStep, setShowNextStep] = useState(false);
+                
     // CART API FUNCTIONS
     const fetchCart = async (eventId) => {
         return await api.get(`/api/v1/cart/appointment-list?event_id=${eventId}`);
@@ -146,24 +147,7 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
     }, [show, eventId]);
 
 
-    // const currencySymbol = cart?.[0]?.currency_symbol || "";
-    // // tax_applied status
-    // const taxApplied = eventDetails?.wellness?.[0].tax_applied
-    // // Calculate Totals
-    // const totalTickets = cart.reduce((n, item) => n + item.count, 0);
-    // const priceTotal = cart.reduce((n, item) => n + item.count * item.ticket_price, 0);
-    // // const feeTotal = (priceTotal * adminFees) / 100;
-    // // If taxApplied = "Y" → apply admin fee  
-    // // If taxApplied = "N" → admin fee = 0
-    // const feeTotal = taxApplied === "Y" ? (priceTotal * adminFees) / 100 : 0;
-
-    // const finalTotal = priceTotal + feeTotal;
-
-    // let discountAmount = couponDetails?.discountAmt;
-
     const currencySymbol = cart?.[0]?.currency_symbol || "";
-
-    // tax_applied status
     const taxApplied = eventDetails?.wellness?.[0]?.tax_applied;
 
     // Calculate Totals
@@ -175,24 +159,14 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
 
     // Discount
     const discountAmount = couponDetails?.discountAmt || 0;
-
-    // Price after discount
     const discountedPriceTotal = priceTotal - discountAmount;
-
     // Admin Fee
-    // If taxApplied = "Y" → apply admin fee
-    // If taxApplied = "N" → admin fee = 0
     const feeTotal =
-        taxApplied === "Y"
+        taxApplied == "Y"
             ? (discountedPriceTotal * adminFees) / 100
             : 0;
-
     // Final Total (discount last applied)
     const finalTotal = discountedPriceTotal + feeTotal;
-
-
-
-
 
     const formatReadableDate = (dateStr) => {
         if (!dateStr) return "";
@@ -207,14 +181,10 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
 
     const formatTime = (timeString) => {
         if (!timeString) return "";
-
         let [hours, minutes] = timeString.split(":");
-
         hours = parseInt(hours);
         const suffix = hours >= 12 ? "PM" : "AM";
-
         hours = hours % 12 || 12; // Convert 0 -> 12, 13 -> 1
-
         return `${hours}:${minutes} ${suffix}`;
     };
 
@@ -353,13 +323,6 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
         setCouponError("");
         setCouponSuccessMessage("");
     };
-
-
-
-
-
-
-
 
 
     return (
@@ -648,13 +611,12 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
                     eventId={eventId}
                     handleModalClose={handleClose}
                     showNextStep={setShowNextStep}
-                    couponDetails={couponDetails}
                     adminFees={adminFees}
                     taxesInfo={ticketingFeeDetails}
                     taxApplied={taxAppliedStatus}
                     eventName={eventName}
                     eventImage={eventImage}
-                    discountAmount={discountAmount}
+                    couponDetails={couponDetails}
                 />
             )}
         </Modal>
