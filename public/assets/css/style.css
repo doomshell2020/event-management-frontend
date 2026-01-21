@@ -4130,7 +4130,7 @@ span.stp2-monte25-nm {
   font-size: 16px;
   text-transform: uppercase;
   font-family: var(--sathosi-bold-font-family);
-  margin-bottom: 40px;
+  /* margin-bottom: 40px; */
   color: var(--black-color);
   margin-top: 30px;
 }

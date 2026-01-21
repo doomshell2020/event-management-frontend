@@ -450,7 +450,6 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
                                                 {cart.length > 0 ? (
                                                     <div className="checkot-tct-purcs monte25-tct-purcs px-0 pb-0">
                                                         <div className="apply-cd mt-1">
-
                                                             {couponError && (
                                                                 <p
                                                                     style={{
