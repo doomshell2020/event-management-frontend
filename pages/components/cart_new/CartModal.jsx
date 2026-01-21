@@ -45,7 +45,6 @@ export default function CartModal({ show, handleClose, eventId }) {
 
     const finalEventId = eventId || eventData?.id;
 
-
     const [isLoading, setIsLoading] = useState(true);
     const [cartLoading, setCartLoading] = useState(false);
     const [loadingId, setLoadingId] = useState(null); // track which pricing ID is loading
@@ -813,14 +812,87 @@ export default function CartModal({ show, handleClose, eventId }) {
         }
     };
 
+    const [couponCode, setCouponCode] = useState("");
+    const [appliedCoupon, setAppliedCoupon] = useState(null);
+    const [couponLoading, setCouponLoading] = useState(false);
+    const [couponError, setCouponError] = useState(null);
+
+    const handleApplyCoupon = async () => {
+        setCouponError(null);
+
+        if (!couponCode.trim()) {
+            setCouponError("Please enter a coupon code");
+            return;
+        }
+
+        if (!/^[A-Z0-9]+$/.test(couponCode)) {
+            setCouponError("Only letters and numbers allowed (no spaces or special characters)");
+            return;
+        }
+
+
+        try {
+            setCouponLoading(true);
+
+            const response = await api.post("/api/v1/coupons/apply", {
+                coupon_code: couponCode.trim().toUpperCase(),
+                event_id: finalEventId,
+                total_amount: grand_total
+            });
+
+            if (response?.data?.success) {
+                setAppliedCoupon(response.data.data);
+                setCouponError(null);
+            }
+
+        } catch (error) {
+            const msg =
+                error?.response?.data?.error?.message ||
+                "Failed to apply coupon";
+
+            setCouponError(msg);
+            setAppliedCoupon(null);
+        } finally {
+            setCouponLoading(false);
+        }
+    };
+
+    const handleRemoveCoupon = () => {
+        setAppliedCoupon(null);
+        setCouponCode("");
+        setCouponError(null);
+    };
+
+    useEffect(() => {
+        if (appliedCoupon) {
+            setAppliedCoupon(null);
+            setCouponCode("");
+            setCouponError("Cart updated – please apply coupon again");
+        }
+    }, [cart]);
+
+
     // Calculate Totals
     const totalTickets = cart.reduce((n, item) => n + item.count, 0);
-    const sub_total = cart.reduce(
-        (n, item) => n + item.count * item.ticket_price,
-        0
-    );
+    const sub_total = cart.reduce((n, item) => n + item.count * item.ticket_price, 0);
     const tax_total = (sub_total * adminFees) / 100;
-    const grand_total = sub_total + tax_total;
+    // const grand_total = sub_total + tax_total;
+    let discountAmount = 0;
+
+    if (appliedCoupon) {
+        if (appliedCoupon.discount_type == "percentage") {
+            discountAmount = (sub_total * appliedCoupon.discount) / 100;
+        } else {
+            discountAmount = appliedCoupon.discount;
+        }
+
+        // Prevent discount from exceeding subtotal
+        if (discountAmount > sub_total) {
+            discountAmount = sub_total;
+        }
+    }
+    const grand_total = sub_total + tax_total - discountAmount;
+
 
     const formatEventDateRange = (start, end) => {
         if (!start || !end) return "";
@@ -1081,6 +1153,7 @@ export default function CartModal({ show, handleClose, eventId }) {
         }));
     };
 
+
     return (
         <Modal
             show={show}
@@ -1154,7 +1227,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                     </Col>
 
                                                     <Col md={7}>
-                                                    <h5 className="mb-3">Available Tickets</h5>
+                                                        <h5 className="mb-3">Available Tickets</h5>
                                                         {(eventData.tickets?.length > 0 || eventData.addons?.length > 0 || eventData.slots?.length > 0) && (
                                                             <div className="ticket-section">
                                                                 {/* 📦 PACKAGES */}
@@ -1280,7 +1353,6 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                                                 </>
                                                                                             )}
                                                                                         </div>
-
 
                                                                                         <div className="text-muted">
                                                                                             {currencySymbol}
@@ -1595,7 +1667,6 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                         );
                                                                     })}
 
-
                                                             </div>
 
                                                         )}
@@ -1648,17 +1719,62 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                         TOTAL {totalTickets} ITEM{totalTickets > 1 ? "S" : ""}
                                                     </h6>
 
+                                                    {/* applied coupon code section  */}
                                                     <div className="apply-cd my-3">
+
                                                         <InputGroup>
+
                                                             <input
                                                                 type="text"
-                                                                placeholder="Promo code"
-                                                                className="form-control"
+                                                                placeholder="Discount Code"
+                                                                className={`form-control ${appliedCoupon ? "text-decoration-line-through" : ""}`}
+                                                                value={couponCode}
+                                                                onChange={(e) => {
+                                                                    const value = e.target.value.toUpperCase();
+                                                                    const validValue = value.replace(/[^A-Z0-9]/g, "");
+                                                                    setCouponCode(validValue);
+                                                                }}
+                                                                disabled={appliedCoupon ? true : false}
                                                             />
+
+                                                            {!appliedCoupon ? (
+                                                                <button
+                                                                    className="btn btn-primary"
+                                                                    onClick={handleApplyCoupon}
+                                                                    disabled={couponLoading}
+                                                                >
+                                                                    {couponLoading ? "Applying..." : "Apply"}
+                                                                </button>
+                                                            ) : (
+                                                                <button
+                                                                    className="btn btn-danger"
+                                                                    onClick={handleRemoveCoupon}
+                                                                >
+                                                                    ✕
+                                                                </button>
+                                                            )}
+
                                                         </InputGroup>
+
+                                                        {/* ERROR MESSAGE */}
+                                                        {couponError && (
+                                                            <div className="text-danger mt-1" style={{ fontSize: "13px" }}>
+                                                                {couponError}
+                                                            </div>
+                                                        )}
+
+                                                        {/* SUCCESS MESSAGE */}
+                                                        {appliedCoupon && (
+                                                            <div className="mt-2 text-success" style={{ fontSize: "13px" }}>
+                                                                Coupon Applied! You saved {currencySymbol}{appliedCoupon.discount}
+                                                            </div>
+                                                        )}
+
                                                     </div>
 
+
                                                     <div className="tickt-ttl-prs">
+
                                                         <div className="d-flex justify-content-between mb-3 pb-3 border-bottom border-dark">
                                                             <p className="mb-0 fw-bold">PRICE</p>
                                                             <span>{currencySymbol}{formatPrice(sub_total)}</span>
@@ -1669,11 +1785,23 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                             <span>{currencySymbol}{formatPrice(tax_total)}</span>
                                                         </div>
 
+                                                        {/* DISCOUNT LINE – ONLY WHEN COUPON APPLIED */}
+                                                        {appliedCoupon && (
+                                                            <div className="d-flex justify-content-between mb-3 pb-3 border-bottom border-dark text-success">
+                                                                <p className="mb-0 fw-bold">DISCOUNT</p>
+                                                                <span>
+                                                                    - {currencySymbol}{formatPrice(discountAmount)}
+                                                                </span>
+                                                            </div>
+                                                        )}
+
                                                         <div className="d-flex justify-content-between total mb-3 pb-3 border-bottom border-dark">
                                                             <p className="mb-0 fw-bold">TOTAL</p>
                                                             <p>{currencySymbol}{formatPrice(grand_total)}</p>
                                                         </div>
+
                                                     </div>
+
 
                                                     {/* PAY NOW BUTTON */}
 
@@ -1750,6 +1878,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                     sub_total={sub_total}
                     tax_total={tax_total}
                     grand_total={grand_total}
+                    appliedCoupon={appliedCoupon}
                 />
             )
             }

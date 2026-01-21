@@ -128,10 +128,6 @@ const CheckoutForm = ({ showNextStep, clientSecret }) => {
             <div className="secnd-flw-trms">
                 <h3 className="terms-hd">Terms and Conditions</h3>
 
-
-
-
-
                 <p style={{ textIndent: "0" }}>
                     This Ticket Terms and Conditions, and Waiver and Release
                     (“Waiver and Release” or this “Agreement”), is entered into by
@@ -144,8 +140,6 @@ const CheckoutForm = ({ showNextStep, clientSecret }) => {
                     ONDALINDA X CAREYES may collectively be referred
                     hereinafter as the &quot;Parties.&quot;
                 </p>
-
-
 
                 <p style={{ textIndent: "0" }}>
                     WHEREAS the Participant wishes to attend the Event;
@@ -162,11 +156,10 @@ const CheckoutForm = ({ showNextStep, clientSecret }) => {
                     CAREYES, upon the terms and conditions hereinafter set forth;
                     and
                 </p>
+
                 <p style={{ textIndent: "0" }}>
                     WHEREAS the terms set forth below are applicable to all participants of the Event for the duration of their stay and participation at the Event.
                 </p>
-
-
 
                 <p style={{ textIndent: "0" }}>
                     By purchasing and/or using an Event ticket, you agree to be
@@ -176,6 +169,7 @@ const CheckoutForm = ({ showNextStep, clientSecret }) => {
                     festival that will be held in Costa Careyes in Jalisco, Mexico, on
                     November 6, 2025 through November 9, 2025.
                 </p>
+
                 <p style={{ textIndent: "0" }}>
                     For good and valuable consideration, the Parties agree as
                     follows:
@@ -189,7 +183,6 @@ const CheckoutForm = ({ showNextStep, clientSecret }) => {
                     November 9, 2025) (the “Term”) unless otherwise expressed in
                     this Agreement.
                 </p>
-
 
                 <h6 style={{ fontWeight: "400" }}>LIMITATION OF LIABILITY</h6>
                 <ol type="1">
@@ -216,6 +209,7 @@ const CheckoutForm = ({ showNextStep, clientSecret }) => {
                     </li>
                 </ol>
             </div>
+
             <div className="terms-check">
                 <Form.Check
                     required
@@ -255,6 +249,7 @@ const CheckoutForm = ({ showNextStep, clientSecret }) => {
                     </Col>
                 </Row>
             </div>
+
         </Form>
         </div>
     );

@@ -3,16 +3,14 @@ import { Button, Col, Row, Modal } from "react-bootstrap";
 import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/router";
-import CheckoutForm from "./CheckoutForm";
 import api from "@/utils/api";
 import { useCart } from "@/shared/layout-components/layout/CartContext";
 import { useAuth } from "@/shared/layout-components/layout/AuthContext";
 import Swal from "sweetalert2";
+import CheckoutForm from "./CheckoutForm";
 
 /* Stripe Init */
-const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY
-);
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY);
 
 /* Round Helper */
 const roundAmount = (val) => Math.round(Number(val) || 0);
@@ -25,6 +23,7 @@ export default function CheckOutComponents({
   tax_total,
   grand_total,
   sub_total,
+  appliedCoupon
 }) {
   const { cart, eventData, loginUserId } = useCart();
 
@@ -89,8 +88,9 @@ export default function CheckOutComponents({
           tax_total: roundAmount(tax_total),
           grand_total: roundAmount(grand_total),
           currency: currencyName,
-          discount_amount: 0,
+          discount_amount: appliedCoupon ? roundAmount(appliedCoupon?.discount || 0) : 0,
           cartData,
+          appliedCoupon
         }).then(res => {
           setClientSecret(res?.data?.data?.clientSecret);
         });
@@ -185,6 +185,7 @@ export default function CheckOutComponents({
           <h3>YOUR TICKETS</h3>
 
           <Row className="align-items-end justify-content-between">
+            {/* TICKET LIST */}
             <Col md={12}>
               <div className="amnt-stl-inr amout-first-row">
                 {cart.map((el, i) => (
@@ -204,16 +205,19 @@ export default function CheckOutComponents({
               </div>
             </Col>
 
+            {/* AMOUNT BREAKDOWN */}
             <Col md={12}>
               <div className="amnt-stl-inr pt-4">
+                {/* SUB TOTAL */}
                 <div className="tct-amt">
-                  <p>TOTAL :</p>
+                  <p>SUB TOTAL :</p>
                   <span>
                     {currencySymbol}
                     {roundAmount(sub_total).toLocaleString()}
                   </span>
                 </div>
 
+                {/* TAX */}
                 <div className="tct-amt mb-2">
                   <p>TAXES & FEES :</p>
                   <span>
@@ -221,14 +225,31 @@ export default function CheckOutComponents({
                     {roundAmount(tax_total).toLocaleString()}
                   </span>
                 </div>
+
+                {/* DISCOUNT (ONLY IF APPLIED) */}
+                {appliedCoupon && appliedCoupon.discount > 0 && (
+                  <div className="tct-amt mb-2 text-success">
+                    <p>
+                      DISCOUNT :{" "}
+                      <span className="fw-normal">
+                        ({appliedCoupon.coupon_code})
+                      </span>
+                    </p>
+                    <span>
+                      - {currencySymbol}
+                      {roundAmount(appliedCoupon.discount).toLocaleString()}
+                    </span>
+                  </div>
+                )}
               </div>
             </Col>
           </Row>
 
+          {/* GRAND TOTAL */}
           <Row className="ttl-amts justify-content-between border-0">
             <Col md={12}>
               <div className="tct-amt amount-last-row">
-                <p>TOTAL:</p>
+                <p>GRAND TOTAL :</p>
                 <p>
                   {currencySymbol}
                   {roundAmount(grand_total).toLocaleString()}
@@ -237,6 +258,7 @@ export default function CheckOutComponents({
             </Col>
           </Row>
         </div>
+
 
         {clientSecret && (
           <CheckoutForm
