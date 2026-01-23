@@ -169,11 +169,11 @@ export default function OrganizerEvents({ userId }) {
                 });
             }
         } catch (error) {
-            console.error("Delete error:", error);
+            // console.error("Delete error:", error);
             Swal.fire({
                 icon: "error",
-                title: "Error",
-                text: "Something went wrong. Please try again later.",
+                title: "Oops!",
+                text: error.response.data.error.message || "Something went wrong. Please try again later.",
             });
         }
     };

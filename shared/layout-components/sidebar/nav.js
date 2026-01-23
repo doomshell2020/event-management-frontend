@@ -26,7 +26,7 @@ export const MENUITEMS = [
     ],
   },
 
-{
+  {
     Items: [
       {
         title: "Finance",
@@ -57,7 +57,30 @@ export const MENUITEMS = [
     ],
   },
 
+  {
+    Items: [
+      {
+        title: "Events",
+        icon: (
+          <svg
+            className="side-menu__icon"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            width="24"
+            height="24"
+          >
+            <path d="M19 3h-1V1h-2v2H8V1H6v2H5a2 2 0 00-2 2v16a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2zm0 18H5V8h14v13z" />
+          </svg>
 
+        ),
+        type: "sub",
+        selected: false,
+        active: false,
+        path: `/admin/events`,
+        type: "link",
+      },
+    ],
+  },
 
   {
     Items: [
@@ -121,34 +144,6 @@ export const MENUITEMS = [
         path: `/admin/customer`,
       },
     ]
-  },
-
-
-
-
-  {
-    Items: [
-      {
-        title: "Events",
-        icon: (
-          <svg
-            className="side-menu__icon"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            width="24"
-            height="24"
-          >
-            <path d="M19 3h-1V1h-2v2H8V1H6v2H5a2 2 0 00-2 2v16a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2zm0 18H5V8h14v13z" />
-          </svg>
-
-        ),
-        type: "sub",
-        selected: false,
-        active: false,
-        path: `/admin/events`,
-        type: "link",
-      },
-    ],
   },
 
   {
@@ -322,7 +317,7 @@ export const MENUITEMS = [
       },
     ],
   },
-  
+
 
 
 
