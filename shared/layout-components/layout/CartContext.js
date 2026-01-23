@@ -11,15 +11,15 @@ export const CartProvider = ({ children }) => {
     const [slotCart, setSlotCart] = useState([]);
     const [normalCart, setNormalCart] = useState([]);
     const [addonCart, setAddonCart] = useState([]);
-    const [eventId, setEventId] = useState(null); // ✔ store eventId globally
-    const [loginUserId, setLoginUserId] = useState(null); // ✔ store eventId globally
+    const [eventId, setEventId] = useState(null);
+    const [loginUserId, setLoginUserId] = useState(null);
+    const [charges, setCharges] = useState({});
 
-    /* 🔥 NEW: COMMITTEE STATES */
+    /* NEW: COMMITTEE STATES */
     const [committeeAssigned, setCommitteeAssigned] = useState(false);
     const [committeePendingCount, setCommitteePendingCount] = useState(0);
 
-
-    // 🟢 MAIN CART LOADER (Uses internal eventId when nothing passed)
+    // MAIN CART LOADER (Uses internal eventId when nothing passed)
     const fetchCart = async (passedEventId = null) => {
         try {
             setLoadingCart(true);
@@ -33,9 +33,13 @@ export const CartProvider = ({ children }) => {
             const query = finalEventId ? `?event_id=${finalEventId}` : "";
             const res = await api.get(`/api/v1/cart/list${query}`);
             const data = res?.data?.data || {};
+
+            const charges = data?.charges;
+
             const userInfoId = data?.user_id;
             const event = data.event || null;
             const cartItems = data.cart || [];
+            setCharges(charges);
 
             /* 🔥 COMMITTEE DATA */
             const committee = data?.committee || {};
@@ -88,7 +92,7 @@ export const CartProvider = ({ children }) => {
         }
     };
 
-    // 🟢 GLOBAL CART LOAD ON APP START (No event selected)
+    // GLOBAL CART LOAD ON APP START (No event selected)
     useEffect(() => {
         fetchCart(eventId || undefined); // load general cart (no event)
     }, []);
@@ -115,7 +119,8 @@ export const CartProvider = ({ children }) => {
                 refreshCart: fetchCart, // refreshCart(eventId)
                 setCart,
                 setCartCount,
-                setEventId,             // allow components to set eventId
+                setEventId, // allow components to set eventId
+                charges
             }}
         >
             {children}

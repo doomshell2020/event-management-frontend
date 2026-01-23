@@ -42,8 +42,7 @@ const LoadingComponent = ({ isActive }) => {
 
 export default function CartModal({ show, handleClose, eventId }) {
 
-    const { cart, refreshCart, eventData, normalCart, addonCart, slotCart, loadingCart, setEventId } = useCart();
-
+    const { cart, refreshCart, eventData, normalCart, addonCart, slotCart, loadingCart, setEventId, charges } = useCart();
     const finalEventId = eventId || eventData?.id;
 
     const [isLoading, setIsLoading] = useState(true);
@@ -51,10 +50,19 @@ export default function CartModal({ show, handleClose, eventId }) {
     const [loadingId, setLoadingId] = useState(null); // track which pricing ID is loading
     const [adminFees, setAdminFees] = useState(8);
     const [showNextStep, setShowNextStep] = useState(false);
+    const [platformFee, setPlatformFee] = useState({})
 
     const currencySymbol = eventData?.currencyName?.Currency_symbol || "₹";
     const currencyName = (eventData?.currencyName?.Currency || "INR").toLowerCase();
     const ticket_limit = (eventData?.ticket_limit || 0);
+
+    useEffect(() => {
+        if (charges) {
+            setPlatformFee(charges)
+        }
+    }, [charges]);
+
+
 
     useEffect(() => {
         setIsLoading(loadingCart);
@@ -815,7 +823,6 @@ export default function CartModal({ show, handleClose, eventId }) {
 
     const [couponCode, setCouponCode] = useState("");
     const [appliedCoupon, setAppliedCoupon] = useState(null);
-    console.log('appliedCoupon :', appliedCoupon);
     const [couponLoading, setCouponLoading] = useState(false);
     const [couponError, setCouponError] = useState(null);
 
@@ -893,6 +900,7 @@ export default function CartModal({ show, handleClose, eventId }) {
             discountAmount = sub_total;
         }
     }
+
     const grand_total = sub_total + tax_total - discountAmount;
 
 
@@ -1685,7 +1693,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                                         <div className="checkot-rgt chackout-box">
                                             {cart?.length > 0 ? (
                                                 <div className="checkot-tct-purcs monte25-tct-purcs px-0 pb-0">
-                                                    <h2>Checkout</h2>
+                                                    {/* <h2>Checkout</h2> */}
                                                     <div className="monte25-tct-purcs">
                                                         <h6>YOUR TICKETS</h6>
 
