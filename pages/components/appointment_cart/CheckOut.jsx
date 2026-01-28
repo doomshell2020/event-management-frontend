@@ -18,9 +18,11 @@ export default function CheckOutComponents({
     taxApplied,
     eventImage,
     eventName,
-    couponDetails
+    couponDetails,
+    taxBreakdown
 }) {
-
+    console.log("taxBreakdown-check-out-model",taxBreakdown)
+    console.log("adminFees--check",adminFees)
 
 
     const [userId, setUserId] = useState("");
@@ -134,7 +136,8 @@ export default function CheckOutComponents({
         // Admin fee (8%)
         const ADMIN_FEE_PERCENT = 8;
         // const adminFee = round2((discountedTotal * ADMIN_FEE_PERCENT) / 100);
-        const adminFee = taxApplied == "Y" ? round2((discountedTotal * ADMIN_FEE_PERCENT) / 100) : 0;
+        // const adminFee = taxApplied == "Y" ? round2((discountedTotal * ADMIN_FEE_PERCENT) / 100) : 0;
+        const adminFee = adminFees || 0;
         // Final amount
         const finalTotalAmount = round2(discountedTotal + adminFee);
         return {
@@ -229,6 +232,7 @@ export default function CheckOutComponents({
                         quantity: item.count,
                         price: Number(item.ticket_price),
                     })),
+                    taxBreakdown:taxBreakdown
                 };
 
                 // only attach coupon if valid
@@ -314,7 +318,7 @@ export default function CheckOutComponents({
                             <Col xl={5} md={6}>
                                 <div className="amnt-stl-inr d-flex justify-content-between">
                                     <div className="tct-amt gap-2">
-                                        <p>APPOINTMENTS: </p>
+                                        <p>SUB TOTAL: </p>
                                         <span>
                                             {currencySymbol}
                                             {cart
@@ -329,10 +333,10 @@ export default function CheckOutComponents({
                                         </span>
                                     </div>
                                     <div className="tct-amt gap-2">
-                                        <p>TAXES & FEES :</p>{" "}
+                                        <p>PLATFORM & PAYMENT GATEWAY FEE :</p>{" "}
                                         <span>
                                             {currencySymbol}
-                                            {formatSmartPrice(totalTax)}
+                                            {Math.round(formatSmartPrice(totalTax))}
                                         </span>
                                     </div>
                                 </div>
@@ -343,7 +347,7 @@ export default function CheckOutComponents({
                                         <p>TOTAL:</p>{" "}
                                         <span>
                                             {currencySymbol}
-                                            {finalTotalAmount}
+                                            {Math.round(finalTotalAmount)}
                                         </span>
                                     </div>
                                 </div>

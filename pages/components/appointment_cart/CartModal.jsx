@@ -12,7 +12,7 @@ import CheckOut from "./CheckOut";
 import Image from "next/image";
 import api from "@/utils/api";
 import Swal from "sweetalert2"; // Import SweetAlert
-
+import { useCart } from "@/shared/layout-components/layout/CartContext";
 // Loader Component
 const LoadingComponent = ({ isActive }) => {
     if (!isActive) return null;
@@ -43,6 +43,7 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
     const [couponLoading, setCouponLoading] = useState(false);
     const [eventDetails, setEventDetails] = useState({});
     const [currency, setCurrency] = useState('');
+    const { charges } = useCart();
     const [taxAppliedStatus, setTaxAppliedStatus] = useState('');
     const [eventName, setEventName] = useState('');
     const [eventImage, setEventImage] = useState('');
@@ -55,7 +56,15 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
     const [coupon, setCoupon] = useState("");
     const [adminFees, setAdminFees] = useState(8);
     const [showNextStep, setShowNextStep] = useState(false);
-                
+    const [platformFee, setPlatformFee] = useState({})
+
+    console.log("platformFee---platformFee---", platformFee);
+    useEffect(() => {
+        if (charges) {
+            setPlatformFee(charges)
+        }
+    }, [charges]);
+
     // CART API FUNCTIONS
     const fetchCart = async (eventId) => {
         return await api.get(`/api/v1/cart/appointment-list?event_id=${eventId}`);
@@ -160,14 +169,58 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
     // Discount
     const discountAmount = couponDetails?.discountAmt || 0;
     const discountedPriceTotal = priceTotal - discountAmount;
-    // Admin Fee
-    const feeTotal =
-        taxApplied == "Y"
-            ? (discountedPriceTotal * adminFees) / 100
+    // TAX CALCULATION
+
+    // Platform Fee Tax (on priceTotal)
+    const platformFeeTax =
+        taxApplied === "Y"
+            ? (discountedPriceTotal * platformFee.platform_fee_percent) / 100
             : 0;
+
+    // Payment Gateway Tax (on priceTotal + platformFeeTax)
+    const paymentGatewayTax =
+        taxApplied === "Y"
+            ? ((discountedPriceTotal + platformFeeTax) *
+                platformFee.payment_gateway_percent) /
+            100
+            : 0;
+
+    console.log("platformFeeTax--", platformFeeTax)
+    console.log("paymentGatewayTax--", paymentGatewayTax)
+
+    // Total Fee (sum of both taxes)
+    const feeTotal = platformFeeTax + paymentGatewayTax;
+
+    // Admin Fee
+    // const feeTotal =
+    //     taxApplied == "Y"
+    //         ? (discountedPriceTotal * adminFees) / 100
+    //         : 0;
+
+    const taxBreakdown = {
+        platform_fee_tax: platformFeeTax,
+        payment_gateway_tax: paymentGatewayTax,
+        platform_fee_percent: platformFee?.platform_fee_percent || 0,
+        payment_gateway_percent: platformFee?.payment_gateway_percent || 0
+    };
+
+    // const taxBreakdown = {
+    //     platformFee: {
+    //         percentage: platformFee?.platform_fee_percent || 0,
+    //         amount: platformFeeTax,
+    //     },
+    //     paymentGatewayFee: {
+    //         percentage: platformFee?.payment_gateway_percent || 0,
+    //         amount: paymentGatewayTax,
+    //     },
+    //     totalTax: feeTotal,
+    // };
+
+
+    console.log("taxBreakdown", taxBreakdown)
+
     // Final Total (discount last applied)
     const finalTotal = discountedPriceTotal + feeTotal;
-
     const formatReadableDate = (dateStr) => {
         if (!dateStr) return "";
         const date = new Date(dateStr);
@@ -539,10 +592,10 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
                                                             )}
 
                                                             <div className="d-flex justify-content-between mb-3 pb-3 border-bottom border-dark">
-                                                                <p className="mb-0 fw-bold">TICKETS FEES & TAXES</p>
+                                                                <p className="mb-0 fw-bold">PLATFORM & PAYMENT GATEWAY FEE</p>
                                                                 <span>
                                                                     {currencySymbol}{" "}
-                                                                    {feeTotal.toFixed(2)}
+                                                                    {Math.round(feeTotal.toFixed(2))}
                                                                 </span>
                                                             </div>
 
@@ -550,7 +603,7 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
                                                                 <p className="mb-0 fw-bold">TOTAL</p>
                                                                 <p>
                                                                     {currencySymbol}{" "}
-                                                                    {finalTotal.toFixed(2)}
+                                                                    {Math.round(finalTotal.toFixed(2))}
                                                                 </p>
                                                             </div>
                                                         </div>
@@ -610,12 +663,14 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
                     eventId={eventId}
                     handleModalClose={handleClose}
                     showNextStep={setShowNextStep}
-                    adminFees={adminFees}
+                    adminFees={feeTotal}
                     taxesInfo={ticketingFeeDetails}
                     taxApplied={taxAppliedStatus}
                     eventName={eventName}
                     eventImage={eventImage}
                     couponDetails={couponDetails}
+                    taxBreakdown={taxBreakdown}
+                    
                 />
             )}
         </Modal>
