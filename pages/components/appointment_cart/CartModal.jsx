@@ -58,7 +58,6 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
     const [showNextStep, setShowNextStep] = useState(false);
     const [platformFee, setPlatformFee] = useState({})
 
-    console.log("platformFee---platformFee---", platformFee);
     useEffect(() => {
         if (charges) {
             setPlatformFee(charges)
@@ -185,9 +184,6 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
             100
             : 0;
 
-    console.log("platformFeeTax--", platformFeeTax)
-    console.log("paymentGatewayTax--", paymentGatewayTax)
-
     // Total Fee (sum of both taxes)
     const feeTotal = platformFeeTax + paymentGatewayTax;
 
@@ -215,9 +211,6 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
     //     },
     //     totalTax: feeTotal,
     // };
-
-
-    console.log("taxBreakdown", taxBreakdown)
 
     // Final Total (discount last applied)
     const finalTotal = discountedPriceTotal + feeTotal;

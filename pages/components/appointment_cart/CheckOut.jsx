@@ -21,10 +21,6 @@ export default function CheckOutComponents({
     couponDetails,
     taxBreakdown
 }) {
-    console.log("taxBreakdown-check-out-model",taxBreakdown)
-    console.log("adminFees--check",adminFees)
-
-
     const [userId, setUserId] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const [clientSecret, setClientSecret] = useState("");
