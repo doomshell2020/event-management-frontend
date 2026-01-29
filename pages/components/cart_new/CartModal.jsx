@@ -884,7 +884,28 @@ export default function CartModal({ show, handleClose, eventId }) {
     // Calculate Totals
     const totalTickets = cart.reduce((n, item) => n + item.count, 0);
     const sub_total = cart.reduce((n, item) => n + item.count * item.ticket_price, 0);
-    const tax_total = (sub_total * adminFees) / 100;
+    // const tax_total = (sub_total * adminFees) / 100;
+
+    // Platform Fee Tax
+    const platformFeeTax = platformFee?.platform_fee_percent
+        ? (sub_total * platformFee.platform_fee_percent) / 100
+        : 0;
+
+    // Payment Gateway Tax (on sub_total + platformFeeTax)
+    const paymentGatewayTax = platformFee?.payment_gateway_percent
+        ? ((sub_total + platformFeeTax) * platformFee.payment_gateway_percent) / 100
+        : 0;
+
+    // Total Fee (sum of both taxes)
+    const tax_total = platformFeeTax + paymentGatewayTax;
+
+    const taxBreakdown = {
+        platform_fee_tax: platformFeeTax,
+        payment_gateway_tax: paymentGatewayTax,
+        platform_fee_percent: platformFee?.platform_fee_percent || 0,
+        payment_gateway_percent: platformFee?.payment_gateway_percent || 0
+    };
+
     // const grand_total = sub_total + tax_total;
     let discountAmount = 0;
 
@@ -1791,7 +1812,8 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                             </div>
 
                                                             <div className="d-flex justify-content-between mb-3 pb-3 border-bottom border-dark">
-                                                                <p className="mb-0 fw-bold">FEES ({adminFees}%)</p>
+                                                                {/* <p className="mb-0 fw-bold">FEES ({adminFees}%)</p> */}
+                                                                <p className="mb-0 fw-bold">PLATFORM & PAYMENT GATEWAY FEE</p>
                                                                 <span>{currencySymbol}{formatPrice(tax_total)}</span>
                                                             </div>
 
@@ -1889,6 +1911,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                     tax_total={tax_total}
                     grand_total={grand_total}
                     appliedCoupon={appliedCoupon}
+                    taxBreakdown={taxBreakdown}
                 />
             )
             }

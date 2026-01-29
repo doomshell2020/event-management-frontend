@@ -19,10 +19,10 @@ export default function CheckOutComponents({
   tax_total,
   grand_total,
   sub_total,
-  appliedCoupon
+  appliedCoupon,
+  taxBreakdown
 }) {
   const { cart, eventData, loginUserId } = useCart();
-
   const router = useRouter();
   const [clientSecret, setClientSecret] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -86,7 +86,8 @@ export default function CheckOutComponents({
           currency: currencyName,
           cartData,
           discount_amount: appliedCoupon ? roundAmount(appliedCoupon?.discount || 0) : 0,
-          appliedCoupon
+          appliedCoupon,
+          taxBreakdown:taxBreakdown
         }).then(res => {
           setClientSecret(res?.data?.data?.clientSecret);
         });
