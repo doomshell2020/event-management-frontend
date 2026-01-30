@@ -28,10 +28,8 @@ const ManagePackages = () => {
     const [ticketsList, setTicketList] = useState([]);
     const [addonsList, setAddonsList] = useState([]);
     const [packageList, setPackageList] = useState([]);
-    // console.log('packageList :', packageList);
 
     const currencyName = eventDetails?.currencyName.Currency_symbol;
-    // console.log('currencyName :', currencyName);
 
     // fetch addons list
     const handleGetPackagesList = async () => {
@@ -71,8 +69,13 @@ const ManagePackages = () => {
         try {
             setLoading(true);
             const res = await api.get(`/api/v1/tickets/list/${id}`);
+            // console.log('res :', res);
             if (res.data.success) {
-                setTicketList(res.data.data || []);
+                const filteredTickets = (res.data.data || []).filter(
+                    (ticket) => ticket.type != "comps"
+                );
+                // console.log('filteredTickets :', filteredTickets);
+                setTicketList(filteredTickets);
             } else {
                 setTicketList([]);
             }
@@ -113,7 +116,8 @@ const ManagePackages = () => {
                     api.get(`/api/v1/addons/list/${id}`),
                     api.get(`/api/v1/tickets/list/${id}`)
                 ]);
-
+                
+                // console.log('ticketsRes :', ticketsRes.data.data);
                 // ✅ Handle packages
                 if (packagesRes.data.success) {
                     setPackageList(packagesRes.data.data || []);
@@ -135,10 +139,15 @@ const ManagePackages = () => {
 
                 // ✅ Handle tickets
                 if (ticketsRes.data.success) {
-                    setTicketList(ticketsRes.data.data || []);
+                    const filteredTickets = (ticketsRes.data.data || []).filter(
+                        (ticket) => ticket.type != "comps"
+                    );
+                    // console.log('filteredTickets :', filteredTickets);
+                    setTicketList(filteredTickets || []);
                 } else {
                     setTicketList([]);
                 }
+
 
             } catch (error) {
                 console.error("Error fetching data:", error);
@@ -359,7 +368,7 @@ const ManagePackages = () => {
             <section id="myevent-deshbord">
                 <div className="d-flex">
                     {/* Sidebar */}
-                    <EventSidebar eventId={id}  eventDetails={eventDetails}/>
+                    <EventSidebar eventId={id} eventDetails={eventDetails} />
 
                     <div className="event-righcontent">
                         <div className="dsa_contant">

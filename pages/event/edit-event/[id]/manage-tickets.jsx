@@ -20,6 +20,14 @@ const ManageTickets = () => {
     const [complimentary, setComplimentary] = useState(false);
     const [openDropdown, setOpenDropdown] = useState(null);
     const currencyName = eventDetails?.currencyName?.Currency_symbol || null;
+    const eventTypes = eventDetails?.entry_type || null;
+    // console.log('eventDetails :', eventDetails);
+
+    const [accessTypeLabels, setAccessTypeLabels] = useState({
+        event: "Full Event Access",
+        slot: "Specific Slot Access",
+        day: "Single Day Access",
+    })
 
     // Ticket form state
     const [ticketForm, setTicketForm] = useState({
@@ -31,6 +39,32 @@ const ManageTickets = () => {
         access_type: "",
         ticketImage: null,
     });
+
+    // console.log('ticketForm :', ticketForm);
+    useEffect(() => {
+        if (eventTypes == "multi") {
+            setTicketForm((prev) => ({
+                ...prev,
+                type: "open_sales",
+            }));
+        }
+
+        if (eventTypes == "event") {
+            setTicketForm((prev) => ({
+                ...prev,
+                access_type: "event",
+            }));
+        }
+
+        if (eventTypes == "multi") {
+            setTicketForm((prev) => ({
+                ...prev,
+                price: 0, // set to zero
+            }));
+        }
+
+
+    }, [eventTypes]);
 
     // console.log('ticketForm :', ticketForm);
     const [ticketId, setTicketId] = useState(null);
@@ -224,7 +258,7 @@ const ManageTickets = () => {
             <section id="myevent-deshbord">
                 <div className="d-flex">
                     {/* Sidebar */}
-                    <EventSidebar eventId={id}  eventDetails={eventDetails}/>
+                    <EventSidebar eventId={id} eventDetails={eventDetails} />
 
                     <div className="event-righcontent">
                         <div className="dsa_contant">
@@ -327,7 +361,7 @@ const ManageTickets = () => {
                                                     )}
                                                 </p>
 
-                                                <div className="row manage-ticket-rows"> 
+                                                <div className="row manage-ticket-rows">
                                                     {/* TYPE */}
                                                     <div className="col-md-3">
                                                         <p className="body-text mb-0 d-flex align-items-center manage-ticket-table">
@@ -343,9 +377,10 @@ const ManageTickets = () => {
                                                     {/* ACCESS TYPE */}
                                                     <div className="col-md-3">
                                                         <p className="body-text mb-0 d-flex align-items-center manage-ticket-table">
-                                                            {ticket.access_type}
+                                                            {accessTypeLabels[ticket.access_type] || "N/A"}
                                                         </p>
                                                     </div>
+
 
                                                     {/* NON-COMPS STATUS */}
                                                     {ticket.type !== "comps" ? (
@@ -630,30 +665,42 @@ const ManageTickets = () => {
                                     required
                                     value={ticketForm.type}
                                     onChange={handleInputChange}
+                                    disabled={eventTypes == "multi"}
                                 >
                                     <option value="">Choose Type</option>
                                     <option value="open_sales">Open Sales</option>
                                     <option value="committee_sales">Committee Sales</option>
                                 </select>
-                                <div className="invalid-feedback">Please select ticket type.</div>
+
+                                <div className="invalid-feedback">
+                                    Please select ticket type.
+                                </div>
                             </div>
+
 
                             <div className="col-md-6">
                                 <label className="form-label">Price</label>
                                 <input
                                     type="number"
                                     name="price"
-                                    required
                                     value={ticketForm.price}
                                     onChange={(e) => {
-                                        e.target.value = e.target.value.replace(/[^a-zA-Z0-9 ]/g, "");
-                                        handleInputChange(e);
+                                        // only allow changes if not multi
+                                        if (eventTypes != "multi") {
+                                            e.target.value = e.target.value.replace(/[^0-9]/g, "");
+                                            handleInputChange(e);
+                                        }
                                     }}
                                     placeholder="Price"
                                     className="form-control"
+                                    readOnly={eventTypes == "multi"} // readonly for multi
+                                    required={eventTypes != "multi"} // required only if editable
                                 />
-                                <div className="invalid-feedback">Please enter price.</div>
+                                {eventTypes !== "multi" && (
+                                    <div className="invalid-feedback">Please enter price.</div>
+                                )}
                             </div>
+
 
                             <div className="col-md-6">
                                 <label className="form-label">Count</label>
@@ -672,22 +719,39 @@ const ManageTickets = () => {
                             </div>
 
                             <div className="col-md-6">
-                                <label className="form-label">Access Type</label>
+                                <label className="form-label">
+                                    Access Type <span className="text-danger">*</span>
+                                </label>
+
                                 <select
                                     name="access_type"
-                                    required
                                     className="form-select"
-                                    value={ticketForm.access_type}
+                                    value={ticketForm.access_type || ""}
                                     onChange={handleInputChange}
+                                    required
                                 >
-                                    <option value="">Choose One</option>
-                                    <option value="event">Event</option>
-                                    <option value="slot">Slot</option>
-                                    <option value="day">Day</option>
+                                    <option value="" disabled>
+                                        Select Access Type
+                                    </option>
+
+                                    <option value="event">
+                                        Full Event Access
+                                    </option>
+
+                                    {eventTypes == "multi" && (
+                                        <>
+                                            <option value="slot">Specific Slot Access</option>
+                                            <option value="day">Single Day Access</option>
+                                        </>
+                                    )}
                                 </select>
 
-                                <div className="invalid-feedback">Please select access type.</div>
+                                <div className="invalid-feedback">
+                                    Please select an access type.
+                                </div>
                             </div>
+
+
 
                             <div className="col-md-6">
                                 <label className="form-label">Visibility</label>
