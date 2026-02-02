@@ -165,33 +165,36 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
         0
     );
 
-    // Discount
-    const discountAmount = couponDetails?.discountAmt || 0;
-    const discountedPriceTotal = priceTotal - discountAmount;
-    // TAX CALCULATION
-
-    // Platform Fee Tax (on priceTotal)
+    // --------------------
+    // DISCOUNT
+    // --------------------
+    const discountAmount = Number(couponDetails?.discountAmt || 0);
+ 
     const platformFeeTax =
         taxApplied === "Y"
-            ? (discountedPriceTotal * platformFee.platform_fee_percent) / 100
+            ? (priceTotal * platformFee.platform_fee_percent) / 100
             : 0;
 
     // Payment Gateway Tax (on priceTotal + platformFeeTax)
     const paymentGatewayTax =
         taxApplied === "Y"
-            ? ((discountedPriceTotal + platformFeeTax) *
+            ? ((priceTotal + platformFeeTax) *
                 platformFee.payment_gateway_percent) /
             100
             : 0;
 
-    // Total Fee (sum of both taxes)
+    // --------------------
+    // TOTAL FEES
+    // --------------------
     const feeTotal = platformFeeTax + paymentGatewayTax;
 
-    // Admin Fee
-    // const feeTotal =
-    //     taxApplied == "Y"
-    //         ? (discountedPriceTotal * adminFees) / 100
-    //         : 0;
+    // --------------------
+    // FINAL TOTAL
+    // --------------------
+    const finalTotal = Math.max(
+        priceTotal + feeTotal - discountAmount,
+        0 // safety: negative total nahi jaane dega
+    );
 
     const taxBreakdown = {
         platform_fee_tax: platformFeeTax,
@@ -200,20 +203,7 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
         payment_gateway_percent: platformFee?.payment_gateway_percent || 0
     };
 
-    // const taxBreakdown = {
-    //     platformFee: {
-    //         percentage: platformFee?.platform_fee_percent || 0,
-    //         amount: platformFeeTax,
-    //     },
-    //     paymentGatewayFee: {
-    //         percentage: platformFee?.payment_gateway_percent || 0,
-    //         amount: paymentGatewayTax,
-    //     },
-    //     totalTax: feeTotal,
-    // };
-
     // Final Total (discount last applied)
-    const finalTotal = discountedPriceTotal + feeTotal;
     const formatReadableDate = (dateStr) => {
         if (!dateStr) return "";
         const date = new Date(dateStr);
@@ -663,7 +653,7 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
                     eventImage={eventImage}
                     couponDetails={couponDetails}
                     taxBreakdown={taxBreakdown}
-                    
+
                 />
             )}
         </Modal>
