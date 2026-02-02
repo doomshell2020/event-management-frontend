@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 
 const EventSidebar = ({ eventId, eventDetails }) => {
 
-    const { is_free } = eventDetails || {};
+    const { is_free,entry_type } = eventDetails || {};
 
     const [isLeftRight, setIsLeftRight] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
@@ -68,7 +68,7 @@ const EventSidebar = ({ eventId, eventDetails }) => {
                         // { href: `/event/payouts/${eventId}`, icon: "bi bi-wallet2", label: "Payouts" },
 
                         // show Committee ONLY if event is NOT free
-                        is_free=='N' && {
+                       (entry_type == 'event' && is_free == 'N') && {
                             href: `/event/edit-event/${eventId}/committee/manage-committee`,
                             icon: "bi bi-people",
                             label: "Committee",

@@ -846,7 +846,8 @@ export default function CartModal({ show, handleClose, eventId }) {
             const response = await api.post("/api/v1/coupons/apply", {
                 coupon_code: couponCode.trim().toUpperCase(),
                 event_id: finalEventId,
-                total_amount: grand_total
+                // total_amount: grand_total
+                total_amount: sub_total
             });
 
             if (response?.data?.success) {
@@ -886,19 +887,70 @@ export default function CartModal({ show, handleClose, eventId }) {
     const sub_total = cart.reduce((n, item) => n + item.count * item.ticket_price, 0);
     // const tax_total = (sub_total * adminFees) / 100;
 
-    // Platform Fee Tax
+    // --------------------
+    // DISCOUNT (ONLY on ticket price)
+    // --------------------
+    let discountAmount = 0;
+
+    // if (appliedCoupon) {
+    //     if (appliedCoupon.discount_type == "percentage") {
+    //         discountAmount = (sub_total * appliedCoupon.discount) / 100;
+    //     } else {
+    //         discountAmount = appliedCoupon.discount;
+    //     }
+
+    //     // Prevent discount from exceeding subtotal
+    //     if (discountAmount > sub_total) {
+    //         discountAmount = sub_total;
+    //     }
+    // }
+
+    console.log("appliedCoupon", appliedCoupon)
+
+    if (appliedCoupon) {
+        discountAmount = Number(appliedCoupon.discount || 0);
+
+        // safety: discount ticket price se zyada nahi
+        if (discountAmount > sub_total) {
+            discountAmount = sub_total;
+        }
+    }
+
+    // Ticket amount after discount
+    const discountedPriceTotal = sub_total - discountAmount;
+
+    // --------------------
+    // TAX (ALWAYS on original priceTotal)
+    // --------------------
+    // Platform Fee Tax (always on subtotal)
     const platformFeeTax = platformFee?.platform_fee_percent
         ? (sub_total * platformFee.platform_fee_percent) / 100
         : 0;
 
-    // Payment Gateway Tax (on sub_total + platformFeeTax)
+    // Payment Gateway Tax (on subtotal + platform fee)
     const paymentGatewayTax = platformFee?.payment_gateway_percent
-        ? ((sub_total + platformFeeTax) * platformFee.payment_gateway_percent) / 100
+        ? ((sub_total + platformFeeTax) *
+            platformFee.payment_gateway_percent) /
+        100
         : 0;
 
-    // Total Fee (sum of both taxes)
+
+    // --------------------
+    // TOTAL FEES
+    // --------------------
     const tax_total = platformFeeTax + paymentGatewayTax;
 
+    // --------------------
+    // FINAL TOTAL
+    // --------------------
+    const grand_total = Math.max(
+        discountedPriceTotal + tax_total,
+        0
+    );
+
+    // --------------------
+    // TAX BREAKDOWN
+    // --------------------
     const taxBreakdown = {
         platform_fee_tax: platformFeeTax,
         payment_gateway_tax: paymentGatewayTax,
@@ -906,23 +958,56 @@ export default function CartModal({ show, handleClose, eventId }) {
         payment_gateway_percent: platformFee?.payment_gateway_percent || 0
     };
 
-    // const grand_total = sub_total + tax_total;
-    let discountAmount = 0;
+    // // const grand_total = sub_total + tax_total;
+    // let discountAmount = 0;
 
-    if (appliedCoupon) {
-        if (appliedCoupon.discount_type == "percentage") {
-            discountAmount = (sub_total * appliedCoupon.discount) / 100;
-        } else {
-            discountAmount = appliedCoupon.discount;
-        }
+    // if (appliedCoupon) {
+    //     if (appliedCoupon.discount_type == "percentage") {
+    //         discountAmount = (sub_total * appliedCoupon.discount) / 100;
+    //     } else {
+    //         discountAmount = appliedCoupon.discount;
+    //     }
 
-        // Prevent discount from exceeding subtotal
-        if (discountAmount > sub_total) {
-            discountAmount = sub_total;
-        }
-    }
+    //     // Prevent discount from exceeding subtotal
+    //     if (discountAmount > sub_total) {
+    //         discountAmount = sub_total;
+    //     }
+    // }
 
-    const grand_total = sub_total + tax_total - discountAmount;
+    // // Platform Fee Tax
+    // const platformFeeTax = platformFee?.platform_fee_percent
+    //     ? (sub_total * platformFee.platform_fee_percent) / 100
+    //     : 0;
+
+    // // Payment Gateway Tax (on sub_total + platformFeeTax)
+    // const paymentGatewayTax = platformFee?.payment_gateway_percent
+    //     ? ((sub_total + platformFeeTax) * platformFee.payment_gateway_percent) / 100
+    //     : 0;
+
+    // // Total Fee (sum of both taxes)
+    // const tax_total = platformFeeTax + paymentGatewayTax;
+
+    // const taxBreakdown = {
+    //     platform_fee_tax: platformFeeTax,
+    //     payment_gateway_tax: paymentGatewayTax,
+    //     platform_fee_percent: platformFee?.platform_fee_percent || 0,
+    //     payment_gateway_percent: platformFee?.payment_gateway_percent || 0
+    // };
+
+
+
+    // // const grand_total = sub_total + tax_total - discountAmount;
+    // const grand_total = Math.max(
+    //     sub_total + tax_total - discountAmount,
+    //     0 // safety: negative total nahi jaane dega
+    // );
+
+
+
+
+
+
+
 
 
     const formatEventDateRange = (start, end) => {
