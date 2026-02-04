@@ -1522,6 +1522,10 @@ span.ticket-icon-circle {
 .header-right button:hover {
   background: #e6ecf5;
 }
+.calendar-header .header-right button:nth-child(2),
+.calendar-header .header-right button:nth-child(3) {
+  font-size: 20px;
+}
 
 .rbc-month-header {
   background-color: white;
@@ -6982,7 +6986,7 @@ padding-right: 8px !important;
         align-items: self-start !important;
         gap: 7px;
     }
-    .btn-bg-color{background-color: #24d5b8 !important; color:white !important;}
+    .btn-bg-color{background-color: #24d5b8 !important; color:white !important; padding: 7px;}
 
 }
 
