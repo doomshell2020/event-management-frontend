@@ -22,6 +22,9 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [showCart, setShowCart] = useState(false);
 
+  // ✅ ADD THIS: mobile menu toggle state
+  const [menuOpen, setMenuOpen] = useState(false);
+
   /* -------------------- AUTH CHECK -------------------- */
   const checkLoginStatus = useCallback(() => {
     const token = Cookies.get("userAuthToken");
@@ -87,15 +90,23 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
     if (cartCount > 0) setShowCart(true);
   };
 
+  // ✅ ADD THIS: close menu helper (links click pe close)
+  const closeMobileMenu = () => setMenuOpen(false);
+
   /* -------------------- JSX -------------------- */
   return (
     <>
       <header className="headernav">
-        <Navbar expand="lg" className="p-0 pt-lg-0 pt-2">
+        {/* ✅ ADD expanded={menuOpen} */}
+        <Navbar
+          expand="lg"
+          className="p-0 pt-lg-0 pt-2"
+          expanded={menuOpen}
+        >
           <Container>
             <div className="navflexbox w-100">
               {/* LOGO */}
-              <Link href="/" className="logodiv">
+              <Link href="/" className="logodiv" onClick={closeMobileMenu}>
                 <img
                   src="/assets/front-images/logo.png"
                   alt="Logo"
@@ -103,22 +114,47 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
                 />
               </Link>
 
-              <Navbar.Toggle aria-controls="basic-navbar-nav" />
+              {/* ✅ REPLACE Navbar.Toggle */}
+              <Navbar.Toggle
+                aria-controls="basic-navbar-nav"
+                onClick={() => setMenuOpen((prev) => !prev)}
+                className="custom-toggler"
+              >
+                {menuOpen ? (
+                  <span className="close-icon" aria-label="Close Menu">
+                    ✕
+                  </span>
+                ) : (
+                  <span className="menu-icon" aria-label="Open Menu">
+                    ☰
+                  </span>
+                )}
+              </Navbar.Toggle>
 
               <Navbar.Collapse id="basic-navbar-nav">
                 <div className="menuflexbox ms-auto">
                   {/* MAIN MENU */}
                   <nav className="menulistbox">
-                    <Link href="/" className="navLink">Home</Link>
-                    <Link href="/calender" className="navLink">Event Calendar</Link>
+                    <Link href="/" className="navLink" onClick={closeMobileMenu}>
+                      Home
+                    </Link>
+
+                    <Link href="/calender" className="navLink" onClick={closeMobileMenu}>
+                      Event Calendar
+                    </Link>
 
                     {isLoggedIn && (
                       <>
-                        <Link href="/orders" className="navLink">My Orders</Link>
+                        <Link href="/orders" className="navLink" onClick={closeMobileMenu}>
+                          My Orders
+                        </Link>
 
                         <button
                           className="navLink position-relative btn btn-link p-0"
-                          onClick={handleCartClick}
+                          onClick={() => {
+                            handleCartClick();
+                            closeMobileMenu();
+                          }}
                         >
                           Cart
                           {cartCount > 0 && (
@@ -132,6 +168,7 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
                           <Link
                             href="/committee/ticket"
                             className="navLink position-relative"
+                            onClick={closeMobileMenu}
                           >
                             Committee
                             {committeePendingCount > 0 && (
@@ -144,7 +181,9 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
                       </>
                     )}
 
-                    <Link href="/contact-us" className="navLink">Contact Us</Link>
+                    <Link href="/contact-us" className="navLink" onClick={closeMobileMenu}>
+                      Contact Us
+                    </Link>
                   </nav>
 
                   {/* USER MENU */}
@@ -162,7 +201,11 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
                           <ul className="header-dropdown">
                             {menuLinks.map((item) => (
                               <li key={item.href}>
-                                <Link href={item.href} className="dropdownLink">
+                                <Link
+                                  href={item.href}
+                                  className="dropdownLink"
+                                  onClick={closeMobileMenu}
+                                >
                                   <i className={`fas ${item.icon}`} /> {item.label}
                                 </Link>
                               </li>
@@ -171,7 +214,10 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
                             <li>
                               <button
                                 className="dropdownLink"
-                                onClick={() => handleLogout(router)}
+                                onClick={() => {
+                                  handleLogout(router);
+                                  closeMobileMenu();
+                                }}
                               >
                                 <i className="fas fa-sign-out-alt" /> Logout
                               </button>
@@ -180,7 +226,7 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
                         )}
                       </>
                     ) : (
-                      <Link href="/login">
+                      <Link href="/login" onClick={closeMobileMenu}>
                         <button className="userloginbtn primery-button">
                           Login / Register
                         </button>

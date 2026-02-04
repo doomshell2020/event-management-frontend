@@ -320,7 +320,7 @@ const TicketDetails = ({ pendingRequests, counts, event_id }) => {
                                 searchResults.map((user) => (
                                   <div
                                     key={user.id}
-                                    className="d-flex align-items-center gap-3 px-3 py-2 hover-bg"
+                                    className="d-flex align-items-center px-2 px-sm-3 py-2 hover-bg justify-content-between direction-collum"
                                     style={{ cursor: "pointer" }}
                                     onClick={() => {
                                       setSelectedUser(user);
@@ -339,6 +339,7 @@ const TicketDetails = ({ pendingRequests, counts, event_id }) => {
                                       });
                                     }}
                                   >
+                                    <div className="d-flex align-items-center gap-2 gap-sm-3">
                                     <div
                                       className="rounded-circle text-white d-flex align-items-center justify-content-center"
                                       style={{
@@ -353,14 +354,15 @@ const TicketDetails = ({ pendingRequests, counts, event_id }) => {
                                     </div>
 
 
-                                    <div className="flex-grow-1">
+                                    <div>
                                       <div className="fw-semibold">
                                         {user.first_name} {user.last_name}
                                       </div>
                                       <small style={{ fontSize: "12px", color: "#e62d56", }}>{user.email}</small>
                                     </div>
 
-                                    <span className="badge bg-success-subtle text-success text-14">
+</div>
+                                    <span className="badge bg-success-subtle text-success text-14 button-mobile-fullwidth btn-bg-color">
                                       Select
                                     </span>
                                   </div>
