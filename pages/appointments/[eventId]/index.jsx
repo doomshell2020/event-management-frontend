@@ -161,14 +161,16 @@ export default function Appointments({ }) {
                     <EventSidebar />
 
                     <div className="event-righcontent">
-                        <h4>My Appointments</h4>
+                        <div className="d-flex justify-content-between flex-wrap gap-3 align-items-center">
+                        <h4 className="mb-0">My Appointments</h4>
                         <button
-                            className="primery-button fw-normal px-2 text-white"
+                            className="primery-button fw-normal px-2 text-white button-mobile-fullwidth"
                             style={{ backgroundColor: "#00ad00" }}
                             onClick={() => router.push(`/appointments/${eventId}/create`)}
                         >
                             <i className="bi bi-plus"></i> Create Appointments
                         </button>
+                        </div>
                         <hr
                             style={{
                                 borderColor: "currentColor",
@@ -202,7 +204,7 @@ export default function Appointments({ }) {
                             <div className="my-ticket-box">
                                 <div className="event-list">
                                     <div className="table-responsive">
-                                        <table className="table table-hover mb-0">
+                                        <table className="table table-hover mb-0 table-mobile-width">
                                             <thead className="table-dark table_bg">
                                                 <tr>
                                                     <th style={{ width: "2%" }} scope="col">#</th>

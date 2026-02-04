@@ -166,7 +166,7 @@ const MyStaff = () => {
 
                 <div className="section-heading">
                     <h1 className="mb-3">My Staff</h1>
-                    <h2 className="mt-4">My Staff</h2>
+                    {/* <h2 className="mt-4">My Staff</h2> */}
                     <p className="mb-4 body-text text-center">
                         You can manage your Staff!
                     </p>

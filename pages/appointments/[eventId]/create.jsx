@@ -167,11 +167,11 @@ const CreateAppointmentPage = () => {
                                         <h4 className="fw-bold">Appointment Info</h4>
 
                                         <div className="resistor-content">
-                                            <div className="row g-3">
+                                            <div className="row align-items-end">
 
                                                 {/* Appointment Name */}
                                                 {/* <div className="col-lg-4 col-md-6 mb-3"> */}
-                                                <div className="col-lg-2 col-md-6 mb-3">
+                                                <div className="col-lg-3">
                                                     <label className="form-label">
                                                         Appointment Name <span className="text-danger">*</span>
                                                     </label>
@@ -190,7 +190,7 @@ const CreateAppointmentPage = () => {
                                                 </div>
 
                                                 {/* Location */}
-                                                <div className="col-lg-2 col-md-6 mb-3">
+                                                <div className="col-lg-3">
                                                     <label className="form-label">
                                                         Location <span className="text-danger">*</span>
                                                     </label>
@@ -223,7 +223,7 @@ const CreateAppointmentPage = () => {
 
 
                                                 {/* NEW – Include Tax Option */}
-                                                <div className="col-lg-2 col-md-6 mb-3">
+                                                <div className="col-lg-3">
                                                     <label className="form-label">
                                                         Include Tax<span className="text-danger">*</span>
                                                     </label>
@@ -242,7 +242,7 @@ const CreateAppointmentPage = () => {
                                                 </div>
 
                                                 {/* Upload Image */}
-                                                <div className="col-lg-4 col-md-6 mb-3">
+                                                <div className="col-lg-3">
                                                     <label className="form-label">
                                                         Upload Image{" "}
                                                         <small className="text-danger">(Size 550×550 JPG, JPEG, PNG Max 2MB)</small>
@@ -297,7 +297,7 @@ const CreateAppointmentPage = () => {
                                         <i className="far fa-calendar-plus"></i> Add Appointment Slots
                                     </h2>
                                     <div className="inner-formdeta p-4 text-start fs-6 fw-normal">
-                                        <div className="resistor-content">
+                                        <div className="resistor-content edit-appointment-module">
 
                                             {slots.map((slot, index) => {
 
@@ -333,7 +333,7 @@ const CreateAppointmentPage = () => {
                                                     >
 
                                                         {/* Date */}
-                                                        <div className="col-lg-2 col-md-6">
+                                                        <div className="col-lg-2 col-md-6 mt-1">
                                                             <label className="form-label" style={labelStyle}>
                                                                 Date <span className="text-danger">*</span>
                                                             </label>
@@ -344,7 +344,7 @@ const CreateAppointmentPage = () => {
                                                                     handleChange(index, "date", formattedDate);
                                                                 }}
                                                                 required
-                                                                className="form-control"
+                                                                className="form-control w-100"
                                                                 style={formControlStyle}
                                                                 minDate={new Date()}
                                                                 dateFormat="yyyy-MM-dd"
@@ -353,7 +353,7 @@ const CreateAppointmentPage = () => {
                                                         </div>
 
                                                         {/* Start Time */}
-                                                        <div className="col-lg-2 col-md-6">
+                                                        <div className="col-lg-2 col-md-6 mt-1">
                                                             <label className="form-label" style={labelStyle}>
                                                                 Start Time <span className="text-danger">*</span>
                                                             </label>
@@ -378,14 +378,14 @@ const CreateAppointmentPage = () => {
                                                                 timeIntervals={5}
                                                                 timeCaption="Start Time"
                                                                 dateFormat="h:mm aa"
-                                                                className="form-control"
+                                                                className="form-control w-100"
                                                                 style={formControlStyle}
                                                                 placeholderText="Start Time"
                                                             />
                                                         </div>
 
                                                         {/* End Time */}
-                                                        <div className="col-lg-2 col-md-6">
+                                                        <div className="col-lg-2 col-md-6 mt-1">
                                                             <label className="form-label" style={labelStyle}>
                                                                 End Time <span className="text-danger">*</span>
                                                             </label>
@@ -410,14 +410,14 @@ const CreateAppointmentPage = () => {
                                                                 timeIntervals={5}
                                                                 timeCaption="End Time"
                                                                 dateFormat="h:mm aa"
-                                                                className="form-control"
+                                                                className="form-control w-100"
                                                                 style={formControlStyle}
                                                                 placeholderText="End Time"
                                                             />
                                                         </div>
 
                                                         {/* Price */}
-                                                        <div className="col-lg-2 col-md-6">
+                                                        <div className="col-lg-2 col-md-6 mt-1">
                                                             <label className="form-label" style={labelStyle}>
                                                                 Price <span className="text-danger">*</span>
                                                             </label>
@@ -425,7 +425,7 @@ const CreateAppointmentPage = () => {
                                                             <input
                                                                 type="text"
                                                                 required
-                                                                className="form-control"
+                                                                className="form-control w-100"
                                                                 style={formControlStyle}
                                                                 value={slot.price}
                                                                 // onChange={(e) => handleChange(index, "price", e.target.value)}
@@ -437,7 +437,7 @@ const CreateAppointmentPage = () => {
                                                         </div>
 
                                                         {/* Count */}
-                                                        <div className="col-lg-2 col-md-6">
+                                                        <div className="col-lg-2 col-md-6 mt-1">
                                                             <label className="form-label" style={labelStyle}>
                                                                 Count <span className="text-danger">*</span>
                                                             </label>
@@ -445,7 +445,7 @@ const CreateAppointmentPage = () => {
                                                             <input
                                                                 type="number"
                                                                 required
-                                                                className="form-control"
+                                                                className="form-control w-100"
                                                                 style={formControlStyle}
                                                                 value={slot.count}
                                                                 onChange={(e) => {
@@ -457,17 +457,17 @@ const CreateAppointmentPage = () => {
                                                         </div>
 
                                                         {/* Buttons */}
-                                                        <div className="col-lg-2 col-md-6 d-flex flex-column align-items-end gap-2">
+                                                        <div className="col-lg-2 col-md-6 d-flex flex-column align-items-end gap-2 mt-2">
 
                                                             {/* Remove button */}
                                                             {index !== 0 && (
                                                                 <button
                                                                     type="button"
-                                                                    className="btn btn-sm"
+                                                                    className="btn h-100"
                                                                     style={{
                                                                         backgroundColor: "#ff6b6b",
                                                                         color: "#fff",
-                                                                        minWidth: "110px",
+                                                                        minWidth: "100%",
                                                                         borderRadius: "4px"
                                                                     }}
                                                                     onClick={() => handleRemove(index)}
@@ -480,11 +480,11 @@ const CreateAppointmentPage = () => {
                                                             {index === slots.length - 1 && (
                                                                 <button
                                                                     type="button"
-                                                                    className="btn btn-sm"
+                                                                    className="btn h-100"
                                                                     style={{
                                                                         backgroundColor: "#16a34a",
                                                                         color: "#fff",
-                                                                        minWidth: "110px",
+                                                                        minWidth: "100%",
                                                                         borderRadius: "4px"
                                                                     }}
                                                                     onClick={handleAddMore}

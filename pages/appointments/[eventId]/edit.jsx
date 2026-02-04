@@ -174,7 +174,6 @@ const EditAppointmentPage = () => {
                 <div className="container">
                     <div className="row">
                         <div className="col-md-12">
-
                             <div className="d-flex justify-content-between post-event-topprt align-items-center">
                                 <div className="top_h w-100">
                                     <p className="des_h mb-0">Update Appointment</p>
@@ -204,10 +203,10 @@ const EditAppointmentPage = () => {
                                         <h4 className="fw-bold">Appointment Info</h4>
 
                                         <div className="resistor-content">
-                                            <div className="row g-3">
+                                            <div className="row align-items-end">
 
                                                 {/* Appointment Name */}
-                                                <div className="col-lg-2 col-md-6 mb-3">
+                                                <div className="col-lg-3">
                                                     <label className="form-label">
                                                         Appointment Name <span className="text-danger">*</span>
                                                     </label>
@@ -226,7 +225,7 @@ const EditAppointmentPage = () => {
                                                 </div>
 
                                                 {/* Location */}
-                                                <div className="col-lg-2 col-md-6 mb-3">
+                                                <div className="col-lg-3 ">
                                                     <label className="form-label">
                                                         Location <span className="text-danger">*</span>
                                                     </label>
@@ -242,7 +241,7 @@ const EditAppointmentPage = () => {
                                                 </div>
 
                                                 {/* Currency */}
-                                                {/* <div className="col-lg-2 col-md-6 mb-3">
+                                                {/* <div className="col-lg-2 col-md-6">
                                                     <label className="form-label">Currency <span className="text-danger">*</span></label>
                                                     <select
                                                         className="form-select rounded-0"
@@ -259,7 +258,7 @@ const EditAppointmentPage = () => {
 
 
                                                 {/* NEW – Include Tax Option */}
-                                                <div className="col-lg-2 col-md-6 mb-3">
+                                                <div className="col-lg-3 ">
                                                     <label className="form-label">
                                                         Include Tax<span className="text-danger">*</span>
                                                     </label>
@@ -278,7 +277,7 @@ const EditAppointmentPage = () => {
                                                 </div>
 
                                                 {/* Upload Image */}
-                                                <div className="col-lg-4 col-md-6 mb-3">
+                                                <div className="col-lg-3 ">
                                                     <label className="form-label">
                                                         Upload Image{" "}
                                                         <small className="text-danger">(Size 550×550 JPG, JPEG, PNG Max 2MB)</small>
@@ -342,7 +341,7 @@ const EditAppointmentPage = () => {
                                     </h2>
 
                                     <div className="inner-formdeta p-4 text-start fs-6 fw-normal">
-                                        <div className="resistor-content">
+                                        <div className="resistor-content edit-appointment-module">
 
                                             {slots.map((slot, index) => {
 
@@ -378,7 +377,7 @@ const EditAppointmentPage = () => {
                                                     >
 
                                                         {/* Date */}
-                                                        <div className="col-lg-2 col-md-6">
+                                                        <div className="col-lg-2 col-md-6 mt-1">
                                                             <label className="form-label" style={labelStyle}>
                                                                 Date <span className="text-danger">*</span>
                                                             </label>
@@ -392,7 +391,7 @@ const EditAppointmentPage = () => {
                                                                     handleChange(index, "date", formattedDate);
                                                                 }}
                                                                 required
-                                                                className="form-control"
+                                                                className="form-control w-100"
                                                                 style={formControlStyle}
                                                                 minDate={new Date()}
                                                                 dateFormat="yyyy-MM-dd"
@@ -401,7 +400,7 @@ const EditAppointmentPage = () => {
                                                         </div>
 
                                                         {/* Start Time */}
-                                                        <div className="col-lg-2 col-md-6">
+                                                        <div className="col-lg-2 col-md-6 mt-1">
                                                             <label className="form-label" style={labelStyle}>
                                                                 Start Time <span className="text-danger">*</span>
                                                             </label>
@@ -426,14 +425,14 @@ const EditAppointmentPage = () => {
                                                                 timeIntervals={5}
                                                                 timeCaption="Start Time"
                                                                 dateFormat="h:mm aa"
-                                                                className="form-control"
+                                                                className="form-control w-100"
                                                                 style={formControlStyle}
                                                                 placeholderText="Start Time"
                                                             />
                                                         </div>
 
                                                         {/* End Time */}
-                                                        <div className="col-lg-2 col-md-6">
+                                                        <div className="col-lg-2 col-md-6 mt-1">
                                                             <label className="form-label" style={labelStyle}>
                                                                 End Time <span className="text-danger">*</span>
                                                             </label>
@@ -458,14 +457,14 @@ const EditAppointmentPage = () => {
                                                                 timeIntervals={5}
                                                                 timeCaption="End Time"
                                                                 dateFormat="h:mm aa"
-                                                                className="form-control"
+                                                                className="form-control w-100"
                                                                 style={formControlStyle}
                                                                 placeholderText="End Time"
                                                             />
                                                         </div>
 
                                                         {/* Price */}
-                                                        <div className="col-lg-2 col-md-6">
+                                                        <div className="col-lg-2 col-md-6 mt-1">
                                                             <label className="form-label" style={labelStyle}>
                                                                 Price <span className="text-danger">*</span>
                                                             </label>
@@ -473,7 +472,7 @@ const EditAppointmentPage = () => {
                                                             <input
                                                                 type="text"
                                                                 required
-                                                                className="form-control"
+                                                                className="form-control w-100"
                                                                 style={formControlStyle}
                                                                 value={slot.price}
                                                                 // onChange={(e) => handleChange(index, "price", e.target.value)}
@@ -485,7 +484,7 @@ const EditAppointmentPage = () => {
                                                         </div>
 
                                                         {/* Count */}
-                                                        <div className="col-lg-2 col-md-6">
+                                                        <div className="col-lg-2 col-md-6 mt-1">
                                                             <label className="form-label" style={labelStyle}>
                                                                 Count <span className="text-danger">*</span>
                                                             </label>
@@ -493,7 +492,7 @@ const EditAppointmentPage = () => {
                                                             <input
                                                                 type="text"
                                                                 required
-                                                                className="form-control"
+                                                                className="form-control w-100"
                                                                 style={formControlStyle}
                                                                 value={slot.count}
                                                                 // onChange={(e) => handleChange(index, "count", e.target.value)}
@@ -505,17 +504,17 @@ const EditAppointmentPage = () => {
                                                         </div>
 
                                                         {/* Buttons */}
-                                                        <div className="col-lg-2 col-md-6 d-flex flex-column align-items-end gap-2">
+                                                        <div className="col-lg-2 col-md-6 d-flex flex-column align-items-end gap-2 mt-2">
 
                                                             {/* Remove button */}
                                                             {index !== 0 && (
                                                                 <button
                                                                     type="button"
-                                                                    className="btn btn-sm"
+                                                                    className="btn"
                                                                     style={{
                                                                         backgroundColor: "#ff6b6b",
                                                                         color: "#fff",
-                                                                        minWidth: "110px",
+                                                                        minWidth: "100%",
                                                                         borderRadius: "4px"
                                                                     }}
                                                                     onClick={() => handleRemove(index)}
@@ -528,11 +527,11 @@ const EditAppointmentPage = () => {
                                                             {index === slots.length - 1 && (
                                                                 <button
                                                                     type="button"
-                                                                    className="btn btn-sm"
+                                                                    className="btn h-100"
                                                                     style={{
                                                                         backgroundColor: "#16a34a",
                                                                         color: "#fff",
-                                                                        minWidth: "110px",
+                                                                        minWidth: "100%",
                                                                         borderRadius: "4px"
                                                                     }}
                                                                     onClick={handleAddMore}

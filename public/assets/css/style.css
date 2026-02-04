@@ -1522,6 +1522,10 @@ span.ticket-icon-circle {
 .header-right button:hover {
   background: #e6ecf5;
 }
+.calendar-header .header-right button:nth-child(2),
+.calendar-header .header-right button:nth-child(3) {
+  font-size: 20px;
+}
 
 .rbc-month-header {
   background-color: white;
@@ -2015,7 +2019,7 @@ section#request-demo {
 }
 
 .resistor-content label {
-  font-size: 15px;
+  font-size: 14px;
   color: rgba(0, 0, 0, .87);
   margin-bottom: 7px;
 }
@@ -2024,7 +2028,9 @@ section#request-demo {
   margin-bottom: 3px;
 }
 
-
+.edit-appointment-module.resistor-content .react-datepicker-wrapper {
+    width: 100% !important;
+}
 .freeEventCheck {
   height: 33.5px;
   border-radius: 3px;
@@ -2067,7 +2073,7 @@ section#request-demo {
 /* post event page end */
 /* my-event page start */
 /* left-bar start*/
-#myevent-deshbord .event-sidebar {
+/* #myevent-deshbord .event-sidebar {
   padding: 20px 20px;
   background: #3d6db5;
   position: relative;
@@ -2075,8 +2081,27 @@ section#request-demo {
   color: #fff;
   margin-right: 45px;
   transition: all 0.5s 0s ease;
+} */
+
+#myevent-deshbord .event-sidebar {
+    background: #3d6db5;
+    color: #fff;
+    position: relative;
+
+    width: 280px;
+    min-width: 280px;
+    flex-shrink: 0;
+    padding: 20px;
+     transition: all 0.5s 0s ease;
 }
 
+
+#myevent-deshbord > .d-flex {
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+    overflow-x: hidden;
+}
 #myevent-deshbord .side_menu_icon {
   height: 35px;
   background: aliceblue;
@@ -2179,10 +2204,17 @@ li.menu_line {
 }
 
 /* sidebar close css*/
-#myevent-deshbord .event-sidebar.sideBarRightLeftClosed {
+/* #myevent-deshbord .event-sidebar.sideBarRightLeftClosed {
   width: 110px;
   transition: all 0.5s 0s ease;
+} */
+#myevent-deshbord .event-sidebar.sideBarRightLeftClosed {
+width: 110px;
+    min-width: 110px;
+    flex-shrink: 0;
+  transition: all 0.5s 0s ease;
 }
+
 
 #myevent-deshbord .event-sidebar.sideBarRightLeftClosed ul li {
   margin-left: 0px;
@@ -2223,9 +2255,15 @@ li.menu_line {
   margin: 40px 0px 60px;
 }
 
-.event-righcontent {
+/* .event-righcontent {
   flex: 1;
   margin: 30px 30px 30px 0px;
+} */
+
+#myevent-deshbord .event-righcontent {
+    flex: 1;
+    min-width: 0;
+    padding: 30px;
 }
 
 #myevent-deshbord .desbord-content thead {
@@ -3021,6 +3059,11 @@ padding-left: 0rem;
 }
 
 /* edit event page end */
+
+.manage-date-page .react-calendar {
+    width: 100%;
+}
+
 /* manage ticket pg start */
 #myevent-deshbord .item_bg {
   background: #f7f7f7;
@@ -5670,9 +5713,11 @@ input[type="date"] {
 .manage-commitee-tiket-module .table-container-box .table thead tr th {
     font-size: 12px;
 }
+#myevent-deshbord .event-sidebar {
+    width: 250px;
+    min-width: 250px;
 }
-
-
+}
 
 @media (min-width: 992px) and (max-width: 1201px) {
   #my-order-module .up_events {
@@ -5693,11 +5738,17 @@ input[type="date"] {
 
   /* sidebar css start responsive */
 
-  #myevent-deshbord .event-sidebar {
+  /* #myevent-deshbord .event-sidebar {
     padding: 20px 0px;
     width: 75px;
     margin-right: 25px;
-  }
+  } */
+
+      #myevent-deshbord .event-sidebar {
+        padding: 20px 0px;
+        width: 75px;
+        min-width: 75px;
+    }
 
   #myevent-deshbord .event-sidebar ul li a,
   #myevent-deshbord .event-sidebar ul li button {
@@ -5744,12 +5795,17 @@ input[type="date"] {
     display: none;
   }
 
-  .event-righcontent {
+  /* .event-righcontent {
     margin: 30px 0px 30px 0;
     width: calc(100% - 100px);
     padding-right: 20px;
-  }
+  } */
+    .event-righcontent {
+        padding-left: 25px !important;
+        padding-right: 20px !important;
+    }
 
+  
 }
 
 
@@ -5895,6 +5951,27 @@ input[type="date"] {
         outline: none;
         border: none;
   }
+
+
+.headernav button.navbar-toggler .close-icon {
+  transform: rotate(90deg);
+}
+.headernav button.navbar-toggler[aria-expanded="true"] .close-icon {
+  opacity: 1;
+  transform: rotate(0deg);
+}
+.headernav button.navbar-toggler[aria-expanded="true"] .menu-icon {
+  opacity: 0;
+  transform: rotate(-90deg);
+}
+.headernav button.navbar-toggler span.menu-icon,
+.headernav button.navbar-toggler span.close-icon {
+  color: white;
+  font-size: 26px;
+  display: inline-block;
+  transition: transform 0.3s ease, opacity 0.25s ease;
+}
+
 
   .headernav .menuflexbox {
     flex-direction: column;
@@ -6086,7 +6163,7 @@ input[type="date"] {
     justify-content: start;
   }
   .careyes-chekout-new .cart-mdl-only .care-new-check.modal-body {
-    max-height: calc(100vh - 88px) !important;
+    max-height: calc(100vh - 110px) !important;
 }
 .headernav .menuflexbox {
     gap: 16px;
@@ -6122,6 +6199,9 @@ input[type="date"] {
     .table-width-992{
       min-width: 1000px !important;
     }
+    .headernav .userloginbtn {
+  margin-left: 0px;
+}
 }
 
 @media (min-width: 768px) and (max-width: 992px) {
@@ -6324,9 +6404,9 @@ input[type="date"] {
     min-width: 800px;
   }
 
-  #myevent-deshbord .event-sidebar {
+  /* #myevent-deshbord .event-sidebar {
     margin-right: 15px;
-  }
+  } */
 
   #myevent-deshbord .contant_bg {
     padding: 25px 15px;
@@ -6345,10 +6425,13 @@ input[type="date"] {
     margin-top: 10px;
   }
 
-  .event-righcontent {
+  /* .event-righcontent {
     margin: 20px 0px 30px 0;
     padding-right: 10px;
-  }
+  } */
+      .event-righcontent {
+        padding: 20px 10px 30px 15px !important;
+    }
 
   .order-1-768 {
     order: 1;
@@ -6664,6 +6747,8 @@ input[type="date"] {
 
   #myevent-deshbord .dsa_contant ul.tabes {
     margin-top: 22px;
+        width: 100%;
+        overflow-x: auto;
   }
 
   #myevent-deshbord .event_names .edit-event-dropdown {
@@ -6896,6 +6981,12 @@ padding-right: 8px !important;
     .committee-event-detailpg .custom-input {
     font-size: 12px !important;
 }
+.direction-collum {
+        flex-direction: column;
+        align-items: self-start !important;
+        gap: 7px;
+    }
+    .btn-bg-color{background-color: #24d5b8 !important; color:white !important; padding: 7px;}
 
 }
 
@@ -6969,6 +7060,9 @@ padding-right: 8px !important;
         .appointment-timeshadulebox {
         zoom: .9;
     }
+        #myevent-deshbord .event_names a, #myevent-deshbord .event_names button {
+        font-size: 12px;
+    }
 
 }
 
@@ -7004,9 +7098,10 @@ padding-right: 8px !important;
     margin-right: 38px !important;
   }
 
-  #myevent-deshbord .event-sidebar {
-    width: 61px;
-  }
+ #myevent-deshbord .event-sidebar {
+        width: 61px;
+        min-width: 61px;
+    }
 
   #myevent-deshbord .event-sidebar ul li a,
   #myevent-deshbord .event-sidebar ul li button {

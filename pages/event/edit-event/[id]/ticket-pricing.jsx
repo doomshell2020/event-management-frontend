@@ -353,7 +353,7 @@ const ManageTicketPricing = () => {
                                         <p className="text-muted">No pricing added yet.</p>
                                     ) : (
                                         <div className="table-responsive">
-                                            <table className="table table-bordered">
+                                            <table className="table table-bordered table-mobile-width">
                                                 <thead>
                                                     <tr>
                                                         <th>Ticket</th>
