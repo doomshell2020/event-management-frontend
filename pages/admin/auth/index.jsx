@@ -65,9 +65,9 @@ export default function Login() {
             toast.success("Login successful!");
             router.push("/admin/index");
         } catch (err) {
-            console.error("Login error:", err);
-
+            // console.error("Login error:", err.response?.data?.error?.details[0].msg);
             const apiErrorMsg =
+                err.response?.data?.error?.details?.[0]?.msg ||
                 err.response?.data?.error?.message ||
                 err.response?.data?.message ||
                 err.message ||
@@ -149,7 +149,7 @@ export default function Login() {
             <Seo title={"Login"} />
             <div className="square-box"></div>
             <div className="page">
-                <Toaster />
+                {/*  <Toaster /> */}
                 <div
                     className="page-single">
                     <div className="container">

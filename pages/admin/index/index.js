@@ -101,7 +101,7 @@ const Dashboard = () => {
 
 
   const [counts, setCounts] = useState(null);
-  const [tickets, setTickets] = useState([]);
+  const [orders, setOrders] = useState([]);
   const [events, setEvents] = useState([]);
   const [staffList, setStaffList] = useState([]);
   const [showStaffModal, setShowStaffModal] = useState(false);
@@ -127,9 +127,10 @@ const Dashboard = () => {
   const getLatestTickets = async () => {
     try {
       setIsLoading(true);
-      const res = await api.get("/api/v1/admin/dashboard/latest-tickets");
+      // const res = await api.get("/api/v1/admin/dashboard/latest-tickets");
+      const res = await api.get("/api/v1/admin/dashboard/latest-orders");
       // console.log("res?.data?.data",res?.data?.data?.tickets)
-      setTickets(res?.data?.data?.tickets);
+      setOrders(res?.data?.data?.orders);
     } catch (err) {
       console.error("Error fetching dashboard counts:", err);
     } finally {
@@ -184,21 +185,32 @@ const Dashboard = () => {
   const formatNumber = (value) => {
     return new Intl.NumberFormat('en-IN').format(value || 0);
   };
+
   const formatCurrencyAmount = (row, key) => {
-    const symbol =
-      row?.order?.event?.currencyName?.Currency_symbol || "";
-    const amount = row?.order?.[key];
-    if (!amount) return "-";
-    return `${symbol} ${Number(amount).toLocaleString("en-IN")}`;
+    const symbol = row?.event?.currencyName?.Currency_symbol || "";
+    const amount = row?.[key];
+
+    if (amount === null || amount === undefined) return "-";
+
+    return `${symbol} ${Math.round(Number(amount)).toLocaleString("en-IN")}`;
   };
+
+
+
+  // const formatCurrencyAmount = (row, key) => {
+  //   const symbol =
+  //     row?.event?.currencyName?.Currency_symbol || "";
+  //   const amount = row?.[key];
+  //   if (!amount) return "-";
+  //   return `${symbol} ${Number(amount).toLocaleString("en-IN")}`;
+  // };
 
   const formatAmount = (row, key) => {
     const symbol = row?.currencyName?.Currency_symbol || "";
     const value = Number(row?.[key] || 0);
-    return value > 0 ? `${symbol} ${value}` : "0";
+    if (value <= 0) return "0";
+    return `${symbol} ${Math.round(value).toLocaleString("en-IN")}`;
   };
-
-
   const handleStatusToggle = async (id, currentStatus) => {
     const newStatus = currentStatus === "Y" ? "N" : "Y";
     const statusText = newStatus === "Y" ? "Activate" : "Deactivate";
@@ -413,7 +425,7 @@ const Dashboard = () => {
                     <span className="text-white">Total Events</span>
                     <h2 className="text-white mb-0" style={{ fontSize: "20px" }}>
                       <span title="Active Events">
-                      {counts?.events?.active || 0}</span> {" / "} <span title="Inactive Events">{counts?.events?.inactive || 0}</span>
+                        {counts?.events?.active || 0}</span> {" / "} <span title="Inactive Events">{counts?.events?.inactive || 0}</span>
                     </h2>
                   </div>
                 </Col>
@@ -433,7 +445,7 @@ const Dashboard = () => {
                 <Col style={{ flex: "1" }}>
                   <div className="mt-0">
                     <span className="text-white">Total Sales</span>
-                    <h2 className="text-white mb-0" style={{ fontSize: "20px" }}  title="Total Sales Amount (Including Tax)">
+                    <h2 className="text-white mb-0" style={{ fontSize: "20px" }} title="Total Sales Amount (Including Tax)">
                       {formatNumber(counts?.total_sales)}
                     </h2>
                   </div>
@@ -630,7 +642,82 @@ const Dashboard = () => {
             </Card.Body>
           </Card>
         </Col> </Row>
+
       <Row className="row-sm">
+        <Col lg={12} md={12}>
+          <Card>
+            <Card.Header>
+              <h3 className="card-title">Latest Sold Orders</h3>
+            </Card.Header>
+            <Card.Body >
+              <div className="table-responsive">
+                <table className="table table-bordered table-hover mb-0">
+                  <thead className="thead-light">
+                    <tr>
+                      <th>S.No</th>
+                      <th>Order Date</th>
+                      <th>Order Details</th>
+                      <th>Event</th>
+                      <th>Customer</th>
+                      <th>Qty.</th>
+                      <th>Customer Pay</th>
+                      <th>Platform Fee</th>
+                      <th>Payment Gateway Fee</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {orders.map((value, index) => {
+                      const items = value.orderItems || [];
+
+                      const totalQty = items.reduce(
+                        (sum, item) => sum + (item.count || 0),
+                        0
+                      );
+                      const eventName = value?.event?.name;
+                      const user = value?.user;
+                      if (!user) return <span>-</span>;
+                      const fullName = [user.first_name, user.last_name].filter(Boolean).join(" ");
+                      return (
+                        <tr key={value.id}>
+                          <td>{index + 1}</td>
+                          <td> {value?.created
+                            ? moment(value?.created).format("DD MMM, YYYY ")
+                            : "---"}</td>
+                          <td><strong>Order Id: </strong>{value.order_uid}<br />
+                            <strong>Order Identifier: </strong>{value.RRN}
+                          </td>
+                          <td>{eventName}</td>
+                          <td><b>Name:</b> {fullName || "-"}<br /><b>Email: </b>{user.email || "-"}<br /><b>Mobile: </b>{user.mobile || "-"}</td>
+
+                          <td>{totalQty}</td>
+                          <td>{formatCurrencyAmount(value, "grand_total")}
+                            {/* {value?.discount_amount ? (
+                              <>
+                                <br />
+                                  Discount: {formatCurrencyAmount(value, "discount_amount")}
+                              </>
+                            ) : null} */}
+                          </td>
+
+                          <td>{formatCurrencyAmount(value, "platform_fee_tax")}</td>
+                          <td>{formatCurrencyAmount(value, "payment_gateway_tax")}</td>
+                        </tr>
+                      )
+                    })}
+
+
+
+                  </tbody>
+                </table>
+              </div>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+
+
+      {/* old tickets show */}
+      {/* <Row className="row-sm">
         <Col lg={12} md={12}>
           <Card>
             <Card.Header>
@@ -647,7 +734,6 @@ const Dashboard = () => {
                       <th>Event</th>
                       <th>Event Date & Time</th>
                       <th>Customer</th>
-                      {/* <th>Mobile</th> */}
                       <th>Qty.</th>
                       <th>Amount</th>
                       <th>Commission</th>
@@ -736,7 +822,7 @@ const Dashboard = () => {
                           <td> {value?.order
                             ? moment(value?.order?.created).format("DD MMM, YYYY hh:mm A")
                             : "---"}</td>
-                          {/* <td> {ticketNo}</td> */}
+                         
                           <td>  <div className="d-flex flex-column">
                             <span className="fw-semibold">{name || "-"}</span>
                             {label && (
@@ -761,7 +847,7 @@ const Dashboard = () => {
                             <strong>To</strong>  {moment(event.date_to).format("DD MMM, YYYY hh:mm A")}
                           </td>
                           <td><b>Name:</b> {fullName || "-"}<br /><b>Email: </b>{user.email || "-"}<br /><b>Mobile: </b>{user.mobile || "-"}</td>
-                          {/* <td>+12687209926</td> */}
+                      
                           <td>{value.count}</td>
                           <td>{formatCurrencyAmount(value, "sub_total")}</td>
                           <td>{formatCurrencyAmount(value, "tax_total")}</td>
@@ -780,7 +866,7 @@ const Dashboard = () => {
 
 
 
-      </Row>
+      </Row> */}
 
 
 

@@ -92,10 +92,16 @@ const EventOrganizerCreate = () => {
                 });
             }
         } catch (err) {
+            const apiErrorMsg =
+                err.response?.data?.error?.details?.[0]?.msg ||
+                err.response?.data?.error?.message ||
+                err.response?.data?.message ||
+                err.message ||
+                "Something went wrong. Please try again.";
             Swal.fire({
                 icon: "error",
                 title: "Server Error",
-                text: err?.response?.data?.error?.message || "Internal server error",
+                text: apiErrorMsg,
             });
         } finally {
             setIsLoading(false);
@@ -126,11 +132,11 @@ const EventOrganizerCreate = () => {
                                 {/* Organizer Name */}
                                 <CCol md={4}>
                                     <CFormLabel>
-                                        Event Organizer <span style={{ color: "red" }}>*</span>
+                                        Organizer Name <span style={{ color: "red" }}>*</span>
                                     </CFormLabel>
                                     <CFormInput
                                         type="text"
-                                        placeholder="Event Organizer"
+                                        placeholder="Organizer Name"
                                         required
                                         value={firstName}
                                         onChange={(e) => {
@@ -144,11 +150,11 @@ const EventOrganizerCreate = () => {
                                 {/* Email */}
                                 <CCol md={4}>
                                     <CFormLabel>
-                                        Event Organizer Email <span style={{ color: "red" }}>*</span>
+                                        Email <span style={{ color: "red" }}>*</span>
                                     </CFormLabel>
                                     <CFormInput
                                         type="email"
-                                        placeholder="Event Organizer Email"
+                                        placeholder="Email"
                                         required
                                         value={email}
                                         onChange={(e) => {
@@ -168,15 +174,29 @@ const EventOrganizerCreate = () => {
                                 {/* Mobile */}
                                 <CCol md={4}>
                                     <CFormLabel>
-                                        Event Organizer Mobile <span style={{ color: "red" }}>*</span>
+                                        Mobile <span style={{ color: "red" }}>*</span>
                                     </CFormLabel>
-                                    <CFormInput
+                                    {/* <CFormInput
                                         type="number"
                                         placeholder="Event Organizer Mobile"
                                         required
                                         value={mobile}
                                         onChange={(e) => setMobile(e.target.value)}
+                                    /> */}
+                                    <CFormInput
+                                        type="text"
+                                        placeholder="Mobile"
+                                        required
+                                        value={mobile}
+                                        maxLength={15}
+                                        onChange={(e) => {
+                                            const value = e.target.value.replace(/\D/g, '');
+                                            if (value.length <= 15) {
+                                                setMobile(value);
+                                            }
+                                        }}
                                     />
+
                                 </CCol>
 
                                 {/* ACTION BUTTONS */}

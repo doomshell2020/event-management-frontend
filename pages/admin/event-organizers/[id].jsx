@@ -171,12 +171,18 @@ const EventOrganizerEdit = () => {
                 });
             }
         } catch (err) {
+
+            const apiErrorMsg =
+                err.response?.data?.error?.details?.[0]?.msg ||
+                err.response?.data?.error?.message ||
+                err.response?.data?.message ||
+                err.message ||
+                "Something went wrong. Please try again.";
+
             Swal.fire({
                 icon: "error",
                 title: "Server Error",
-                text:
-                    err?.response?.data?.error?.message ||
-                    "Internal server error",
+                text: apiErrorMsg
             });
         } finally {
             setBtnLoading(false);
@@ -254,6 +260,19 @@ const EventOrganizerEdit = () => {
                                         <span style={{ color: "red" }}>*</span>
                                     </CFormLabel>
                                     <CFormInput
+                                        type="text"
+                                        placeholder="Mobile"
+                                        required
+                                        value={mobile}
+                                        maxLength={15}
+                                        onChange={(e) => {
+                                            const value = e.target.value.replace(/\D/g, '');
+                                            if (value.length <= 15) {
+                                                setMobile(value);
+                                            }
+                                        }}
+                                    />
+                                    {/* <CFormInput
                                         type="number"
                                         placeholder="Mobile"
                                         required
@@ -261,7 +280,7 @@ const EventOrganizerEdit = () => {
                                         onChange={(e) =>
                                             setMobile(e.target.value)
                                         }
-                                    />
+                                    /> */}
                                 </CCol>
 
                                 {/* Platform Fee */}
