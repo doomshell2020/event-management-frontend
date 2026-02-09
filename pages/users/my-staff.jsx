@@ -177,8 +177,8 @@ const MyStaff = () => {
                         <Button size="sm" onClick={openAddModal}>Add Staff</Button>
                     </div>
 
-                    <div className="table-responsive my-staff-table">
-                        <table className="table">
+                    <div className="table-responsive my-staff-table ">
+                        <table className="table table-width-992">
                             <thead className="table-dark">
                                 <tr>
                                     <th>S.No</th>
@@ -237,7 +237,7 @@ const MyStaff = () => {
             </section>
 
             {/* ================= MODAL ================= */}
-            <Modal show={show} onHide={() => setShow(false)} backdrop="static" size="lg">
+            <Modal show={show} onHide={() => setShow(false)} backdrop="static" size="lg profile-addstaff-modal">
                 <Form onSubmit={handleSubmit}>
                     <Modal.Header closeButton>
                         <Modal.Title>{isEdit ? "Edit Staff" : "Add Staff"}</Modal.Title>

@@ -482,8 +482,10 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
 
                                         {/* RIGHT SIDE (CART SUMMARY) */}
                                         <Col lg={4} className="crys-accomo-rgt men-innr-sec monten25-rgt-pnl">
+                                            <div className="chackout-side-box">
                                             <div className="checkot-rgt chackout-box">
                                                 {cart.length > 0 ? (
+                                                    
                                                     <div className="checkot-tct-purcs monte25-tct-purcs px-0 pb-0">
                                                         <div className="apply-cd mt-1">
                                                             {couponError && (
@@ -591,6 +593,7 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    
                                                 ) : (
                                                     <h3 className="text-center mt-2">Cart is Empty</h3>
                                                 )}
@@ -631,7 +634,7 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
 
 
                                             </div>
-
+</div>
 
                                         </Col>
                                     </Row>

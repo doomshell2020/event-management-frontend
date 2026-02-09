@@ -181,7 +181,7 @@ const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
 
                 {/* Title */}
                 <div className="text-center edit-event-header-title">
-                    <h6 className="event_Heading mb-0 fs-5 fw-bold">{eventDetails?.name || ""}</h6>
+                    <h6 className="event_Heading mb-0 fs-6 fw-bold">{eventDetails?.name || ""}</h6>
                 </div>
 
                 {/* View Event */}

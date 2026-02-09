@@ -117,20 +117,32 @@ const PublishEvent = () => {
                                 </p>
 
                                 <div className="contant_bg mt-4 shadow-sm rounded p-4 bg-white border">
-                                    <div className="d-flex align-items-center justify-content-between mb-3">
-                                        <h6 className="fw-bold mb-0">
-                                            Activation Setting
-                                        </h6>
+                                    <div className="row mb-3">
+                                        <div className="col-md-8 col-sm-6">
+                                            <h6 className="fw-bold mb-0">
+                                                Activation Setting
+                                            </h6>
+                                        </div>
+                                        <div className="col-md-4 col-sm-6 mt-2 mt-sm-0">
+                                            {eventDetails?.admineventstatus == "Y" ? (
+                                                <span
+                                                    className="bg-success px-3 text-white py-2 h-100 d-flex align-items-center justify-content-center"
+                                                    style={{ fontSize: "12px" }}
+                                                >
+                                                    ✔ Admin Approved
+                                                </span>
+                                            ) : (
+                                                <span
+                                                    className="text-white bg-warning text-dark px-3 py-2 h-100 d-flex align-items-center justify-content-center"
+                                                    style={{ fontSize: "12px" }}
+                                                >
+                                                    ⏳ Pending Admin Approval
+                                                </span>
+                                            )}
+                                        </div>
 
-                                        {eventDetails?.admineventstatus == "Y" ? (
-                                            <span className="badge bg-success px-3 py-2">
-                                                ✔ Admin Approved
-                                            </span>
-                                        ) : (
-                                            <span className="badge bg-warning text-dark px-3 py-2">
-                                                ⏳ Pending Admin Approval
-                                            </span>
-                                        )}
+
+
                                     </div>
 
                                     <hr className="mt-2 mb-3" />
@@ -143,8 +155,8 @@ const PublishEvent = () => {
                                                 </div>
                                             </div>
                                         ) : (
-                                            <div className="d-flex align-items-start justify-content-between flex-wrap">
-                                                <div className="d-flex align-items-center">
+                                            <div className="row align-items-center">
+                                                <div className="col-md-8 col-sm-6 d-flex align-items-center">
                                                     <div className="me-3">
                                                         {eventDetails?.status == "Y" ? (
                                                             <div
@@ -216,9 +228,9 @@ const PublishEvent = () => {
                                                     </div>
                                                 </div>
 
-                                                <div className="mt-3 mt-md-0">
+                                                <div className="mt-3 mt-md-0 col-md-4 col-sm-6">
                                                     <button
-                                                        className={`btn px-4 fw-semibold ${eventDetails?.status == "Y"
+                                                        className={`btn px-4 fw-semibold w-100 ${eventDetails?.status == "Y"
                                                             ? "btn-danger"
                                                             : "btn-success"
                                                             }`}

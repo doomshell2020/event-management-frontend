@@ -626,11 +626,11 @@ const EventDetailPage = ({ event, slug }) => {
 
             {/* 🎥 Event Video */}
             {event.video_url && getYoutubeEmbedUrl(event.video_url) && (
-              <div className="mt-4">
+              <div className="mt-4 event-editor-content-box">
                 <h6 className="mb-2">Event Preview</h6>
 
                 <div
-                  className="ratio ratio-16x9 rounded overflow-hidden shadow-sm"
+                  className="ratio ratio-16x9  rounded overflow-hidden shadow-sm"
                   style={{ backgroundColor: "#000" }}
                 >
                   <iframe

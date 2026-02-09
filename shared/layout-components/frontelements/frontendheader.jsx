@@ -93,10 +93,19 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
   // ✅ ADD THIS: close menu helper (links click pe close)
   const closeMobileMenu = () => setMenuOpen(false);
 
+  // ✅ ADD THIS: active route helpers
+  const isActive = (href) => {
+    if (!router?.pathname) return false;
+    if (href === "/") return router.pathname === "/";
+    return router.pathname === href || router.pathname.startsWith(href + "/");
+  };
+
+  const linkClass = (href) => `navLink ${isActive(href) ? "active" : ""}`;
+
   /* -------------------- JSX -------------------- */
   return (
     <>
-      <header className="headernav">
+     <header className="headernav">
         {/* ✅ ADD expanded={menuOpen} */}
         <Navbar
           expand="lg"
@@ -135,22 +144,32 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
                 <div className="menuflexbox ms-auto">
                   {/* MAIN MENU */}
                   <nav className="menulistbox">
-                    <Link href="/" className="navLink" onClick={closeMobileMenu}>
+                    <Link href="/" className={linkClass("/")} onClick={closeMobileMenu}>
                       Home
                     </Link>
 
-                    <Link href="/calender" className="navLink" onClick={closeMobileMenu}>
+                    <Link
+                      href="/calender"
+                      className={linkClass("/calender")}
+                      onClick={closeMobileMenu}
+                    >
                       Event Calendar
                     </Link>
 
                     {isLoggedIn && (
                       <>
-                        <Link href="/orders" className="navLink" onClick={closeMobileMenu}>
+                        <Link
+                          href="/orders"
+                          className={linkClass("/orders")}
+                          onClick={closeMobileMenu}
+                        >
                           My Orders
                         </Link>
 
                         <button
-                          className="navLink position-relative btn btn-link p-0"
+                          className={`navLink position-relative btn btn-link p-0 ${
+                            isActive("/cart") ? "active" : ""
+                          }`}
                           onClick={() => {
                             handleCartClick();
                             closeMobileMenu();
@@ -167,7 +186,9 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
                         {committeeAssigned && (
                           <Link
                             href="/committee/ticket"
-                            className="navLink position-relative"
+                            className={`navLink position-relative ${
+                              isActive("/committee/ticket") ? "active" : ""
+                            }`}
                             onClick={closeMobileMenu}
                           >
                             Committee
@@ -181,7 +202,11 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
                       </>
                     )}
 
-                    <Link href="/contact-us" className="navLink" onClick={closeMobileMenu}>
+                    <Link
+                      href="/contact-us"
+                      className={linkClass("/contact-us")}
+                      onClick={closeMobileMenu}
+                    >
                       Contact Us
                     </Link>
                   </nav>
@@ -203,7 +228,7 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
                               <li key={item.href}>
                                 <Link
                                   href={item.href}
-                                  className="dropdownLink"
+                                  className={`dropdownLink ${isActive(item.href) ? "active" : ""}`}
                                   onClick={closeMobileMenu}
                                 >
                                   <i className={`fas ${item.icon}`} /> {item.label}

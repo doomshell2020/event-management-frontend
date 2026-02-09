@@ -212,7 +212,7 @@ const MyEventsPage = () => {
                                     </div>
 
                                     <div className="text-center">
-                                        <h6 className="event_Heading mb-0 fs-5 fw-bold">Jescie Wiggins</h6>
+                                        <h6 className="event_Heading mb-0 fs-6 fw-bold">Jescie Wiggins</h6>
                                     </div>
 
                                     <div className="text-right mt-1">
