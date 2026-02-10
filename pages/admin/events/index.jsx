@@ -1570,7 +1570,7 @@ export const Events = () => {
                             </div>
                         </Card.Header>
 
-                        <div className="table-responsive mt-4">
+                        <div className="table-responsive mt-4 admin-table-deta-no-wrap">
                             {isLoading ? (
                                 <div
                                     style={{
@@ -1592,7 +1592,7 @@ export const Events = () => {
                             ) : (
                                 <table
                                     {...getTableProps()}
-                                    className="table table-bordered table-hover mb-0 text-md-nowrap"
+                                    className="table table-bordered table-hover mb-0 "
                                 >
                                     <thead>
                                         <tr>

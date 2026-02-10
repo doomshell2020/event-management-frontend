@@ -173,6 +173,17 @@ License        :   Licensed under ThemeForest License
 .badge-pill {padding-left: 8px;
   padding-right: 8px;}
 /*////////////////////badgelight//////////////////*/
+
+
+.admin-profile-img img {
+    object-fit: cover;
+}
+.payout-events-table.table .event-name-links {
+    color: #f34343;
+}
+
+.admin-table-deta-no-wrap{white-space: nowrap;}
+
 .badge-primary-transparent {color: var(--primary-bg-color);
   background-color: var(--primary02);}
 .badge-success-transparent {background-color: rgba(36, 213, 184, 0.15) !important;

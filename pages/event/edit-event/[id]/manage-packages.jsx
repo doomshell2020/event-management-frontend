@@ -692,7 +692,7 @@ const ManagePackages = () => {
 
             <FrontendFooter />
 
-            <Modal show={show} onHide={() => setShow(false)} size="lg" centered>
+            <Modal show={show} onHide={() => setShow(false)} size="lg profile-addstaff-modal" centered>
                 <Modal.Header closeButton>
                     <Modal.Title>{packageForm?.id ? "Edit Package" : "Create Package"}</Modal.Title>
                 </Modal.Header>
@@ -711,7 +711,7 @@ const ManagePackages = () => {
                         className={validateDefault ? "was-validated" : ""}>
 
                         <div className="row mb-3">
-                            <div className="col-md-6">
+                            <div className="col-lg-4">
                                 <Form.Label>Package Name:</Form.Label>
                                 <Form.Control
                                     type="text"
@@ -727,7 +727,7 @@ const ManagePackages = () => {
                                 </Form.Control.Feedback>
                             </div>
 
-                            <div className="col-md-2">
+                            <div className="col-lg-3">
                                 <Form.Label>Package Limit:</Form.Label>
                                 <Form.Select
                                     required
@@ -747,7 +747,7 @@ const ManagePackages = () => {
                                     Please select a limit.
                                 </Form.Control.Feedback>
                             </div>
-                            <div className="col-md-2">
+                            <div className="col-lg-2">
                                 <Form.Label>Total</Form.Label>
                                 <Form.Control
                                     type="number"
@@ -764,7 +764,7 @@ const ManagePackages = () => {
                                 </Form.Control.Feedback>
                             </div>
 
-                            <div className="col-md-2">
+                            <div className="col-lg-3">
                                 <Form.Label>Visibility:</Form.Label>
                                 <Form.Select
                                     required
@@ -784,7 +784,8 @@ const ManagePackages = () => {
                         </div>
 
                         {/* Tickets Table */}
-                        <table className="table table-bordered align-middle text-center">
+                        <div className="table-responsive">
+                        <table className="table table-bordered align-middle text-center table-mobile-width">
                             <thead className="bg-primary">
                                 <tr>
                                     <th>S.No</th>
@@ -880,6 +881,7 @@ const ManagePackages = () => {
                                 ))}
                             </tbody>
                         </table>
+                        </div>
 
                         {/* Totals Section */}
                         {(() => {

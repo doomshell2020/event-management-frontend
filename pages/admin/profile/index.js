@@ -147,7 +147,7 @@ const Profile = () => {
             <Card.Body className="bg-white">
               <Row className="align-items-center">
                 <Col md={2} sm={12} className="text-center mb-3 mb-md-0">
-                  <div className="position-relative d-inline-block">
+                  <div className="position-relative d-inline-block admin-profile-img">
                     <Image
                       src={
                         profile?.profile_image ||

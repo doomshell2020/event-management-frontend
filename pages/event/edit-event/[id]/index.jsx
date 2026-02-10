@@ -673,7 +673,7 @@ const MyEventsPage = () => {
 
                                                     )}
 
-                                                    <div className="col-md-8">
+                                                    <div className="col-md-6">
                                                         <label htmlFor="formFile" className="form-label">
                                                             Upload Image{" "}
                                                             <small className="text-danger" style={{ fontSize: "11px" }}>
@@ -806,7 +806,7 @@ const MyEventsPage = () => {
                                                     </div>
 
                                                     {!isFree && (
-                                                        <div className="col-md-4">
+                                                        <div className="col-md-6 col-md-6 d-flex flex-column justify-content-between">
                                                             <label className="form-label d-flex align-items-center gap-2">
                                                                 Type of Event
 

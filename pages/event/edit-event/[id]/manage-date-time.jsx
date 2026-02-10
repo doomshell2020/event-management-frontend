@@ -359,9 +359,9 @@ const ManageDateTime = () => {
                                     {/* Left: Calendar */}
                                     <div className="col-md-6">
                                         <div className="card p-3">
-                                            <div className="">
+                                            <div className="d-flex justify-content-between align-items-center mb-1">
                                                 <h6 className="mb-0">Calendar</h6>
-                                                <small>{calendarDate.toLocaleString("default", { month: "long", year: "numeric" })}</small>
+                                                <span>{calendarDate.toLocaleString("default", { month: "long", year: "numeric" })}</span>
                                             </div>
 
                                             <Calendar
@@ -389,7 +389,7 @@ const ManageDateTime = () => {
                                             />
 
                                             <div className="mt-3">
-                                                <Button variant="secondary" size="sm" onClick={() => openForDate(new Date())} disabled={!addDateAllowed}>
+                                                <Button variant="secondary" onClick={() => openForDate(new Date())} disabled={!addDateAllowed}>
                                                     + Add a date
                                                 </Button>
                                                 {!addDateAllowed && (
@@ -404,8 +404,8 @@ const ManageDateTime = () => {
                                     {/* Middle: date slots list */}
                                     <div className=" col-md-6">
                                         <div className="card p-3">
-                                            <div className="d-flex justify-content-between align-items-center">
-                                                <h4 className="text-24 mb-0">Manage dates and times</h4>
+                                            <div>
+                                                <h4 className="fs-6 fw-bold mb-1">Manage dates and times</h4>
                                                 <small className="text-14">Add dates & time slots within the event range</small>
                                             </div>
 
@@ -425,15 +425,15 @@ const ManageDateTime = () => {
                                                             >
                                                                 {/* LEFT: Date Column */}
                                                                 <div className="d-flex align-items-start justify-content-between">
-                                                                <div className="d-flex gap-2">
-                                                                    <div style={{ fontSize: 22, fontWeight: 800 }}>
+                                                                <div className="d-flex gap-2 align-items-center">
+                                                                    <div className="manage-dete-dateboax">
                                                                         {String(new Date(dKey).getDate()).padStart(2, "0")}
                                                                     </div>
                                                                     <div>
                                                                     <div className="text-muted" style={{ fontSize: 14 }}>
                                                                         {new Date(dKey).toLocaleString("default", { month: "long" })}
                                                                     </div>
-                                                                    <div style={{ fontSize: 14, fontWeight: 700 }}>
+                                                                    <div style={{ fontSize: 13, fontWeight: 700 }}>
                                                                         {new Date(dKey)
                                                                             .toLocaleString("default", { weekday: "short" })
                                                                             .toUpperCase()}
@@ -462,7 +462,7 @@ const ManageDateTime = () => {
 </div>
                                                                 {/* MIDDLE: Slot Pills */}
                                                                 <div >
-                                                                    <div style={{ fontWeight: 600 }}>
+                                                                    <div style={{ fontWeight: 600,textAlign:"right" }}>
                                                                         {arr.length} time slot{arr.length > 1 ? "s" : ""}
                                                                     </div>
 
@@ -515,7 +515,7 @@ const ManageDateTime = () => {
                                 </div>
 
                                 {/* Modal for adding/editing slots */}
-                                <Modal show={showModal} onHide={() => setShowModal(false)} size="lg" centered>
+                                <Modal show={showModal} onHide={() => setShowModal(false)} size="lg"  centered>
                                     <Modal.Header closeButton>
                                         <Modal.Title>
                                             <div>

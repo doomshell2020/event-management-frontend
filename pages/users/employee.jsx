@@ -72,7 +72,7 @@ const ProfilePage = () => {
           </div>
 
           <div className="table-responsive my-staff-table">
-            <table className="table table-deta-no-wrap">
+            <table className="table table-deta-no-wrap table-width-992">
               <thead className="table-dark">
                 <tr>
                   <th>S.No</th>

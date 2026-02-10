@@ -177,7 +177,7 @@ const EventsSalesList = () => {
                   <Spinner />
                 </div>
               ) : (
-                <Table hover responsive className="mb-0">
+                <Table hover responsive className="mb-0 payout-events-table">
                   <thead className="table-light">
                     <tr>
                       <th>#</th>
@@ -210,7 +210,7 @@ const EventsSalesList = () => {
                             <Link
                               href={`/admin/payouts/${ev.event_id}`}
                               target="_blank"
-                              className="fw-semibold text-decoration-none d-block"
+                              className="fw-semibold text-decoration-none d-block event-name-links"
                             >
                               {ev.event_name}
                             </Link>

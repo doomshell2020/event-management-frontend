@@ -899,7 +899,7 @@ export const TicketList = () => {
                             ) : (
                                 <table
                                     {...getTableProps()}
-                                    className="table table-bordered table-hover mb-0 text-md-nowrap"
+                                    className="table table-bordered table-hover mb-0 admin-table-deta-no-wrap"
                                 >
                                     <thead>
                                         <tr>
