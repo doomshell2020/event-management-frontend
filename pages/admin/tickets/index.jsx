@@ -74,52 +74,152 @@ export const TicketList = () => {
             Header: "Ticket",
             accessor: "ticket_name",
             className: "borderrigth",
+            // Cell: ({ row }) => {
+            //     const item = row.original;
+            //     const { type } = item;
+
+            //     let name = "-";
+            //     let label = "";
+
+            //     switch (type) {
+            //         case "ticket":
+            //             name = item.ticketType?.title;
+            //             label = "Ticket";
+            //             break;
+
+            //         case "comps":
+            //             name = item.ticketType?.title;
+            //             label = "Comps";
+            //             break;
+
+            //         case "committesale":
+            //             name = item.ticketType?.title;
+            //             label = "Committee";
+            //             break;
+
+            //         case "addon":
+            //             name = item.addonType?.name;
+            //             label = "Addon";
+            //             break;
+
+            //         case "appointment":
+            //             name = item.appointment?.wellnessList?.name;
+            //             label = "Appointment";
+            //             break;
+
+            //         case "package":
+            //             name = item.package?.name;
+            //             label = "Package";
+            //             break;
+
+            //         case "ticket_price":
+            //             if (item.ticketPricing?.ticket?.title) {
+            //                 const slotName = item.ticketPricing?.slot?.slot_name;
+            //                 name = slotName
+            //                     ? `${item.ticketPricing.ticket.title} (${slotName})`
+            //                     : item.ticketPricing.ticket.title;
+            //                 label = "Ticket Price";
+            //             }
+            //             break;
+
+            //         default:
+            //             name = "-";
+            //             label = "";
+            //     }
+
+            //     return (
+            //         <div className="d-flex flex-column">
+            //             <span className="fw-semibold">{name || "-"}</span>
+
+            //             {label && (
+            //                 <span
+            //                     className="badge mt-1"
+            //                     style={{
+            //                         backgroundColor: "#28a745",
+            //                         color: "#fff",
+            //                         fontSize: "12px",
+            //                         padding: "4px 8px",
+            //                         borderRadius: "4px",
+            //                         fontWeight: 600,
+            //                         width: "fit-content",
+            //                     }}
+            //                 >
+            //                     {label}
+            //                 </span>
+            //             )}
+            //         </div>
+            //     );
+            // },
+
             Cell: ({ row }) => {
-                const item = row.original;
-                const { type } = item;
+                const { type, appointment } = row.original;
 
                 let name = "-";
                 let label = "";
+                let badgeColor = "#28a745"; // default green
+                let extraInfo = null;
+
+                // helpers
+                const formatDate = (dateStr) => {
+                    return dateStr ? moment(dateStr).format("DD MMM, YYYY") : "-";
+                };
+
+                const formatTime = (timeStr) => {
+                    if (!timeStr) return "-";
+                    const [h, m] = timeStr.split(":");
+                    const date = new Date();
+                    date.setHours(h, m);
+                    return date.toLocaleTimeString("en-US", {
+                        hour: "numeric",
+                        minute: "2-digit",
+                        hour12: true,
+                    });
+                };
 
                 switch (type) {
                     case "ticket":
-                        name = item.ticketType?.title;
+                        name = row.original.ticketType?.title;
                         label = "Ticket";
                         break;
 
                     case "comps":
-                        name = item.ticketType?.title;
+                        name = row.original.ticketType?.title;
                         label = "Comps";
                         break;
 
                     case "committesale":
-                        name = item.ticketType?.title;
+                        name = row.original.ticketType?.title;
                         label = "Committee";
                         break;
 
                     case "addon":
-                        name = item.addonType?.name;
+                        name = row.original.addonType?.name;
                         label = "Addon";
                         break;
 
+                    case "ticket_price":
+                        name = row.original.ticketPricing?.ticket?.title;
+                        label = "Ticket Pricing";
+                        break;
+
+
                     case "appointment":
-                        name = item.appointment?.wellnessList?.name;
+                        name = appointment?.wellnessList?.name;
                         label = "Appointment";
+                        badgeColor = "#0d6efd"; // 🔵 blue for appointment
+
+                        extraInfo = (
+                            <span>
+                                <strong>Date: </strong>{formatDate(appointment?.date)} <br />
+                                <strong>Time: </strong> {formatTime(appointment?.slot_start_time)} –{" "}
+                                {formatTime(appointment?.slot_end_time)}
+                            </span>
+                        );
                         break;
 
                     case "package":
-                        name = item.package?.name;
+                        name = row.original.package?.name;
                         label = "Package";
-                        break;
-
-                    case "ticket_price":
-                        if (item.ticketPricing?.ticket?.title) {
-                            const slotName = item.ticketPricing?.slot?.slot_name;
-                            name = slotName
-                                ? `${item.ticketPricing.ticket.title} (${slotName})`
-                                : item.ticketPricing.ticket.title;
-                            label = "Ticket Price";
-                        }
                         break;
 
                     default:
@@ -130,12 +230,13 @@ export const TicketList = () => {
                 return (
                     <div className="d-flex flex-column">
                         <span className="fw-semibold">{name || "-"}</span>
+                        <span className="fw-semibold"> {extraInfo}</span>
 
                         {label && (
                             <span
                                 className="badge mt-1"
                                 style={{
-                                    backgroundColor: "#28a745",
+                                    backgroundColor: badgeColor,
                                     color: "#fff",
                                     fontSize: "12px",
                                     padding: "4px 8px",
@@ -150,6 +251,7 @@ export const TicketList = () => {
                     </div>
                 );
             },
+
         },
 
 
@@ -228,26 +330,26 @@ export const TicketList = () => {
                 );
             },
         },
-        {
-            Header: "Customer Pay",
-            accessor: "CustomerPay",
-            className: "borderrigth",
-            Cell: ({ row }) => (
-                <div>
-                    {formatCurrencyAmount(row.original, "sub_total")}
-                </div>
-            ),
-        },
-        {
-            Header: "Admin Commission",
-            accessor: "Commission",
-            className: "borderrigth",
-            Cell: ({ row }) => (
-                <div>
-                    {formatCurrencyAmount(row.original, "tax_total")}
-                </div>
-            ),
-        },
+        // {
+        //     Header: "Customer Pay",
+        //     accessor: "CustomerPay",
+        //     className: "borderrigth",
+        //     Cell: ({ row }) => (
+        //         <div>
+        //             {formatCurrencyAmount(row.original, "sub_total")}
+        //         </div>
+        //     ),
+        // },
+        // {
+        //     Header: "Admin Commission",
+        //     accessor: "Commission",
+        //     className: "borderrigth",
+        //     Cell: ({ row }) => (
+        //         <div>
+        //             {formatCurrencyAmount(row.original, "tax_total")}
+        //         </div>
+        //     ),
+        // },
 
 
 
@@ -322,11 +424,16 @@ export const TicketList = () => {
     const { globalFilter, pageIndex, pageSize } = state;
     useEffect(() => { setPageSize(50) }, []);
 
-
+    const formatDate = (date) => {
+        if (!date) return "";
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+    };
 
     const handleSearch = async (e) => {
         e.preventDefault();
-
         try {
             const response = await api.get("/api/v1/admin/tickets/search", {
                 params: {
@@ -335,8 +442,10 @@ export const TicketList = () => {
                     email: email,
                     event,
                     ticketNumber,
-                    purchaseFrom: fromDate ? fromDate.toISOString().split("T")[0] : "",
-                    purchaseTo: toDate ? toDate.toISOString().split("T")[0] : "",
+                    // purchaseFrom: fromDate ? fromDate.toISOString().split("T")[0] : "",
+                    // purchaseTo: toDate ? toDate.toISOString().split("T")[0] : "",
+                    purchaseFrom: formatDate(fromDate),
+                    purchaseTo: formatDate(toDate),
                 },
             });
             setTicketList(response?.data?.data.tickets || []);
@@ -376,8 +485,8 @@ export const TicketList = () => {
         "Customer Name",
         "Mobile",
         "Buy Ticket",
-        "Amount",
-        "Commission(8%)",
+        // "Amount",
+        // "Commission(8%)",
     ];
     const formatDateTime = (date) => {
         if (!date) return "----";
@@ -447,8 +556,8 @@ export const TicketList = () => {
                 `${user?.first_name || ""} ${user?.last_name || ""}`.trim() || "----",
             "Mobile": user?.mobile || "----",
             "Buy Ticket": item?.count || 0,
-            "Amount": `${currency}${amount}`,
-            "Commission (8%)": `${currency}${commission}`,
+            // "Amount": `${currency}${amount}`,
+            // "Commission (8%)": `${currency}${commission}`,
         };
     });
 

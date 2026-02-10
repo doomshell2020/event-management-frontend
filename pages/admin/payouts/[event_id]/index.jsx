@@ -16,6 +16,7 @@ import moment from "moment";
 import api from "@/utils/api";
 import { formatEventDateTime } from "@/utils/formatDate";
 import { useRouter } from "next/router";
+import Swal from "sweetalert2";
 
 const PayoutsList = () => {
     /* ================= ROUTER ================= */
@@ -44,7 +45,7 @@ const PayoutsList = () => {
     /* ================= FETCH ================= */
     const fetchPayouts = async (params = {}) => {
         try {
-            console.log('params :', params);
+            // console.log('params :', params);
             setLoading(true);
             const { data } = await api.get("/api/v1/admin/payouts/list", { params });
             setPayouts(data?.data?.payouts || []);
@@ -93,10 +94,11 @@ const PayoutsList = () => {
     const resetFilter = () => {
         setFromDate(null);
         setToDate(null);
-        setEventId("all"); // reset to All
+        setEventId(routeEventId); // reset to All
 
         // On reset, fetch all payouts regardless of routeEventId
-        fetchPayouts();
+        // fetchPayouts();
+        fetchPayouts({ event_id: routeEventId });
     };
 
 
@@ -167,8 +169,20 @@ const PayoutsList = () => {
             setTxnRef("");
             setRemarks("");
             setSubmitted(false);
+            fetchPayouts({ event_id: routeEventId })
         } catch (err) {
-            console.error(err);
+            // console.error("errr",err);
+            const apiErrorMsg =
+                err.response?.data?.error?.details ||
+                err.response?.data?.error?.message ||
+                err.response?.data?.message ||
+                err.message ||
+                "Something went wrong. Please try again.";
+            Swal.fire({
+                icon: "error",
+                title: "Server Error",
+                text: apiErrorMsg,
+            });
         } finally {
             setSubmitting(false);
         }

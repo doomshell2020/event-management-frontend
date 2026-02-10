@@ -80,7 +80,8 @@ const StaticEdit = () => {
         event.stopPropagation();
         // ✅ Frontend validation
         const content = getHtmlEditorContent(noteRef).trim();
-        if (!title.trim() || !subject.trim() || !selectedEvent || isEditorEmpty(content)) {
+        // console.log(title,subject,selectedEvent,content)
+        if (!title.trim() || !subject.trim() || selectedEvent === null || selectedEvent === undefined || isEditorEmpty(content)) {
             setValidateDefault(true);
             Swal.fire({
                 icon: "warning",

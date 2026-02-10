@@ -26,6 +26,8 @@ import AsyncSelect from "react-select/async";
 import { useRouter } from "next/router";
 
 export const EventOrganizersList = () => {
+    const router = useRouter();
+    const { status: queryStatus } = router.query;
     const [COLUMNS, setCOLUMNS] = useState([
         {
             Header: "S.No",
@@ -269,6 +271,7 @@ export const EventOrganizersList = () => {
 
     ]);
     let navigate = useRouter();
+    const [status, setStatus] = useState("");
     const [OrganizerList, setOrganizerList] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedCustomer, setSelectedCustomer] = useState(null);
@@ -356,9 +359,9 @@ export const EventOrganizersList = () => {
         }
     };
 
-    useEffect(() => {
-        getEventOrganizers();
-    }, []);
+    // useEffect(() => {
+    //     getEventOrganizers();
+    // }, []);
 
     const tableInstance = useTable(
         {
@@ -401,7 +404,8 @@ export const EventOrganizersList = () => {
                 params: {
                     first_name: firstName,
                     email: email,
-                    mobile: mobile
+                    mobile: mobile,
+                    status: status
                 },
             });
             setOrganizerList(response?.data?.data?.eventOrganizers); // Save API results in state
@@ -418,9 +422,43 @@ export const EventOrganizersList = () => {
         setSelectedCustomer(null);   // 👈 THIS WAS MISSING
         setSelectedEmail(null);   // 👈 THIS WAS MISSING
         setOrganizerList([]);
+        setStatus("");
+        router.replace("/admin/event-organizers", undefined, { shallow: true });
         getEventOrganizers();
     };
 
+    const autoSearch = async (statusValue) => {
+        try {
+            const response = await api.get("/api/v1/admin/event-organizer/search", {
+                params: {
+                    first_name: firstName,
+                    email: email,
+                    mobile: mobile,
+                    status: statusValue
+                },
+            });
+            setIsLoading(false);
+            setOrganizerList(response?.data?.data?.eventOrganizers || []);
+        } catch (error) {
+            console.error("Error fetching customers:", error);
+            setOrganizerList([]);
+        }
+    };
+
+    useEffect(() => {
+        if (!router.isReady) return;
+        if (queryStatus) return;
+        getEventOrganizers();
+    }, [router.isReady, queryStatus]);
+
+    useEffect(() => {
+        if (!router.isReady) return;
+
+        if (queryStatus) {
+            setStatus(queryStatus);
+            autoSearch(queryStatus);
+        }
+    }, [router.isReady, queryStatus]);
 
     const loadUserOptions = async (inputValue) => {
         if (inputValue.length < 2) return [];
@@ -593,7 +631,17 @@ export const EventOrganizersList = () => {
                                     />
                                 </Form.Group>
 
-
+                                <Form.Group className="mb-3" controlId="formStatus">
+                                    <Form.Label>Status</Form.Label>
+                                    <Form.Select
+                                        value={status}
+                                        onChange={(e) => setStatus(e.target.value)}
+                                    >
+                                        <option value="">Select Status</option>
+                                        <option value="Y">Active</option>
+                                        <option value="N">Inactive</option>
+                                    </Form.Select>
+                                </Form.Group>
 
 
                                 <div className="d-flex align-items-end justify-content-between">

@@ -381,11 +381,61 @@ const Dashboard = () => {
                     <i style={{ fontSize: "35px" }} className="fe fe-users"></i>
                   </div>
                 </div>
-                <Col style={{ flex: "1" }}>
+                {/* <Col style={{ flex: "1" }}>
                   <div className="mt-0">
                     <span className="text-white">Total Customers</span>
                     <h2 className="text-white mb-0" style={{ fontSize: "20px" }}><span title="Active Customers">
                       {counts?.customers?.active || 0}</span>{" / "}<span title="Inactive Customers">{counts?.customers?.inactive || 0}</span></h2>
+                  </div>
+                </Col> */}
+
+
+                <Col style={{ flex: "1" }}>
+                  <div className="mt-0">
+                    <span className="text-white">Total Customers</span>
+
+                    <h2
+                      className="text-white mb-0"
+                      style={{ fontSize: "20px" }}
+                    >
+                      {/* ✅ Active */}
+                      <Link
+                        href={{
+                          pathname: "/admin/customer",
+                          query: { status: "Y" },
+                        }}
+                        target="_blank"
+                        title="Active Customers"
+                        style={{
+                          cursor: "pointer",
+                          // textDecoration: "underline",
+                          color: "#ffffff",
+                          marginRight: "4px",
+                        }}
+                      >
+                        {counts?.customers?.active || 0}
+                      </Link>
+
+                      {" / "}
+
+                      {/* ❌ Inactive */}
+                      <Link
+                        href={{
+                          pathname: "/admin/customer",
+                          query: { status: "N" },
+                        }}
+                        target="_blank"
+                        title="Inactive Customers"
+                        style={{
+                          cursor: "pointer",
+                          // textDecoration: "underline",
+                          color: "#ffffff",
+                          marginLeft: "4px",
+                        }}
+                      >
+                        {counts?.customers?.inactive || 0}
+                      </Link>
+                    </h2>
                   </div>
                 </Col>
               </Row>
@@ -404,7 +454,39 @@ const Dashboard = () => {
                 <Col style={{ flex: "1" }}>
                   <div className="mt-0">
                     <span className="text-white">Event Organizers</span>
-                    <h2 className="text-white mb-0" style={{ fontSize: "20px" }}><span title="Active Event Organizers">{counts?.organizers?.active || 0}</span> {" / "} <span title="Inactive Event Organizers">{counts?.organizers?.inactive || 0}</span></h2>
+                    <h2 className="text-white mb-0" style={{ fontSize: "20px" }}><span title="Active Event Organizers">
+                      <Link
+                        href={{
+                          pathname: "/admin/event-organizers/",
+                          query: { status: "Y" },
+                        }}
+                        target="_blank"
+                        title="Active Event Organizers"
+                        style={{
+                          cursor: "pointer",
+                          // textDecoration: "underline",
+                          color: "#ffffff",
+                          marginRight: "4px",
+                        }}
+                      >
+                        {counts?.organizers?.active || 0}</Link></span> {" / "} <span title="Inactive Event Organizers">
+                           <Link
+                        href={{
+                          pathname: "/admin/event-organizers/",
+                          query: { status: "N" },
+                        }}
+                        target="_blank"
+                        title="Inactive Event Organizers"
+                        style={{
+                          cursor: "pointer",
+                          // textDecoration: "underline",
+                          color: "#ffffff",
+                          marginRight: "4px",
+                        }}
+                      >
+                          {counts?.organizers?.inactive || 0}
+                          </Link>
+                          </span></h2>
                   </div>
                 </Col>
               </Row>
@@ -425,7 +507,39 @@ const Dashboard = () => {
                     <span className="text-white">Total Events</span>
                     <h2 className="text-white mb-0" style={{ fontSize: "20px" }}>
                       <span title="Active Events">
-                        {counts?.events?.active || 0}</span> {" / "} <span title="Inactive Events">{counts?.events?.inactive || 0}</span>
+                         <Link
+                        href={{
+                          pathname: "/admin/events",
+                          query: { status: "Y" },
+                        }}
+                        target="_blank"
+                        title="Active Event"
+                        style={{
+                          cursor: "pointer",
+                          // textDecoration: "underline",
+                          color: "#ffffff",
+                          marginRight: "4px",
+                        }}
+                      >
+                        {counts?.events?.active || 0} </Link></span> {" / "} <span title="Inactive Events">
+                           <Link
+                        href={{
+                          pathname: "/admin/events/",
+                          query: { status: "N" },
+                        }}
+                        target="_blank"
+                        title="Inactive Event"
+                        style={{
+                          cursor: "pointer",
+                          // textDecoration: "underline",
+                          color: "#ffffff",
+                          marginRight: "4px",
+                        }}
+                      >
+                          {counts?.events?.inactive || 0}
+                          </Link>
+                          </span>
+                          
                     </h2>
                   </div>
                 </Col>
@@ -466,8 +580,8 @@ const Dashboard = () => {
                 <Col style={{ flex: "1" }}>
                   <div className="mt-0">
                     <span className="text-white">Total Earning</span>
-                    <h2 className="text-white mb-0" style={{ fontSize: "20px" }} title="Total Earning Admin">
-                      {formatNumber(counts?.total_earning)}
+                    <h2 className="text-white mb-0" style={{ fontSize: "20px" }} title="Total Earning include free event">
+                      {formatNumber(counts?.total_earning + counts?.total_free_event_earnings)}
                     </h2>
                   </div>
                 </Col>
