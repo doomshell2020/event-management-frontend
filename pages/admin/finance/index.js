@@ -22,9 +22,12 @@ import { saveAs } from "file-saver";
 const Finance = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [searchEventData, setSearchEventData] = useState([]);
+  // console.log("searchEventData", searchEventData)
   const [allEvents, setAllEvents] = useState([]); // To store list of all events for the dropdown
   const [selectedEvent, setSelectedEvent] = useState("all"); // Track the selected event
   const [excelLoadingId, setExcelLoadingId] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   useEffect(() => {
     fetchEvents();
   }, []);
@@ -227,7 +230,28 @@ const Finance = () => {
 
 
 
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
 
+  const currentEvents = searchEventData.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
+
+  const totalPages = Math.ceil(searchEventData.length / itemsPerPage);
+  const maxVisiblePages = 3;
+
+  const getVisiblePages = () => {
+    let start = Math.max(currentPage - 1, 1);
+    let end = start + maxVisiblePages - 1;
+
+    if (end > totalPages) {
+      end = totalPages;
+      start = Math.max(end - maxVisiblePages + 1, 1);
+    }
+
+    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+  };
 
 
 
@@ -302,6 +326,7 @@ const Finance = () => {
                                 <th>Tickets (Qty)</th>
                                 <th>Addons (Qty)</th>
                                 <th>package (Qty)</th>
+                                <th>Appointment (Qty)</th>
                                 <th>Staff Tickets</th>
                                 {/* <th>Transfer</th> */}
                                 <th>Face Value</th>
@@ -310,7 +335,8 @@ const Finance = () => {
                               </tr>
                             </thead>
                             <tbody>
-                              {searchEventData.map((detail, index) => (
+                              {/* {searchEventData.map((detail, index) => ( */}
+                              {currentEvents.map((detail, index) => (
                                 <tr key={index}>
                                   {/* Event Name */}
                                   <td>
@@ -469,6 +495,29 @@ const Finance = () => {
                                     </div>
                                   </td>
 
+                                  {/* Total appointment Sold */}
+                                  <td>
+                                    <div className="bold-text">
+                                      <b>Total:</b>{" "}
+                                      <Link
+                                        href={{
+                                          pathname: `/admin/orders/order-details/appointment/${detail.event_id}`
+                                        }}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        style={{
+                                          textDecoration: "underline",
+                                          color: "blue",
+                                        }}
+                                      >
+                                        {detail.appointment_count}
+                                      </Link>
+                                    </div>
+                                    <div className="bold-text">
+                                      <b>Cancelled:</b>{" "}
+                                      {detail.cancel_appointment_count}
+                                    </div>
+                                  </td>
 
 
                                   {/* Total Staff Ticket */}
@@ -477,7 +526,8 @@ const Finance = () => {
                                       <b>Total:</b>{" "}
                                       <Link
                                         href={{
-                                          pathname: `/admin/events/staff/${detail.event_id}`}}
+                                          pathname: `/admin/events/staff/${detail.event_id}`
+                                        }}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         style={{
@@ -565,7 +615,10 @@ const Finance = () => {
                                       <strong>Cancel Amount:</strong>{" "}
                                       {`${detail.currency_symbol || ""}${Number(
                                         detail.cancel_grand_total || 0
-                                      ).toLocaleString()}`}
+                                      ).toFixed(2)}`}
+                                      {/* {`${detail.currency_symbol || ""}${Number(
+                                        detail.cancel_grand_total || 0
+                                      ).toLocaleString()}`} */}
 
                                     </div>
                                     <div>
@@ -580,6 +633,70 @@ const Finance = () => {
                               ))}
                             </tbody>
                           </Table>
+                          <div className="d-flex justify-content-end mt-3">
+                            <nav>
+                              <ul className="pagination mb-0">
+
+                                {/* First */}
+                                <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                                  <button
+                                    className="page-link"
+                                    onClick={() => setCurrentPage(1)}
+                                  >
+                                    ⏮
+                                  </button>
+                                </li>
+
+                                {/* Prev */}
+                                <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                                  <button
+                                    className="page-link"
+                                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                                  >
+                                    ◀
+                                  </button>
+                                </li>
+
+                                {/* Page Numbers */}
+                                {getVisiblePages().map(page => (
+                                  <li
+                                    key={page}
+                                    className={`page-item ${currentPage === page ? "active" : ""}`}
+                                  >
+                                    <button
+                                      className="page-link"
+                                      onClick={() => setCurrentPage(page)}
+                                    >
+                                      {page}
+                                    </button>
+                                  </li>
+                                ))}
+
+                                {/* Next */}
+                                <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                                  <button
+                                    className="page-link"
+                                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                                  >
+                                    ▶
+                                  </button>
+                                </li>
+
+                                {/* Last */}
+                                <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                                  <button
+                                    className="page-link"
+                                    onClick={() => setCurrentPage(totalPages)}
+                                  >
+                                    ⏭
+                                  </button>
+                                </li>
+
+                              </ul>
+                            </nav>
+                          </div>
+
+
                         </div>
                       </>
                     )}

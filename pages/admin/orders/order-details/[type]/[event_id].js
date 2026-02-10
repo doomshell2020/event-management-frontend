@@ -23,6 +23,7 @@ import AsyncSelect from "react-select/async";
 export const OrderDetails = () => {
     const router = useRouter();
     const { type, event_id } = router.query;
+
     const [COLUMNS, setCOLUMNS] = useState([
         {
             Header: "S.No",
@@ -51,10 +52,29 @@ export const OrderDetails = () => {
             accessor: "ticket_name",
             className: "borderrigth",
             Cell: ({ row }) => {
-                const { type } = row.original;
+                const { type, appointment } = row.original;
 
                 let name = "-";
                 let label = "";
+                let badgeColor = "#28a745"; // default green
+                let extraInfo = null;
+
+                // helpers
+                const formatDate = (dateStr) => {
+                    return dateStr ? moment(dateStr).format("DD MMM, YYYY") : "-";
+                };
+
+                const formatTime = (timeStr) => {
+                    if (!timeStr) return "-";
+                    const [h, m] = timeStr.split(":");
+                    const date = new Date();
+                    date.setHours(h, m);
+                    return date.toLocaleTimeString("en-US", {
+                        hour: "numeric",
+                        minute: "2-digit",
+                        hour12: true,
+                    });
+                };
 
                 switch (type) {
                     case "ticket":
@@ -78,8 +98,17 @@ export const OrderDetails = () => {
                         break;
 
                     case "appointment":
-                        name = row.original.appointment?.wellnessList?.name;
+                        name = appointment?.wellnessList?.name;
                         label = "Appointment";
+                        badgeColor = "#0d6efd"; // 🔵 blue for appointment
+
+                        extraInfo = (
+                            <span>
+                               <strong>Date: </strong>{formatDate(appointment?.date)} <br />
+                               <strong>Time: </strong> {formatTime(appointment?.slot_start_time)} –{" "}
+                                {formatTime(appointment?.slot_end_time)}
+                            </span>
+                        );
                         break;
 
                     case "package":
@@ -95,16 +124,19 @@ export const OrderDetails = () => {
                 return (
                     <div className="d-flex flex-column">
                         <span className="fw-semibold">{name || "-"}</span>
+                        <span className="fw-semibold"> {extraInfo}</span>
+
                         {label && (
                             <span
-                                className="badge"
+                                className="badge mt-1"
                                 style={{
-                                    backgroundColor: "#28a745",
+                                    backgroundColor: badgeColor,
                                     color: "#fff",
                                     fontSize: "12px",
                                     padding: "4px 8px",
                                     borderRadius: "4px",
                                     fontWeight: 600,
+                                    width: "fit-content",
                                 }}
                             >
                                 {label}
@@ -113,6 +145,7 @@ export const OrderDetails = () => {
                     </div>
                 );
             },
+
         },
 
 
@@ -191,26 +224,26 @@ export const OrderDetails = () => {
                 );
             },
         },
-        {
-            Header: "Customer Pay",
-            accessor: "CustomerPay",
-            className: "borderrigth",
-            Cell: ({ row }) => (
-                <div>
-                    {formatCurrencyAmount(row.original, "sub_total")}
-                </div>
-            ),
-        },
-        {
-            Header: "Admin Commission",
-            accessor: "Commission",
-            className: "borderrigth",
-            Cell: ({ row }) => (
-                <div>
-                    {formatCurrencyAmount(row.original, "tax_total")}
-                </div>
-            ),
-        },
+        // {
+        //     Header: "Customer Pay",
+        //     accessor: "CustomerPay",
+        //     className: "borderrigth",
+        //     Cell: ({ row }) => (
+        //         <div>
+        //             {formatCurrencyAmount(row.original, "sub_total")}
+        //         </div>
+        //     ),
+        // },
+        // {
+        //     Header: "Admin Commission",
+        //     accessor: "Commission",
+        //     className: "borderrigth",
+        //     Cell: ({ row }) => (
+        //         <div>
+        //             {formatCurrencyAmount(row.original, "tax_total")}
+        //         </div>
+        //     ),
+        // },
 
 
 
@@ -227,10 +260,12 @@ export const OrderDetails = () => {
         return `${symbol} ${Number(amount).toLocaleString("en-IN")}`;
     };
     const [ticketList, setTicketList] = useState([]);
+    // console.log("ticketList", ticketList)
     const [isLoading, setIsLoading] = useState(true);
     const [customer, setCustomer] = useState("");
     const [mobile, setMobile] = useState("");
     const [event, setEvent] = useState("");
+    // console.log("event--",event)
     const [ticketNumber, setTicketNumber] = useState("");
     const [fromDate, setFromDate] = useState(null);
     const [toDate, setToDate] = useState(null);
@@ -308,19 +343,28 @@ export const OrderDetails = () => {
         fetchEventById();
     }, [event_id]);
 
-
+    const formatDate = (date) => {
+        if (!date) return "";
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+    };
     const handleSearch = async (e) => {
         e.preventDefault();
 
         try {
+            const formattedFromDate = formatDate(fromDate);
+            const formattedToDate = formatDate(toDate);
             const response = await api.get("/api/v1/admin/tickets/search", {
                 params: {
                     customer,
                     mobile,
                     event,
                     ticketNumber,
-                    purchaseFrom: fromDate ? fromDate.toISOString().split("T")[0] : "",
-                    purchaseTo: toDate ? toDate.toISOString().split("T")[0] : "",
+                    purchaseFrom: formattedFromDate,
+                    purchaseTo: formattedToDate,
+                    type: type
                 },
             });
             setTicketList(response?.data?.data.tickets || []);
@@ -356,8 +400,8 @@ export const OrderDetails = () => {
         "Customer Name",
         "Mobile",
         "Buy Ticket",
-        "Amount",
-        "Commission(8%)",
+        // "Amount",
+        // "Commission(8%)",
     ];
     const formatDateTime = (date) => {
         if (!date) return "----";
@@ -379,14 +423,14 @@ export const OrderDetails = () => {
 
         return {
             "Buy Date & Time": formatDateTime(order?.created),
-            "Ticket No.": item?.ticket_id || "----",
+            "Ticket No.": item?.ticket_id || item?.package_id || item?.appointment_id || item?.addon_id || "----",
             "Event Name": event?.name || "----",
             "Event Date & Time": `${formatDateTime(event?.date_from)} - ${formatDateTime(event?.date_to)}`,
             "Customer Name": `${user?.first_name || ""} ${user?.last_name || ""}`.trim() || "----",
             "Mobile": user?.mobile || "----",
             "Buy Ticket": item?.count || 0,
-            "Amount": `${currency}${amount}`,
-            "Commission(8%)": `${currency}${commission}`,
+            // "Amount": `${currency}${amount}`,
+            // "Commission(8%)": `${currency}${commission}`,
         };
     });
     const onExportLinkPress = () => {
@@ -577,7 +621,7 @@ export const OrderDetails = () => {
 
 
 
-                                <Form.Group className="mb-3">
+                                {/* <Form.Group className="mb-3">
                                     <Form.Label>Ticket Number</Form.Label>
                                     <Form.Control
                                         type="text"
@@ -585,7 +629,7 @@ export const OrderDetails = () => {
                                         value={ticketNumber}
                                         onChange={(e) => setTicketNumber(e.target.value)}
                                     />
-                                </Form.Group>
+                                </Form.Group> */}
 
                                 <Form.Group className="mb-3">
                                     <Form.Label>Purchase From</Form.Label>

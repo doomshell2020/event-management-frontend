@@ -41,7 +41,7 @@ const TemplateCreate = () => {
         event.preventDefault();
         event.stopPropagation();
         // ✅ Frontend validation
-        if (!title.trim() || !subject.trim() || isEditorEmpty(content)|| !selectedEvent) {
+        if (!title.trim() || !subject.trim() || isEditorEmpty(content)|| selectedEvent === null || selectedEvent === undefined) {
             setValidateDefault(true);
             Swal.fire({
                 icon: "warning",

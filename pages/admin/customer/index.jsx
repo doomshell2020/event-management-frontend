@@ -13,6 +13,7 @@ import {
     useGlobalFilter,
     usePagination,
 } from "react-table";
+import { useRouter } from "next/router";
 import Seo from "@/shared/layout-components/seo/seo";
 import api from "@/utils/api";
 import Moment from "react-moment";
@@ -21,6 +22,11 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import AsyncSelect from "react-select/async";
 export const CustomerList = () => {
+
+    const router = useRouter();
+    const { status: queryStatus } = router.query;
+
+
     const [COLUMNS, setCOLUMNS] = useState([
         {
             Header: "S.No",
@@ -290,9 +296,9 @@ export const CustomerList = () => {
         }
     };
 
-    useEffect(() => {
-        getCustomers();
-    }, []);
+    // useEffect(() => {
+    //     getCustomers();
+    // }, []);
 
     const tableInstance = useTable(
         {
@@ -334,6 +340,7 @@ export const CustomerList = () => {
 
     const handleSearch = async (e) => {
         e.preventDefault();
+        autoSearch(status);
         try {
             const formattedFromDate = formatDate(fromDate);
             const formattedToDate = formatDate(toDate);
@@ -341,7 +348,7 @@ export const CustomerList = () => {
                 params: {
                     first_name: firstName,
                     email,
-                    status:status,
+                    status: status,
                     fromDate: formattedFromDate,
                     toDate: formattedToDate,
                 },
@@ -359,13 +366,49 @@ export const CustomerList = () => {
         setFromDate(null);
         setToDate(null);
         setCustomers([]);
-        getCustomers();
+
         setSelectedEmail(null);
         setSelectedCustomer(null);
         setStatus("");
+        router.replace("/admin/customer", undefined, { shallow: true });
+        getCustomers();
+    };
+    const autoSearch = async (statusValue) => {
+        try {
+            const formattedFromDate = formatDate(fromDate);
+            const formattedToDate = formatDate(toDate);
+
+            const response = await api.get("/api/v1/admin/customers/search", {
+                params: {
+                    first_name: firstName,
+                    email,
+                    status: statusValue, // 🔥 URL wala status
+                    fromDate: formattedFromDate,
+                    toDate: formattedToDate,
+                },
+            });
+            setIsLoading(false);
+            setCustomers(response?.data?.data?.customers || []);
+        } catch (error) {
+            console.error("Error fetching customers:", error);
+            setCustomers([]);
+        }
     };
 
+    useEffect(() => {
+        if (!router.isReady) return;
+        if (queryStatus) return;
+        getCustomers();
+    }, [router.isReady, queryStatus]);
 
+    useEffect(() => {
+        if (!router.isReady) return;
+
+        if (queryStatus) {
+            setStatus(queryStatus);
+            autoSearch(queryStatus);
+        }
+    }, [router.isReady, queryStatus]);
 
     const loadUserOptions = async (inputValue) => {
         if (inputValue.length < 2) return [];

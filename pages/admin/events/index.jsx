@@ -29,10 +29,11 @@ import AsyncSelect from "react-select/async";
 import { formatEventDateTime, formatPrice } from "@/utils/formatDate";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
-
+import { useRouter } from "next/router";
 
 export const Events = () => {
-
+    const router = useRouter();
+    const { status: queryStatus } = router.query;
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [selectedEvent, setSelectedEvent] = useState(null);
 
@@ -46,7 +47,7 @@ export const Events = () => {
     const [staffList, setStaffList] = useState([]);
     const [loadingStaff, setLoadingStaff] = useState(false);
     const [selectedEventId, setSelectedEventId] = useState(null);
-
+    const [status, setStatus] = useState("");
     const [COLUMNS, setCOLUMNS] = useState([
 
         // ===== S.NO =====
@@ -85,21 +86,25 @@ export const Events = () => {
             Cell: ({ row }) => {
                 const eventName = row.original.name || "---";
                 const eventUrl = `/event/${row.original.id}/${row.original.slug}`;
-
+                const location = row.original.location || "--";
                 return (
-                    <Link
-                        href={eventUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        title={eventName}
-                        style={{
-                            color: "#0d6efd",
-                            textDecoration: "underline",
-                            cursor: "pointer"
-                        }}
-                    >
-                        {eventName}
-                    </Link>
+                    <>
+                        <Link
+                            href={eventUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title={eventName}
+                            style={{
+                                color: "#0d6efd",
+                                textDecoration: "underline",
+                                cursor: "pointer"
+                            }}
+                        >
+                            {eventName}
+                        </Link><br />
+                        <strong>Location: </strong>
+                        <span title={location}>{location}</span>
+                    </>
                 );
             },
         },
@@ -130,17 +135,17 @@ export const Events = () => {
         },
 
         // ===== VENUE =====
-        {
-            Header: "Venue",
-            accessor: "venue",
-            className: "borderrigth",
-            style: { width: "12%" },
+        // {
+        //     Header: "Venue",
+        //     accessor: "venue",
+        //     className: "borderrigth",
+        //     style: { width: "12%" },
 
-            Cell: ({ row }) => {
-                const location = row.original.location || "--";
-                return <span title={location}>{location}</span>;
-            },
-        },
+        //     Cell: ({ row }) => {
+        //         const location = row.original.location || "--";
+        //         return <span title={location}>{location}</span>;
+        //     },
+        // },
 
         // ===== TICKET TYPES =====
         {
@@ -150,20 +155,129 @@ export const Events = () => {
             style: { width: "12%" },
 
             Cell: ({ row }) => {
-                const tickets = row?.original?.tickets;
+                const tickets = row?.original?.tickets || [];
+                const addons = row?.original?.addons || [];
+                const packages = row?.original?.package || [];
+                const wellness = row?.original?.wellness || [];
+
+                const [expanded, setExpanded] = useState(false);
+                const MAX_VISIBLE = 2;
+
+                const renderItems = (data) =>
+                    data.map((item, index) => (
+                        <div
+                            key={item.id || index}
+                            title={item.title || item.name}
+                            style={{
+                                display: "flex",
+                                gap: "6px",
+                                paddingLeft: "6px"
+                            }}
+                        >
+                            <strong>{index + 1}.</strong>
+                            <span>{item.title || item.name || "--"}</span>
+                        </div>
+                    ));
+
+                const hasAnyData =
+                    tickets.length || addons.length || packages.length || wellness.length;
+
+                if (!hasAnyData) return "--";
 
                 return (
-                    <div>
-                        {Array.isArray(tickets) && tickets.length > 0
-                            ? tickets.map((ticket, index) => (
-                                <div key={ticket.id || index} title={ticket.title}>
-                                    {ticket.title || "--"}
+                    <div style={{ lineHeight: "1.6" }}>
+                        {/* 🔹 COLLAPSED STATE */}
+                        {!expanded && tickets.length > 0 && (
+                            <div style={{ marginBottom: "8px" }}>
+                                <div
+                                    style={{
+                                        fontWeight: "600",
+                                        fontSize: "12px",
+                                        color: "#555",
+                                        marginBottom: "4px"
+                                    }}
+                                >
+                                    Tickets ({tickets.length})
                                 </div>
-                            ))
-                            : "--"}
+
+                                {renderItems(tickets.slice(0, MAX_VISIBLE))}
+
+                                {tickets.length > MAX_VISIBLE && (
+                                    <div
+                                        onClick={() => setExpanded(true)}
+                                        style={{
+                                            cursor: "pointer",
+                                            fontSize: "12px",
+                                            color: "#1976d2",
+                                            marginTop: "4px",
+                                            fontWeight: "500"
+                                        }}
+                                    >
+                                        ▼ Show more
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* 🔹 EXPANDED STATE */}
+                        {expanded && (
+                            <>
+                                {tickets.length > 0 && (
+                                    <div style={{ marginBottom: "8px" }}>
+                                        {/* <div className="section-title"> */}
+                                        Tickets ({tickets.length})
+                                        {/* </div> */}
+                                        {renderItems(tickets)}
+                                    </div>
+                                )}
+
+                                {addons.length > 0 && (
+                                    <div style={{ marginBottom: "8px" }}>
+                                        {/* <div className="section-title"> */}
+                                        Addons ({addons.length})
+                                        {/* </div> */}
+                                        {renderItems(addons)}
+                                    </div>
+                                )}
+
+                                {packages.length > 0 && (
+                                    <div style={{ marginBottom: "8px" }}>
+                                        {/* <div className="section-title"> */}
+                                        Packages ({packages.length})
+                                        {/* </div> */}
+                                        {renderItems(packages)}
+                                    </div>
+                                )}
+
+                                {wellness.length > 0 && (
+                                    <div style={{ marginBottom: "8px" }}>
+                                        {/* <div className="section-title"> */}
+                                        Appointments ({wellness.length})
+                                        {/* </div> */}
+                                        {renderItems(wellness)}
+                                    </div>
+                                )}
+
+                                {/* 🔼 BUTTON AT VERY BOTTOM */}
+                                <div
+                                    onClick={() => setExpanded(false)}
+                                    style={{
+                                        cursor: "pointer",
+                                        fontSize: "12px",
+                                        color: "#1976d2",
+                                        marginTop: "4px",
+                                        fontWeight: "500"
+                                    }}
+                                >
+                                    ▲ Show less
+                                </div>
+                            </>
+                        )}
                     </div>
                 );
             },
+
+
         },
 
         // ===== SALES / COMMISSION =====
@@ -186,19 +300,19 @@ export const Events = () => {
 
                 return (
                     <div className="text-center">
-                        <Link
+                        {/* <Link
                             href={`/admin/events/${eventId}`}
                             target="_blank"
                             title="View Event Sales"
                             className="fw-bold d-block text-primary"
                             style={{ textDecoration: "none" }}
-                        >
-                            {totalSales}
-                        </Link>
+                        > */}
+                        {event?.currencyName?.Currency_symbol}{" "}{totalSales}
+                        {/* </Link> */}
 
                         <div className="mt-1">
                             <small title="Platform Commission">
-                                Comm (8%): <span className="fw-semibold">{commission}</span>
+                                Comm ({event?.Organizer?.default_platform_charges}%): <span className="fw-semibold">{event?.currencyName?.Currency_symbol}{" "}{commission}</span>
                             </small>
                         </div>
                     </div>
@@ -367,26 +481,72 @@ export const Events = () => {
         }).format(value);
     };
 
-    const formatEventDate = (from, to) => {
-        const date = new Date(from);
+    //     const formatEventDate = (dateString) => {
+    //     if (!dateString) return "";
 
-        const day = date.getDate();
-        const year = date.getFullYear();
-        const month = date.toLocaleString("en-US", { month: "long" });
+    //     try {
+    //         const date = new Date(dateString.replace(" ", "T")); // handles "YYYY-MM-DD HH:mm:ss"
 
-        const suffix =
-            day % 10 == 1 && day !== 11 ? "st" :
-                day % 10 == 2 && day !== 12 ? "nd" :
-                    day % 10 == 3 && day !== 13 ? "rd" : "th";
+    //         const day = date.getDate().toString().padStart(2, "0");
+    //         const month = date.toLocaleString("en-GB", { month: "short" }); // e.g. "Nov"
+    //         const year = date.getFullYear();
 
-        const time = date.toLocaleTimeString("en-US", {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: true,
-        });
+    //         let hours = date.getHours();
+    //         const minutes = date.getMinutes().toString().padStart(2, "0");
+    //         const ampm = hours >= 12 ? "PM" : "AM";
+    //         hours = hours % 12 || 12; // convert to 12-hour format
 
-        return `${month} ${day}${suffix} ${year} @${time}`;
-    };
+    //         return `${day}-${month}-${year} ${hours}:${minutes} ${ampm}`;
+    //     } catch (error) {
+    //         console.error("Invalid date:", dateString);
+    //         return "";
+    //     }
+    // };
+
+
+
+    //     const formatEventDate = (from) => {
+    //     if (!from || typeof from !== "string") return "--";
+
+    //     let date;
+
+    //     // Case 1: "YYYY-MM-DD HH:mm:ss" OR "YYYY-MM-DD HH:mm"
+    //     if (from.includes(" ")) {
+    //         const [datePart, timePart = "00:00"] = from.split(" ");
+
+    //         if (!datePart) return "--";
+
+    //         const [year, month, day] = datePart.split("-").map(Number);
+    //         const [hour = 0, minute = 0] = timePart.split(":").map(Number);
+
+    //         date = new Date(year, month - 1, day, hour, minute);
+    //     }
+    //     // Case 2: ISO or other valid date string
+    //     else {
+    //         date = new Date(from);
+    //         if (isNaN(date.getTime())) return "--";
+    //     }
+
+    //     const day = date.getDate();
+    //     const year = date.getFullYear();
+    //     const month = date.toLocaleString("en-US", { month: "long" });
+
+    //     const suffix =
+    //         day % 10 === 1 && day !== 11 ? "st" :
+    //         day % 10 === 2 && day !== 12 ? "nd" :
+    //         day % 10 === 3 && day !== 13 ? "rd" : "th";
+
+    //     const time = date.toLocaleTimeString("en-US", {
+    //         hour: "2-digit",
+    //         minute: "2-digit",
+    //         hour12: true,
+    //     });
+
+    //     return `${month} ${day}${suffix} ${year} @${time}`;
+    // };
+
+
+
 
     const formatTableDate = (dateStr) => {
         if (!dateStr) return "-";
@@ -403,7 +563,8 @@ export const Events = () => {
             hour12: true,
         });
 
-        return `${day}-${month}-${year} ${time}`;
+        // return `${day}-${month}-${year} ${time}`;
+        return `${day}-${month}-${year}`;
     };
 
     const generatePaymentReport = async (eventId) => {
@@ -416,10 +577,11 @@ export const Events = () => {
             // ===============================
             const eventInfo = {
                 name: event.name,
-                date: formatEventDate(event.date_from, event.date_to),
+                // date: formatEventDateTime(event.date_from, event.date_to),
+                date: formatEventDateTime(event.created),
                 location: event.location,
-                totalSales: event.totalSubTotal,
-                totalCommission: event.totalTaxTotal,
+                totalSales: event.orders.reduce((s, o) => s + Number(o.sub_total || 0), 0),
+                totalCommission: event.orders.reduce((s, o) => s + Number(o.tax_total || 0), 0),
             };
 
             // ===============================
@@ -430,28 +592,32 @@ export const Events = () => {
                     { text: "No#", color: "white", bold: true },
                     { text: "Invoice No", color: "white", bold: true },
                     { text: "Date", color: "white", bold: true },
-                    { text: "Ticket Name", color: "white", bold: true },
+                    { text: "Qty", color: "white", bold: true },
                     { text: "Price", color: "white", bold: true, alignment: "right" },
-                    { text: "Commission", color: "white", bold: true, alignment: "right" },
+                    { text: "Platform Fee", color: "white", bold: true, alignment: "right" },
+                    { text: "Payment Gateway Fee", color: "white", bold: true, alignment: "right" },
                     { text: "Customer", color: "white", bold: true },
                     { text: "Contact", color: "white", bold: true },
                 ],
             ];
 
-            event.orderItems.forEach((item, index) => {
-                const order = item.order || {};
+            event.orders.forEach((order, index) => {
                 const user = order.user || {};
 
-                const price = Number(order.sub_total || 0);
-                const commission = Number(order.tax_total || 0);
+                // total tickets in that order
+                const totalTickets = order.orderItems?.reduce(
+                    (sum, item) => sum + Number(item.count || 0),
+                    0
+                ) || 0;
+
                 tableBody.push([
                     index + 1,
                     order.id || "-",
-                    // order.created ? new Date(order.created).toLocaleString() : "-",
                     formatTableDate(order.created),
-                    getTicketName(item),
-                    { text: formatCurrency(price, currency), alignment: "right" },
-                    { text: formatCurrency(commission, currency), alignment: "right" },
+                    totalTickets,
+                    { text: formatCurrency(order.grand_total, currency), alignment: "right" },
+                    { text: formatCurrency(order.platform_fee_tax, currency), alignment: "right" },
+                    { text: formatCurrency(order.payment_gateway_tax, currency), alignment: "right" },
                     `${user.first_name || ""} ${user.last_name || ""}`,
                     user.mobile || "-",
                 ]);
@@ -530,13 +696,14 @@ export const Events = () => {
                     {
                         table: {
                             headerRows: 1,
-                            widths: ["5%", "10%", "15%", "20%", "10%", "10%", "15%", "15%"],
+                            widths: ["5%", "10%", "12%", "6%", "10%", "12%", "12%", "16%", "17%"],
                             body: tableBody,
                         },
                         layout: {
-                            fillColor: (rowIndex) => (rowIndex == 0 ? "#3F4A5A" : null),
+                            fillColor: (rowIndex) => (rowIndex === 0 ? "#3F4A5A" : null),
                         },
-                    },
+                    }
+
                 ],
 
                 styles: {
@@ -573,6 +740,8 @@ export const Events = () => {
             item.ticketType?.title?.trim() ||
             item.addonType?.name?.trim() ||
             item.appointment?.wellnessList?.name?.trim() ||
+            item.package?.name?.trim() ||
+            item.ticketPricing?.ticket?.title?.trim() ||
             "N/A"
         );
     };
@@ -589,9 +758,9 @@ export const Events = () => {
         }
     };
 
-    useEffect(() => {
-        getEventList();
-    }, []);
+    // useEffect(() => {
+    //     getEventList();
+    // }, []);
 
     const handleDeleteEvent = async (id) => {
         const result = await Swal.fire({
@@ -935,6 +1104,7 @@ export const Events = () => {
                     eventName,
                     fromDate: formattedFromDate,
                     toDate: formattedToDate,
+                    status: status
                 },
             });
 
@@ -955,7 +1125,55 @@ export const Events = () => {
         getEventList();
         setSelectedCustomer(null)
         setSelectedEvent(null)
+        setStatus("");
+        router.replace("/admin/events", undefined, { shallow: true });
     };
+
+
+    const autoSearch = async (statusValue) => {
+        try {
+            const formattedFromDate = formatDate(fromDate);
+            const formattedToDate = formatDate(toDate);
+            const response = await api.get("/api/v1/admin/events/search", {
+                params: {
+                    organizer,
+                    eventName,
+                    fromDate: formattedFromDate,
+                    toDate: formattedToDate,
+                    status: statusValue
+                },
+            });
+            setIsLoading(false);
+            setEventList(response?.data?.data?.events || []);
+        } catch (error) {
+            console.error("Error fetching customers:", error);
+            setEventList([]);
+        }
+    };
+
+    useEffect(() => {
+        if (!router.isReady) return;
+        if (queryStatus) return;
+        getEventList();
+    }, [router.isReady, queryStatus]);
+
+    useEffect(() => {
+        if (!router.isReady) return;
+
+        if (queryStatus) {
+            setStatus(queryStatus);
+            autoSearch(queryStatus);
+        }
+    }, [router.isReady, queryStatus]);
+
+
+
+
+
+
+
+
+
 
     const getCurrentDate = () => {
         const d = new Date();
@@ -992,6 +1210,18 @@ export const Events = () => {
         };
     });
 
+    const formatSectionForExcel = (title, data) => {
+        if (!Array.isArray(data) || data.length === 0) return "";
+
+        const items = data
+            .map((item, index) => `${index + 1}. ${item.title || item.name || "--"}`)
+            .join("\n");
+
+        return `${title}:\n${items}`;
+    };
+
+
+
     const onExportLinkPress = () => {
         const excelData = eventList.map((item, index) => {
 
@@ -1001,9 +1231,23 @@ export const Events = () => {
                 : "--";
 
             // Ticket Types
-            const ticketTypes = Array.isArray(item?.tickets) && item.tickets.length > 0
-                ? item.tickets.map(t => t.title).join(", ")
-                : "--";
+            // const ticketTypes = Array.isArray(item?.tickets) && item.tickets.length > 0
+            //     ? item.tickets.map(t => t.title).join(", ")
+            //     : "--";
+
+            const ticketTypesData = [
+                formatSectionForExcel("Tickets", item?.tickets),
+                formatSectionForExcel("Addons", item?.addons),
+                formatSectionForExcel("Packages", item?.package),
+                formatSectionForExcel("Appointments", item?.wellness),
+            ]
+                .filter(Boolean)        // empty sections remove
+                .join("\n\n");          // section gap
+
+            const ticketTypes = ticketTypesData || "--";
+
+
+
 
             // Sales / Commission
             const sales =
@@ -1224,6 +1468,18 @@ export const Events = () => {
                                             }),
                                         }}
                                     />
+                                </Form.Group>
+
+                                <Form.Group className="mb-3" controlId="formStatus">
+                                    <Form.Label>Status</Form.Label>
+                                    <Form.Select
+                                        value={status}
+                                        onChange={(e) => setStatus(e.target.value)}
+                                    >
+                                        <option value="">Select Status</option>
+                                        <option value="Y">Active</option>
+                                        <option value="N">Inactive</option>
+                                    </Form.Select>
                                 </Form.Group>
 
                                 {/* <Form.Group className="mb-3" controlId="formName">
@@ -1466,7 +1722,7 @@ export const Events = () => {
                         </div>
                     </Card>
                 </Col>
-                
+
             </Row>
 
             <Modal
