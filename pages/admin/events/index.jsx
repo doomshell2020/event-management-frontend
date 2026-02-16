@@ -87,27 +87,46 @@ export const Events = () => {
                 const eventName = row.original.name || "---";
                 const eventUrl = `/event/${row.original.id}/${row.original.slug}`;
                 const location = row.original.location || "--";
+                const status = row.original.status; // Y / N
+
                 return (
                     <>
-                        <Link
-                            href={eventUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            title={eventName}
-                            style={{
-                                color: "#0d6efd",
-                                textDecoration: "underline",
-                                cursor: "pointer"
-                            }}
-                        >
-                            {eventName}
-                        </Link><br />
+                        {status === "Y" ? (
+                            <Link
+                                href={eventUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                title={eventName}
+                                style={{
+                                    color: "#0d6efd",
+                                    textDecoration: "underline",
+                                    cursor: "pointer"
+                                }}
+                            >
+                                {eventName}
+                            </Link>
+                        ) : (
+                            <span
+                                title="Event is inactive"
+                                style={{
+                                    color: "#6c757d",
+                                    cursor: "not-allowed",
+                                    textDecoration: "none"
+                                }}
+                            >
+                                {eventName}
+                            </span>
+                        )}
+
+                        <br />
+
                         <strong>Location: </strong>
                         <span title={location}>{location}</span>
                     </>
                 );
             },
         },
+
 
         // ===== DATE AND TIME =====
         {

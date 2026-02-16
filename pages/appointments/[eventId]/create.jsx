@@ -8,6 +8,10 @@ import moment from "moment-timezone"; // ✅ Import moment-timezone
 import HtmlEditor, { getHtmlEditorContent } from "@/pages/components/HtmlEditor/HtmlEditor";
 import { useRouter } from 'next/router';
 import DatePicker from "react-datepicker";
+import Cropper from "react-cropper";
+import "cropperjs/dist/cropper.css";
+import { Button, Modal } from "react-bootstrap";
+
 const CreateAppointmentPage = () => {
     const [backgroundImage, setIsMobile] = useState('/assets/front-images/about-slider_bg.jpg');
     const router = useRouter();
@@ -22,6 +26,68 @@ const CreateAppointmentPage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const content = getHtmlEditorContent(noteRef);
     const [editorData, setEditorData] = useState({ content: "" });
+    const [success, setSuccess] = useState(false);
+    const [imageURL, setImageURL] = useState(null);
+    const [imageFile, setImageFile] = useState(null);
+    const [cropData, setCropData] = useState(null);
+    const [showCroppedImage, setShowCroppedImage] = useState(false); // State to toggle between original and cropped image
+    const cropperRef = useRef(null);
+    const fileInputRef = useRef(null);
+
+    const onChange = (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setShowCroppedImage(false);
+
+        const reader = new FileReader();
+        reader.onload = () => {
+            setImage(reader.result); // preview
+            setSuccess(true);
+        };
+        reader.readAsDataURL(file);
+
+        // ❌ yahan clear mat karo
+    };
+
+    const [isLoading2, setIsLoading2] = useState(false);
+    const getCropData = () => {
+        if (!cropperRef.current?.cropper) return;
+
+        const croppedCanvas = cropperRef.current.cropper.getCroppedCanvas();
+        if (!croppedCanvas) return;
+
+        croppedCanvas.toBlob((blob) => {
+            if (!blob) return;
+
+            const croppedFile = new File(
+                [blob],
+                "cropped_image.jpg",
+                { type: "image/jpeg" }
+            );
+
+            setImageFile(croppedFile);   // ✅ API FILE
+            const previewURL = URL.createObjectURL(blob);
+
+            setImageURL(previewURL);     // ✅ preview
+            setShowCroppedImage(true);
+            setSuccess(false);
+
+            // clear input safely
+            if (fileInputRef.current) {
+                fileInputRef.current.value = "";
+            }
+        }, "image/jpeg");
+    };
+
+
+
+
+
+
+
+
+
 
     // const handleChange = (index, field, value) => {
     //     const updatedSlots = [...slots];
@@ -136,9 +202,13 @@ const CreateAppointmentPage = () => {
             body.append("tax_applied", isTaxApplied);
             body.append("slots", slotsJSON);
             // ✅ Append image only if user selected
-            if (image) {
-                body.append("wellnessImage", image);
+            // ✅ Append CROPPED FILE
+            if (imageFile) {
+                body.append("wellnessImage", imageFile);
             }
+            // if (image) {
+            //     body.append("wellnessImage", image);
+            // }
             const response = await api.post("/api/v1/wellness/create-slots", body, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
@@ -291,31 +361,50 @@ const CreateAppointmentPage = () => {
                                                         <small className="text-danger">(Size 550×550 JPG, JPEG, PNG Max 2MB)</small>
                                                     </label>
                                                     <input
+                                                        ref={fileInputRef}
+                                                        type="file"
+                                                        className="form-control rounded-0"
+                                                        accept=".jpg,.jpeg,.png"
+                                                        onChange={onChange}
+                                                    />
+                                                    {/* <input
+                                                        id="fileInput"
                                                         type="file"
                                                         className="form-control rounded-0"
                                                         accept=".jpg, .jpeg, .png"
-                                                        onChange={(e) => {
-                                                            const file = e.target.files[0];
-                                                            if (!file) return;
+                                                        // onChange={(e) => {
+                                                        //     const file = e.target.files[0];
+                                                        //     if (!file) return;
 
-                                                            const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
-                                                            if (!allowedTypes.includes(file.type)) {
-                                                                Swal.fire("Invalid File", "Only JPG, JPEG, PNG allowed.", "error");
-                                                                e.target.value = "";
-                                                                return;
-                                                            }
+                                                        //     const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
+                                                        //     if (!allowedTypes.includes(file.type)) {
+                                                        //         Swal.fire("Invalid File", "Only JPG, JPEG, PNG allowed.", "error");
+                                                        //         e.target.value = "";
+                                                        //         return;
+                                                        //     }
 
-                                                            const maxSize = 2 * 1024 * 1024;
-                                                            if (file.size > maxSize) {
-                                                                Swal.fire("File Too Large", "Maximum size 2 MB.", "warning");
-                                                                e.target.value = "";
-                                                                return;
-                                                            }
+                                                        //     const maxSize = 2 * 1024 * 1024;
+                                                        //     if (file.size > maxSize) {
+                                                        //         Swal.fire("File Too Large", "Maximum size 2 MB.", "warning");
+                                                        //         e.target.value = "";
+                                                        //         return;
+                                                        //     }
 
-                                                            handleFileChange(e);
-                                                        }}
-                                                    />
+                                                        //     handleFileChange(e);
+                                                        // }}
+                                                        onChange={onChange}
+                                                    /> */}
                                                 </div>
+
+                                                {showCroppedImage && imageURL && (
+                                                    <img
+                                                        src={imageURL}
+                                                        alt="Cropped Preview"
+                                                        style={{ width: "100px", height: "100px", objectFit: "cover" }}
+                                                    />
+                                                )}
+
+
 
                                                 {/* Description */}
                                                 <div className="col-12">
@@ -609,6 +698,75 @@ const CreateAppointmentPage = () => {
                 </div>
             </section>
             <FrontendFooter />
+
+            <Modal show={success}>
+                <Modal.Header>
+                    <h5>
+                        <strong>
+                            Enhance your image here! Crop it to perfection.
+                        </strong>
+                    </h5>
+                    <Button
+                        variant=""
+                        className="btn btn-close"
+                        onClick={() => {
+                            setSuccess(false);
+                        }}
+                    >
+                        x
+                    </Button>
+                </Modal.Header>
+                <Modal.Body>
+                    <div className="tx-center ">
+                        <div className="profile-cropper" style={{}}>
+                            <br />
+                            {!showCroppedImage && (
+                                <Cropper
+                                    style={{
+                                        height: 300,
+                                        width: "100%",
+                                        overflow: "hidden",
+                                        backgroundColor: "transparent !important",
+                                    }}
+                                    initialAspectRatio={1}
+                                    preview=".img-preview"
+                                    src={image}
+                                    ref={cropperRef}
+                                    viewMode={1}
+                                    guides={true}
+                                    minCropBoxHeight={10}
+                                    minCropBoxWidth={10}
+                                    background={false}
+                                    responsive={true}
+                                    checkOrientation={false}
+                                />
+                            )}
+                        </div>
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    {/* <Button variant="primary">
+                          Save Changes
+                        </Button> */}
+                    {/* <Button variant="primary" style={{ float: "right" }} onClick={getCropData}>
+                          {isLoading2 ? "Loading..." : "Save"}
+                        </Button> */}
+                    <Button
+                        variant="primary"
+                        style={{ float: "right" }}
+                        onClick={getCropData}
+                        disabled={isLoading2}
+                    >
+                        {isLoading2 ? "Loading..." : "Save"}
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+
+
+
+
+
         </>
     );
 };

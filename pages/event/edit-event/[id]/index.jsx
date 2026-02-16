@@ -484,7 +484,7 @@ const MyEventsPage = () => {
                                                     </div>
 
                                                     {/* Checkboxes */}
-                                                    <div className="col-md-3 d-flex align-items-end">
+                                                    {/* <div className="col-md-3 d-flex align-items-end">
                                                         <CFormCheck
                                                             type="checkbox"
                                                             id="is_free"
@@ -493,7 +493,7 @@ const MyEventsPage = () => {
                                                             onChange={handleChange}
                                                             label="This event is free"
                                                         />
-                                                    </div>
+                                                    </div> */}
 
                                                     {/* <div className="col-md-3 d-flex align-items-center">
                                                         <CFormCheck

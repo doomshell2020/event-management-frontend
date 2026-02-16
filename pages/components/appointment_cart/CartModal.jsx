@@ -13,6 +13,8 @@ import Image from "next/image";
 import api from "@/utils/api";
 import Swal from "sweetalert2"; // Import SweetAlert
 import { useCart } from "@/shared/layout-components/layout/CartContext";
+import CryptoJS from "crypto-js";
+
 // Loader Component
 const LoadingComponent = ({ isActive }) => {
     if (!isActive) return null;
@@ -292,10 +294,10 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
             // Encrypt the data
             const storedToken = localStorage.getItem("accessToken");
             const secretKey = process.env.DATA_ENCODE_SECRET_KEY;
-            const encryptedData = CryptoJS.AES.encrypt(
-                JSON.stringify(data),
-                secretKey
-            ).toString();
+            // const encryptedData = CryptoJS.AES.encrypt(
+            //     JSON.stringify(data),
+            //     secretKey
+            // ).toString();
 
             Swal.fire({
                 title: "Processing...",
@@ -308,9 +310,12 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
                 },
             });
 
-            const response = await axios.post(
-                `/api/v1/create-order`,
-                { key: "free_ticket", data: encryptedData },
+            const response = await api.post(`/api/v1/orders/create-appointment`,
+                { key: "free_ticket",
+                    event_id:eventId,
+                    total_amount:0,
+                    payment_method:"Online",
+                    data: data },
                 {
                     headers: {
                         Authorization: `Bearer ${storedToken}`,
@@ -321,7 +326,7 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
 
             // If the API response is successful
             if (response.data.success) {
-                setShow(false);
+                // setShow(false);
                 Swal.fire({
                     title: "Success!",
                     text: "Your free ticket has been created successfully!",
