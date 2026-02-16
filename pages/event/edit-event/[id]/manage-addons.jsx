@@ -417,7 +417,7 @@ const ManageAddons = () => {
                                                                                                 handleGetAddonsList();
                                                                                             })
                                                                                             .catch((error) => {
-                                                                                            // console.log('error :', error);
+                                                                                                // console.log('error :', error);
                                                                                                 const message = error.response.data.error.message || "Failed to delete addon.";
                                                                                                 Swal.fire(
                                                                                                     "Error",
@@ -535,8 +535,10 @@ const ManageAddons = () => {
                                     required
                                 >
                                     <option value="">Select</option>
-                                    <option value="Y">Visible</option>
-                                    <option value="N">Hidden</option>
+                                    {/* <option value="Y">Visible</option>
+                                    <option value="N">Hidden</option> */}
+                                    <option value="N">Visible</option>
+                                    <option value="Y">Hidden</option>
                                 </Form.Select>
                                 <Form.Control.Feedback type="invalid">
                                     Please select visibility.

@@ -46,7 +46,7 @@ const AnalyticsIndexPage = () => {
                 // Dashboard analytics
                 const dashRes = await api.get(`/api/v1/orders/event-dashboard-analytics?event_id=${id}`);
                 if (dashRes.data.success) {
-                    console.log('dashRes.data.data :', dashRes.data.data);
+                    // console.log('dashRes.data.data :', dashRes.data.data);
                     setDashboardData(dashRes.data.data);
                 }
             } catch (err) {
@@ -129,9 +129,11 @@ const AnalyticsIndexPage = () => {
                                     <li>
                                         <Link href={`/event/analytics/${id}/sales`} className="text-16">Sales</Link>
                                     </li>
+                                    {eventDetails?.is_free !== "Y" && (
                                     <li>
                                         <Link href={`/event/analytics/${id}/sales-addons`} className="text-16">Addons</Link>
                                     </li>
+                                    )}
                                 </ul>
 
                                 {/* ================= CHARTS ================= */}

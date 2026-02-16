@@ -23,22 +23,65 @@ const CreateAppointmentPage = () => {
     const content = getHtmlEditorContent(noteRef);
     const [editorData, setEditorData] = useState({ content: "" });
 
+    // const handleChange = (index, field, value) => {
+    //     const updatedSlots = [...slots];
+    //     updatedSlots[index][field] = value;
+
+    //     const start = updatedSlots[index].slot_start_time;
+    //     const end = updatedSlots[index].slot_end_time;
+    //     // ✅ End time must be greater than Start time
+    //     if (start && end && start >= end) {
+    //         // alert("End time must be greater than Start time");
+    //         Swal.fire({
+    //             icon: "error",
+    //             title: "Oops!",
+    //             text: 'End time must be greater than Start time',
+    //         });
+    //         updatedSlots[index].slot_end_time = "";
+    //     }
+    //     setSlots(updatedSlots);
+    // };
+
     const handleChange = (index, field, value) => {
         const updatedSlots = [...slots];
         updatedSlots[index][field] = value;
 
+        const today = new Date().toLocaleDateString("en-CA");
+        const nowTime = new Date().toLocaleTimeString("en-GB", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false
+        });
+
+        const selectedDate = updatedSlots[index].date;
+
+        // ✅ If selected date is today, start time must be greater than current time
+        if (field === "slot_start_time" && selectedDate === today) {
+            if (value <= nowTime) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Invalid Time",
+                    text: "Start time cannot be in the past for today's date",
+                });
+                updatedSlots[index].slot_start_time = "";
+                setSlots(updatedSlots);
+                return;
+            }
+        }
+
         const start = updatedSlots[index].slot_start_time;
         const end = updatedSlots[index].slot_end_time;
+
         // ✅ End time must be greater than Start time
         if (start && end && start >= end) {
-            // alert("End time must be greater than Start time");
             Swal.fire({
                 icon: "error",
                 title: "Oops!",
-                text: 'End time must be greater than Start time',
+                text: "End time must be greater than Start time",
             });
             updatedSlots[index].slot_end_time = "";
         }
+
         setSlots(updatedSlots);
     };
 
@@ -223,7 +266,7 @@ const CreateAppointmentPage = () => {
 
 
                                                 {/* NEW – Include Tax Option */}
-                                                <div className="col-lg-3">
+                                                {/* <div className="col-lg-3">
                                                     <label className="form-label">
                                                         Include Tax<span className="text-danger">*</span>
                                                     </label>
@@ -239,7 +282,7 @@ const CreateAppointmentPage = () => {
                                                         <option value="Y">Yes, Include Tax</option>
                                                         <option value="N">No, Exclude Tax</option>
                                                     </select>
-                                                </div>
+                                                </div> */}
 
                                                 {/* Upload Image */}
                                                 <div className="col-lg-3">
@@ -353,7 +396,7 @@ const CreateAppointmentPage = () => {
                                                         </div>
 
                                                         {/* Start Time */}
-                                                        <div className="col-lg-2 col-md-6 mt-1">
+                                                        {/* <div className="col-lg-2 col-md-6 mt-1">
                                                             <label className="form-label" style={labelStyle}>
                                                                 Start Time <span className="text-danger">*</span>
                                                             </label>
@@ -382,7 +425,48 @@ const CreateAppointmentPage = () => {
                                                                 style={formControlStyle}
                                                                 placeholderText="Start Time"
                                                             />
+                                                        </div> */}
+
+                                                        {/* Start Time */}
+                                                        <div className="col-lg-2 col-md-6 mt-1">
+                                                            <label className="form-label" style={labelStyle}>
+                                                                Start Time <span className="text-danger">*</span>
+                                                            </label>
+
+                                                            <DatePicker
+                                                                selected={
+                                                                    slot.slot_start_time
+                                                                        ? new Date(`2000-01-01T${slot.slot_start_time}`)
+                                                                        : null
+                                                                }
+                                                                onChange={(date) => {
+                                                                    const dbTime = date.toLocaleTimeString("en-GB", {
+                                                                        hour: "2-digit",
+                                                                        minute: "2-digit",
+                                                                        hour12: false
+                                                                    });
+                                                                    handleChange(index, "slot_start_time", dbTime);
+                                                                }}
+                                                                showTimeSelect
+                                                                showTimeSelectOnly
+                                                                timeIntervals={5}
+                                                                timeCaption="Start Time"
+                                                                dateFormat="h:mm aa"
+                                                                className="form-control w-100"
+                                                                style={formControlStyle}
+                                                                placeholderText="Start Time"
+
+                                                                // ✅ NEW LOGIC START
+                                                                minTime={
+                                                                    slot.date === new Date().toLocaleDateString("en-CA")
+                                                                        ? new Date() // current time
+                                                                        : new Date("2000-01-01T00:00:00")
+                                                                }
+                                                                maxTime={new Date("2000-01-01T23:59:59")}
+                                                            // ✅ NEW LOGIC END
+                                                            />
                                                         </div>
+
 
                                                         {/* End Time */}
                                                         <div className="col-lg-2 col-md-6 mt-1">

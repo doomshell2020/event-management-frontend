@@ -158,7 +158,16 @@ const MyEventsPage = () => {
                 }
             } catch (err) {
                 Swal.close();
-                Swal.fire("Error", err.response?.data?.message || "Failed", "error");
+                const apiErrorMsg = err.response?.data?.error?.message ||
+                    err.response?.data?.message ||
+                    err.message ||
+                    "Something went wrong. Please try again.";
+                Swal.fire({
+                    icon: "error",
+                    title: "Server Error",
+                    text: apiErrorMsg,
+                })
+                // Swal.fire("Error", err.response?.data?.message || "Failed", "error");
             }
         }
     };
@@ -167,6 +176,7 @@ const MyEventsPage = () => {
 
     const [eventSearchText, setEventSearchText] = useState("");
     const [eventSearchResults, setEventSearchResults] = useState([]);
+    console.log("eventSearchResults", eventSearchResults)
     const [loadingEventSearch, setLoadingEventSearch] = useState(false);
     const [selectedImportEvent, setSelectedImportEvent] = useState(null);
     const [isEventSelected, setIsEventSelected] = useState(false);
@@ -276,7 +286,7 @@ const MyEventsPage = () => {
 
             <section id="myevent-deshbord">
                 <div className="d-flex">
-                    <EventSidebar eventId={id}  eventDetails={eventDetails}/>
+                    <EventSidebar eventId={id} eventDetails={eventDetails} />
 
                     <div className="event-righcontent">
                         <div className="dsa_contant">

@@ -23,7 +23,7 @@ export default function Appointments() {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
 
-    /* ---------------- Fetch Promotion Codes ---------------- */
+    /* ---------------- Fetch Coupon Codes ---------------- */
     const fetchCodes = async () => {
         setLoading(true);
         try {
@@ -117,17 +117,17 @@ export default function Appointments() {
             const response = await api.get(`/api/v1/coupons/event/${eventId}`);
             const records = response.data?.coupons || [];
             if (!records.length) {
-                Swal.fire("Info", "No promotion codes found", "info");
+                Swal.fire("Info", "No Coupon codes found", "info");
                 return;
             }
 
             const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet("Promotion Codes");
+            const worksheet = workbook.addWorksheet("Coupon Codes");
 
             /* ---------------- Excel Columns ---------------- */
             worksheet.columns = [
                 { header: "S.No", key: "srNo", width: 8 },
-                { header: "Promotion Code", key: "promoCode", width: 22 },
+                { header: "Coupon Code", key: "promoCode", width: 22 },
                 { header: "Discount", key: "discount", width: 15 },
                 { header: "Duration", key: "duration", width: 15 },
                 { header: "Applicable", key: "applicable", width: 18 },
@@ -185,7 +185,7 @@ export default function Appointments() {
 
             saveAs(
                 new Blob([buffer]),
-                `Promotion_Codes_${eventName}_${moment().format(
+                `Coupon_Codes_${eventName}_${moment().format(
                     "YYYYMMDD_HHmmss"
                 )}.xlsx`
             );
@@ -208,7 +208,7 @@ export default function Appointments() {
 
                     <div className="event-righcontent">
                         <div className="d-flex flex-column flex-md-row justify-content-md-between align-items-center mb-4">
-                            <h4 className="mb-0">Promotion Codes || {eventName}</h4>
+                            <h4 className="mb-0">Coupon Codes || {eventName}</h4>
                             <div className="d-flex align-items-center gap-2">
                                 <button
                                     className="primery-button fw-normal px-2 text-white"
@@ -216,7 +216,7 @@ export default function Appointments() {
                                     onClick={() => router.push(`/promotioncodes/${eventId}/create`)}
                                 >
                                     <i className="bi bi-gift-fill pe-1"></i>
-                                    Create Promotion Codes
+                                    Create Coupon Codes
                                 </button>
 
                                 <Button
@@ -244,7 +244,7 @@ export default function Appointments() {
                                 <thead className="table-dark table_bg">
                                     <tr>
                                         <th>S.No</th>
-                                        <th>Promotion Code</th>
+                                        <th>Coupon Code</th>
                                         <th>Discount</th>
                                         <th>Duration</th>
                                         <th>Applicable</th>
@@ -290,7 +290,7 @@ export default function Appointments() {
                                     ) : (
                                         <tr>
                                             <td colSpan="9" className="text-center py-4 fw-bold text-muted">
-                                                No Promotion Codes Found
+                                                No Coupon Codes Found
                                             </td>
                                         </tr>
                                     )}

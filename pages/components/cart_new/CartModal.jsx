@@ -44,7 +44,7 @@ export default function CartModal({ show, handleClose, eventId }) {
 
     const { cart, refreshCart, eventData, normalCart, addonCart, slotCart, loadingCart, setEventId, charges } = useCart();
     const finalEventId = eventId || eventData?.id;
-
+    // console.log("eventData---",eventData);
     const [isLoading, setIsLoading] = useState(true);
     const [cartLoading, setCartLoading] = useState(false);
     const [loadingId, setLoadingId] = useState(null); // track which pricing ID is loading
@@ -529,7 +529,8 @@ export default function CartModal({ show, handleClose, eventId }) {
                     title: "Booking Limit Reached",
                     text:
                         remaining == 0
-                            ? "This addon has reached its booking limit."
+                            // ? "This addon has reached its booking limit."
+                            ? "This add-on has reached its booking limit and is now sold out."
                             : `Only ${remaining} addon(s) left. Please reduce quantity.`,
                     confirmButtonText: "OK"
                 });
@@ -823,6 +824,8 @@ export default function CartModal({ show, handleClose, eventId }) {
 
     const [couponCode, setCouponCode] = useState("");
     const [appliedCoupon, setAppliedCoupon] = useState(null);
+    console.log("appliedCoupon",appliedCoupon);
+    console.log("couponCode",couponCode);
     const [couponLoading, setCouponLoading] = useState(false);
     const [couponError, setCouponError] = useState(null);
 
@@ -905,7 +908,7 @@ export default function CartModal({ show, handleClose, eventId }) {
     //     }
     // }
 
-    console.log("appliedCoupon", appliedCoupon)
+    // console.log("appliedCoupon", appliedCoupon)
 
     if (appliedCoupon) {
         discountAmount = Number(appliedCoupon.discount || 0);
@@ -1481,7 +1484,8 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                             </div>
 
                                                                             {/* ACTION */}
-                                                                            <div className="text-end mt-3 d-flex justify-content-end">
+
+                                                                            {/* <div className="text-end mt-3 d-flex justify-content-end">
 
                                                                                 <Counter
                                                                                     count={
@@ -1493,8 +1497,23 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                                     onInc={() => increasePackage(pkg)}
                                                                                     onDec={() => decreasePackage(pkg)}
                                                                                 />
+                                                                            </div> */}
+                                                                            <div className="text-end mt-3 d-flex justify-content-end">
+                                                                                {pkg.sold_out === "Y" ? (
+                                                                                    <span className="text-danger fw-bold">Sold Out</span>
+                                                                                ) : (
+                                                                                    <Counter
+                                                                                        count={
+                                                                                            cart.find(
+                                                                                                item => item.item_type === "package" && item.uniqueId === pkg.id
+                                                                                            )?.count || 0
+                                                                                        }
+                                                                                        loading={loadingId === `package-${pkg.id}`}
+                                                                                        onInc={() => increasePackage(pkg)}
+                                                                                        onDec={() => decreasePackage(pkg)}
+                                                                                    />
+                                                                                )}
                                                                             </div>
-
                                                                         </div>
                                                                     ))}
 
@@ -1729,6 +1748,7 @@ export default function CartModal({ show, handleClose, eventId }) {
 
                                                                 {/* 🎟️ Ticket Prices */}
                                                                 {eventData.ticketPrices
+                                                                ?.filter(tp => tp.ticket?.hidden !== "Y")   
                                                                     .map((tp, i) => {
                                                                         const pricingId = tp.id; // ✅ ticketPrice ID
                                                                         const cartItem = slotCart.find(item => item.uniqueId == pricingId);
@@ -1797,191 +1817,191 @@ export default function CartModal({ show, handleClose, eventId }) {
 
                                     <Col lg={4} className="crys-accomo-rgt men-innr-sec monten25-rgt-pnl">
                                         <div className="chackout-side-box">
-                                        <div className="checkot-rgt chackout-box">
-                                            {cart?.length > 0 ? (
-                                                
-                                                <div className="checkot-tct-purcs monte25-tct-purcs px-0 pb-0">
-                                                    {/* <h2>Checkout</h2> */}
-                                                    <div className="monte25-tct-purcs">
-                                                        <h6>YOUR TICKETS</h6>
+                                            <div className="checkot-rgt chackout-box">
+                                                {cart?.length > 0 ? (
 
-                                                        {cart.map((item) => {
-                                                            const itemPrice = Number(item.ticket_price || 0);
-                                                            const itemTotal = item.count * itemPrice;
+                                                    <div className="checkot-tct-purcs monte25-tct-purcs px-0 pb-0">
+                                                        {/* <h2>Checkout</h2> */}
+                                                        <div className="monte25-tct-purcs">
+                                                            <h6>YOUR TICKETS</h6>
 
-                                                            return (
-                                                                <div key={item.id} className="chackout-detabox mb-3">
-                                                                    <div className="d-flex justify-content-between align-items-center mb-2">
-                                                                        <strong>{item.display_name}</strong>
+                                                            {cart.map((item) => {
+                                                                const itemPrice = Number(item.ticket_price || 0);
+                                                                const itemTotal = item.count * itemPrice;
 
+                                                                return (
+                                                                    <div key={item.id} className="chackout-detabox mb-3">
+                                                                        <div className="d-flex justify-content-between align-items-center mb-2">
+                                                                            <strong>{item.display_name}</strong>
+
+                                                                            <button
+                                                                                className="btn btn-sm delete-btn"
+                                                                                onClick={() => handleDeleteItem(item.id)}
+                                                                            >
+                                                                                <i className="bi bi-trash"></i>
+                                                                            </button>
+                                                                        </div>
+
+                                                                        <div className="d-flex justify-content-between">
+                                                                            <p className="mb-0">
+                                                                                {item.count} × {currencySymbol} {formatPrice(itemPrice)}
+                                                                            </p>
+
+                                                                            <p className="mb-0">{currencySymbol} {formatPrice(itemTotal)}</p>
+                                                                        </div>
+                                                                    </div>
+                                                                );
+                                                            })}
+
+
+                                                            <h6 className="mt-4 fw-bold">
+                                                                TOTAL {totalTickets} ITEM{totalTickets > 1 ? "S" : ""}
+                                                            </h6>
+
+                                                            {/* applied coupon code section  */}
+                                                            <div className="apply-cd my-3">
+                                                                <InputGroup className="input-group">
+
+                                                                    <Form.Control
+                                                                        placeholder="COUPON CODE"
+                                                                        type="text"
+                                                                        className={`form-control ${appliedCoupon ? "text-decoration-line-through" : ""}`}
+                                                                        value={couponCode}
+                                                                        onChange={(e) => {
+                                                                            const value = e.target.value.toUpperCase();
+                                                                            const validValue = value.replace(/[^A-Z0-9]/g, "");
+                                                                            setCouponCode(validValue);
+                                                                        }}
+                                                                        disabled={appliedCoupon ? true : false}
+                                                                    />
+
+                                                                    {!appliedCoupon ? (
                                                                         <button
-                                                                            className="btn btn-sm delete-btn"
-                                                                            onClick={() => handleDeleteItem(item.id)}
+                                                                            className="btn btn-primary"
+                                                                            onClick={handleApplyCoupon}
+                                                                            disabled={couponLoading}
                                                                         >
-                                                                            <i className="bi bi-trash"></i>
+                                                                            {couponLoading ? "Applying..." : "Apply"}
                                                                         </button>
+                                                                    ) : (
+                                                                        <button
+                                                                            className="btn btn-danger"
+                                                                            onClick={handleRemoveCoupon}
+                                                                        >
+                                                                            ✕
+                                                                        </button>
+                                                                    )}
+
+                                                                </InputGroup>
+
+                                                                {/* ERROR MESSAGE */}
+                                                                {couponError && (
+                                                                    <div className="text-danger mt-1" style={{ fontSize: "13px" }}>
+                                                                        {couponError}
                                                                     </div>
-
-                                                                    <div className="d-flex justify-content-between">
-                                                                        <p className="mb-0">
-                                                                            {item.count} × {currencySymbol} {formatPrice(itemPrice)}
-                                                                        </p>
-
-                                                                        <p className="mb-0">{currencySymbol} {formatPrice(itemTotal)}</p>
-                                                                    </div>
-                                                                </div>
-                                                            );
-                                                        })}
-
-
-                                                        <h6 className="mt-4 fw-bold">
-                                                            TOTAL {totalTickets} ITEM{totalTickets > 1 ? "S" : ""}
-                                                        </h6>
-
-                                                        {/* applied coupon code section  */}
-                                                        <div className="apply-cd my-3">
-                                                            <InputGroup className="input-group">
-
-                                                                <Form.Control
-                                                                    placeholder="COUPON CODE"
-                                                                    type="text"
-                                                                    className={`form-control ${appliedCoupon ? "text-decoration-line-through" : ""}`}
-                                                                    value={couponCode}
-                                                                    onChange={(e) => {
-                                                                        const value = e.target.value.toUpperCase();
-                                                                        const validValue = value.replace(/[^A-Z0-9]/g, "");
-                                                                        setCouponCode(validValue);
-                                                                    }}
-                                                                    disabled={appliedCoupon ? true : false}
-                                                                />
-
-                                                                {!appliedCoupon ? (
-                                                                    <button
-                                                                        className="btn btn-primary"
-                                                                        onClick={handleApplyCoupon}
-                                                                        disabled={couponLoading}
-                                                                    >
-                                                                        {couponLoading ? "Applying..." : "Apply"}
-                                                                    </button>
-                                                                ) : (
-                                                                    <button
-                                                                        className="btn btn-danger"
-                                                                        onClick={handleRemoveCoupon}
-                                                                    >
-                                                                        ✕
-                                                                    </button>
                                                                 )}
 
-                                                            </InputGroup>
+                                                                {/* SUCCESS MESSAGE */}
+                                                                {appliedCoupon && (
+                                                                    <div className="mt-2 text-success" style={{ fontSize: "13px" }}>
+                                                                        Coupon Applied! You saved {currencySymbol}{appliedCoupon.discount}
+                                                                    </div>
+                                                                )}
 
-                                                            {/* ERROR MESSAGE */}
-                                                            {couponError && (
-                                                                <div className="text-danger mt-1" style={{ fontSize: "13px" }}>
-                                                                    {couponError}
+                                                            </div>
+
+
+                                                            <div className="tickt-ttl-prs">
+
+                                                                <div className="d-flex justify-content-between mb-3 pb-3 border-bottom border-dark">
+                                                                    <p className="mb-0 fw-bold">PRICE</p>
+                                                                    <span>{currencySymbol}{formatPrice(sub_total)}</span>
                                                                 </div>
-                                                            )}
 
-                                                            {/* SUCCESS MESSAGE */}
-                                                            {appliedCoupon && (
-                                                                <div className="mt-2 text-success" style={{ fontSize: "13px" }}>
-                                                                    Coupon Applied! You saved {currencySymbol}{appliedCoupon.discount}
+                                                                <div className="d-flex justify-content-between mb-3 pb-3 border-bottom border-dark">
+                                                                    {/* <p className="mb-0 fw-bold">FEES ({adminFees}%)</p> */}
+                                                                    <p className="mb-0 fw-bold">PLATFORM & PAYMENT GATEWAY FEE</p>
+                                                                    <span>{currencySymbol}{formatPrice(tax_total)}</span>
+                                                                </div>
+
+                                                                {/* DISCOUNT LINE – ONLY WHEN COUPON APPLIED */}
+                                                                {appliedCoupon && (
+                                                                    <div className="d-flex justify-content-between mb-3 pb-3 border-bottom border-dark text-success">
+                                                                        <p className="mb-0 fw-bold">DISCOUNT</p>
+                                                                        <span>
+                                                                            - {currencySymbol}{formatPrice(discountAmount)}
+                                                                        </span>
+                                                                    </div>
+                                                                )}
+
+                                                                <div className="d-flex justify-content-between total mb-3 pb-3 border-bottom border-dark">
+                                                                    <p className="mb-0 fw-bold">TOTAL</p>
+                                                                    <p>{currencySymbol}{formatPrice(grand_total)}</p>
+                                                                </div>
+
+                                                            </div>
+
+
+                                                            {/* PAY NOW BUTTON */}
+
+                                                            {grand_total > 0 && (
+                                                                <div className="by-nw-btn accomofl-ck-bt">
+                                                                    <Button
+                                                                        variant=""
+                                                                        className="btn"
+                                                                        type="submit"
+                                                                        disabled={isBtnLoading}
+                                                                        style={{
+                                                                            backgroundColor: "rgb(223, 59, 103)",
+                                                                            color: "white",
+                                                                            borderRadius: "30px",
+                                                                            padding: "10px 24px",
+                                                                            fontWeight: "600",
+                                                                            border: "none",
+                                                                            width: "50%",
+                                                                            display: "block",
+                                                                            margin: "20px auto 0",
+                                                                            opacity: isBtnLoading ? 0.7 : 1,
+                                                                            cursor: isBtnLoading ? "not-allowed" : "pointer"
+                                                                        }}
+                                                                        onClick={(e) => {
+                                                                            if (isBtnLoading) return;
+
+                                                                            if (grand_total == 0) {
+                                                                                e.preventDefault();
+                                                                                handleFreeTicket();
+                                                                            } else {
+                                                                                handlePurchase(e);
+                                                                            }
+                                                                        }}
+                                                                    >
+                                                                        {isBtnLoading ? (
+                                                                            <>
+                                                                                <span
+                                                                                    className="spinner-border spinner-border-sm me-2"
+                                                                                    role="status"
+                                                                                    aria-hidden="true"
+                                                                                />
+                                                                                Processing...
+                                                                            </>
+                                                                        ) : grand_total == 0 ? (
+                                                                            "FREE TICKET"
+                                                                        ) : (
+                                                                            "PURCHASE"
+                                                                        )}
+                                                                    </Button>
                                                                 </div>
                                                             )}
 
                                                         </div>
-
-
-                                                        <div className="tickt-ttl-prs">
-
-                                                            <div className="d-flex justify-content-between mb-3 pb-3 border-bottom border-dark">
-                                                                <p className="mb-0 fw-bold">PRICE</p>
-                                                                <span>{currencySymbol}{formatPrice(sub_total)}</span>
-                                                            </div>
-
-                                                            <div className="d-flex justify-content-between mb-3 pb-3 border-bottom border-dark">
-                                                                {/* <p className="mb-0 fw-bold">FEES ({adminFees}%)</p> */}
-                                                                <p className="mb-0 fw-bold">PLATFORM & PAYMENT GATEWAY FEE</p>
-                                                                <span>{currencySymbol}{formatPrice(tax_total)}</span>
-                                                            </div>
-
-                                                            {/* DISCOUNT LINE – ONLY WHEN COUPON APPLIED */}
-                                                            {appliedCoupon && (
-                                                                <div className="d-flex justify-content-between mb-3 pb-3 border-bottom border-dark text-success">
-                                                                    <p className="mb-0 fw-bold">DISCOUNT</p>
-                                                                    <span>
-                                                                        - {currencySymbol}{formatPrice(discountAmount)}
-                                                                    </span>
-                                                                </div>
-                                                            )}
-
-                                                            <div className="d-flex justify-content-between total mb-3 pb-3 border-bottom border-dark">
-                                                                <p className="mb-0 fw-bold">TOTAL</p>
-                                                                <p>{currencySymbol}{formatPrice(grand_total)}</p>
-                                                            </div>
-
-                                                        </div>
-
-
-                                                        {/* PAY NOW BUTTON */}
-
-                                                        {grand_total > 0 && (
-                                                            <div className="by-nw-btn accomofl-ck-bt">
-                                                                <Button
-                                                                    variant=""
-                                                                    className="btn"
-                                                                    type="submit"
-                                                                    disabled={isBtnLoading}
-                                                                    style={{
-                                                                        backgroundColor: "rgb(223, 59, 103)",
-                                                                        color: "white",
-                                                                        borderRadius: "30px",
-                                                                        padding: "10px 24px",
-                                                                        fontWeight: "600",
-                                                                        border: "none",
-                                                                        width: "50%",
-                                                                        display: "block",
-                                                                        margin: "20px auto 0",
-                                                                        opacity: isBtnLoading ? 0.7 : 1,
-                                                                        cursor: isBtnLoading ? "not-allowed" : "pointer"
-                                                                    }}
-                                                                    onClick={(e) => {
-                                                                        if (isBtnLoading) return;
-
-                                                                        if (grand_total == 0) {
-                                                                            e.preventDefault();
-                                                                            handleFreeTicket();
-                                                                        } else {
-                                                                            handlePurchase(e);
-                                                                        }
-                                                                    }}
-                                                                >
-                                                                    {isBtnLoading ? (
-                                                                        <>
-                                                                            <span
-                                                                                className="spinner-border spinner-border-sm me-2"
-                                                                                role="status"
-                                                                                aria-hidden="true"
-                                                                            />
-                                                                            Processing...
-                                                                        </>
-                                                                    ) : grand_total == 0 ? (
-                                                                        "FREE TICKET"
-                                                                    ) : (
-                                                                        "PURCHASE"
-                                                                    )}
-                                                                </Button>
-                                                            </div>
-                                                        )}
-
                                                     </div>
-                                                </div>
-                                               
-                                            ) : (
-                                                <div className="chackout-box">
-                                                    <h3 className="text-center mt-2">Cart is Empty</h3>
-                                                </div>
-                                            )}
-                                        </div>
+
+                                                ) : (
+                                                    <div className="chackout-box">
+                                                        <h3 className="text-center mt-2">Cart is Empty</h3>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
                                     </Col>
 

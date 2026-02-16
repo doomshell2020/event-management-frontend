@@ -97,6 +97,68 @@ export const CartProvider = ({ children }) => {
         fetchCart(eventId || undefined); // load general cart (no event)
     }, []);
 
+
+
+    useEffect(() => {
+        if (!eventData || !cart.length) return;
+
+        const invalidCartIds = [];
+
+        cart.forEach(item => {
+
+            if (item.item_type === "ticket") {
+                const ticket = eventData.tickets?.find(t => t.id == item.uniqueId);
+                if (!ticket || ticket.hidden === "Y" || ticket.sold_out === "Y") {
+                    invalidCartIds.push(item.id);
+                }
+            }
+
+            if (item.item_type === "addon") {
+                const addon = eventData.addons?.find(a => a.id == item.uniqueId);
+                if (!addon || addon.hidden === "Y" || addon.sold_out === "Y") {
+                    invalidCartIds.push(item.id);
+                }
+            }
+
+            if (item.item_type === "ticket_price") {
+                const slot = eventData.ticketPrices?.find(tp => tp.id == item.uniqueId);
+                if (!slot || slot.ticket?.hidden === "Y" || slot.ticket?.sold_out === "Y") {
+                    invalidCartIds.push(item.id);
+                }
+            }
+
+            if (item.item_type === "package") {
+                const pkg = eventData.package?.find(p => p.id == item.uniqueId);
+                if (!pkg || pkg.hidden === "Y" || pkg.status !== "Y" || pkg.sold_out === "Y") {
+                    invalidCartIds.push(item.id);
+                }
+            }
+
+        });
+
+        if (invalidCartIds.length > 0) {
+            removeInvalidItems(invalidCartIds);
+        }
+
+    }, [eventData]);
+
+
+
+const removeInvalidItems = async (cartIds) => {
+    try {
+        await api.delete("/api/v1/cart/clear");
+
+        fetchCart(); // 🔥 refresh after deletion
+    } catch (err) {
+        console.log("Failed removing hidden items", err);
+    }
+};
+
+
+
+
+
+
     return (
         <CartContext.Provider
             value={{

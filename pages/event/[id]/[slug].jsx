@@ -196,24 +196,48 @@ const EventDetailPage = ({ event, slug }) => {
   }, [eventId]);
 
   const [selectedSlots, setSelectedSlots] = useState({});
+  // const toggleSlotSelection = (wellnessId, slot) => {
+  //   setSelectedSlots((prev) => {
+  //     const current = prev[wellnessId] || [];
+
+  //     const exists = current.find((s) => s.id === slot.id);
+
+  //     let updated;
+  //     if (exists) {
+  //       // remove slot
+  //       updated = current.filter((s) => s.id !== slot.id);
+  //     } else {
+  //       // add full slot object with numeric price
+  //       updated = [...current, { ...slot, price: Number(slot.price) }];
+  //     }
+
+  //     return {
+  //       ...prev,
+  //       [wellnessId]: updated
+  //     };
+  //   });
+  // };
   const toggleSlotSelection = (wellnessId, slot) => {
     setSelectedSlots((prev) => {
-      const current = prev[wellnessId] || [];
+      const currentSlots = prev[wellnessId] || [];
 
-      const exists = current.find((s) => s.id === slot.id);
+      const isAlreadySelected = currentSlots.some(
+        (s) => s.id === slot.id
+      );
 
-      let updated;
-      if (exists) {
+      let updatedSlots;
+
+      if (isAlreadySelected) {
         // remove slot
-        updated = current.filter((s) => s.id !== slot.id);
+        updatedSlots = currentSlots.filter((s) => s.id !== slot.id);
       } else {
-        // add full slot object with numeric price
-        updated = [...current, { ...slot, price: Number(slot.price) }];
+        updatedSlots = [...currentSlots, slot];
       }
 
+      // ✅ IMPORTANT PART
+      // Only keep slots for this wellnessId
       return {
-        ...prev,
-        [wellnessId]: updated
+        [wellnessId]: updatedSlots,
       };
     });
   };
