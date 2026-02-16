@@ -29,7 +29,7 @@ const EventDetailsPage = () => {
         sale_end: "",
         ticket_limit: "",
         slug: "",
-        approve_timer: "",
+        approve_timer: "10",
         is_free: "N",
         allow_register: "N",
         request_rsvp: "",

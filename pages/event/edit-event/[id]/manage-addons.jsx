@@ -34,7 +34,7 @@ const ManageAddons = () => {
         description: "",
         image: null,
     });
-
+    
     const [addonsList, setAddonsList] = useState([]);
     const [validateDefault, setValidateDefault] = useState(false);
 
