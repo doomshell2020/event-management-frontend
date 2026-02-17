@@ -910,9 +910,18 @@ const ManagePackages = () => {
                         {(() => {
                             const ticketTotal = ticketsList.reduce(
                                 (acc, t) =>
-                                    acc + (packageForm.ticketQty?.[t.id] || 0) * t.price,
+                                    acc +
+                                    (packageForm.ticketQty?.[t.id] ?? 0) *
+                                    (t.price > 0 ? t.price : Number(t.pricings?.[0]?.price ?? 0)),
                                 0
                             );
+
+
+                            // const ticketTotal = ticketsList.reduce(
+                            //     (acc, t) =>
+                            //         acc + (packageForm.ticketQty?.[t.id] || 0) * t.price,
+                            //     0
+                            // );
                             const addonTotal = addonsList.reduce(
                                 (acc, a) => acc + (packageForm.addonQty?.[a.id] || 0) * a.price,
                                 0
