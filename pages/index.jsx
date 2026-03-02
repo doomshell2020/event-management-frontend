@@ -525,7 +525,8 @@ const Home = ({ events }) => {
       </section>
 
       {/*  */}
-      <CalculateFees />
+      
+      {/* <CalculateFees /> */}
 
       {/*  */}
       <div id="down_app">
