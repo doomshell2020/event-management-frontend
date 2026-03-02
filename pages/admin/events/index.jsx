@@ -36,7 +36,6 @@ export const Events = () => {
     const { status: queryStatus } = router.query;
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [selectedEvent, setSelectedEvent] = useState(null);
-
     const [eventList, setEventList] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [fromDate, setFromDate] = useState(null);
@@ -167,6 +166,7 @@ export const Events = () => {
         // },
 
         // ===== TICKET TYPES =====
+
         {
             Header: "Ticket Types",
             accessor: "TicketTypes",
@@ -203,39 +203,49 @@ export const Events = () => {
 
                 if (!hasAnyData) return "--";
 
+                const showMoreRequired =
+                    tickets.length > MAX_VISIBLE ||
+                    addons.length > 0 ||
+                    packages.length > 0 ||
+                    wellness.length > MAX_VISIBLE;
+
                 return (
                     <div style={{ lineHeight: "1.6" }}>
                         {/* 🔹 COLLAPSED STATE */}
-                        {!expanded && tickets.length > 0 && (
-                            <div style={{ marginBottom: "8px" }}>
-                                <div
-                                    style={{
-                                        fontWeight: "600",
-                                        fontSize: "12px",
-                                        color: "#555",
-                                        marginBottom: "4px"
-                                    }}
-                                >
-                                    Tickets ({tickets.length})
-                                </div>
+                        {!expanded && (
+                            <>
+                                {tickets.length > 0 && (
+                                    <div style={{ marginBottom: "8px" }}>
+                                        <div style={{ fontWeight: 600, fontSize: "12px", color: "#555" }}>
+                                            Tickets ({tickets.length})
+                                        </div>
+                                        {renderItems(tickets.slice(0, MAX_VISIBLE))}
+                                    </div>
+                                )}
 
-                                {renderItems(tickets.slice(0, MAX_VISIBLE))}
+                                {wellness.length > 0 && (
+                                    <div style={{ marginBottom: "8px" }}>
+                                        <div style={{ fontWeight: 600, fontSize: "12px", color: "#555" }}>
+                                            Appointments ({wellness.length})
+                                        </div>
+                                        {renderItems(wellness.slice(0, MAX_VISIBLE))}
+                                    </div>
+                                )}
 
-                                {tickets.length > MAX_VISIBLE && (
+                                {showMoreRequired && (
                                     <div
                                         onClick={() => setExpanded(true)}
                                         style={{
                                             cursor: "pointer",
                                             fontSize: "12px",
                                             color: "#1976d2",
-                                            marginTop: "4px",
                                             fontWeight: "500"
                                         }}
                                     >
                                         ▼ Show more
                                     </div>
                                 )}
-                            </div>
+                            </>
                         )}
 
                         {/* 🔹 EXPANDED STATE */}
@@ -243,48 +253,38 @@ export const Events = () => {
                             <>
                                 {tickets.length > 0 && (
                                     <div style={{ marginBottom: "8px" }}>
-                                        {/* <div className="section-title"> */}
-                                        Tickets ({tickets.length})
-                                        {/* </div> */}
+                                        <strong>Tickets ({tickets.length})</strong>
                                         {renderItems(tickets)}
                                     </div>
                                 )}
 
                                 {addons.length > 0 && (
                                     <div style={{ marginBottom: "8px" }}>
-                                        {/* <div className="section-title"> */}
-                                        Addons ({addons.length})
-                                        {/* </div> */}
+                                        <strong>Addons ({addons.length})</strong>
                                         {renderItems(addons)}
                                     </div>
                                 )}
 
                                 {packages.length > 0 && (
                                     <div style={{ marginBottom: "8px" }}>
-                                        {/* <div className="section-title"> */}
-                                        Packages ({packages.length})
-                                        {/* </div> */}
+                                        <strong>Packages ({packages.length})</strong>
                                         {renderItems(packages)}
                                     </div>
                                 )}
 
                                 {wellness.length > 0 && (
                                     <div style={{ marginBottom: "8px" }}>
-                                        {/* <div className="section-title"> */}
-                                        Appointments ({wellness.length})
-                                        {/* </div> */}
+                                        <strong>Appointments ({wellness.length})</strong>
                                         {renderItems(wellness)}
                                     </div>
                                 )}
 
-                                {/* 🔼 BUTTON AT VERY BOTTOM */}
                                 <div
                                     onClick={() => setExpanded(false)}
                                     style={{
                                         cursor: "pointer",
                                         fontSize: "12px",
                                         color: "#1976d2",
-                                        marginTop: "4px",
                                         fontWeight: "500"
                                     }}
                                 >
@@ -294,10 +294,141 @@ export const Events = () => {
                         )}
                     </div>
                 );
-            },
-
-
+            }
         },
+
+
+        // {
+        //     Header: "Ticket Types",
+        //     accessor: "TicketTypes",
+        //     className: "borderrigth",
+        //     style: { width: "12%" },
+
+        //     Cell: ({ row }) => {
+        //         const tickets = row?.original?.tickets || [];
+        //         const addons = row?.original?.addons || [];
+        //         const packages = row?.original?.package || [];
+        //         const wellness = row?.original?.wellness || [];
+
+        //         const [expanded, setExpanded] = useState(false);
+        //         const MAX_VISIBLE = 2;
+
+        //         const renderItems = (data) =>
+        //             data.map((item, index) => (
+        //                 <div
+        //                     key={item.id || index}
+        //                     title={item.title || item.name}
+        //                     style={{
+        //                         display: "flex",
+        //                         gap: "6px",
+        //                         paddingLeft: "6px"
+        //                     }}
+        //                 >
+        //                     <strong>{index + 1}.</strong>
+        //                     <span>{item.title || item.name || "--"}</span>
+        //                 </div>
+        //             ));
+
+        //         const hasAnyData =
+        //             tickets.length || addons.length || packages.length || wellness.length;
+
+        //         if (!hasAnyData) return "--";
+
+        //         return (
+        //             <div style={{ lineHeight: "1.6" }}>
+        //                 {/* 🔹 COLLAPSED STATE */}
+        //                 {!expanded && tickets.length > 0 && (
+        //                     <div style={{ marginBottom: "8px" }}>
+        //                         <div
+        //                             style={{
+        //                                 fontWeight: "600",
+        //                                 fontSize: "12px",
+        //                                 color: "#555",
+        //                                 marginBottom: "4px"
+        //                             }}
+        //                         >
+        //                             Tickets ({tickets.length})
+        //                         </div>
+
+        //                         {renderItems(tickets.slice(0, MAX_VISIBLE))}
+
+        //                         {tickets.length > MAX_VISIBLE && (
+        //                             <div
+        //                                 onClick={() => setExpanded(true)}
+        //                                 style={{
+        //                                     cursor: "pointer",
+        //                                     fontSize: "12px",
+        //                                     color: "#1976d2",
+        //                                     marginTop: "4px",
+        //                                     fontWeight: "500"
+        //                                 }}
+        //                             >
+        //                                 ▼ Show more
+        //                             </div>
+        //                         )}
+        //                     </div>
+        //                 )}
+
+        //                 {/* 🔹 EXPANDED STATE */}
+        //                 {expanded && (
+        //                     <>
+        //                         {tickets.length > 0 && (
+        //                             <div style={{ marginBottom: "8px" }}>
+        //                                 {/* <div className="section-title"> */}
+        //                                 Tickets ({tickets.length})
+        //                                 {/* </div> */}
+        //                                 {renderItems(tickets)}
+        //                             </div>
+        //                         )}
+
+        //                         {addons.length > 0 && (
+        //                             <div style={{ marginBottom: "8px" }}>
+        //                                 {/* <div className="section-title"> */}
+        //                                 Addons ({addons.length})
+        //                                 {/* </div> */}
+        //                                 {renderItems(addons)}
+        //                             </div>
+        //                         )}
+
+        //                         {packages.length > 0 && (
+        //                             <div style={{ marginBottom: "8px" }}>
+        //                                 {/* <div className="section-title"> */}
+        //                                 Packages ({packages.length})
+        //                                 {/* </div> */}
+        //                                 {renderItems(packages)}
+        //                             </div>
+        //                         )}
+
+        //                         {wellness.length > 0 && (
+        //                             <div style={{ marginBottom: "8px" }}>
+        //                                 {/* <div className="section-title"> */}
+        //                                 Appointments ({wellness.length})
+        //                                 {/* </div> */}
+        //                                 {renderItems(wellness)}
+        //                             </div>
+        //                         )}
+
+        //                         {/* 🔼 BUTTON AT VERY BOTTOM */}
+        //                         <div
+        //                             onClick={() => setExpanded(false)}
+        //                             style={{
+        //                                 cursor: "pointer",
+        //                                 fontSize: "12px",
+        //                                 color: "#1976d2",
+        //                                 marginTop: "4px",
+        //                                 fontWeight: "500"
+        //                             }}
+        //                         >
+        //                             ▲ Show less
+        //                         </div>
+        //                     </>
+        //                 )}
+        //             </div>
+        //         );
+        //     },
+
+
+        // },
 
         // ===== SALES / COMMISSION =====
         {
@@ -315,7 +446,8 @@ export const Events = () => {
                 }
 
                 const totalSales = formatPrice(event?.total_sales);
-                const commission = formatPrice(event?.total_tax);
+                const commission = formatPrice(event?.platform_fee_tax);
+                const payment_gateway_commission = formatPrice(event?.payment_gateway_tax);
 
                 return (
                     <div className="text-center">
@@ -331,7 +463,10 @@ export const Events = () => {
 
                         <div className="mt-1">
                             <small title="Platform Commission">
-                                Comm ({event?.Organizer?.default_platform_charges}%): <span className="fw-semibold">{event?.currencyName?.Currency_symbol}{" "}{commission}</span>
+                                Platform Commission ({event?.Organizer?.default_platform_charges}%): <span className="fw-semibold">{event?.currencyName?.Currency_symbol}{" "}{commission}</span>
+                            </small><br/>
+                            <small title="Payment Gateway Commission">
+                                Payment Gateway Commission ({row?.original?.admin_payment_gateway_charges}%): <span className="fw-semibold">{event?.currencyName?.Currency_symbol}{" "}{payment_gateway_commission}</span>
                             </small>
                         </div>
                     </div>

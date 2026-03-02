@@ -28,7 +28,7 @@ export async function getServerSideProps({ params }) {
     });
 
     const data = await response.json();
-
+    // console.log("data",data.data)
     return {
       props: {
         event: data?.data?.events?.[0] || null,
@@ -49,6 +49,7 @@ export async function getServerSideProps({ params }) {
 const EventDetailPage = ({ event, slug }) => {
   const { token } = useAuth();
   const router = useRouter();
+  // console.log("event",event.is_empty_event)
   const [backgroundImage, setIsMobile] = useState("/assets/front-images/about-slider_bg.jpg");
   const [isLoading, setIsLoading] = useState(true);
   const [appointmentData, setAppointmentData] = useState([]);
@@ -337,19 +338,10 @@ const EventDetailPage = ({ event, slug }) => {
                           handleOpenCart();
                         }}
                         className="btn btn-primary"
+                        disabled={event?.is_empty_event === "Y"}
                       >
                         Check Availability
                       </button>
-
-                      {/* <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleOpenAppointmentCart();
-                        }}
-                        className="btn btn-outline-primary"
-                      >
-                        Check Appointment
-                      </button> */}
                     </div>
                   )}
 

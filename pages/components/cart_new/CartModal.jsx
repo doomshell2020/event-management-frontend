@@ -44,7 +44,7 @@ export default function CartModal({ show, handleClose, eventId }) {
 
     const { cart, refreshCart, eventData, normalCart, addonCart, slotCart, loadingCart, setEventId, charges } = useCart();
     const finalEventId = eventId || eventData?.id;
-    // console.log("eventData---",eventData);
+    // console.log("eventData.package---", eventData?.ticketPrices);
     const [isLoading, setIsLoading] = useState(true);
     const [cartLoading, setCartLoading] = useState(false);
     const [loadingId, setLoadingId] = useState(null); // track which pricing ID is loading
@@ -94,23 +94,7 @@ export default function CartModal({ show, handleClose, eventId }) {
         }, 0);
     };
 
-    const checkTicketLimit = () => {
-        if (!ticket_limit || ticket_limit <= 0) return true; // no limit
 
-        const totalTicketsInCart = getTotalTicketCountInCart();
-
-        if (totalTicketsInCart >= ticket_limit) {
-            Swal.fire({
-                icon: "warning",
-                title: "Ticket Limit Reached",
-                text: `You can add maximum ${ticket_limit} tickets for this event.`,
-                confirmButtonText: "OK"
-            });
-            return false;
-        }
-
-        return true;
-    };
 
     const increaseCart = async (cartId) => {
         return await api.put(`/api/v1/cart/increase/${cartId}`);
@@ -130,6 +114,26 @@ export default function CartModal({ show, handleClose, eventId }) {
 
     const increaseSlot = async (ticketPrice) => {
         const pricingId = ticketPrice?.id;
+        if (!ticket_limit || ticket_limit <= 0 || !pricingId) return true; // no limit
+
+        const inCart = cart.reduce((total, item) => {
+            if (item.item_type == "ticket_price" && item.uniqueId == pricingId) {
+                return total + (item.count || 0);
+            }
+            return total;
+        }, 0);
+
+        // TICKET LIMIT VALIDATION
+        if (ticket_limit > 0 && inCart >= ticket_limit) {
+            Swal.fire({
+                icon: "warning",
+                title: "Ticket Limit Reached",
+                text: `You can add maximum ${ticket_limit} tickets for this event.`,
+                confirmButtonText: "OK"
+            });
+            return false;
+        }
+
         if (!pricingId) return;
         const maxLimit = Number(ticketPrice?.ticket?.count || 0);
 
@@ -824,8 +828,7 @@ export default function CartModal({ show, handleClose, eventId }) {
 
     const [couponCode, setCouponCode] = useState("");
     const [appliedCoupon, setAppliedCoupon] = useState(null);
-    console.log("appliedCoupon",appliedCoupon);
-    console.log("couponCode",couponCode);
+    // console.log("couponCode",couponCode);
     const [couponLoading, setCouponLoading] = useState(false);
     const [couponError, setCouponError] = useState(null);
 
@@ -960,58 +963,6 @@ export default function CartModal({ show, handleClose, eventId }) {
         platform_fee_percent: platformFee?.platform_fee_percent || 0,
         payment_gateway_percent: platformFee?.payment_gateway_percent || 0
     };
-
-    // // const grand_total = sub_total + tax_total;
-    // let discountAmount = 0;
-
-    // if (appliedCoupon) {
-    //     if (appliedCoupon.discount_type == "percentage") {
-    //         discountAmount = (sub_total * appliedCoupon.discount) / 100;
-    //     } else {
-    //         discountAmount = appliedCoupon.discount;
-    //     }
-
-    //     // Prevent discount from exceeding subtotal
-    //     if (discountAmount > sub_total) {
-    //         discountAmount = sub_total;
-    //     }
-    // }
-
-    // // Platform Fee Tax
-    // const platformFeeTax = platformFee?.platform_fee_percent
-    //     ? (sub_total * platformFee.platform_fee_percent) / 100
-    //     : 0;
-
-    // // Payment Gateway Tax (on sub_total + platformFeeTax)
-    // const paymentGatewayTax = platformFee?.payment_gateway_percent
-    //     ? ((sub_total + platformFeeTax) * platformFee.payment_gateway_percent) / 100
-    //     : 0;
-
-    // // Total Fee (sum of both taxes)
-    // const tax_total = platformFeeTax + paymentGatewayTax;
-
-    // const taxBreakdown = {
-    //     platform_fee_tax: platformFeeTax,
-    //     payment_gateway_tax: paymentGatewayTax,
-    //     platform_fee_percent: platformFee?.platform_fee_percent || 0,
-    //     payment_gateway_percent: platformFee?.payment_gateway_percent || 0
-    // };
-
-
-
-    // // const grand_total = sub_total + tax_total - discountAmount;
-    // const grand_total = Math.max(
-    //     sub_total + tax_total - discountAmount,
-    //     0 // safety: negative total nahi jaane dega
-    // );
-
-
-
-
-
-
-
-
 
     const formatEventDateRange = (start, end) => {
         if (!start || !end) return "";
@@ -1351,7 +1302,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                             <div className="ticket-section">
                                                                 {/* 📦 PACKAGES */}
                                                                 {eventData.package
-                                                                    ?.filter(pkg => pkg.hidden != "Y" && pkg.status == "Y")
+                                                                    ?.filter(pkg => pkg.hidden != "Y" && pkg.status == "Y" && pkg.sold_out != "Y")
                                                                     .map((pkg, i) => (
                                                                         <div
                                                                             key={`package-${i}`}
@@ -1475,9 +1426,18 @@ export default function CartModal({ show, handleClose, eventId }) {
 
                                                                                         <div className="text-muted">
                                                                                             {currencySymbol}
-                                                                                            {formatPrice(
+                                                                                            {/* {formatPrice(
                                                                                                 (item.ticketType?.price || item.addonType?.price || 0) * item.qty
+                                                                                            )} */}
+                                                                                            {formatPrice(
+                                                                                                (
+                                                                                                    Number(item.ticketType?.price) > 0
+                                                                                                        ? Number(item.ticketType?.price)
+                                                                                                        : item.ticketType?.pricings?.[0]?.price ?? item.addonType?.price ?? 0
+                                                                                                ) * item.qty
                                                                                             )}
+
+
                                                                                         </div>
                                                                                     </div>
                                                                                 ))}
@@ -1520,7 +1480,7 @@ export default function CartModal({ show, handleClose, eventId }) {
 
                                                                 {/* 🎟️ TICKETS */}
                                                                 {eventData.entry_type != 'multi' && eventData.tickets
-                                                                    ?.filter(ticket => ticket.hidden != "Y")
+                                                                    ?.filter(ticket => ticket.hidden != "Y" && ticket.sold_out != "Y")
                                                                     .map((ticket, i) => {
                                                                         const cartItem = normalCart.find(item => item.uniqueId == ticket.id);
                                                                         const isLoading = loadingId == ticket.id;
@@ -1718,12 +1678,11 @@ export default function CartModal({ show, handleClose, eventId }) {
 
                                                                 {/* ➕ ADDONS */}
                                                                 {eventData.addons
-                                                                    ?.filter(addon => addon.hidden !== "Y")
+                                                                    ?.filter(addon => addon.hidden !== "Y" && addon.sold_out != "Y")
                                                                     .map((addon, i) => {
                                                                         const cartItem = addonCart.find(item => item.uniqueId == addon.id);
                                                                         const isLoading = loadingId == addon.id;
                                                                         const isSoldOut = addon.sold_out == "Y";
-
                                                                         return (
                                                                             <div key={`addon-${i}`} className="ticket-item only-ticket ticket-addon">
                                                                                 <div className="d-flex justify-content-between align-items-start ticket-infobox">
@@ -1748,7 +1707,7 @@ export default function CartModal({ show, handleClose, eventId }) {
 
                                                                 {/* 🎟️ Ticket Prices */}
                                                                 {eventData.ticketPrices
-                                                                ?.filter(tp => tp.ticket?.hidden !== "Y")   
+                                                                    ?.filter(tp => tp.ticket?.hidden !== "Y" && tp.ticket?.sold_out !== "Y")
                                                                     .map((tp, i) => {
                                                                         const pricingId = tp.id; // ✅ ticketPrice ID
                                                                         const cartItem = slotCart.find(item => item.uniqueId == pricingId);

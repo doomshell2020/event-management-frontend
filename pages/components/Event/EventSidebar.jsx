@@ -119,6 +119,12 @@ const EventSidebar = ({ eventId, eventDetails }) => {
                                         </Link>
                                     </li>
                                     <li>
+                                        <Link className="dropdown-item" href="/company">
+                                            <i className="bi bi-building"></i>
+                                            <span> Manage Companies </span>
+                                        </Link>
+                                    </li>
+                                    <li>
                                         <Link className="dropdown-item" href="/">
                                             <i className="bi bi-box-arrow-right"></i>
                                             <span> Logout </span>

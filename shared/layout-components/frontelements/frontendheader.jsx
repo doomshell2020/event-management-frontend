@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import Cookies from "js-cookie";
 import { Container, Navbar } from "react-bootstrap";
-
+import Swal from "sweetalert2";
 import { handleLogout } from "@/utils/logout";
 import { useCart } from "@/shared/layout-components/layout/CartContext";
 import { useAuth } from "../layout/AuthContext";
@@ -86,8 +86,22 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
     { href: "/users/payouts", icon: "fa-coins", label: "Payouts" },
   ];
 
+  // const handleCartClick = () => {
+  //   if (cartCount > 0) setShowCart(true);
+  // };
   const handleCartClick = () => {
-    if (cartCount > 0) setShowCart(true);
+    if (cartCount > 0) {
+      setShowCart(true);
+    } else {
+      Swal.fire({
+        icon: "info",
+        title: "Your cart is empty",
+        text: "Please add at least one ticket before proceeding to checkout.",
+        confirmButtonText: "Okay",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+      });
+    }
   };
 
   // ✅ ADD THIS: close menu helper (links click pe close)
@@ -105,7 +119,7 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
   /* -------------------- JSX -------------------- */
   return (
     <>
-     <header className="headernav">
+      <header className="headernav">
         {/* ✅ ADD expanded={menuOpen} */}
         <Navbar
           expand="lg"
@@ -167,9 +181,8 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
                         </Link>
 
                         <button
-                          className={`navLink position-relative btn btn-link p-0 ${
-                            isActive("/cart") ? "active" : ""
-                          }`}
+                          className={`navLink position-relative btn btn-link p-0 ${isActive("/cart") ? "active" : ""
+                            }`}
                           onClick={() => {
                             handleCartClick();
                             closeMobileMenu();
@@ -186,9 +199,8 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
                         {committeeAssigned && (
                           <Link
                             href="/committee/ticket"
-                            className={`navLink position-relative ${
-                              isActive("/committee/ticket") ? "active" : ""
-                            }`}
+                            className={`navLink position-relative ${isActive("/committee/ticket") ? "active" : ""
+                              }`}
                             onClick={closeMobileMenu}
                           >
                             Committee
@@ -240,9 +252,26 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
                               <button
                                 className="dropdownLink"
                                 onClick={() => {
-                                  handleLogout(router);
-                                  closeMobileMenu();
+                                  Swal.fire({
+                                    title: "Are you sure?",
+                                    text: "You want to logout?",
+                                    icon: "warning",
+                                    showCancelButton: true,
+                                    confirmButtonColor: "#d33",
+                                    cancelButtonColor: "#3085d6",
+                                    confirmButtonText: "Yes, Logout",
+                                    cancelButtonText: "No",
+                                  }).then((result) => {
+                                    if (result.isConfirmed) {
+                                      handleLogout(router);
+                                      closeMobileMenu();
+                                    }
+                                  });
                                 }}
+                              // onClick={() => {
+                              //   handleLogout(router);
+                              //   closeMobileMenu();
+                              // }}
                               >
                                 <i className="fas fa-sign-out-alt" /> Logout
                               </button>

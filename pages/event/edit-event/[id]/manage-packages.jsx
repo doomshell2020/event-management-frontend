@@ -185,7 +185,8 @@ const ManagePackages = () => {
     // ✅ Auto calculate totals on qty/discount change
     useEffect(() => {
         const ticketTotal = ticketsList.reduce(
-            (acc, t) => acc + (packageForm.ticketQty?.[t.id] || 0) * t.price,
+            // (acc, t) => acc + (packageForm.ticketQty?.[t.id] || 0) * t.price,
+            (acc, t) => acc + (packageForm.ticketQty?.[t.id] || 0) * (t.price > 0 ? t.price : Number(t.pricings?.[0]?.price ?? 0)),
             0
         );
         const addonTotal = addonsList.reduce(
@@ -650,7 +651,7 @@ const ManagePackages = () => {
                                                                                     const data = isTicket
                                                                                         ? item.ticketType
                                                                                         : item.addonType;
-
+                                                                                    // console.log("item", item)
                                                                                     return (
                                                                                         <tr key={item.id}>
                                                                                             <td>{index + 1}</td>
@@ -667,7 +668,13 @@ const ManagePackages = () => {
                                                                                             </td>
                                                                                             <td>{item.qty}</td>
                                                                                             <td>
-                                                                                                {currencyName}{data?.price || 0}
+                                                                                                {currencyName}
+                                                                                                {(
+                                                                                                    Number(data.price) > 0
+                                                                                                        ? Number(data.price)
+                                                                                                        : Number(data.pricings?.[0]?.price ?? 0)
+                                                                                                )}
+                                                                                                {/* {data?.price || 0} */}
                                                                                             </td>
                                                                                         </tr>
                                                                                     );

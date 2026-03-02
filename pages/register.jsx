@@ -221,7 +221,8 @@ const RegisterPage = () => {
                         }}
                         aria-label={showPassword ? "Hide password" : "Show password"}
                       >
-                        {showPassword ? "🙈" : "👁️"}
+                        {/* {showPassword ? "🙈" : "👁️"} */}
+                        {showPassword ? <i className="bi bi-eye-slash"></i> : <i className="bi bi-eye"></i>}
                       </button>
                     </div>
 
@@ -265,7 +266,7 @@ const RegisterPage = () => {
                           onChange={handleChange}
                           className="form-control"
                           required
-                          min="2000-01-01"
+                          // min="2000-01-01"
                           max={new Date().toISOString().split("T")[0]}
                         />
                       </div>

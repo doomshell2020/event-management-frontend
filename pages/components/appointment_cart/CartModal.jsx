@@ -45,8 +45,6 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
     const [couponLoading, setCouponLoading] = useState(false);
     const [eventDetails, setEventDetails] = useState({});
     const [currency, setCurrency] = useState('');
-    const { charges } = useCart();
-    // console.log("charges",charges)
     const [taxAppliedStatus, setTaxAppliedStatus] = useState('');
     const [eventName, setEventName] = useState('');
     const [eventImage, setEventImage] = useState('');
@@ -59,13 +57,7 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
     const [coupon, setCoupon] = useState("");
     const [adminFees, setAdminFees] = useState(8);
     const [showNextStep, setShowNextStep] = useState(false);
-    const [platformFee, setPlatformFee] = useState({})
-
-    useEffect(() => {
-        if (charges) {
-            setPlatformFee(charges)
-        }
-    }, [charges]);
+    const [platformFee, setPlatformFee] = useState({});
 
     // CART API FUNCTIONS
     const fetchCart = async (eventId) => {
@@ -98,15 +90,17 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
                     { slotIds: slotIds }
                 );
                 const currencySymbol = res?.data?.data?.currencyName?.Currency_symbol || "$";
-                // console.log("---res.data.data", currencySymbol);
+
                 setCurrency(currencySymbol)
                 setEventDetails(res.data.data);
                 setTaxAppliedStatus(res.data?.data?.wellness?.[0].tax_applied);
                 setEventName(res?.data?.data?.name)
                 setEventImage(res?.data?.data?.feat_image)
+                setPlatformFee(res.data?.data?.charges)
                 // STEP 3: Load fresh empty cart
                 const cartRes = await fetchCart(eventId);
                 const list = cartRes?.data?.data || [];
+
                 setCart(list);
 
                 // STEP 4: Build slotCart map (empty because cart cleared)
@@ -157,88 +151,30 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
         fetchDetails();
     }, [show, eventId]);
 
-
-    // const currencySymbol = cart?.[0]?.currency_symbol || "";
-    // const taxApplied = eventDetails?.wellness?.[0]?.tax_applied;
-
-    // // Calculate Totals
-    // const totalTickets = cart.reduce((n, item) => n + item.count, 0);
-    // const priceTotal = cart.reduce(
-    //     (n, item) => n + item.count * item.ticket_price,
-    //     0
-    // );
-
-    // // --------------------
-    // // DISCOUNT
-    // // --------------------
-    // const discountAmount = Number(couponDetails?.discountAmt || 0);
-
-    // const platformFeeTax =
-    //     taxApplied === "Y"
-    //         ? (priceTotal * platformFee.platform_fee_percent) / 100
-    //         : 0;
-
-    // // Payment Gateway Tax (on priceTotal + platformFeeTax)
-    // const paymentGatewayTax =
-    //     taxApplied === "Y"
-    //         ? ((priceTotal + platformFeeTax) *
-    //             platformFee.payment_gateway_percent) /
-    //         100
-    //         : 0;
-
-    // // --------------------
-    // // TOTAL FEES
-    // // --------------------
-    // const feeTotal = platformFeeTax + paymentGatewayTax;
-
-    // // --------------------
-    // // FINAL TOTAL
-    // // --------------------
-    // const finalTotal = Math.max(
-    //     priceTotal + feeTotal - discountAmount,
-    //     0 
-    // );
-
-    // const taxBreakdown = {
-    //     platform_fee_tax: platformFeeTax,
-    //     payment_gateway_tax: paymentGatewayTax,
-    //     platform_fee_percent: platformFee?.platform_fee_percent || 0,
-    //     payment_gateway_percent: platformFee?.payment_gateway_percent || 0
-    // };
-
     const currencySymbol = cart?.[0]?.currency_symbol || "";
-
-    // --------------------
-    // TOTALS
-    // --------------------
-    const totalTickets = cart.reduce((n, item) => n + item.count, 0);
 
     const priceTotal = cart.reduce(
         (n, item) => n + item.count * item.ticket_price,
         0
     );
-
-    // --------------------
-    // DISCOUNT
-    // --------------------
     const discountAmount = Number(couponDetails?.discountAmt || 0);
 
-    // Base amount after discount
-    const discountedBase = Math.max(priceTotal - discountAmount, 0);
+    // --------------------
+    // BASE PRICE (NO COUPON HERE)
+    // --------------------
+    const basePrice = Number(priceTotal);
 
     // --------------------
-    // TAX CALCULATION
+    // TAX CALCULATION (ON BASE PRICE ONLY)
     // --------------------
-
-    // If discounted amount is 0 → no tax
     const platformFeeTax =
-        discountedBase > 0
-            ? (discountedBase * platformFee.platform_fee_percent) / 100
+        basePrice > 0
+            ? (basePrice * platformFee.platform_fee_percent) / 100
             : 0;
 
     const paymentGatewayTax =
-        discountedBase > 0
-            ? ((discountedBase + platformFeeTax) *
+        basePrice > 0
+            ? ((basePrice + platformFeeTax) *
                 platformFee.payment_gateway_percent) / 100
             : 0;
 
@@ -248,9 +184,14 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
     const feeTotal = platformFeeTax + paymentGatewayTax;
 
     // --------------------
-    // FINAL TOTAL
+    // GROSS TOTAL (BEFORE COUPON)
     // --------------------
-    const finalTotal = discountedBase + feeTotal;
+    const grossTotal = basePrice + feeTotal;
+
+    // --------------------
+    // APPLY COUPON AT END
+    // --------------------
+    const finalTotal = Math.max(grossTotal - discountAmount, 0);
 
     // --------------------
     // TAX BREAKDOWN
@@ -259,9 +200,9 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
         platform_fee_tax: platformFeeTax,
         payment_gateway_tax: paymentGatewayTax,
         platform_fee_percent: platformFee?.platform_fee_percent || 0,
-        payment_gateway_percent: platformFee?.payment_gateway_percent || 0
+        payment_gateway_percent: platformFee?.payment_gateway_percent || 0,
+        coupon_discount: discountAmount
     };
-
 
     // Final Total (discount last applied)
     const formatReadableDate = (dateStr) => {
@@ -311,11 +252,13 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
             });
 
             const response = await api.post(`/api/v1/orders/create-appointment`,
-                { key: "free_ticket",
-                    event_id:eventId,
-                    total_amount:0,
-                    payment_method:"Online",
-                    data: data },
+                {
+                    key: "free_ticket",
+                    event_id: eventId,
+                    total_amount: 0,
+                    payment_method: "Online",
+                    data: data
+                },
                 {
                     headers: {
                         Authorization: `Bearer ${storedToken}`,

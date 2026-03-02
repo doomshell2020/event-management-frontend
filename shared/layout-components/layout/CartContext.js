@@ -87,6 +87,7 @@ export const CartProvider = ({ children }) => {
             );
         } catch (error) {
             console.log("Cart Error:", error);
+             setLoadingCart(false);
         } finally {
             setLoadingCart(false);
         }

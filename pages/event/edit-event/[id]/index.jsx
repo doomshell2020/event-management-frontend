@@ -561,6 +561,7 @@ const MyEventsPage = () => {
                                                             name="date_from"
                                                             value={formData.date_from}
                                                             onChange={handleDateChange}
+                                                            disabled
                                                         />
                                                         {dateErrors.date_from && (
                                                             <div className="invalid-feedback">{dateErrors.date_from}</div>
@@ -582,6 +583,7 @@ const MyEventsPage = () => {
                                                             value={formData.date_to}
                                                             onChange={handleDateChange}
                                                             min={formData.date_from}
+                                                            disabled
                                                         />
                                                         {dateErrors.date_to && (
                                                             <div className="invalid-feedback">{dateErrors.date_to}</div>
@@ -603,6 +605,7 @@ const MyEventsPage = () => {
                                                                     name="sale_start"
                                                                     value={formData.sale_start}
                                                                     onChange={handleDateChange}
+                                                                    disabled
                                                                 // disabled={!formData.date_from || !formData.date_to}
                                                                 />
                                                             </div>
@@ -621,6 +624,7 @@ const MyEventsPage = () => {
                                                                     onChange={handleDateChange}
                                                                     min={formData.sale_start}
                                                                     max={formData.date_to}
+                                                                    disabled
                                                                 // disabled={!formData.sale_start}
                                                                 />
                                                                 {dateErrors.sale_end && (

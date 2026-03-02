@@ -148,11 +148,41 @@ const ProfilePage = () => {
                         </tr>
                         <tr>
                           <td>Email Related Events</td>
-                          <td>{user?.emailRelatedEvents ? user.emailRelatedEvents : 'N'}</td>
+                          <td>
+                            <span
+                              style={{
+                                padding: '4px 10px',
+                                borderRadius: '12px',
+                                fontSize: '13px',
+                                fontWeight: '600',
+                                color: '#fff',
+                                backgroundColor:
+                                  user?.emailRelatedEvents === 'Y' ? '#28a745' : '#dc3545',
+                              }}
+                            >
+                              {user?.emailRelatedEvents === 'Y' ? 'Yes' : 'No'}
+                            </span>
+                            {/* {user?.emailRelatedEvents ? user.emailRelatedEvents : 'N'} */}
+                          </td>
                         </tr>
                         <tr>
                           <td>Email Newsletter</td>
-                          <td>{user?.emailNewsLetter ? user.emailNewsLetter : 'N'}</td>
+                          {/* <td>{user?.emailNewsLetter ? user.emailNewsLetter : 'N'}</td> */}
+                          <td>
+                            <span
+                              style={{
+                                padding: '4px 10px',
+                                borderRadius: '12px',
+                                fontSize: '13px',
+                                fontWeight: '600',
+                                color: '#fff',
+                                backgroundColor:
+                                  user?.emailNewsLetter === 'Y' ? '#28a745' : '#dc3545',
+                              }}
+                            >
+                              {user?.emailNewsLetter === 'Y' ? 'Yes' : 'No'}
+                            </span>
+                          </td>
                         </tr>
 
                       </tbody>

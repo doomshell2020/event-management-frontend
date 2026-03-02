@@ -9,6 +9,7 @@ import Image from "next/image";
 import api from "@/utils/api";
 import Cookies from "js-cookie";
 import { handleAdminLogout } from "@/utils/logout";
+import Swal from "sweetalert2";
 export default function Header() {
   const router = useRouter();
   const dispatch = useDispatch();
@@ -282,8 +283,24 @@ export default function Header() {
                       href="#"
                       className="dropdown-item"
                       onClick={() => {
-                        handleAdminLogout(router);
+                        Swal.fire({
+                          title: "Are you sure?",
+                          text: "You want to logout?",
+                          icon: "warning",
+                          showCancelButton: true,
+                          confirmButtonColor: "#d33",
+                          cancelButtonColor: "#3085d6",
+                          confirmButtonText: "Yes, Logout",
+                          cancelButtonText: "No",
+                        }).then((result) => {
+                          if (result.isConfirmed) {
+                            handleAdminLogout(router);
+                          }
+                        });
                       }}
+                    // onClick={() => {
+                    //   handleAdminLogout(router);
+                    // }}
                     >
                       <i className="far fa-arrow-alt-circle-left"></i> Sign Out
                     </Link>

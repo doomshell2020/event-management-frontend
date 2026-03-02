@@ -36,11 +36,13 @@ const ManageAddons = () => {
     });
     
     const [addonsList, setAddonsList] = useState([]);
+    console.log("addonsList",addonsList);
     const [validateDefault, setValidateDefault] = useState(false);
 
     // handle input changes
     const handleInputChange = (e) => {
         const { name, value } = e.target;
+        console.log("name, value",name, value)
         setAddonForm({
             ...addonForm,
             [name]: value,
@@ -109,7 +111,8 @@ const ManageAddons = () => {
             formData.append("name", addonForm.name);
             formData.append("price", addonForm.price);
             formData.append("count", addonForm.count);
-            formData.append("visibility", addonForm.visibility);
+            // formData.append("visibility", addonForm.visibility);
+            formData.append("visibility", addonForm.hidden);
             formData.append("description", addonForm.description);
             formData.append("event_id", id);
 

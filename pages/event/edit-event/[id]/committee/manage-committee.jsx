@@ -176,7 +176,6 @@ const MyEventsPage = () => {
 
     const [eventSearchText, setEventSearchText] = useState("");
     const [eventSearchResults, setEventSearchResults] = useState([]);
-    console.log("eventSearchResults", eventSearchResults)
     const [loadingEventSearch, setLoadingEventSearch] = useState(false);
     const [selectedImportEvent, setSelectedImportEvent] = useState(null);
     const [isEventSelected, setIsEventSelected] = useState(false);
@@ -195,7 +194,7 @@ const MyEventsPage = () => {
             try {
                 setLoadingEventSearch(true);
                 const res = await api.get(
-                    `/api/v1/events/search?keyword=${eventSearchText}`
+                    `/api/v1/events/search?keyword=${eventSearchText}&currentEventId=${id}`
                 );
 
                 if (res.data.success) {
@@ -280,6 +279,68 @@ const MyEventsPage = () => {
         }
     };
 
+
+    const [selectedUserIds, setSelectedUserIds] = useState([]);
+    const handleUserCheckboxChange = (userId) => {
+        setSelectedUserIds((prev) => {
+            if (prev.includes(userId)) {
+                // uncheck → remove
+                return prev.filter(id => id !== userId);
+            } else {
+                // check → add
+                return [...prev, userId];
+            }
+        });
+    };
+    const handleBulkAdd = async () => {
+        if (selectedUserIds.length === 0) return;
+
+        try {
+            const result = await Swal.fire({
+                title: `Add ${selectedUserIds.length} members to the committee?`,
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonText: "Yes, add all",
+                cancelButtonText: "Cancel",
+            });
+
+            if (!result.isConfirmed) return;
+
+            Swal.fire({
+                title: 'Adding members...',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading(),
+            });
+
+            // OPTION A: existing API reuse (recommended)
+            const requests = selectedUserIds.map((userId) =>
+                api.post(`/api/v1/committee/member/add-member`, {
+                    event_id: id,
+                    user_id: userId,
+                })
+            );
+
+            await Promise.all(requests);
+            await fetchMembers(id);
+            Swal.close();
+            Swal.fire("Success", "Members added successfully", "success");
+
+            setSelectedUserIds([]);
+            setSearchText("");
+            setSearchResults([]);
+
+        } catch (err) {
+            Swal.close();
+            Swal.fire(
+                "Error",
+                err.response?.data?.message || "Failed to add members",
+                "error"
+            );
+        }
+    };
+
+
+
     return (
         <>
             <FrontendHeader backgroundImage={backgroundImage} />
@@ -354,6 +415,16 @@ const MyEventsPage = () => {
                                                                                     style={{ cursor: alreadyAdded ? "not-allowed" : "pointer" }}
                                                                                     title={alreadyAdded ? "Already added" : ""}
                                                                                 >
+                                                                                    {/* ✅ Checkbox (ONLY if not already added) */}
+                                                                                    {!alreadyAdded && (
+                                                                                        <input
+                                                                                            type="checkbox"
+                                                                                            className="form-check-input mt-0 ms-0 position-static"
+                                                                                            checked={selectedUserIds.includes(user.id)}
+                                                                                            style={{ cursor: "pointer" }}
+                                                                                            onChange={() => handleUserCheckboxChange(user.id)}
+                                                                                        />
+                                                                                    )}
                                                                                     <div
                                                                                         className="rounded-circle d-flex align-items-center justify-content-center text-white"
                                                                                         style={{
@@ -379,6 +450,7 @@ const MyEventsPage = () => {
                                                                                                 color: "#e62d56",
                                                                                             }}>{user.email} • {user.mobile}</small>
                                                                                         </div>
+                                                                                         {/*
                                                                                         {!alreadyAdded && (
                                                                                             <button
                                                                                                 className="btn btn-sm text-14 btn-primary"
@@ -387,6 +459,7 @@ const MyEventsPage = () => {
                                                                                                 Add
                                                                                             </button>
                                                                                         )}
+                                                                                            */}
                                                                                     </div>
                                                                                 </div>
                                                                             )
@@ -398,8 +471,12 @@ const MyEventsPage = () => {
                                                     </div>
                                                     <div className="col-sm-2">
                                                         <button
-                                                            className="btn next primery-button w-100 h-100 text-14 py-2">
-                                                            Add
+                                                            className="btn next primery-button w-100 h-100 text-14 py-2"
+                                                            disabled={selectedUserIds.length === 0}
+                                                            onClick={handleBulkAdd}
+                                                        >
+                                                            Add{selectedUserIds.length > 0 && `(${selectedUserIds.length})`}
+
                                                         </button>
                                                     </div>
                                                 </div>

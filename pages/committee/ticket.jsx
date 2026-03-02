@@ -7,73 +7,139 @@ import api from "@/utils/api";
 import Cookies from "js-cookie";
 import TicketCountTabs from "@/pages/components/Event/TicketCountTabs";
 import { useCart } from "@/shared/layout-components/layout/CartContext";
+import dayjs from "dayjs";
+
+// const CommitteeEventCard = ({ event, assets }) => {
+//     const router = useRouter();
+
+//     const handleClick = () => {
+//         router.push(`/committee/ticket-details/${event.id}`);
+//     };
+
+//     const formatDate = (dateStr) => {
+//         if (!dateStr) return "--";
+//         return new Date(dateStr).toLocaleString("en-IN", {
+//             day: "2-digit",
+//             month: "short",
+//             year: "numeric",
+//             hour: "2-digit",
+//             minute: "2-digit",
+//         });
+//     };
+
+//     const eventImage = event.feat_image
+//         ? `${assets.event_image_path}/${event.feat_image}`
+//         : "/assets/front-images/event-demo.jpg";
+
+
+//     return (
+//         <div
+//             onClick={handleClick}
+//             className="committee-event-sec bg-white border shadow-sm rounded-3 p-3 cursor-pointer"
+//         >
+//             <div className="row align-items-stretch gap-2 gap-lg-0">
+//                 <div className="col-lg-4 d-flex">
+//                     <div className="event-img-wrap w-100 h-100 d-flex align-items-center justify-content-center">
+//                         <img
+//                             src={eventImage}
+//                             alt={event.name}
+//                             className="img-fluid rounded-3"
+//                         />
+//                     </div>
+//                 </div>
+//                 <div className="col-lg-8 d-flex">
+//                     <div className="w-100 d-flex flex-column justify-content-center">
+//                         <h6 className="fw-semibold mb-1">
+//                             {event.name}
+//                         </h6>
+
+//                         <p className="text-muted mb-2">
+//                             @{event.location}
+//                         </p>
+//                         <p className="mb-1">
+//                             📅 <strong>Start:</strong> {formatDate(event.date_from)}
+//                         </p>
+
+//                         <p className="mb-2">
+//                             📅 <strong>End:</strong> {formatDate(event.date_to)}
+//                         </p>
+
+//                         <span className="btn text-white btn-sm rounded-pill align-self-start px-3">
+//                             View Requests →
+//                         </span>
+//                     </div>
+//                 </div>
+
+//             </div>
+//         </div>
+//     );
+// };
 
 
 const CommitteeEventCard = ({ event, assets }) => {
-    const router = useRouter();
+  const router = useRouter();
 
-    const handleClick = () => {
-        router.push(`/committee/ticket-details/${event.id}`);
-    };
+  const handleClick = () => {
+    router.push(`/committee/ticket-details/${event.id}`);
+  };
 
-    const formatDate = (dateStr) => {
-        if (!dateStr) return "--";
-        return new Date(dateStr).toLocaleString("en-IN", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-        });
-    };
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "--";
+    return dayjs(dateStr).format("DD MMM YYYY, hh:mm a");
+  };
 
-    const eventImage = event.feat_image
-        ? `${assets.event_image_path}/${event.feat_image}`
-        : "/assets/front-images/event-demo.jpg";
+  const eventImage = event.feat_image
+    ? `${assets.event_image_path}/${event.feat_image}`
+    : "/assets/front-images/event-demo.jpg";
 
-
-    return (
-        <div
-            onClick={handleClick}
-            className="committee-event-sec bg-white border shadow-sm rounded-3 p-3 cursor-pointer"
-        >
-            <div className="row align-items-stretch gap-2 gap-lg-0">
-                <div className="col-lg-4 d-flex">
-                    <div className="event-img-wrap w-100 h-100 d-flex align-items-center justify-content-center">
-                        <img
-                            src={eventImage}
-                            alt={event.name}
-                            className="img-fluid rounded-3"
-                        />
-                    </div>
-                </div>
-                <div className="col-lg-8 d-flex">
-                    <div className="w-100 d-flex flex-column justify-content-center">
-                        <h6 className="fw-semibold mb-1">
-                            {event.name}
-                        </h6>
-
-                        <p className="text-muted mb-2">
-                            @{event.location}
-                        </p>
-                        <p className="mb-1">
-                            📅 <strong>Start:</strong> {formatDate(event.date_from)}
-                        </p>
-
-                        <p className="mb-2">
-                            📅 <strong>End:</strong> {formatDate(event.date_to)}
-                        </p>
-
-                        <span className="btn text-white btn-sm rounded-pill align-self-start px-3">
-                            View Requests →
-                        </span>
-                    </div>
-                </div>
-
-            </div>
+  return (
+    <div
+      onClick={handleClick}
+      className="committee-event-sec bg-white border shadow-sm rounded-3 p-3 cursor-pointer"
+    >
+      <div className="row align-items-stretch gap-2 gap-lg-0">
+        <div className="col-lg-4 d-flex">
+          <div className="event-img-wrap w-100 h-100 d-flex align-items-center justify-content-center">
+            <img
+              src={eventImage}
+              alt={event.name}
+              className="img-fluid rounded-3"
+            />
+          </div>
         </div>
-    );
+
+        <div className="col-lg-8 d-flex">
+          <div className="w-100 d-flex flex-column justify-content-center">
+            <h6 className="fw-semibold mb-1">{event.name}</h6>
+
+            <p className="text-muted mb-2">@{event.location}</p>
+
+            <p className="mb-1">
+              📅 <strong>Start:</strong> {formatDate(event.date_from)}
+            </p>
+
+            <p className="mb-2">
+              📅 <strong>End:</strong> {formatDate(event.date_to)}
+            </p>
+
+            <span className="btn text-white btn-sm rounded-pill align-self-start px-3">
+              View Requests →
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
+
+
+
+
+
+
+
+
+
 
 export async function getServerSideProps(context) {
     try {
