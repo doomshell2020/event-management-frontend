@@ -97,9 +97,11 @@ button.swal2-close.text-white.bg-transparent.position-absolute.top-2.right-2.fs-
   top: 5px;
   font-size: 31px !important;
 }
+
 .table thead th {
-    vertical-align: middle;
+  vertical-align: middle;
 }
+
 .swal2-popup.swal2-modal.swal2-show img.swal2-image {
   width: auto !important;
   margin: 0px auto 0px;
@@ -413,17 +415,18 @@ header .navflexbox .logodiv:focus-visible {
 }
 
 header .menulistbox .navLink.active {
-          color: #f87171 !important;
-        }
-        header .menulistbox .navLink.active::after {
-          content: "";
-          display: block;
-          height: 2px;
-          width: 100%;
-          background: #f87171;
-          margin-top: 3px;
-          border-radius: 2px;
-        }
+  color: #f87171 !important;
+}
+
+header .menulistbox .navLink.active::after {
+  content: "";
+  display: block;
+  height: 2px;
+  width: 100%;
+  background: #f87171;
+  margin-top: 3px;
+  border-radius: 2px;
+}
 
 .headerlogo {
   width: 300px;
@@ -486,8 +489,9 @@ header .menulistbox .navLink.active {
 }
 
 .dropdown-item {
-    font-size: 14px;
+  font-size: 14px;
 }
+
 .headernav .userwelcome-button:hover {
   background-color: #d61b46;
 }
@@ -1295,12 +1299,14 @@ footer .footer-policybox li a:hover {
   margin: 0 !important;
   border-radius: 19px;
 }
-.event-editor-content-box{
-    max-width: 750px;
-    margin: auto;
+
+.event-editor-content-box {
+  max-width: 750px;
+  margin: auto;
 }
+
 .note-editor.note-airframe .note-placeholder {
-    display: none !important;
+  display: none !important;
 }
 
 
@@ -1478,11 +1484,13 @@ span.ticket-icon-circle {
 /* analitics page css start */
 
 .react-calendar__navigation button.react-calendar__navigation__arrow {
-    font-size: 24px;
+  font-size: 24px;
 }
+
 .react-calendar__month-view__weekdays__weekday {
-    font-size: 11px;
+  font-size: 11px;
 }
+
 /* event calender page css start */
 /* ================= WRAPPER ================= */
 .calendar-wrapper {
@@ -1547,6 +1555,7 @@ span.ticket-icon-circle {
 .header-right button:hover {
   background: #e6ecf5;
 }
+
 .calendar-header .header-right button:nth-child(2),
 .calendar-header .header-right button:nth-child(3) {
   font-size: 20px;
@@ -2054,8 +2063,9 @@ section#request-demo {
 }
 
 .edit-appointment-module.resistor-content .react-datepicker-wrapper {
-    width: 100% !important;
+  width: 100% !important;
 }
+
 .freeEventCheck {
   height: 33.5px;
   border-radius: 3px;
@@ -2109,24 +2119,25 @@ section#request-demo {
 } */
 
 #myevent-deshbord .event-sidebar {
-    background: #3d6db5;
-    color: #fff;
-    position: relative;
+  background: #3d6db5;
+  color: #fff;
+  position: relative;
 
-    width: 280px;
-    min-width: 280px;
-    flex-shrink: 0;
-    padding: 20px;
-     transition: all 0.5s 0s ease;
+  width: 280px;
+  min-width: 280px;
+  flex-shrink: 0;
+  padding: 20px;
+  transition: all 0.5s 0s ease;
 }
 
 
-#myevent-deshbord > .d-flex {
-    display: flex;
-    align-items: stretch;
-    width: 100%;
-    overflow-x: hidden;
+#myevent-deshbord>.d-flex {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  overflow-x: hidden;
 }
+
 #myevent-deshbord .side_menu_icon {
   height: 35px;
   background: aliceblue;
@@ -2234,9 +2245,9 @@ li.menu_line {
   transition: all 0.5s 0s ease;
 } */
 #myevent-deshbord .event-sidebar.sideBarRightLeftClosed {
-width: 110px;
-    min-width: 110px;
-    flex-shrink: 0;
+  width: 110px;
+  min-width: 110px;
+  flex-shrink: 0;
   transition: all 0.5s 0s ease;
 }
 
@@ -2286,9 +2297,9 @@ width: 110px;
 } */
 
 #myevent-deshbord .event-righcontent {
-    flex: 1;
-    min-width: 0;
-    padding: 30px;
+  flex: 1;
+  min-width: 0;
+  padding: 30px;
 }
 
 #myevent-deshbord .desbord-content thead {
@@ -2500,12 +2511,13 @@ width: 110px;
 }
 
 .careyes-chekout-new .cart-mdl-only .model-left-content {
-    overflow-y: auto;
-    padding: 0px 25px 0px;
-    height: 100%;
+  overflow-y: auto;
+  padding: 0px 25px 0px;
+  height: 100%;
 }
+
 .careyes-chekout-new .cart-mdl-only .care-new-check.modal-body .cart-mdl-innercontent {
-    height: 100%;
+  height: 100%;
 }
 
 .careyes-chekout-new .cart-mdl-only .cart-mdl-title {
@@ -2516,12 +2528,13 @@ width: 110px;
 }
 
 .cart-mdl-innercontent .ticket-section {
-     height: 79vh;
-    overflow-y: scroll;
+  height: 79vh;
+  overflow-y: scroll;
 }
+
 .careyes-chekout-new .cart-mdl-only .care-new-check.modal-body {
-    margin-bottom: 0px;
-    max-height: calc(100vh - 101px) !important;
+  margin-bottom: 0px;
+  max-height: calc(100vh - 101px) !important;
 }
 
 .careyes-chekout-new .cart-mdl-only .cartmdl-left-img {
@@ -2636,9 +2649,10 @@ width: 110px;
   padding: 20px;
   border-radius: 19px;
 }
-.chackout-side-box{
- overflow-y: auto;
-    height: calc(100vh - 144px);
+
+.chackout-side-box {
+  overflow-y: auto;
+  height: calc(100vh - 144px);
 }
 
 .careyes-chekout-new .cart-mdl-only .chackout-box h2 {
@@ -2975,19 +2989,22 @@ width: 110px;
 #profile .profil_deaile .profile-details {
   box-shadow: 0px 0px 14px 3px rgb(0 0 0 / 5%);
 }
+
 .modal-dialog.profile-addstaff-modal {
-    height: calc(100% - 60px) !important;
+  height: calc(100% - 60px) !important;
 }
+
 .modal-dialog.profile-addstaff-modal .modal-content {
-    height: 100%;
-    overflow-y: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+  height: 100%;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
+
 .modal-dialog.profile-addstaff-modal .modal-content::-webkit-scrollbar {
-    width: 0;
-    height: 0;
-    display: none;
+  width: 0;
+  height: 0;
+  display: none;
 }
 
 
@@ -3025,18 +3042,18 @@ width: 110px;
 }
 
 #myevent-deshbord .dsa_contant ul.tabes {
-padding-left: 0rem;
-    margin-top: 32px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid #ccc;
-    display: inline-flex;
-    width: max-content; 
-    white-space: nowrap;
+  padding-left: 0rem;
+  margin-top: 32px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #ccc;
+  display: inline-flex;
+  width: max-content;
+  white-space: nowrap;
 }
 
 #myevent-deshbord .dsa_contant .col-md-7:has(> ul.tabes) {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 #myevent-deshbord .dsa_contant ul.tabes li {
@@ -3105,18 +3122,19 @@ padding-left: 0rem;
 /* edit event page end */
 
 .manage-date-page .react-calendar {
-    width: 100%;
+  width: 100%;
 }
+
 .manage-dete-dateboax {
-    width: 38px;
-    height: 38px;
-    background-color: rgb(230, 45, 86);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: 900;
+  width: 38px;
+  height: 38px;
+  background-color: rgb(230, 45, 86);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 900;
 }
 
 /* manage ticket pg start */
@@ -3137,8 +3155,9 @@ padding-left: 0rem;
 .next.primery-button {
   background-color: #3d6db5;
 }
- .setting-dropdown svg.lucide.lucide-settings {
-    margin-top: -1px;
+
+.setting-dropdown svg.lucide.lucide-settings {
+  margin-top: -1px;
 }
 
 /* manage ticket pg end */
@@ -3648,10 +3667,11 @@ a.active {
 }
 
 .checkbutn-row .form-check {
-    padding-left: 16px;
+  padding-left: 16px;
 }
-.checkbutn-row .form-check label{
-    font-size: 14px;
+
+.checkbutn-row .form-check label {
+  font-size: 14px;
 }
 
 .modal-content {
@@ -4015,7 +4035,7 @@ h3.cart-emty {
 
 .careyes-chekout-new .care-new-check-secnd.modal-body {
   margin-bottom: 20px;
-    height: calc(100vh - 135px);
+  height: calc(100vh - 135px);
   overflow-y: auto;
 }
 
@@ -4751,7 +4771,8 @@ span.stp2-monte25-nm {
 .oxmonten2025EvntSec .care-new-check-secnd .secon-flw-btn .btn-bg {
   background-color: #e62d56 !important;
   padding: 12px;
-  color: var(--white-color) !important;font-weight: bold;
+  color: var(--white-color) !important;
+  font-weight: bold;
 }
 
 .oxmonten2025EvntSec .care-new-check-secnd .secon-flw-btn .btn-out {
@@ -5702,9 +5723,10 @@ input[type="date"] {
     width: 240px;
     height: 235px;
   }
-  .checkbutn-row .form-check label{
+
+  .checkbutn-row .form-check label {
     font-size: 12px;
-}
+  }
 }
 
 @media (max-width: 1200px) {
@@ -5755,23 +5777,28 @@ input[type="date"] {
     font-size: 13px;
     text-align: justify;
   }
+
   .calender-box {
     margin-right: 20px;
     width: 60%;
-}
-#request-demo .mettingTimingsDv {
+  }
+
+  #request-demo .mettingTimingsDv {
     width: 40%;
-}
-.manage-ticket-table {
+  }
+
+  .manage-ticket-table {
     font-size: 12px !important;
-}
-.manage-commitee-tiket-module .table-container-box .table thead tr th {
+  }
+
+  .manage-commitee-tiket-module .table-container-box .table thead tr th {
     font-size: 12px;
-}
-#myevent-deshbord .event-sidebar {
+  }
+
+  #myevent-deshbord .event-sidebar {
     width: 250px;
     min-width: 250px;
-}
+  }
 }
 
 @media (min-width: 992px) and (max-width: 1201px) {
@@ -5799,11 +5826,11 @@ input[type="date"] {
     margin-right: 25px;
   } */
 
-      #myevent-deshbord .event-sidebar {
-        padding: 20px 0px;
-        width: 75px;
-        min-width: 75px;
-    }
+  #myevent-deshbord .event-sidebar {
+    padding: 20px 0px;
+    width: 75px;
+    min-width: 75px;
+  }
 
   #myevent-deshbord .event-sidebar ul li a,
   #myevent-deshbord .event-sidebar ul li button {
@@ -5855,14 +5882,16 @@ input[type="date"] {
     width: calc(100% - 100px);
     padding-right: 20px;
   } */
-    .event-righcontent {
-        padding-left: 25px !important;
-        padding-right: 20px !important;
-    }
-#myevent-deshbord .event_names a, #myevent-deshbord .event_names button {
+  .event-righcontent {
+    padding-left: 25px !important;
+    padding-right: 20px !important;
+  }
+
+  #myevent-deshbord .event_names a,
+  #myevent-deshbord .event_names button {
     font-size: 13px;
-}
-  
+  }
+
 }
 
 
@@ -5991,43 +6020,47 @@ input[type="date"] {
     overflow: hidden;
   }
 
-   .headernav .navbar-light .navbar-collapse.show {
-        height: auto;
-        max-height: 100vh;
-        overflow-y: scroll;
-    }
-    .headernav .header-dropdown {
+  .headernav .navbar-light .navbar-collapse.show {
+    height: auto;
+    max-height: 100vh;
+    overflow-y: scroll;
+  }
+
+  .headernav .header-dropdown {
     position: static;
-}
+  }
 
   .headernav button.navbar-toggler {
-     position: relative;
-        z-index: 999;
-        box-shadow: none;
-        background-color: transparent;
-        outline: none;
-        border: none;
+    position: relative;
+    z-index: 999;
+    box-shadow: none;
+    background-color: transparent;
+    outline: none;
+    border: none;
   }
 
 
-.headernav button.navbar-toggler .close-icon {
-  transform: rotate(90deg);
-}
-.headernav button.navbar-toggler[aria-expanded="true"] .close-icon {
-  opacity: 1;
-  transform: rotate(0deg);
-}
-.headernav button.navbar-toggler[aria-expanded="true"] .menu-icon {
-  opacity: 0;
-  transform: rotate(-90deg);
-}
-.headernav button.navbar-toggler span.menu-icon,
-.headernav button.navbar-toggler span.close-icon {
-  color: white;
-  font-size: 26px;
-  display: inline-block;
-  transition: transform 0.3s ease, opacity 0.25s ease;
-}
+  .headernav button.navbar-toggler .close-icon {
+    transform: rotate(90deg);
+  }
+
+  .headernav button.navbar-toggler[aria-expanded="true"] .close-icon {
+    opacity: 1;
+    transform: rotate(0deg);
+  }
+
+  .headernav button.navbar-toggler[aria-expanded="true"] .menu-icon {
+    opacity: 0;
+    transform: rotate(-90deg);
+  }
+
+  .headernav button.navbar-toggler span.menu-icon,
+  .headernav button.navbar-toggler span.close-icon {
+    color: white;
+    font-size: 26px;
+    display: inline-block;
+    transition: transform 0.3s ease, opacity 0.25s ease;
+  }
 
 
   .headernav .menuflexbox {
@@ -6219,53 +6252,69 @@ input[type="date"] {
   #contact-us .content_inf {
     justify-content: start;
   }
+
   .careyes-chekout-new .cart-mdl-only .care-new-check.modal-body {
     max-height: calc(100vh - 72px) !important;
-}
-.headernav .menuflexbox {
+  }
+
+  .headernav .menuflexbox {
     gap: 16px;
-}
-.demo-innerconent .col-lg-4 img.contactImg {
+  }
+
+  .demo-innerconent .col-lg-4 img.contactImg {
     width: 60%;
     margin: auto;
-}
-#request-demo .meattingpgRgt {
+  }
+
+  #request-demo .meattingpgRgt {
     padding: 20px;
-}
-#request-demo .mettingTimingsDv ul {
+  }
+
+  #request-demo .mettingTimingsDv ul {
     padding-right: 0px;
-}
-#myevent-deshbord .dsa_contant ul.tabes li a {
+  }
+
+  #myevent-deshbord .dsa_contant ul.tabes li a {
     font-size: 14px;
-}
-#myevent-deshbord .dsa_contant ul.tabes li {
+  }
+
+  #myevent-deshbord .dsa_contant ul.tabes li {
     padding-right: 1rem;
-}
-#myevent-deshbord .contant_bg {
+  }
+
+  #myevent-deshbord .contant_bg {
     padding: 25px 20px;
-}
-.onlymanage-question-page .row {
+  }
+
+  .onlymanage-question-page .row {
     row-gap: 13px;
-}
-    .checkbutn-row .form-check label {
-        font-size: 13px;
-    }
-       .onlymanage-question-page .form-check-input[type=checkbox] {
-        margin-top: 3px;
-    }
-    .table-width-992{
-      min-width: 1000px !important;
-    }
-    .headernav .userloginbtn {
-  margin-left: 0px;
-}
-.chackout-side-box {
+  }
+
+  .checkbutn-row .form-check label {
+    font-size: 13px;
+  }
+
+  .onlymanage-question-page .form-check-input[type=checkbox] {
+    margin-top: 3px;
+  }
+
+  .table-width-992 {
+    min-width: 1000px !important;
+  }
+
+  .headernav .userloginbtn {
+    margin-left: 0px;
+  }
+
+  .chackout-side-box {
     height: 100%;
-}
-#myevent-deshbord .event-righcontent .dsa_contant .buttons-row .primery-button {
+  }
+
+  #myevent-deshbord .event-righcontent .dsa_contant .buttons-row .primery-button {
     font-size: 12px !important;
-}
- #myevent-deshbord .event_names {
+  }
+
+  #myevent-deshbord .event_names {
     flex-wrap: wrap;
     gap: 5px;
   }
@@ -6277,13 +6326,15 @@ input[type="date"] {
     max-width: 810px;
   }
 }
-@media (min-width: 577px) and (max-width: 767px){
-#myevent-deshbord .event_names .edit-event-header-title {
+
+@media (min-width: 577px) and (max-width: 767px) {
+  #myevent-deshbord .event_names .edit-event-header-title {
     order: 3;
-}
-#myevent-deshbord .event_names .edit-view-event {
+  }
+
+  #myevent-deshbord .event_names .edit-view-event {
     order: 2;
-}
+  }
 }
 
 @media (max-width: 767px) {
@@ -6499,70 +6550,89 @@ input[type="date"] {
     margin: 20px 0px 30px 0;
     padding-right: 10px;
   } */
-      .event-righcontent {
-        padding: 20px 10px 30px 15px !important;
-    }
+  .event-righcontent {
+    padding: 20px 10px 30px 15px !important;
+  }
 
   .order-1-768 {
     order: 1;
   }
+
   .cart-mdl-innercontent .ticket-section {
     height: 30vh;
     overflow-y: scroll;
-}
-.event-crt-deta.mt-2.text-center {
+  }
+
+  .event-crt-deta.mt-2.text-center {
     margin-bottom: 30px;
-}
-    .careyes-chekout-new .cart-mdl-only .model-left-content {
-        overflow: hidden;
-    }
-   .calender-box {
-        width: 50%;
-        margin-right: 0px;
-    }
-        #request-demo .mettingTimingsDv {
-        width: 50%;
-    }
-    .input-row .form-control, .form-select {
-        color: #212529  !important;
-    }
-    #request-demo .mettingTimingsDv ul li a {
-    font-size: 14px;
-}
-.manage-ticket-table {
-    font-size: 14x !important;
-}
-.row.manage-ticket-rows {
-    gap: 10px;
-}
-    .manage-ticket-table {
-        font-size: 13px !important;
-    }
-    .checkbutn-row .form-check {
-    padding-left: 20px;
-}
-.manage-ticket-module .sold-button {
-    font-size: 12px;
-}
-.secon-flw.paynow-mdl-rowbox .row .pay-now-leftimg {
-    padding: 40px 10px;
-}
-.secon-flw.paynow-mdl-rowbox .row .pay-now-leftimg img {
+  }
+
+  .careyes-chekout-new .cart-mdl-only .model-left-content {
+    overflow: hidden;
+  }
+
+  .calender-box {
     width: 50%;
-}
-.cart-mdl-only .paynow-mdl-container .secon-flw.paynow-mdl-rowbox .row .paynow-titlesec h2 {
+    margin-right: 0px;
+  }
+
+  #request-demo .mettingTimingsDv {
+    width: 50%;
+  }
+
+  .input-row .form-control,
+  .form-select {
+    color: #212529 !important;
+  }
+
+  #request-demo .mettingTimingsDv ul li a {
+    font-size: 14px;
+  }
+
+  .manage-ticket-table {
+    font-size: 14x !important;
+  }
+
+  .row.manage-ticket-rows {
+    gap: 10px;
+  }
+
+  .manage-ticket-table {
+    font-size: 13px !important;
+  }
+
+  .checkbutn-row .form-check {
+    padding-left: 20px;
+  }
+
+  .manage-ticket-module .sold-button {
+    font-size: 12px;
+  }
+
+  .secon-flw.paynow-mdl-rowbox .row .pay-now-leftimg {
+    padding: 40px 10px;
+  }
+
+  .secon-flw.paynow-mdl-rowbox .row .pay-now-leftimg img {
+    width: 50%;
+  }
+
+  .cart-mdl-only .paynow-mdl-container .secon-flw.paynow-mdl-rowbox .row .paynow-titlesec h2 {
     font-size: 26px;
-}
-.oxmonten2025EvntSec .care-new-check-secnd .terms-check .form-check-label {
+  }
+
+  .oxmonten2025EvntSec .care-new-check-secnd .terms-check .form-check-label {
     font-size: 12px !important;
-}
-.careyes-chekout-new .care-new-check-secnd .secnd-flw-trms {
+  }
+
+  .careyes-chekout-new .care-new-check-secnd .secnd-flw-trms {
     height: 180px;
     margin: 30px 0;
-}
-.careyes-chekout-new .care-new-check-secnd .terms-check {
+  }
+
+  .careyes-chekout-new .care-new-check-secnd .terms-check {
     margin-bottom: 13px;
-}
+  }
 }
 
 @media (max-width: 663px) {
@@ -6830,8 +6900,8 @@ input[type="date"] {
 
   #myevent-deshbord .dsa_contant ul.tabes {
     margin-top: 22px;
-        width: 100%;
-        overflow-x: auto;
+    width: 100%;
+    overflow-x: auto;
   }
 
   #myevent-deshbord .event_names .edit-event-dropdown {
@@ -6844,12 +6914,13 @@ input[type="date"] {
     order: 2;
   }
 
-     #myevent-deshbord .event_names .edit-view-event a, #myevent-deshbord .event_names .edit-event-dropdown button {
-        width: 100%;
-        white-space: normal;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-    }
+  #myevent-deshbord .event_names .edit-view-event a,
+  #myevent-deshbord .event_names .edit-event-dropdown button {
+    width: 100%;
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
 
   #myevent-deshbord .event_names .edit-event-header-title {
     order: 2;
@@ -6890,89 +6961,119 @@ input[type="date"] {
   #contact-us .content_inf ul li span {
     font-size: 13px;
   }
+
   .header-left h2 {
     font-size: 19px;
-}
-.careyes-chekout-new .cart-mdl-only .cartmdl-left-img {
+  }
+
+  .careyes-chekout-new .cart-mdl-only .cartmdl-left-img {
     height: 155px;
-}
-.careyes-chekout-new .cart-mdl-only .model-left-content {
+  }
+
+  .careyes-chekout-new .cart-mdl-only .model-left-content {
     padding: 0px 0px 25px;
-}
-.careyes-chekout-new .cart-mdl-only .cart-mdl-innercontent {
+  }
+
+  .careyes-chekout-new .cart-mdl-only .cart-mdl-innercontent {
     margin-bottom: 0px;
-}
-.careyes-chekout-new .cart-mdl-only .cart-mdl-title {
+  }
+
+  .careyes-chekout-new .cart-mdl-only .cart-mdl-title {
     font-size: 1rem;
     margin-bottom: 16px;
-}
-.careyes-chekout-new .cart-mdl-only .ticket-item.package-box .count-price-deta .count-total-prize {
+  }
+
+  .careyes-chekout-new .cart-mdl-only .ticket-item.package-box .count-price-deta .count-total-prize {
     font-size: 13px !important;
-}
-.careyes-chekout-new .cart-mdl-only .ticket-item.package-box .count-price-deta .discount-price{font-size: 12px !important;}
-.careyes-chekout-new .cart-mdl-only .ticket-item.package-box .count-price-deta .pay-price{font-size: 13px !important;}
-.careyes-chekout-new .cart-mdl-only .ticket-item .family-package-heading{
-  font-size: 14px !important;
-}
-.oxmonten2025EvntSec .care-new-check .checkout-innr .checkot-lft .eventsBxSec .ticket-section h5 {
+  }
+
+  .careyes-chekout-new .cart-mdl-only .ticket-item.package-box .count-price-deta .discount-price {
+    font-size: 12px !important;
+  }
+
+  .careyes-chekout-new .cart-mdl-only .ticket-item.package-box .count-price-deta .pay-price {
+    font-size: 13px !important;
+  }
+
+  .careyes-chekout-new .cart-mdl-only .ticket-item .family-package-heading {
+    font-size: 14px !important;
+  }
+
+  .oxmonten2025EvntSec .care-new-check .checkout-innr .checkot-lft .eventsBxSec .ticket-section h5 {
     font-size: 15px !important;
-}
-.careyes-chekout-new .care-new-check .checkout-innr .checkot-lft .ck-event-dtl {
-        margin-top: 14px !important;
-    }
-    .oxmonten2025EvntSec .care-new-check .checkout-innr .checkot-lft .eventsBxSec {
-        margin-bottom: 8px;
-    }
-.appointment-model .men-innr-sec .ticket-box.only-appo {
+  }
+
+  .careyes-chekout-new .care-new-check .checkout-innr .checkot-lft .ck-event-dtl {
+    margin-top: 14px !important;
+  }
+
+  .oxmonten2025EvntSec .care-new-check .checkout-innr .checkot-lft .eventsBxSec {
+    margin-bottom: 8px;
+  }
+
+  .appointment-model .men-innr-sec .ticket-box.only-appo {
     padding-left: 10px !important;
     padding-right: 10px !important;
     background-color: transparent;
     box-shadow: none !important;
     border: none !important;
     padding: 0px !important;
-}
-.appointment-timeshadulebox {
-    padding: 10px !important;
-}
-.appointment-timeshadulebox .appointment-date-timebox {
-    gap: 8px !important;
-}
-.appointment-timeshadulebox .apointment-price {
-    font-size: 14px !important;
-}
-    .calender-box {
-        width: 100%;
-    }
-        #request-demo .mettingTimingsDv {
-        width: 100%;
-    }
-    .demo-innerconent .col-lg-4 img.contactImg {
-        width: 100%;
-    }
-    #request-demo .meattingpgLeft h1 {
-    font-size: 18px;
-}
-#request-demo .timingsMeetingUl li {
-    font-size: 14px;
-}
-.meatingForm .form-control,
-.meatingForm .form-floating > label {
-    font-size: 13px !important;
-}
+  }
 
-.meatingForm .form-control::placeholder {
-    font-size: 13px;
-}
-.flex-grow-1.phone-numberinput {
+  .appointment-timeshadulebox {
+    padding: 10px !important;
+  }
+
+  .appointment-timeshadulebox .appointment-date-timebox {
+    gap: 8px !important;
+  }
+
+  .appointment-timeshadulebox .apointment-price {
+    font-size: 14px !important;
+  }
+
+  .calender-box {
     width: 100%;
-}
-.checkbutn-row .form-check {
-        padding-left: 30px;
-    }
-    .careyes-chekout-new .care-new-check-secnd.modal-body {
+  }
+
+  #request-demo .mettingTimingsDv {
+    width: 100%;
+  }
+
+  .demo-innerconent .col-lg-4 img.contactImg {
+    width: 100%;
+  }
+
+  #request-demo .meattingpgLeft h1 {
+    font-size: 18px;
+  }
+
+  #request-demo .timingsMeetingUl li {
+    font-size: 14px;
+  }
+
+  .meatingForm .form-control,
+  .meatingForm .form-floating>label {
+    font-size: 13px !important;
+  }
+
+  .meatingForm .form-control::placeholder {
+    font-size: 13px;
+  }
+
+  .flex-grow-1.phone-numberinput {
+    width: 100%;
+  }
+
+  .checkbutn-row .form-check {
+    padding-left: 30px;
+  }
+
+  .careyes-chekout-new .care-new-check-secnd.modal-body {
     height: calc(100vh - 100px);
-}
-/* .p-Tabs-container .p-PaymentMethodSelector button,.p-Tabs-container .p-PaymentMethodSelector .p-AdditionalPaymentMethods{
+  }
+
+  /* .p-Tabs-container .p-PaymentMethodSelector button,.p-Tabs-container .p-PaymentMethodSelector .p-AdditionalPaymentMethods{
     min-width: 49%;
     margin: 0px;
 }
@@ -6981,30 +7082,36 @@ input[type="date"] {
     gap: 5px;
 } */
 
-.careyes-chekout-new .care-new-check-secnd .scnd-flw-amnts h3 {
+  .careyes-chekout-new .care-new-check-secnd .scnd-flw-amnts h3 {
     margin-bottom: 18px;
     font-size: 17px;
-}
-.careyes-chekout-new .care-new-check-secnd .scnd-flw-amnts .amnt-stl-inr .tct-amt p {
+  }
+
+  .careyes-chekout-new .care-new-check-secnd .scnd-flw-amnts .amnt-stl-inr .tct-amt p {
     font-size: 14px;
-}
-.careyes-chekout-new .care-new-check-secnd .scnd-flw-amnts .amnt-stl-inr .tct-amt span {
+  }
+
+  .careyes-chekout-new .care-new-check-secnd .scnd-flw-amnts .amnt-stl-inr .tct-amt span {
     font-family: var(--sathosi-light-font-family);
     font-size: 14px;
     color: var(--black-color);
-}
-.careyes-chekout-new .care-new-check-secnd .secon-flw-btn .btn-out {
+  }
+
+  .careyes-chekout-new .care-new-check-secnd .secon-flw-btn .btn-out {
     font-size: 14px;
-}
-.careyes-chekout-new .care-new-check-secnd .secon-flw-btn .btn-bg {
+  }
+
+  .careyes-chekout-new .care-new-check-secnd .secon-flw-btn .btn-bg {
     font-size: 14px;
-}
-    .cart-mdl-only .paynow-mdl-container .secon-flw.paynow-mdl-rowbox .row .paynow-titlesec h2 {
-        font-size: 23px;
-    }
-    .careyes-chekout-new .care-new-check-secnd .secnd-flw-trms {
-        height: 162px;
-    }
+  }
+
+  .cart-mdl-only .paynow-mdl-container .secon-flw.paynow-mdl-rowbox .row .paynow-titlesec h2 {
+    font-size: 23px;
+  }
+
+  .careyes-chekout-new .care-new-check-secnd .secnd-flw-trms {
+    height: 162px;
+  }
 
 }
 
@@ -7061,53 +7168,83 @@ input[type="date"] {
   .mobile-talbe-width-480 {
     width: 403px !important;
   }
+
   .calendar-wrapper {
     padding: 17px;
-}
-.careyes-chekout-new .cart-mdl-only .only-ticket .counter-btn span {
+  }
+
+  .careyes-chekout-new .cart-mdl-only .only-ticket .counter-btn span {
     font-size: 10px !important;
     width: 6px !important;
-}
-.careyes-chekout-new .cart-mdl-only .ticket-info p {
+  }
+
+  .careyes-chekout-new .cart-mdl-only .ticket-info p {
     margin-bottom: 7px;
-}
-.careyes-chekout-new .cart-mdl-only .ticket-info strong {
+  }
+
+  .careyes-chekout-new .cart-mdl-only .ticket-info strong {
     font-size: 13px !important;
-}
-.careyes-chekout-new .cart-mdl-only .ticket-item {
-        padding: 10px;
-    }
-    .careyes-chekout-new .cart-mdl-only .chackout-box h2 {
+  }
+
+  .careyes-chekout-new .cart-mdl-only .ticket-item {
+    padding: 10px;
+  }
+
+  .careyes-chekout-new .cart-mdl-only .chackout-box h2 {
     font-size: 18px;
-}
-.oxmonten2025EvntSec .care-new-check .checkout-innr .checkot-lft .eventsBxSec .appointment-date-timebox span {
+  }
+
+  .oxmonten2025EvntSec .care-new-check .checkout-innr .checkot-lft .eventsBxSec .appointment-date-timebox span {
     font-size: 12px !important;
-}
-.careyes-chekout-new .cart-mdl-only .chackout-box {
+  }
+
+  .careyes-chekout-new .cart-mdl-only .chackout-box {
     padding: 17px 14px;
-}
-.careyes-chekout-new .care-new-check .checkout-innr .checkot-rgt .checkot-tct-purcs .apply-cd input {
+  }
+
+  .careyes-chekout-new .care-new-check .checkout-innr .checkot-rgt .checkot-tct-purcs .apply-cd input {
     font-size: 14px !important;
-}
-.careyes-chekout-new .care-new-check .checkout-innr .checkot-rgt .checkot-tct-purcs .apply-cd Button {
+  }
+
+  .careyes-chekout-new .care-new-check .checkout-innr .checkot-rgt .checkot-tct-purcs .apply-cd Button {
     padding: 5px 32px !important;
-}
-.button-mobile-fullwidth{width: 100%;margin-left: 0px !important; margin-top: 5px;}
-.onlymanage-question-page .form-check-input[type=checkbox] {margin-top: 2px;font-size: 14px !important;}
-#myevent-deshbord .contant_bg h6 {font-size: 13px;}
-    #myevent-deshbord .event_names {
-padding-left: 8px !important;
-padding-right: 8px !important;
-    }
-    .committee-event-detailpg .custom-input {
+  }
+
+  .button-mobile-fullwidth {
+    width: 100%;
+    margin-left: 0px !important;
+    margin-top: 5px;
+  }
+
+  .onlymanage-question-page .form-check-input[type=checkbox] {
+    margin-top: 2px;
+    font-size: 14px !important;
+  }
+
+  #myevent-deshbord .contant_bg h6 {
+    font-size: 13px;
+  }
+
+  #myevent-deshbord .event_names {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
+  .committee-event-detailpg .custom-input {
     font-size: 12px !important;
-}
-.direction-collum {
-        flex-direction: column;
-        align-items: self-start !important;
-        gap: 7px;
-    }
-    .btn-bg-color{background-color: #24d5b8 !important; color:white !important; padding: 7px;}
+  }
+
+  .direction-collum {
+    flex-direction: column;
+    align-items: self-start !important;
+    gap: 7px;
+  }
+
+  .btn-bg-color {
+    background-color: #24d5b8 !important;
+    color: white !important;
+    padding: 7px;
+  }
 
 }
 
@@ -7144,11 +7281,12 @@ padding-right: 8px !important;
   .import_committee {
     padding: 10px 10px;
   }
+
   .calendar-icon {
     width: 38px;
     height: 38px;
     font-size: 18px;
-}
+  }
 
 }
 
@@ -7166,24 +7304,31 @@ padding-right: 8px !important;
   .headerlogo {
     width: 150px;
   }
-    .header-left h2 {
-        font-size: 15px;
-    }
-    .header-right button {
+
+  .header-left h2 {
+    font-size: 15px;
+  }
+
+  .header-right button {
     font-size: 12px;
-}
-.rbc-date-cell .rbc-button-link {
+  }
+
+  .rbc-date-cell .rbc-button-link {
     font-size: 13px;
-}
-    .careyes-chekout-new .cart-mdl-only .ticket-item {
-        zoom: .9;
-    }
-        .appointment-timeshadulebox {
-        zoom: .9;
-    }
-        #myevent-deshbord .event_names a, #myevent-deshbord .event_names button {
-        font-size: 12px;
-    }
+  }
+
+  .careyes-chekout-new .cart-mdl-only .ticket-item {
+    zoom: .9;
+  }
+
+  .appointment-timeshadulebox {
+    zoom: .9;
+  }
+
+  #myevent-deshbord .event_names a,
+  #myevent-deshbord .event_names button {
+    font-size: 12px;
+  }
 
 }
 
@@ -7219,16 +7364,151 @@ padding-right: 8px !important;
     margin-right: 38px !important;
   }
 
- #myevent-deshbord .event-sidebar {
-        width: 61px;
-        min-width: 61px;
-    }
+  #myevent-deshbord .event-sidebar {
+    width: 61px;
+    min-width: 61px;
+  }
 
   #myevent-deshbord .event-sidebar ul li a,
   #myevent-deshbord .event-sidebar ul li button {
     font-size: 10px !important;
   }
-      #myevent-deshbord .event_names a, #myevent-deshbord .event_names button {
-        font-size: 12px;
-    }
+
+  #myevent-deshbord .event_names a,
+  #myevent-deshbord .event_names button {
+    font-size: 12px;
+  }
+}
+
+
+
+
+/* ===== DASHBOARD CARDS ===== */
+.dashboard-card {
+  padding: 20px;
+  border-radius: 14px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+}
+
+.dash-label {
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+.dash-value {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.dash-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+/* ===== LIGHT CARDS ===== */
+.light-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.pill {
+  background: #f1f5f9;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+}
+
+.pill.warning {
+  background: #fff4cc;
+  color: #b45309;
+}
+
+/* ===== LIST ROW ===== */
+.list-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.list-row.highlight {
+  background: #f0fdf4;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  margin-top: 8px;
+}
+
+/* ===== FORMULA ===== */
+.formula-box {
+  background: #f8fafc;
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 14px;
+  font-size: 13px;
+}
+
+/* ===== PROGRESS ===== */
+.light-progress {
+  height: 8px;
+  border-radius: 10px;
+}
+
+/* ===== SALES STATS ===== */
+.sales-stats {
+  display: flex;
+  gap: 16px;
+}
+
+.sales-box {
+  flex: 1;
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.sales-box p {
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 6px;
+  line-height: 1.2;
+}
+
+.sales-box h4 {
+  font-size: 22px;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* ===== SUMMARY ===== */
+.summary-row {
+  display: flex;
+  align-items: center;
+  background: #f8fafc;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  margin-top: 16px;
+}
+
+/* Section titles */
+.section-title {
+  font-weight: 600;
+  margin-bottom: 12px;
 }

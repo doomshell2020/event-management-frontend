@@ -60,7 +60,7 @@ const EventSidebar = ({ eventId, eventDetails }) => {
             {eventId ? (
                 <ul className="listunstyl components">
                     {[
-                        { href: `/event/my-event/`, icon: "bi bi-speedometer2", label: "Dashboard" },
+                        { href: `/event/dashboard/${eventId}`, icon: "bi bi-speedometer2", label: "Dashboard" },
                         { href: `/event/edit-event/${eventId}`, icon: "bi bi-sliders", label: "Settings" },
                         { href: `/event/payments/${eventId}`, icon: "bi bi-credit-card", label: "Payments" },
                         { href: `/event/export-tickets/${eventId}`, icon: "bi bi-wallet2", label: "Export Tickets" },

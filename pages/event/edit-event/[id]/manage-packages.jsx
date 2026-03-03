@@ -28,7 +28,7 @@ const ManagePackages = () => {
     const [ticketsList, setTicketList] = useState([]);
     const [addonsList, setAddonsList] = useState([]);
     const [packageList, setPackageList] = useState([]);
-    // console.log("ticketsList", ticketsList);
+    // console.log("addonsList", addonsList);
 
     const currencyName = eventDetails?.currencyName.Currency_symbol;
 
@@ -133,7 +133,13 @@ const ManagePackages = () => {
 
                 // ✅ Handle addons
                 if (addonsRes.data.success) {
-                    setAddonsList(addonsRes.data.data || []);
+                    const filteredAddons = (addonsRes.data.data || []).filter(
+                        addon =>
+                            addon.hidden !== "Y" &&
+                            Number(addon.count) > Number(addon.sold_count)
+                    );
+
+                    setAddonsList(filteredAddons);
                 } else {
                     setAddonsList([]);
                 }
@@ -143,6 +149,8 @@ const ManagePackages = () => {
                     const filteredTickets = (ticketsRes.data.data || []).filter(
                         (ticket) =>
                             // ticket.type != "comps"
+                            ticket.hidden !== "Y" &&
+                            ticket.sold_out !== "Y" &&
                             ticket.type !== "comps" &&
                             ticket.type !== "committee_sales" &&
                             (

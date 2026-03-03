@@ -36,7 +36,6 @@ const ManageAddons = () => {
     });
     
     const [addonsList, setAddonsList] = useState([]);
-    console.log("addonsList",addonsList);
     const [validateDefault, setValidateDefault] = useState(false);
 
     // handle input changes
@@ -112,7 +111,7 @@ const ManageAddons = () => {
             formData.append("price", addonForm.price);
             formData.append("count", addonForm.count);
             // formData.append("visibility", addonForm.visibility);
-            formData.append("visibility", addonForm.hidden);
+            formData.append("hidden", addonForm.hidden);
             formData.append("description", addonForm.description);
             formData.append("event_id", id);
 
@@ -538,8 +537,6 @@ const ManageAddons = () => {
                                     required
                                 >
                                     <option value="">Select</option>
-                                    {/* <option value="Y">Visible</option>
-                                    <option value="N">Hidden</option> */}
                                     <option value="N">Visible</option>
                                     <option value="Y">Hidden</option>
                                 </Form.Select>
