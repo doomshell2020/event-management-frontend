@@ -178,9 +178,9 @@ const Profile = () => {
                     {profile?.last_name || ""}
                   </h4>
 
-                  <div className="text-muted">
+                  <div className="text-muted profile-card-icons">
                     <p className="mb-1">
-                      <i className="fa fa-phone me-2 text-primary"></i>
+                      <i className="fa fa-phone me-2 text-primary mobile-icon"></i>
                       <span className="fw-semibold me-1">Phone:</span>
                       {profile?.mobile ? `+${profile.mobile}` : "---"}
                     </p>

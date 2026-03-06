@@ -181,6 +181,16 @@ License        :   Licensed under ThemeForest License
 .payout-events-table.table .event-name-links {
     color: #f34343;
 }
+.admn-prl .profile-user img {
+    width: 37px;
+    height: 37px;
+    object-fit: cover;
+}
+.profile-card-icons .mobile-icon {
+    transform: rotate(101deg);
+}
+
+
 
 .admin-table-deta-no-wrap{white-space: nowrap;}
 
