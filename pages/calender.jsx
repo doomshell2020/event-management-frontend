@@ -1,13 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import FrontendHeader from "@/shared/layout-components/frontelements/frontendheader";
 import FrontendFooter from "@/shared/layout-components/frontelements/frontendfooter";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-
-
+import api from "@/utils/api";
 const localizer = momentLocalizer(moment);
-
+import { useRouter } from "next/router";
 /* ================= CUSTOM HEADER ================= */
 const CustomCalendarHeader = ({ date, onNavigate }) => {
   return (
@@ -31,19 +30,74 @@ const CustomCalendarHeader = ({ date, onNavigate }) => {
 
 const CalendarPage = () => {
   const [date, setDate] = useState(new Date());
+  const [events, setEvents] = useState([]);
+  const router = useRouter();
+  /* ================= LOAD EVENTS ON MONTH CHANGE ================= */
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const response = await api.get(
+          "/api/v1/events/calendar/event-list"
+        );
 
-  const events = [
-    {
-      title: "Team Sync",
-      start: new Date(2025, 11, 26, 10, 0),
-      end: new Date(2025, 11, 26, 11, 0),
-    },
-    {
-      title: "Design Review",
-      start: new Date(2025, 11, 26, 14, 0),
-      end: new Date(2025, 11, 26, 15, 0),
-    },
-  ];
+        const calendarEvents =
+          response?.data?.data?.events?.map((event) => {
+            const startDate = new Date(event.date_from);
+
+            return {
+              id: event.id,
+              slug: event.slug,
+              status: event.status,   // 🔥 IMPORTANT
+              title: event.name,
+              start: startDate,
+              end: startDate,         // no long bars
+            };
+          }) || [];
+
+        setEvents(calendarEvents);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchEvents();
+  }, [date]);
+
+  const handleSelectEvent = (event) => {
+    if (event.status === "Y") {
+      router.push(`/event/${event.id}/${event.slug}`);
+    }
+  };
+
+  const CustomEvent = ({ event }) => {
+    const isActive = event.status === "Y";
+
+    return (
+      <div
+        title={
+          isActive
+            ? "Click to view event details"
+            : "Details not available"
+        }
+        style={{
+          background: isActive ? "#2563eb" : "#9ca3af",
+          color: "#fff",
+          borderRadius: 6,
+          padding: "2px 6px",
+          fontSize: 12,
+          cursor: isActive ? "pointer" : "not-allowed",
+          opacity: isActive ? 1 : 0.6,
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        }}
+      >
+        {event.title}
+      </div>
+    );
+  };
+
+
 
   return (
     <>
@@ -69,12 +123,25 @@ const CalendarPage = () => {
           date={date}
           onNavigate={setDate}
           views={["month"]}
+          toolbar={false}
+          popup
+          onSelectEvent={handleSelectEvent}
+          components={{ event: CustomEvent }}
+        />
+        {/* <Calendar
+          localizer={localizer}
+          events={events}
+          startAccessor="start"
+          endAccessor="end"
+          date={date}
+          onNavigate={setDate}
+          views={["month"]}
           defaultView="month"
           toolbar={false}
           popup
-          style={{ height: "auto" }}   // 🔥 IMPORTANT
+          style={{ height: "auto" }}
           messages={{ noEventsInRange: "No Events" }}
-        />
+        /> */}
       </div>
 
       <FrontendFooter />

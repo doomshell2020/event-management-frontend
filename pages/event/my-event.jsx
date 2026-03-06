@@ -499,7 +499,7 @@ export default function OrganizerEvents({ userId }) {
                                                                         className="edit deleteIcos">
                                                                         <button type="button" className="edit p-0 m-0">
                                                                              <i className="bi bi-gift-fill pe-1"></i>{" "}
-                                                                            Promotion Codes
+                                                                            Coupon Codes
                                                                         </button>
                                                                     </Link>
 

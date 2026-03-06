@@ -15,6 +15,7 @@ export default function MyOrdersDetails() {
     );
 
     const [orderData, setOrderData] = useState(null);
+
     const [baseUrls, setBaseUrls] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -43,6 +44,7 @@ export default function MyOrdersDetails() {
     }, [orderId]);
 
     const handleCancelAppointment = async (order_item_id) => {
+        // console.log("order_item_id",order_item_id)
         const result = await Swal.fire({
             title: "Are you sure?",
             text: "This action will permanently cancel the appointment.",

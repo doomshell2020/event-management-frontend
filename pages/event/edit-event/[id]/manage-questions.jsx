@@ -88,21 +88,52 @@ const ManageQuestions = () => {
         }
     };
 
+    // const handleGetTicketsList = async (eventId) => {
+    //     try {
+    //         setLoading(true);
+    //         const res = await api.get(`/api/v1/tickets/list/${eventId}`);
+    //         if (res.data.success) {
+    //             setTicketList(res.data.data || []);
+    //         } else {
+    //             setTicketList([]);
+    //         }
+    //     } catch (error) {
+    //         console.error("Error fetching tickets:", error);
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
+
+    // filter free ticket Complimentary tickets should not be shown
     const handleGetTicketsList = async (eventId) => {
         try {
             setLoading(true);
+
             const res = await api.get(`/api/v1/tickets/list/${eventId}`);
+
             if (res.data.success) {
-                setTicketList(res.data.data || []);
+
+                const filteredTickets = (res.data.data || []).filter(
+                    (ticket) => ticket.type !== "comps"
+                );
+
+                setTicketList(filteredTickets);
+
             } else {
                 setTicketList([]);
             }
+
         } catch (error) {
             console.error("Error fetching tickets:", error);
+            setTicketList([]);
         } finally {
             setLoading(false);
         }
     };
+
+
+
+
 
     useEffect(() => {
         if (id) handleGetQuestionsList();
@@ -320,7 +351,7 @@ const ManageQuestions = () => {
             <section id="myevent-deshbord">
                 <div className="d-flex">
                     {/* Sidebar */}
-                    <EventSidebar eventId={id}  eventDetails={eventDetails}/>
+                    <EventSidebar eventId={id} eventDetails={eventDetails} />
 
                     <div className="event-righcontent">
                         <div className="dsa_contant">
@@ -497,6 +528,7 @@ const ManageQuestions = () => {
                                 value={questionForm.type}
                                 onChange={handleInputChange}
                                 required
+                                disabled={!!questionId}
                             >
                                 <option value="">Select Type</option>
                                 <option value="Select">Select</option>

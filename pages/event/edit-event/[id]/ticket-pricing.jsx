@@ -9,6 +9,7 @@ import FrontendFooter from "@/shared/layout-components/frontelements/frontendfoo
 import EventSidebar from "@/pages/components/Event/EventSidebar";
 import { Form, Button } from "react-bootstrap";
 import EventHeaderSection from "@/pages/components/Event/EventProgressBar";
+import moment from "moment";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -45,7 +46,11 @@ const ManageTicketPricing = () => {
             const res = await api.get(`/api/v1/tickets/list/${id}`);
 
             if (res.data.success) {
-                setTicketsList(res.data.data || []);
+                const filteredTickets = (res.data.data || []).filter(
+                (ticket) => ticket.type !== "comps"
+            );
+                setTicketsList(filteredTickets );
+                // setTicketsList(res.data.data || []);
             } else {
                 setTicketsList([]);
             }
@@ -221,7 +226,7 @@ const ManageTicketPricing = () => {
 
             <section id="myevent-deshbord">
                 <div className="d-flex">
-                    <EventSidebar eventId={id}  eventDetails={eventDetails}/>
+                    <EventSidebar eventId={id} eventDetails={eventDetails} />
 
                     <div className="event-righcontent">
                         <div className="dsa_contant">
@@ -322,9 +327,19 @@ const ManageTicketPricing = () => {
                                                         >
                                                             <option value="">-- Select Slot --</option>
                                                             {slotsList.map((slot) => (
+                                                                // <option key={slot.id} value={slot.id}>
+                                                                //     {slot.slot_name} ({slot.start_time} - {slot.end_time})
+                                                                // </option>
+
                                                                 <option key={slot.id} value={slot.id}>
-                                                                    {slot.slot_name} ({slot.start_time} - {slot.end_time})
+                                                                    {slot.slot_name} (
+                                                                    {slot.slot_date
+                                                                        ? moment(slot.slot_date).format("DD-MM-YYYY")
+                                                                        : ""}{" "}
+                                                                        ({slot.start_time} - {slot.end_time})
+                                                                    )
                                                                 </option>
+
                                                             ))}
                                                         </Form.Select>
                                                         <Form.Control.Feedback type="invalid">
@@ -367,7 +382,10 @@ const ManageTicketPricing = () => {
                                                         <tr key={index}>
                                                             <td>{row?.ticket?.title || "-"}</td>
                                                             <td>{currencyName}{row.price}</td>
-                                                            <td>{row.date || "-"}</td>
+                                                            {/* <td>{row.date || "-"}</td> */}
+                                                            <td>
+                                                                {row.date ? moment(row.date).format("DD-MM-YYYY") : "-"}
+                                                            </td>
                                                             <td>{row.slot ? `${row.slot.slot_name} (${row.slot.start_time.slice(0, 5)} - ${row.slot.end_time.slice(0, 5)})` : "-"}</td>
                                                         </tr>
                                                     ))}

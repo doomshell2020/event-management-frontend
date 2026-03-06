@@ -34,13 +34,14 @@ const ManageAddons = () => {
         description: "",
         image: null,
     });
-
+    
     const [addonsList, setAddonsList] = useState([]);
     const [validateDefault, setValidateDefault] = useState(false);
 
     // handle input changes
     const handleInputChange = (e) => {
         const { name, value } = e.target;
+        console.log("name, value",name, value)
         setAddonForm({
             ...addonForm,
             [name]: value,
@@ -109,7 +110,8 @@ const ManageAddons = () => {
             formData.append("name", addonForm.name);
             formData.append("price", addonForm.price);
             formData.append("count", addonForm.count);
-            formData.append("visibility", addonForm.visibility);
+            // formData.append("visibility", addonForm.visibility);
+            formData.append("hidden", addonForm.hidden);
             formData.append("description", addonForm.description);
             formData.append("event_id", id);
 
@@ -417,7 +419,7 @@ const ManageAddons = () => {
                                                                                                 handleGetAddonsList();
                                                                                             })
                                                                                             .catch((error) => {
-                                                                                            // console.log('error :', error);
+                                                                                                // console.log('error :', error);
                                                                                                 const message = error.response.data.error.message || "Failed to delete addon.";
                                                                                                 Swal.fire(
                                                                                                     "Error",
@@ -535,8 +537,8 @@ const ManageAddons = () => {
                                     required
                                 >
                                     <option value="">Select</option>
-                                    <option value="Y">Visible</option>
-                                    <option value="N">Hidden</option>
+                                    <option value="N">Visible</option>
+                                    <option value="Y">Hidden</option>
                                 </Form.Select>
                                 <Form.Control.Feedback type="invalid">
                                     Please select visibility.

@@ -140,11 +140,20 @@ export default function Appointments({ }) {
             }
         } catch (error) {
             console.error("Delete error:", error);
+            const apiErrorMsg = error.response?.data?.error?.message ||
+                error.response?.data?.message ||
+                error.message ||
+                "Something went wrong. Please try again.";
             Swal.fire({
                 icon: "error",
-                title: "Error",
-                text: "Something went wrong. Please try again later.",
+                title: "Server Error",
+                text: apiErrorMsg,
             });
+            // Swal.fire({
+            //     icon: "error",
+            //     title: "Error",
+            //     text: "Something went wrong. Please try again later.",
+            // });
         }
     };
 
@@ -162,14 +171,14 @@ export default function Appointments({ }) {
 
                     <div className="event-righcontent">
                         <div className="d-flex justify-content-between flex-wrap gap-3 align-items-center">
-                        <h4 className="mb-0">My Appointments</h4>
-                        <button
-                            className="primery-button fw-normal px-2 text-white button-mobile-fullwidth"
-                            style={{ backgroundColor: "#00ad00" }}
-                            onClick={() => router.push(`/appointments/${eventId}/create`)}
-                        >
-                            <i className="bi bi-plus"></i> Create Appointments
-                        </button>
+                            <h4 className="mb-0">My Appointments</h4>
+                            <button
+                                className="primery-button fw-normal px-2 text-white button-mobile-fullwidth"
+                                style={{ backgroundColor: "#00ad00" }}
+                                onClick={() => router.push(`/appointments/${eventId}/create`)}
+                            >
+                                <i className="bi bi-plus"></i> Create Appointments
+                            </button>
                         </div>
                         <hr
                             style={{

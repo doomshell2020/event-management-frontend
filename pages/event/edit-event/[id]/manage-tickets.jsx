@@ -729,6 +729,7 @@ const ManageTickets = () => {
                                     value={ticketForm.access_type || ""}
                                     onChange={handleInputChange}
                                     required
+                                    disabled={!!ticketId} 
                                 >
                                     <option value="" disabled>
                                         Select Access Type

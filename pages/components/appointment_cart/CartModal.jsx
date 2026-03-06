@@ -13,6 +13,8 @@ import Image from "next/image";
 import api from "@/utils/api";
 import Swal from "sweetalert2"; // Import SweetAlert
 import { useCart } from "@/shared/layout-components/layout/CartContext";
+import CryptoJS from "crypto-js";
+
 // Loader Component
 const LoadingComponent = ({ isActive }) => {
     if (!isActive) return null;
@@ -43,7 +45,6 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
     const [couponLoading, setCouponLoading] = useState(false);
     const [eventDetails, setEventDetails] = useState({});
     const [currency, setCurrency] = useState('');
-    const { charges } = useCart();
     const [taxAppliedStatus, setTaxAppliedStatus] = useState('');
     const [eventName, setEventName] = useState('');
     const [eventImage, setEventImage] = useState('');
@@ -56,13 +57,7 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
     const [coupon, setCoupon] = useState("");
     const [adminFees, setAdminFees] = useState(8);
     const [showNextStep, setShowNextStep] = useState(false);
-    const [platformFee, setPlatformFee] = useState({})
-
-    useEffect(() => {
-        if (charges) {
-            setPlatformFee(charges)
-        }
-    }, [charges]);
+    const [platformFee, setPlatformFee] = useState({});
 
     // CART API FUNCTIONS
     const fetchCart = async (eventId) => {
@@ -95,15 +90,17 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
                     { slotIds: slotIds }
                 );
                 const currencySymbol = res?.data?.data?.currencyName?.Currency_symbol || "$";
-                // console.log("---res.data.data", currencySymbol);
+
                 setCurrency(currencySymbol)
                 setEventDetails(res.data.data);
                 setTaxAppliedStatus(res.data?.data?.wellness?.[0].tax_applied);
                 setEventName(res?.data?.data?.name)
                 setEventImage(res?.data?.data?.feat_image)
+                setPlatformFee(res.data?.data?.charges)
                 // STEP 3: Load fresh empty cart
                 const cartRes = await fetchCart(eventId);
                 const list = cartRes?.data?.data || [];
+
                 setCart(list);
 
                 // STEP 4: Build slotCart map (empty because cart cleared)
@@ -154,33 +151,31 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
         fetchDetails();
     }, [show, eventId]);
 
-
     const currencySymbol = cart?.[0]?.currency_symbol || "";
-    const taxApplied = eventDetails?.wellness?.[0]?.tax_applied;
 
-    // Calculate Totals
-    const totalTickets = cart.reduce((n, item) => n + item.count, 0);
     const priceTotal = cart.reduce(
         (n, item) => n + item.count * item.ticket_price,
         0
     );
+    const discountAmount = Number(couponDetails?.discountAmt || 0);
 
     // --------------------
-    // DISCOUNT
+    // BASE PRICE (NO COUPON HERE)
     // --------------------
-    const discountAmount = Number(couponDetails?.discountAmt || 0);
- 
+    const basePrice = Number(priceTotal);
+
+    // --------------------
+    // TAX CALCULATION (ON BASE PRICE ONLY)
+    // --------------------
     const platformFeeTax =
-        taxApplied === "Y"
-            ? (priceTotal * platformFee.platform_fee_percent) / 100
+        basePrice > 0
+            ? (basePrice * platformFee.platform_fee_percent) / 100
             : 0;
 
-    // Payment Gateway Tax (on priceTotal + platformFeeTax)
     const paymentGatewayTax =
-        taxApplied === "Y"
-            ? ((priceTotal + platformFeeTax) *
-                platformFee.payment_gateway_percent) /
-            100
+        basePrice > 0
+            ? ((basePrice + platformFeeTax) *
+                platformFee.payment_gateway_percent) / 100
             : 0;
 
     // --------------------
@@ -189,18 +184,24 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
     const feeTotal = platformFeeTax + paymentGatewayTax;
 
     // --------------------
-    // FINAL TOTAL
+    // GROSS TOTAL (BEFORE COUPON)
     // --------------------
-    const finalTotal = Math.max(
-        priceTotal + feeTotal - discountAmount,
-        0 // safety: negative total nahi jaane dega
-    );
+    const grossTotal = basePrice + feeTotal;
 
+    // --------------------
+    // APPLY COUPON AT END
+    // --------------------
+    const finalTotal = Math.max(grossTotal - discountAmount, 0);
+
+    // --------------------
+    // TAX BREAKDOWN
+    // --------------------
     const taxBreakdown = {
         platform_fee_tax: platformFeeTax,
         payment_gateway_tax: paymentGatewayTax,
         platform_fee_percent: platformFee?.platform_fee_percent || 0,
-        payment_gateway_percent: platformFee?.payment_gateway_percent || 0
+        payment_gateway_percent: platformFee?.payment_gateway_percent || 0,
+        coupon_discount: discountAmount
     };
 
     // Final Total (discount last applied)
@@ -234,10 +235,10 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
             // Encrypt the data
             const storedToken = localStorage.getItem("accessToken");
             const secretKey = process.env.DATA_ENCODE_SECRET_KEY;
-            const encryptedData = CryptoJS.AES.encrypt(
-                JSON.stringify(data),
-                secretKey
-            ).toString();
+            // const encryptedData = CryptoJS.AES.encrypt(
+            //     JSON.stringify(data),
+            //     secretKey
+            // ).toString();
 
             Swal.fire({
                 title: "Processing...",
@@ -250,9 +251,14 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
                 },
             });
 
-            const response = await axios.post(
-                `/api/v1/create-order`,
-                { key: "free_ticket", data: encryptedData },
+            const response = await api.post(`/api/v1/orders/create-appointment`,
+                {
+                    key: "free_ticket",
+                    event_id: eventId,
+                    total_amount: 0,
+                    payment_method: "Online",
+                    data: data
+                },
                 {
                     headers: {
                         Authorization: `Bearer ${storedToken}`,
@@ -263,7 +269,7 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
 
             // If the API response is successful
             if (response.data.success) {
-                setShow(false);
+                // setShow(false);
                 Swal.fire({
                     title: "Success!",
                     text: "Your free ticket has been created successfully!",
@@ -320,37 +326,93 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
     }
 
     // Apply Coupon Code
+    // const handleApplyCoupon = async () => {
+    //     setCouponLoading(true);
+    //     if (!coupon) {
+    //         setCouponLoading(false);
+    //         return;
+    //     }
+    //     try {
+    //         const response = await api.get(`/api/v1/coupons/check-eligibility/${eventId}`, {
+    //             params: { couponCode: coupon },
+    //         });
+    //         if (response.data.success) {
+    //             setCouponDetails(response.data.data);
+    //             setCouponSuccessMessage(response.data.message);
+    //             setCouponError("");
+    //             localStorage.setItem("couponCode", coupon);
+    //         } else {
+    //             setCouponError(response.data.message || "Invalid coupon code.");
+    //             setCouponSuccessMessage("");
+    //         }
+    //         setCouponLoading(false);
+    //     } catch (error) {
+    //         console.error("Error applying coupon:", error.message);
+    //         const errorMessage =
+    //             error.response?.data?.message ||
+    //             "An error occurred while applying the coupon.";
+    //         setCouponError(errorMessage);
+    //         setCouponSuccessMessage("");
+    //         // clearMessages();
+    //         setCouponLoading(false);
+    //     }
+    // };
+
     const handleApplyCoupon = async () => {
         setCouponLoading(true);
+
         if (!coupon) {
             setCouponLoading(false);
             return;
         }
+
         try {
-            const response = await api.get(`/api/v1/coupons/check-eligibility/${eventId}`, {
-                params: { couponCode: coupon },
-            });
+            const response = await api.get(
+                `/api/v1/coupons/check-eligibility/${eventId}`,
+                { params: { couponCode: coupon } }
+            );
+
             if (response.data.success) {
+
+                const discountAmt = Number(response.data.data?.discountAmt || 0);
+
+                // ❌ Prevent discount greater than cart total
+                if (discountAmt > priceTotal) {
+                    setCouponError("Coupon discount cannot be greater than cart total.");
+                    setCouponSuccessMessage("");
+                    setCouponDetails("");
+                    setCouponLoading(false);
+                    return;
+                }
+
                 setCouponDetails(response.data.data);
                 setCouponSuccessMessage(response.data.message);
                 setCouponError("");
                 localStorage.setItem("couponCode", coupon);
+
             } else {
                 setCouponError(response.data.message || "Invalid coupon code.");
                 setCouponSuccessMessage("");
             }
+
             setCouponLoading(false);
+
         } catch (error) {
             console.error("Error applying coupon:", error.message);
+
             const errorMessage =
                 error.response?.data?.message ||
                 "An error occurred while applying the coupon.";
+
             setCouponError(errorMessage);
             setCouponSuccessMessage("");
-            // clearMessages();
             setCouponLoading(false);
         }
     };
+
+
+
+
 
     // Remove Coupon Code
     const handleRemoveCoupon = async () => {
@@ -483,158 +545,158 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
                                         {/* RIGHT SIDE (CART SUMMARY) */}
                                         <Col lg={4} className="crys-accomo-rgt men-innr-sec monten25-rgt-pnl">
                                             <div className="chackout-side-box">
-                                            <div className="checkot-rgt chackout-box">
-                                                {cart.length > 0 ? (
-                                                    
-                                                    <div className="checkot-tct-purcs monte25-tct-purcs px-0 pb-0">
-                                                        <div className="apply-cd mt-1">
-                                                            {couponError && (
-                                                                <p
-                                                                    style={{
-                                                                        color: "red",
-                                                                        textTransform: "uppercase",
-                                                                    }}
-                                                                >
-                                                                    {couponError}
-                                                                </p>
-                                                            )}
-                                                            {couponSuccessMessage && (
-                                                                <p
-                                                                    style={{
-                                                                        color: "#ff6d94",
-                                                                        textTransform: "uppercase",
-                                                                    }}
-                                                                >
-                                                                    {couponSuccessMessage}
-                                                                </p>
-                                                            )}
-                                                            <InputGroup className="input-group">
-                                                                <Form.Control
-                                                                    className="form-control"
-                                                                    placeholder="COUPON CODE"
-                                                                    type="text"
-                                                                    value={coupon}
-                                                                    onChange={(e) =>
-                                                                        setCoupon(e.target.value.toUpperCase())
-                                                                    }
-                                                                />
-                                                                {/* Conditional rendering of the button */}
-                                                                {couponDetails ? (
-                                                                    <Button
-                                                                        variant=""
-                                                                        className="btn"
-                                                                        type="button"
-                                                                        onClick={handleRemoveCoupon} // Function to remove the coupon
-                                                                    >
-                                                                        REMOVE
-                                                                    </Button>
-                                                                ) : (
-                                                                    <Button
-                                                                        variant=""
-                                                                        className="btn"
-                                                                        type="button"
-                                                                        onClick={handleApplyCoupon}
-                                                                        disabled={couponLoading}   // 👈 THIS IS REQUIRED
-                                                                    >
-                                                                        {couponLoading ? "APPLYING..." : "APPLY"}
-                                                                    </Button>
-                                                                    // <Button
-                                                                    //     variant=""
-                                                                    //     className="btn"
-                                                                    //     type="button"
-                                                                    //     onClick={handleApplyCoupon} // Function to apply the coupon
-                                                                    // >
-                                                                    //     APPLY
-                                                                    // </Button>
-                                                                )}
-                                                            </InputGroup>
-                                                        </div>
+                                                <div className="checkot-rgt chackout-box">
+                                                    {cart.length > 0 ? (
 
-                                                        <div className="tickt-ttl-prs my-3">
-                                                            <div className="d-flex justify-content-between mb-3 pb-3 border-bottom border-dark ">
-                                                                <p className="mb-0 fw-bold">SUBTOTAL</p>
-                                                                <span>
-                                                                    {currencySymbol}{" "}
-                                                                    {priceTotal.toFixed(2)} {" "}
-                                                                </span>
+                                                        <div className="checkot-tct-purcs monte25-tct-purcs px-0 pb-0">
+                                                            <div className="apply-cd mt-1">
+                                                                {couponError && (
+                                                                    <p
+                                                                        style={{
+                                                                            color: "red",
+                                                                            textTransform: "uppercase",
+                                                                        }}
+                                                                    >
+                                                                        {couponError}
+                                                                    </p>
+                                                                )}
+                                                                {couponSuccessMessage && (
+                                                                    <p
+                                                                        style={{
+                                                                            color: "#ff6d94",
+                                                                            textTransform: "uppercase",
+                                                                        }}
+                                                                    >
+                                                                        {couponSuccessMessage}
+                                                                    </p>
+                                                                )}
+                                                                <InputGroup className="input-group">
+                                                                    <Form.Control
+                                                                        className="form-control"
+                                                                        placeholder="COUPON CODE"
+                                                                        type="text"
+                                                                        value={coupon}
+                                                                        onChange={(e) =>
+                                                                            setCoupon(e.target.value.toUpperCase())
+                                                                        }
+                                                                    />
+                                                                    {/* Conditional rendering of the button */}
+                                                                    {couponDetails ? (
+                                                                        <Button
+                                                                            variant=""
+                                                                            className="btn"
+                                                                            type="button"
+                                                                            onClick={handleRemoveCoupon} // Function to remove the coupon
+                                                                        >
+                                                                            REMOVE
+                                                                        </Button>
+                                                                    ) : (
+                                                                        <Button
+                                                                            variant=""
+                                                                            className="btn"
+                                                                            type="button"
+                                                                            onClick={handleApplyCoupon}
+                                                                            disabled={couponLoading}   // 👈 THIS IS REQUIRED
+                                                                        >
+                                                                            {couponLoading ? "APPLYING..." : "APPLY"}
+                                                                        </Button>
+                                                                        // <Button
+                                                                        //     variant=""
+                                                                        //     className="btn"
+                                                                        //     type="button"
+                                                                        //     onClick={handleApplyCoupon} // Function to apply the coupon
+                                                                        // >
+                                                                        //     APPLY
+                                                                        // </Button>
+                                                                    )}
+                                                                </InputGroup>
                                                             </div>
 
-                                                            {couponDetails && (
-                                                                <div className="d-flex justify-content-between mb-3 pb-3 border-bottom border-dark">
-                                                                    <p className="mb-0 fw-bold">DISCOUNT</p>
+                                                            <div className="tickt-ttl-prs my-3">
+                                                                <div className="d-flex justify-content-between mb-3 pb-3 border-bottom border-dark ">
+                                                                    <p className="mb-0 fw-bold">SUBTOTAL</p>
                                                                     <span>
-                                                                        {couponDetails.discount_type === "percentage" ? (
-                                                                            <> {Math.floor(couponDetails.discount_value)}% ({currencySymbol}{formatSmartPrice(discountAmount)})</>
-                                                                        ) : (
-                                                                            <>
-                                                                                -{" "}
-                                                                                {currencySymbol || ""}
-                                                                                {formatSmartPrice(discountAmount)}
-                                                                            </>
-                                                                        )}
+                                                                        {currencySymbol}{" "}
+                                                                        {priceTotal.toFixed(2)} {" "}
                                                                     </span>
                                                                 </div>
-                                                            )}
 
-                                                            <div className="d-flex justify-content-between mb-3 pb-3 border-bottom border-dark">
-                                                                <p className="mb-0 fw-bold">PLATFORM & PAYMENT GATEWAY FEE</p>
-                                                                <span>
-                                                                    {currencySymbol}{" "}
-                                                                    {Math.round(feeTotal.toFixed(2))}
-                                                                </span>
-                                                            </div>
+                                                                {couponDetails && (
+                                                                    <div className="d-flex justify-content-between mb-3 pb-3 border-bottom border-dark">
+                                                                        <p className="mb-0 fw-bold">DISCOUNT</p>
+                                                                        <span>
+                                                                            {couponDetails.discount_type === "percentage" ? (
+                                                                                <> {Math.floor(couponDetails.discount_value)}% ({currencySymbol}{formatSmartPrice(discountAmount)})</>
+                                                                            ) : (
+                                                                                <>
+                                                                                    -{" "}
+                                                                                    {currencySymbol || ""}
+                                                                                    {formatSmartPrice(discountAmount)}
+                                                                                </>
+                                                                            )}
+                                                                        </span>
+                                                                    </div>
+                                                                )}
 
-                                                            <div className="d-flex justify-content-between mb-3 pb-3 border-bottom border-dark">
-                                                                <p className="mb-0 fw-bold">TOTAL</p>
-                                                                <p>
-                                                                    {currencySymbol}{" "}
-                                                                    {Math.round(finalTotal.toFixed(2))}
-                                                                </p>
+                                                                <div className="d-flex justify-content-between mb-3 pb-3 border-bottom border-dark">
+                                                                    <p className="mb-0 fw-bold">PLATFORM & PAYMENT GATEWAY FEE</p>
+                                                                    <span>
+                                                                        {currencySymbol}{" "}
+                                                                        {Math.round(feeTotal.toFixed(2))}
+                                                                    </span>
+                                                                </div>
+
+                                                                <div className="d-flex justify-content-between mb-3 pb-3 border-bottom border-dark">
+                                                                    <p className="mb-0 fw-bold">TOTAL</p>
+                                                                    <p>
+                                                                        {currencySymbol}{" "}
+                                                                        {Math.round(finalTotal.toFixed(2))}
+                                                                    </p>
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                    
-                                                ) : (
-                                                    <h3 className="text-center mt-2">Cart is Empty</h3>
-                                                )}
 
-                                                {cart.length > 0 && (
-                                                    <div className="by-nw-btn accomofl-ck-bt">
-                                                        <Button
-                                                            variant=""
-                                                            className="btn"
-                                                            type="submit"
-                                                            style={{
-                                                                backgroundColor: "#df3b67ff",
-                                                                color: "white",
-                                                                borderRadius: "30px",
-                                                                padding: "10px 24px",
-                                                                fontWeight: "600",
-                                                                border: "none",
-                                                                width: "50%",          // full width hat gaya
-                                                                display: "block",
-                                                                margin: "20px auto 0",      // button center me aa jayega
-                                                                opacity: isBtnLoading ? 0.7 : 1,
-                                                                cursor: isBtnLoading ? "not-allowed" : "pointer"
-                                                            }}
-                                                            onClick={(e) => {
-                                                                if (finalTotal == 0) {
-                                                                    e.preventDefault();
-                                                                    handleFreeTicket();
-                                                                }
-                                                            }}
-                                                        >
-                                                            {finalTotal == 0
-                                                                ? "FREE TICKET"
-                                                                : "PURCHASE"}
+                                                    ) : (
+                                                        <h3 className="text-center mt-2">Cart is Empty</h3>
+                                                    )}
 
-                                                        </Button>
-                                                    </div>
-                                                )}
+                                                    {cart.length > 0 && (
+                                                        <div className="by-nw-btn accomofl-ck-bt">
+                                                            <Button
+                                                                variant=""
+                                                                className="btn"
+                                                                type="submit"
+                                                                style={{
+                                                                    backgroundColor: "#df3b67ff",
+                                                                    color: "white",
+                                                                    borderRadius: "30px",
+                                                                    padding: "10px 24px",
+                                                                    fontWeight: "600",
+                                                                    border: "none",
+                                                                    width: "50%",          // full width hat gaya
+                                                                    display: "block",
+                                                                    margin: "20px auto 0",      // button center me aa jayega
+                                                                    opacity: isBtnLoading ? 0.7 : 1,
+                                                                    cursor: isBtnLoading ? "not-allowed" : "pointer"
+                                                                }}
+                                                                onClick={(e) => {
+                                                                    if (finalTotal == 0) {
+                                                                        e.preventDefault();
+                                                                        handleFreeTicket();
+                                                                    }
+                                                                }}
+                                                            >
+                                                                {finalTotal == 0
+                                                                    ? "FREE TICKET"
+                                                                    : "PURCHASE"}
+
+                                                            </Button>
+                                                        </div>
+                                                    )}
 
 
+                                                </div>
                                             </div>
-</div>
 
                                         </Col>
                                     </Row>

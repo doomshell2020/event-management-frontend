@@ -60,7 +60,7 @@ const EventSidebar = ({ eventId, eventDetails }) => {
             {eventId ? (
                 <ul className="listunstyl components">
                     {[
-                        { href: `/event/my-event/`, icon: "bi bi-speedometer2", label: "Dashboard" },
+                        { href: `/event/dashboard/${eventId}`, icon: "bi bi-speedometer2", label: "Dashboard" },
                         { href: `/event/edit-event/${eventId}`, icon: "bi bi-sliders", label: "Settings" },
                         { href: `/event/payments/${eventId}`, icon: "bi bi-credit-card", label: "Payments" },
                         { href: `/event/export-tickets/${eventId}`, icon: "bi bi-wallet2", label: "Export Tickets" },
@@ -116,6 +116,12 @@ const EventSidebar = ({ eventId, eventDetails }) => {
                                         <Link className="dropdown-item" href="/users/view-profile">
                                             <i className="bi bi-person"></i>
                                             <span> Profile </span>
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link className="dropdown-item" href="/company">
+                                            <i className="bi bi-building"></i>
+                                            <span> Manage Companies </span>
                                         </Link>
                                     </li>
                                     <li>

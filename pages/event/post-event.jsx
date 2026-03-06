@@ -29,10 +29,10 @@ const EventDetailsPage = () => {
         sale_end: "",
         ticket_limit: "",
         slug: "",
-        approve_timer: "",
+        approve_timer: "10",
         is_free: "N",
         allow_register: "N",
-        request_rsvp: "",
+        request_rsvp: new Date().toISOString(),
         event_timezone: "",
         video_url: "",
         entry_type: "event"
@@ -643,7 +643,7 @@ const EventDetailsPage = () => {
                                                     </div>
                                                 </div>
 
-                                                {formData.is_free != "Y" && (
+                                                {/* {formData.is_free != "Y" && ( */}
                                                     <>
                                                         {/* Currency */}
                                                         <div className="col-lg-3 col-md-6 mb-3 mt-0">
@@ -663,7 +663,7 @@ const EventDetailsPage = () => {
 
                                                     </>
 
-                                                )}
+                                                {/* )} */}
 
                                                 {/* Timezone */}
                                                 <div
@@ -726,7 +726,7 @@ const EventDetailsPage = () => {
                                                 {isFree ? (
                                                     <>
                                                         {/* RSVP By - Only for Free Events */}
-                                                        <div className="col-xl-4 col-lg-6 col-md-6 mb-2 mt-0">
+                                                        {/* <div className="col-xl-4 col-lg-6 col-md-6 mb-2 mt-0">
                                                             <label className="form-label">
                                                                 Request RSVP By <span className="text-danger">*</span>
                                                             </label>
@@ -738,7 +738,7 @@ const EventDetailsPage = () => {
                                                                 value={formData.request_rsvp || ""}
                                                                 required
                                                             />
-                                                        </div>
+                                                        </div> */}
                                                     </>
                                                 ) : (
                                                     <>
@@ -818,8 +818,8 @@ const EventDetailsPage = () => {
                                                             </select>
                                                         </div>
 
-                                                        {/* Approval Expiry */}
-                                                        <div className="col-xl-4 col-lg-6 col-md-6 mb-2 mt-0">
+                                                        {/* Approval Expiry Remove 12-02-2026 kamal */}
+                                                        {/* <div className="col-xl-4 col-lg-6 col-md-6 mb-2 mt-0">
                                                             <label className="form-label">Approval Expiry</label>
                                                             <select
                                                                 className="form-select rounded-0"
@@ -834,7 +834,7 @@ const EventDetailsPage = () => {
                                                                     </option>
                                                                 ))}
                                                             </select>
-                                                        </div>
+                                                        </div> */}
                                                     </>
                                                 )}
 

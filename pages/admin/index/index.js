@@ -761,7 +761,7 @@ const Dashboard = () => {
         <Col lg={12} md={12}>
           <Card>
             <Card.Header>
-              <h3 className="card-title">Latest Sold Orders</h3>
+              <h3 className="card-title">Latest Orders</h3>
             </Card.Header>
             <Card.Body >
               <div className="table-responsive">

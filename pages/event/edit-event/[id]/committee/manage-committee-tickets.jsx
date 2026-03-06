@@ -8,6 +8,7 @@ import EventSidebar from "@/pages/components/Event/EventSidebar";
 import EventHeaderSection from "@/pages/components/Event/EventProgressBar";
 import { Form, Button, Modal } from "react-bootstrap";
 import { Dropdown } from "react-bootstrap";
+import Swal from "sweetalert2";
 
 import api from "@/utils/api";
 
@@ -184,6 +185,15 @@ const CommitteeTicketsPage = () => {
             fetchAssignedTickets();      // refresh table
         } catch (err) {
             console.error("Ticket update failed", err);
+            const apiErrorMsg =err.response?.data?.error?.message ||
+                err.response?.data?.message ||
+                err.message ||
+                "Something went wrong. Please try again.";
+            Swal.fire({
+                icon: "error",
+                title: "Server Error",
+                text: apiErrorMsg,
+            });
         } finally {
             setIsSubmitting(false);      // stop loader
         }

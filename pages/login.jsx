@@ -29,6 +29,51 @@ const LoginPage = () => {
 
   const { login: loginUser } = useAuth();  // 👈 Get login function from context
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   setLoading(true);
+  //   setError("");
+  //   setSuccess("");
+
+  //   const payload = { email, password };
+
+  //   try {
+  //     const res = await api.post("/api/v1/auth/login", payload);
+
+  //     if (!res.data?.success) {
+  //       const msg =
+  //         res.data?.error?.message ||
+  //         res.data?.message ||
+  //         "Invalid credentials, please try again.";
+  //       throw new Error(msg);
+  //     }
+
+  //     const { token, user } = res.data.data;
+  //     loginUser(user, token);
+  //     toast.success("Login successful!");
+  //     router.push("/");
+
+  //   } catch (err) {
+  //     console.error("Login error:", err);
+
+  //     const apiErrorMsg =
+  //       err.response?.data?.error?.message ||
+  //       err.response?.data?.message ||
+  //       err.message ||
+  //       "Something went wrong. Please try again.";
+
+  //     setError(apiErrorMsg);
+
+  //     Swal.fire({
+  //       icon: "error",
+  //       title: "Login Failed",
+  //       text: apiErrorMsg,
+  //     });
+
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -51,27 +96,69 @@ const LoginPage = () => {
       const { token, user } = res.data.data;
       loginUser(user, token);
       toast.success("Login successful!");
-      // Swal.fire({
-      //   icon: "success",
-      //   title: "Welcome!",
-      //   text: "Login successful!",
-      //   timer: 1500,
-      //   showConfirmButton: false,
-      // });
-
       router.push("/");
 
     } catch (err) {
       console.error("Login error:", err);
 
       const apiErrorMsg =
-        err.response?.data?.error?.message ||
         err.response?.data?.message ||
+        err.response?.data?.error?.message ||
         err.message ||
         "Something went wrong. Please try again.";
 
       setError(apiErrorMsg);
 
+      // 🔴 EMAIL NOT VERIFIED CASE
+      if (apiErrorMsg === "Email not verified. Please verify your email to login.") {
+        Swal.fire({
+          icon: "warning",
+          title: "Email Not Verified",
+          text: "Your email is not verified. Please verify your email to continue.",
+          showCancelButton: true,
+          confirmButtonText: "Resend Verification Email",
+          cancelButtonText: "Cancel",
+        }).then(async (result) => {
+          if (result.isConfirmed) {
+
+            // 🔵 SHOW LOADER
+            Swal.fire({
+              title: "Please wait...",
+              text: "Sending verification email",
+              allowOutsideClick: false,
+              allowEscapeKey: false,
+              didOpen: () => {
+                Swal.showLoading();
+              }
+            });
+
+            try {
+              await api.post("/api/v1/auth/resend-verification", {
+                email: email,
+              });
+
+              // ✅ SUCCESS POPUP
+              Swal.fire({
+                icon: "success",
+                title: "Email Sent",
+                text: "Verification email has been sent successfully.",
+              });
+
+            } catch (error) {
+              // ❌ ERROR POPUP
+              Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Unable to resend verification email. Please try again later.",
+              });
+            }
+          }
+        });
+
+        return;
+      }
+
+      // 🔹 Normal errors (wrong password, inactive user, etc.)
       Swal.fire({
         icon: "error",
         title: "Login Failed",
@@ -82,7 +169,6 @@ const LoginPage = () => {
       setLoading(false);
     }
   };
-
 
   const [backgroundImage, setIsMobile] = useState('/assets/front-images/about-slider_bg.jpg');
   const [showPassword, setShowPassword] = useState(false);
@@ -144,7 +230,8 @@ const LoginPage = () => {
                           cursor: 'pointer'
                         }}
                       >
-                        {showPassword ? "🙈" : "👁️"}
+                        {/* {showPassword ? "🙈" : "👁️"} */}
+                        {showPassword ? <i className="bi bi-eye-slash"></i> : <i className="bi bi-eye"></i>}
 
                       </span>
                     </div>

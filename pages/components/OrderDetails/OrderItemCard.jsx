@@ -63,6 +63,8 @@ const OrderItemCard = ({
                             ? item?.appointment?.wellnessList?.name
                             : "";
 
+
+
     return (
         <div
             className="border-5 p-4 bg-white rounded-3 mb-3 ticktes-detail-box"
@@ -93,6 +95,23 @@ const OrderItemCard = ({
                     {itemName && (
                         <div className="text-muted">{itemName}</div>
                     )}
+
+                    {isAppointment && (
+                        <div className="appointment-info">
+                            <div>
+                                <strong>Date: </strong>{format(new Date(item?.appointment?.date), "EEE, dd MMM yyyy")}
+                            </div>
+
+                            <div>
+                               <strong>Time: </strong> {format(new Date(`1970-01-01T${item?.appointment?.slot_start_time}`), "hh:mm a")}
+                                {" - "}
+                                {format(new Date(`1970-01-01T${item?.appointment?.slot_end_time}`), "hh:mm a")}
+                            </div>
+                        </div>
+                    )}
+
+
+
 
                     {/* SLOT DETAILS (Ticket Price only) */}
                     {isTicketPrice && slot && (

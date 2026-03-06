@@ -28,6 +28,7 @@ const ManagePackages = () => {
     const [ticketsList, setTicketList] = useState([]);
     const [addonsList, setAddonsList] = useState([]);
     const [packageList, setPackageList] = useState([]);
+    // console.log("addonsList", addonsList);
 
     const currencyName = eventDetails?.currencyName.Currency_symbol;
 
@@ -116,7 +117,7 @@ const ManagePackages = () => {
                     api.get(`/api/v1/addons/list/${id}`),
                     api.get(`/api/v1/tickets/list/${id}`)
                 ]);
-                
+
                 // console.log('ticketsRes :', ticketsRes.data.data);
                 // ✅ Handle packages
                 if (packagesRes.data.success) {
@@ -132,7 +133,13 @@ const ManagePackages = () => {
 
                 // ✅ Handle addons
                 if (addonsRes.data.success) {
-                    setAddonsList(addonsRes.data.data || []);
+                    const filteredAddons = (addonsRes.data.data || []).filter(
+                        addon =>
+                            addon.hidden !== "Y" &&
+                            Number(addon.count) > Number(addon.sold_count)
+                    );
+
+                    setAddonsList(filteredAddons);
                 } else {
                     setAddonsList([]);
                 }
@@ -140,7 +147,16 @@ const ManagePackages = () => {
                 // ✅ Handle tickets
                 if (ticketsRes.data.success) {
                     const filteredTickets = (ticketsRes.data.data || []).filter(
-                        (ticket) => ticket.type != "comps"
+                        (ticket) =>
+                            // ticket.type != "comps"
+                            ticket.hidden !== "Y" &&
+                            ticket.sold_out !== "Y" &&
+                            ticket.type !== "comps" &&
+                            ticket.type !== "committee_sales" &&
+                            (
+                                Number(ticket.price) > 0 ||
+                                Number(ticket.pricings?.[0]?.price) > 0
+                            )
                     );
                     // console.log('filteredTickets :', filteredTickets);
                     setTicketList(filteredTickets || []);
@@ -177,7 +193,8 @@ const ManagePackages = () => {
     // ✅ Auto calculate totals on qty/discount change
     useEffect(() => {
         const ticketTotal = ticketsList.reduce(
-            (acc, t) => acc + (packageForm.ticketQty?.[t.id] || 0) * t.price,
+            // (acc, t) => acc + (packageForm.ticketQty?.[t.id] || 0) * t.price,
+            (acc, t) => acc + (packageForm.ticketQty?.[t.id] || 0) * (t.price > 0 ? t.price : Number(t.pricings?.[0]?.price ?? 0)),
             0
         );
         const addonTotal = addonsList.reduce(
@@ -642,7 +659,7 @@ const ManagePackages = () => {
                                                                                     const data = isTicket
                                                                                         ? item.ticketType
                                                                                         : item.addonType;
-
+                                                                                    // console.log("item", item)
                                                                                     return (
                                                                                         <tr key={item.id}>
                                                                                             <td>{index + 1}</td>
@@ -659,7 +676,13 @@ const ManagePackages = () => {
                                                                                             </td>
                                                                                             <td>{item.qty}</td>
                                                                                             <td>
-                                                                                                {currencyName}{data?.price || 0}
+                                                                                                {currencyName}
+                                                                                                {(
+                                                                                                    Number(data.price) > 0
+                                                                                                        ? Number(data.price)
+                                                                                                        : Number(data.pricings?.[0]?.price ?? 0)
+                                                                                                )}
+                                                                                                {/* {data?.price || 0} */}
                                                                                             </td>
                                                                                         </tr>
                                                                                     );
@@ -785,111 +808,135 @@ const ManagePackages = () => {
 
                         {/* Tickets Table */}
                         <div className="table-responsive">
-                        <table className="table table-bordered align-middle text-center table-mobile-width">
-                            <thead className="bg-primary">
-                                <tr>
-                                    <th>S.No</th>
-                                    <th>Ticket Type</th>
-                                    <th>Price</th>
-                                    <th>Qty</th>
-                                    <th>Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {ticketsList.map((ticket, index) => (
-                                    <tr key={ticket.id}>
-                                        <td>{index + 1}</td>
-                                        <td>{ticket.title}</td>
-                                        <td>{currencyName}{ticket.price}</td>
-                                        <td>
-                                            <Form.Select
-                                                style={{ width: "100px", margin: "auto" }}
-                                                value={packageForm.ticketQty?.[ticket.id] ?? ""}
-                                                onChange={(e) => {
-                                                    const qty = parseInt(e.target.value) || 0;
-                                                    setPackageForm((prev) => ({
-                                                        ...prev,
-                                                        ticketQty: {
-                                                            ...prev.ticketQty,
-                                                            [ticket.id]: qty,
-                                                        },
-                                                    }));
-                                                }}
-                                            >
-                                                <option value="">Select</option>
-                                                {[...Array(11).keys()].map((n) => (
-                                                    <option key={n} value={n}>
-                                                        {n}
-                                                    </option>
-                                                ))}
-                                            </Form.Select>
-                                        </td>
-
-                                        <td>
-                                            {currencyName}{(
-                                                (packageForm.ticketQty?.[ticket.id] || 0) * ticket.price
-                                            ).toFixed(2)}
-                                        </td>
+                            <table className="table table-bordered align-middle text-center table-mobile-width">
+                                <thead className="bg-primary">
+                                    <tr>
+                                        <th>S.No</th>
+                                        <th>Ticket Type</th>
+                                        <th>Price</th>
+                                        <th>Qty</th>
+                                        <th>Total</th>
                                     </tr>
-                                ))}
+                                </thead>
+                                <tbody>
+                                    {ticketsList.map((ticket, index) => (
+                                        <tr key={ticket.id}>
+                                            <td>{index + 1}</td>
+                                            <td>{ticket.title}</td>
+                                            <td>{currencyName}
+                                                {/* {ticket.price} */}
+                                                {ticket.price > 0
+                                                    ? ticket.price
+                                                    : ticket.pricings?.[0]?.price ?? 0}
+                                            </td>
+                                            <td>
+                                                <Form.Select
+                                                    style={{ width: "100px", margin: "auto" }}
+                                                    value={packageForm.ticketQty?.[ticket.id] ?? ""}
+                                                    onChange={(e) => {
+                                                        const qty = parseInt(e.target.value) || 0;
+                                                        setPackageForm((prev) => ({
+                                                            ...prev,
+                                                            ticketQty: {
+                                                                ...prev.ticketQty,
+                                                                [ticket.id]: qty,
+                                                            },
+                                                        }));
+                                                    }}
+                                                >
+                                                    <option value="">Select</option>
+                                                    {[...Array(11).keys()].map((n) => (
+                                                        <option key={n} value={n}>
+                                                            {n}
+                                                        </option>
+                                                    ))}
+                                                </Form.Select>
+                                            </td>
 
-                                {/* Addons Header */}
-                                {addonsList.length > 0 && (
-                                    <tr className="bg-light">
-                                        <td colSpan="5" className="text-start fw-bold">
-                                            Addons
-                                        </td>
-                                    </tr>
-                                )}
+                                            <td>
+                                                {currencyName}{
+                                                    (
+                                                        (packageForm.ticketQty?.[ticket.id] || 0) *
+                                                        (
+                                                            Number(ticket.price) > 0
+                                                                ? Number(ticket.price)
+                                                                : Number(ticket.pricings?.[0]?.price ?? 0)
+                                                        )
+                                                    ).toFixed(2)
+                                                    // (
+                                                    //     (packageForm.ticketQty?.[ticket.id] || 0) * ticket.price
+                                                    // ).toFixed(2)
+                                                }
+                                            </td>
+                                        </tr>
+                                    ))}
 
-                                {/* Addons List */}
-                                {addonsList.map((addon, index) => (
-                                    <tr key={addon.id}>
-                                        <td>{ticketsList.length + index + 1}</td>
-                                        <td>{addon.name}</td>
-                                        <td>{addon.price}</td>
-                                        <td>
-                                            <Form.Select
-                                                style={{ width: "100px", margin: "auto" }}
-                                                value={packageForm.addonQty?.[addon.id] ?? ""}
-                                                onChange={(e) => {
-                                                    const qty = parseInt(e.target.value) || 0;
-                                                    setPackageForm((prev) => ({
-                                                        ...prev,
-                                                        addonQty: {
-                                                            ...prev.addonQty,
-                                                            [addon.id]: qty,
-                                                        },
-                                                    }));
-                                                }}
-                                            >
-                                                <option value="">Select</option>
-                                                {[...Array(11).keys()].map((n) => (
-                                                    <option key={n} value={n}>
-                                                        {n}
-                                                    </option>
-                                                ))}
-                                            </Form.Select>
-                                        </td>
+                                    {/* Addons Header */}
+                                    {addonsList.length > 0 && (
+                                        <tr className="bg-light">
+                                            <td colSpan="5" className="text-start fw-bold">
+                                                Addons
+                                            </td>
+                                        </tr>
+                                    )}
 
-                                        <td>
-                                            {currencyName}{(
-                                                (packageForm.addonQty?.[addon.id] || 0) * addon.price
-                                            ).toFixed(2)}
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                    {/* Addons List */}
+                                    {addonsList.map((addon, index) => (
+                                        <tr key={addon.id}>
+                                            <td>{ticketsList.length + index + 1}</td>
+                                            <td>{addon.name}</td>
+                                            <td>{addon.price}</td>
+                                            <td>
+                                                <Form.Select
+                                                    style={{ width: "100px", margin: "auto" }}
+                                                    value={packageForm.addonQty?.[addon.id] ?? ""}
+                                                    onChange={(e) => {
+                                                        const qty = parseInt(e.target.value) || 0;
+                                                        setPackageForm((prev) => ({
+                                                            ...prev,
+                                                            addonQty: {
+                                                                ...prev.addonQty,
+                                                                [addon.id]: qty,
+                                                            },
+                                                        }));
+                                                    }}
+                                                >
+                                                    <option value="">Select</option>
+                                                    {[...Array(11).keys()].map((n) => (
+                                                        <option key={n} value={n}>
+                                                            {n}
+                                                        </option>
+                                                    ))}
+                                                </Form.Select>
+                                            </td>
+
+                                            <td>
+                                                {currencyName}{(
+                                                    (packageForm.addonQty?.[addon.id] || 0) * addon.price
+                                                ).toFixed(2)}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
 
                         {/* Totals Section */}
                         {(() => {
                             const ticketTotal = ticketsList.reduce(
                                 (acc, t) =>
-                                    acc + (packageForm.ticketQty?.[t.id] || 0) * t.price,
+                                    acc +
+                                    (packageForm.ticketQty?.[t.id] ?? 0) *
+                                    (t.price > 0 ? t.price : Number(t.pricings?.[0]?.price ?? 0)),
                                 0
                             );
+
+
+                            // const ticketTotal = ticketsList.reduce(
+                            //     (acc, t) =>
+                            //         acc + (packageForm.ticketQty?.[t.id] || 0) * t.price,
+                            //     0
+                            // );
                             const addonTotal = addonsList.reduce(
                                 (acc, a) => acc + (packageForm.addonQty?.[a.id] || 0) * a.price,
                                 0

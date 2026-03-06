@@ -8,7 +8,9 @@ import moment from "moment-timezone"; // ✅ Import moment-timezone
 import HtmlEditor, { getHtmlEditorContent } from "@/pages/components/HtmlEditor/HtmlEditor";
 import { useRouter } from 'next/router';
 import DatePicker from "react-datepicker";
-
+import Cropper from "react-cropper";
+import "cropperjs/dist/cropper.css";
+import { Button, Modal } from "react-bootstrap";
 
 
 const EditAppointmentPage = () => {
@@ -25,24 +27,103 @@ const EditAppointmentPage = () => {
     const noteRef = useRef(null);
     const [isLoading, setIsLoading] = useState(false);
     // const content = getHtmlEditorContent(noteRef);
+    const [success, setSuccess] = useState(false);
     const [editorData, setEditorData] = useState({ content: "" });
+    const [imageURL, setImageURL] = useState(null);
+    const [imageFile, setImageFile] = useState(null);
+    const [cropData, setCropData] = useState(null);
+    const [showCroppedImage, setShowCroppedImage] = useState(false); // State to toggle between original and cropped image
+    const cropperRef = useRef(null);
+    const fileInputRef = useRef(null);
+
+
+    const onChange = (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setShowCroppedImage(false);
+
+        const reader = new FileReader();
+        reader.onload = () => {
+            setImage(reader.result); // preview
+            setSuccess(true);
+        };
+        reader.readAsDataURL(file);
+
+        // ❌ yahan clear mat karo
+    };
+
+    const [isLoading2, setIsLoading2] = useState(false);
+    const getCropData = () => {
+        if (!cropperRef.current?.cropper) return;
+
+        const croppedCanvas = cropperRef.current.cropper.getCroppedCanvas();
+        if (!croppedCanvas) return;
+
+        croppedCanvas.toBlob((blob) => {
+            if (!blob) return;
+
+            const croppedFile = new File(
+                [blob],
+                "cropped_image.jpg",
+                { type: "image/jpeg" }
+            );
+
+            setImageFile(croppedFile);   // ✅ API FILE
+            const previewURL = URL.createObjectURL(blob);
+
+            setImageURL(previewURL);     // ✅ preview
+            setShowCroppedImage(true);
+            setSuccess(false);
+
+            // clear input safely
+            if (fileInputRef.current) {
+                fileInputRef.current.value = "";
+            }
+        }, "image/jpeg");
+    };
+
 
     const handleChange = (index, field, value) => {
         const updatedSlots = [...slots];
         updatedSlots[index][field] = value;
 
+        const today = new Date().toLocaleDateString("en-CA");
+        const nowTime = new Date().toLocaleTimeString("en-GB", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false
+        });
+
+        const selectedDate = updatedSlots[index].date;
+
+        // ✅ If selected date is today, start time must be greater than current time
+        if (field === "slot_start_time" && selectedDate === today) {
+            if (value <= nowTime) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Invalid Time",
+                    text: "Start time cannot be in the past for today's date",
+                });
+                updatedSlots[index].slot_start_time = "";
+                setSlots(updatedSlots);
+                return;
+            }
+        }
+
         const start = updatedSlots[index].slot_start_time;
         const end = updatedSlots[index].slot_end_time;
+
         // ✅ End time must be greater than Start time
         if (start && end && start >= end) {
-            // alert("End time must be greater than Start time");
             Swal.fire({
                 icon: "error",
                 title: "Oops!",
-                text: 'End time must be greater than Start time',
+                text: "End time must be greater than Start time",
             });
             updatedSlots[index].slot_end_time = "";
         }
+
         setSlots(updatedSlots);
     };
 
@@ -129,9 +210,12 @@ const EditAppointmentPage = () => {
             body.append("tax_applied", isTaxApplied);
 
             // ✅ Append image only if user selected
-            if (image) {
-                body.append("wellnessImage", image);
+            if (imageFile) {
+                body.append("wellnessImage", imageFile);
             }
+            // if (image) {
+            //     body.append("wellnessImage", image);
+            // }
             // ✅ API Call
             const response = await api.put(`/api/v1/wellness/update-wellness/${AppointmentId}`, body, {
                 headers: { "Content-Type": "multipart/form-data" },
@@ -258,7 +342,7 @@ const EditAppointmentPage = () => {
 
 
                                                 {/* NEW – Include Tax Option */}
-                                                <div className="col-lg-3 ">
+                                                {/* <div className="col-lg-3 ">
                                                     <label className="form-label">
                                                         Include Tax<span className="text-danger">*</span>
                                                     </label>
@@ -274,15 +358,26 @@ const EditAppointmentPage = () => {
                                                         <option value="Y">Yes, Include Tax</option>
                                                         <option value="N">No, Exclude Tax</option>
                                                     </select>
-                                                </div>
+                                                </div> */}
 
                                                 {/* Upload Image */}
+
+
+
+
                                                 <div className="col-lg-3 ">
                                                     <label className="form-label">
                                                         Upload Image{" "}
                                                         <small className="text-danger">(Size 550×550 JPG, JPEG, PNG Max 2MB)</small>
                                                     </label>
                                                     <input
+                                                        ref={fileInputRef}
+                                                        type="file"
+                                                        className="form-control rounded-0"
+                                                        accept=".jpg,.jpeg,.png"
+                                                        onChange={onChange}
+                                                    />
+                                                    {/* <input
                                                         type="file"
                                                         className="form-control rounded-0"
                                                         accept=".jpg, .jpeg, .png"
@@ -306,9 +401,15 @@ const EditAppointmentPage = () => {
 
                                                             handleFileChange(e);
                                                         }}
-                                                    />
+                                                    /> */}
                                                 </div>
-
+                                                {showCroppedImage && imageURL && (
+                                                    <img
+                                                        src={imageURL}
+                                                        alt="Cropped Preview"
+                                                        style={{ width: "100px", height: "100px", objectFit: "cover" }}
+                                                    />
+                                                )}
                                                 {/* Description */}
                                                 <div className="col-12">
                                                     <label className="form-label">Description</label>
@@ -400,7 +501,7 @@ const EditAppointmentPage = () => {
                                                         </div>
 
                                                         {/* Start Time */}
-                                                        <div className="col-lg-2 col-md-6 mt-1">
+                                                        {/* <div className="col-lg-2 col-md-6 mt-1">
                                                             <label className="form-label" style={labelStyle}>
                                                                 Start Time <span className="text-danger">*</span>
                                                             </label>
@@ -429,7 +530,51 @@ const EditAppointmentPage = () => {
                                                                 style={formControlStyle}
                                                                 placeholderText="Start Time"
                                                             />
+                                                        </div> */}
+
+                                                        {/* Start Time */}
+                                                        <div className="col-lg-2 col-md-6 mt-1">
+                                                            <label className="form-label" style={labelStyle}>
+                                                                Start Time <span className="text-danger">*</span>
+                                                            </label>
+
+                                                            <DatePicker
+                                                                selected={
+                                                                    slot.slot_start_time
+                                                                        ? new Date(`2000-01-01T${slot.slot_start_time}`)
+                                                                        : null
+                                                                }
+                                                                onChange={(date) => {
+                                                                    const dbTime = date.toLocaleTimeString("en-GB", {
+                                                                        hour: "2-digit",
+                                                                        minute: "2-digit",
+                                                                        hour12: false
+                                                                    });
+                                                                    handleChange(index, "slot_start_time", dbTime);
+                                                                }}
+                                                                showTimeSelect
+                                                                showTimeSelectOnly
+                                                                timeIntervals={5}
+                                                                timeCaption="Start Time"
+                                                                dateFormat="h:mm aa"
+                                                                className="form-control w-100"
+                                                                style={formControlStyle}
+                                                                placeholderText="Start Time"
+
+                                                                // ✅ NEW LOGIC START
+                                                                minTime={
+                                                                    slot.date === new Date().toLocaleDateString("en-CA")
+                                                                        ? new Date() // current time
+                                                                        : new Date("2000-01-01T00:00:00")
+                                                                }
+                                                                maxTime={new Date("2000-01-01T23:59:59")}
+                                                            // ✅ NEW LOGIC END
+                                                            />
                                                         </div>
+
+
+
+
 
                                                         {/* End Time */}
                                                         <div className="col-lg-2 col-md-6 mt-1">
@@ -569,6 +714,69 @@ const EditAppointmentPage = () => {
                 </div>
             </section>
             <FrontendFooter />
+
+            <Modal show={success}>
+                <Modal.Header>
+                    <h5>
+                        <strong>
+                            Enhance your image here! Crop it to perfection.
+                        </strong>
+                    </h5>
+                    <Button
+                        variant=""
+                        className="btn btn-close"
+                        onClick={() => {
+                            setSuccess(false);
+                        }}
+                    >
+                        x
+                    </Button>
+                </Modal.Header>
+                <Modal.Body>
+                    <div className="tx-center ">
+                        <div className="profile-cropper" style={{}}>
+                            <br />
+                            {!showCroppedImage && (
+                                <Cropper
+                                    style={{
+                                        height: 300,
+                                        width: "100%",
+                                        overflow: "hidden",
+                                        backgroundColor: "transparent !important",
+                                    }}
+                                    initialAspectRatio={1}
+                                    preview=".img-preview"
+                                    src={image}
+                                    ref={cropperRef}
+                                    viewMode={1}
+                                    guides={true}
+                                    minCropBoxHeight={10}
+                                    minCropBoxWidth={10}
+                                    background={false}
+                                    responsive={true}
+                                    checkOrientation={false}
+                                />
+                            )}
+                        </div>
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    {/* <Button variant="primary">
+                          Save Changes
+                        </Button> */}
+                    {/* <Button variant="primary" style={{ float: "right" }} onClick={getCropData}>
+                          {isLoading2 ? "Loading..." : "Save"}
+                        </Button> */}
+                    <Button
+                        variant="primary"
+                        style={{ float: "right" }}
+                        onClick={getCropData}
+                        disabled={isLoading2}
+                    >
+                        {isLoading2 ? "Loading..." : "Save"}
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </>
     );
 };

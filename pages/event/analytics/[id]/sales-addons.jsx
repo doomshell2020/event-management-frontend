@@ -17,6 +17,7 @@ const SalesAddonsPage = () => {
 
     /* ---------------- STATES ---------------- */
     const [eventDetails, setEventDetails] = useState(null);
+    // console.log("eventDetails",eventDetails.is_free);
     const [addonsSales, setAddonsSales] = useState([]);
     const [loading, setLoading] = useState(false);
 
@@ -100,6 +101,7 @@ const SalesAddonsPage = () => {
                                             Sales
                                         </Link>
                                     </li>
+                                    {eventDetails?.is_free !== "Y" && (
                                     <li>
                                         <Link
                                             href={`/event/analytics/${id}/sales-addons`}
@@ -108,6 +110,7 @@ const SalesAddonsPage = () => {
                                             Addons
                                         </Link>
                                     </li>
+                                    )}
                                 </ul>
 
                                 <div className="contant_bg">

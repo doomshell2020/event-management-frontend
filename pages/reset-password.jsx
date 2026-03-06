@@ -1,20 +1,84 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import FrontendHeader from "@/shared/layout-components/frontelements/frontendheader";
 import FrontendFooter from "@/shared/layout-components/frontelements/frontendfooter";
 import Swal from "sweetalert2";
 import api from "@/utils/api";
-
+import toast from "react-hot-toast";
 const ResetPasswordPage = () => {
   const router = useRouter();
   const { token } = router.query;
 
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [tokenValid, setTokenValid] = useState(false);
+  const [checkingToken, setCheckingToken] = useState(true);
 
   const backgroundImage = "/assets/front-images/about-slider_bg.jpg";
+
+
+  const verify = async () => {
+    setLoading(true);
+    setError("");
+    setSuccess("");
+
+    const verifyPromise = api
+      .get(`/api/v1/auth/validate-reset-token?token=${token}`)
+      .then((res) => res.data);
+
+    toast.promise(verifyPromise, {
+      loading: "Verifying reset link...",
+      success: (data) =>  "You're all set! Create your new password.",
+      error: () => "Invalid or expired link!",
+    });
+
+    try {
+      const data = await verifyPromise;
+
+      // ✅ Token valid
+      setSuccess(data.message);
+      setTokenValid(true);
+    } catch (err) {
+      const message =
+        err.response?.data?.message ||
+        err.response?.data?.error?.message ||
+        "This password reset link is invalid or has already been used.";
+
+      setError(message);
+      setTokenValid(false);
+
+      // 🔴 NON-CLOSABLE SWAL
+      Swal.fire({
+        icon: "error",
+        title: "Link Expired",
+        text: message,
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        showConfirmButton: true,
+        confirmButtonText: "Request New Link",
+      }).then(() => {
+        router.push("/forgot-password");
+      });
+    } finally {
+      setLoading(false);
+      setCheckingToken(false);
+    }
+  };
+
+
+
+  useEffect(() => {
+    if (!token) return;
+    verify();
+  }, [token]);
+
+  const isStrongPassword = (password) =>
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(password);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,10 +88,19 @@ const ResetPasswordPage = () => {
       return;
     }
 
-    if (password.length < 6) {
-      Swal.fire("Error", "Password must be at least 6 characters long.", "error");
+    // Strong password check
+    if (!isStrongPassword(password)) {
+      Swal.fire(
+        "Weak Password",
+        "Password must be at least 8 characters and include uppercase, lowercase, and a number.",
+        "error"
+      );
       return;
     }
+    // if (password.length < 6) {
+    //   Swal.fire("Error", "Password must be at least 6 characters long.", "error");
+    //   return;
+    // }
 
     if (password !== confirmPassword) {
       Swal.fire("Error", "Passwords do not match.", "error");
@@ -77,7 +150,9 @@ const ResetPasswordPage = () => {
             <div className="row align-items-center justify-content-center">
               {/* Left side GIF */}
               <div className="col-md-6 col-sm-12 sig_img">
-                <img src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExOWFzMnZhZDJ6dXRxYmx5bzUycnZmdGxzMGF6Y2Rsbzhuemh2NmVkMyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/IgLIVXrBcID9cExa6r/giphy.gif" alt="Reset Password" style={{ maxWidth: "100%", marginBottom: "20px" }} />
+                {/* <img src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExOWFzMnZhZDJ6dXRxYmx5bzUycnZmdGxzMGF6Y2Rsbzhuemh2NmVkMyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/IgLIVXrBcID9cExa6r/giphy.gif" alt="Reset Password" style={{ maxWidth: "100%", marginBottom: "20px" }} /> */}
+
+                <img src="/assets/front-images/sigin.png" alt="Forgot Password Illustration" />
 
               </div>
 
@@ -104,19 +179,34 @@ const ResetPasswordPage = () => {
                           cursor: "pointer",
                         }}
                       >
-                        {showPassword ? "🙈" : "👁️"}
+                        {/* {showPassword ? "🙈" : "👁️"} */}
+                        {showPassword ? <i className="bi bi-eye-slash"></i> : <i className="bi bi-eye"></i>}
                       </span>
                     </div>
 
-                    <div>
+                    <div style={{ position: "relative" }}>
                       <input
-                        type="password"
+                        // type="password"
+                        type={showConfirmPassword ? "text" : "password"}
                         placeholder="Confirm Password"
                         className="form-control mb-3"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         required
                       />
+                      <span
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        style={{
+                          position: "absolute",
+                          right: "10px",
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          cursor: "pointer",
+                        }}
+                      >
+                        {/* {showPassword ? "🙈" : "👁️"} */}
+                        {showConfirmPassword ? <i className="bi bi-eye-slash"></i> : <i className="bi bi-eye"></i>}
+                      </span>
                     </div>
 
                     <button

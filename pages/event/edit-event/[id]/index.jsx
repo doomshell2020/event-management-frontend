@@ -358,7 +358,7 @@ const MyEventsPage = () => {
                 <div className="d-flex">
 
                     {/* left menu */}
-                    <EventSidebar eventId={id}  eventDetails={eventDetails}/>
+                    <EventSidebar eventId={id} eventDetails={eventDetails} />
 
                     <div className="event-righcontent">
                         <div className="dsa_contant">
@@ -484,7 +484,7 @@ const MyEventsPage = () => {
                                                     </div>
 
                                                     {/* Checkboxes */}
-                                                    <div className="col-md-3 d-flex align-items-end">
+                                                    {/* <div className="col-md-3 d-flex align-items-end">
                                                         <CFormCheck
                                                             type="checkbox"
                                                             id="is_free"
@@ -493,7 +493,7 @@ const MyEventsPage = () => {
                                                             onChange={handleChange}
                                                             label="This event is free"
                                                         />
-                                                    </div>
+                                                    </div> */}
 
                                                     {/* <div className="col-md-3 d-flex align-items-center">
                                                         <CFormCheck
@@ -506,24 +506,24 @@ const MyEventsPage = () => {
                                                         />
                                                     </div> */}
 
-                                                    {!isFree && (
-                                                        <div className="col-md-3">
-                                                            <label className="form-label">
-                                                                Currency <span className="text-danger">*</span>
-                                                            </label>
-                                                            <select
-                                                                className="form-select rounded-0"
-                                                                name="payment_currency"
-                                                                value={formData.payment_currency}
-                                                                onChange={handleChange}
-                                                            >
-                                                                <option value="">Payment Type</option>
-                                                                <option value="1">INR</option>
-                                                                <option value="2">USD</option>
-                                                            </select>
-                                                        </div>
+                                                    {/* {!isFree && ( */}
+                                                    <div className="col-md-3">
+                                                        <label className="form-label">
+                                                            Currency <span className="text-danger">*</span>
+                                                        </label>
+                                                        <select
+                                                            className="form-select rounded-0"
+                                                            name="payment_currency"
+                                                            value={formData.payment_currency}
+                                                            onChange={handleChange}
+                                                        >
+                                                            <option value="">Payment Type</option>
+                                                            <option value="1">INR</option>
+                                                            <option value="2">USD</option>
+                                                        </select>
+                                                    </div>
 
-                                                    )}
+                                                    {/* )} */}
 
                                                     <div className={`col-md-${!isFree ? 3 : 6}`}>
                                                         <label className="form-label">
@@ -561,6 +561,7 @@ const MyEventsPage = () => {
                                                             name="date_from"
                                                             value={formData.date_from}
                                                             onChange={handleDateChange}
+                                                            disabled
                                                         />
                                                         {dateErrors.date_from && (
                                                             <div className="invalid-feedback">{dateErrors.date_from}</div>
@@ -573,7 +574,7 @@ const MyEventsPage = () => {
                                                             Event End:- (
                                                             {formatDateTimeShort(eventDetails?.date_to?.local)}
                                                             ) <span className="text-danger">*</span>
-                                                        </label>                                                       
+                                                        </label>
 
                                                         <input
                                                             type="datetime-local"
@@ -582,6 +583,7 @@ const MyEventsPage = () => {
                                                             value={formData.date_to}
                                                             onChange={handleDateChange}
                                                             min={formData.date_from}
+                                                            disabled
                                                         />
                                                         {dateErrors.date_to && (
                                                             <div className="invalid-feedback">{dateErrors.date_to}</div>
@@ -603,7 +605,8 @@ const MyEventsPage = () => {
                                                                     name="sale_start"
                                                                     value={formData.sale_start}
                                                                     onChange={handleDateChange}
-                                                                    // disabled={!formData.date_from || !formData.date_to}
+                                                                    disabled
+                                                                // disabled={!formData.date_from || !formData.date_to}
                                                                 />
                                                             </div>
 
@@ -621,7 +624,8 @@ const MyEventsPage = () => {
                                                                     onChange={handleDateChange}
                                                                     min={formData.sale_start}
                                                                     max={formData.date_to}
-                                                                    // disabled={!formData.sale_start}
+                                                                    disabled
+                                                                // disabled={!formData.sale_start}
                                                                 />
                                                                 {dateErrors.sale_end && (
                                                                     <div className="invalid-feedback">{dateErrors.sale_end}</div>
@@ -651,7 +655,8 @@ const MyEventsPage = () => {
                                                                 </select>
                                                             </div>
 
-                                                            <div className="col-md-6">
+                                                            {/* Approval Expiry Remove 12-02-2026 kamal */}
+                                                            {/* <div className="col-md-6">
                                                                 <label className="form-label">
                                                                     Approval Expiry <span className="text-danger">*</span>
                                                                 </label>
@@ -668,7 +673,7 @@ const MyEventsPage = () => {
                                                                         </option>
                                                                     ))}
                                                                 </select>
-                                                            </div>
+                                                            </div> */}
                                                         </>
 
                                                     )}
@@ -804,8 +809,8 @@ const MyEventsPage = () => {
                                                         />
 
                                                     </div>
-
-                                                    {!isFree && (
+                                                    {/* Hide update time according to testing team - 12-02-2026 */}
+                                                    {/* {!isFree && (
                                                         <div className="col-md-6 col-md-6 d-flex flex-column justify-content-between">
                                                             <label className="form-label d-flex align-items-center gap-2">
                                                                 Type of Event
@@ -837,12 +842,11 @@ const MyEventsPage = () => {
                                                                 <option value="">Choose Type</option>
                                                                 <option value="event">Event</option>
                                                                 <option value="multi">Multi</option>
-                                                                {/* <option value="slot">Slot</option>
-                                                                <option value="single">Single</option> */}
+                                                              
                                                             </select>
 
                                                         </div>
-                                                    )}
+                                                    )} */}
 
                                                     {/* Youtube URL */}
                                                     <div className="col-lg-6">
