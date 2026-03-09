@@ -7512,3 +7512,23 @@ input[type="date"] {
   font-weight: 600;
   margin-bottom: 12px;
 }
+
+.light-card{
+  background:#fff;
+  border-radius:12px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.05);
+}
+
+.light-progress{
+  height:8px;
+  border-radius:10px;
+}
+
+.sales-box p{
+  font-size:12px;
+  color:#777;
+}
+
+.sales-box h4{
+  font-weight:700;
+}

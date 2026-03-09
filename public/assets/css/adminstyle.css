@@ -121,7 +121,7 @@ License        :   Licensed under ThemeForest License
   border-top: 0px;
   border-radius: 5px;}
 .accordion .collapse.show .card-body {border-radius: 0px 0px 5px 5px;}
-.card .card {box-shadow: none !important;}
+/* .card .card {box-shadow: none !important;} */
 .accordion > .card {border: 0;}
 /* ###### 3.1 Accordion ###### */
 .accordion-dark .card {background-color: #ebe2fc;}
