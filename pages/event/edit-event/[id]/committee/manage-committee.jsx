@@ -368,6 +368,11 @@ const MyEventsPage = () => {
                                             Groups
                                         </Link>
                                     </li>
+                                    <li>
+                                        <Link href={`/event/edit-event/${id}/committee/manage-committee-commissions`} className="text-16">
+                                            Committee Commissions
+                                        </Link>
+                                    </li>
                                 </ul>
 
                                 <div className="contant_bg">

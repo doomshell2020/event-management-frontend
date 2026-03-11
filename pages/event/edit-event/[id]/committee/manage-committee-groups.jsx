@@ -102,7 +102,7 @@ const CommitteeGroupPage = () => {
 
             <section id="myevent-deshbord">
                 <div className="d-flex">
-                    <EventSidebar eventId={id}  eventDetails={eventDetails}/>
+                    <EventSidebar eventId={id} eventDetails={eventDetails} />
 
                     <div className="event-righcontent">
                         <div className="dsa_contant">
@@ -131,6 +131,11 @@ const CommitteeGroupPage = () => {
                                     <li>
                                         <Link href={`/event/edit-event/${id}/committee/manage-committee-groups`} className="active text-16">
                                             Groups
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link href={`/event/edit-event/${id}/committee/manage-committee-commissions`} className="text-16">
+                                            Committee Commissions
                                         </Link>
                                     </li>
                                 </ul>
@@ -211,14 +216,14 @@ const CommitteeGroupPage = () => {
                                                 <div className="col-6">
                                                     <button
                                                         className="btn primery-button py-2 fw-normal text-14"
-                                                        style={{height:"auto"  }}
+                                                        style={{ height: "auto" }}
                                                     >
                                                         Previous
                                                     </button>
                                                 </div>
                                                 <div className="col-6 text-end">
                                                     <button className="btn save py-2 primery-button fw-normal text-14"
-                                                    style={{ height:"auto",backgroundColor:"#3d6db5" }}>
+                                                        style={{ height: "auto", backgroundColor: "#3d6db5" }}>
                                                         Next
                                                     </button>
                                                 </div>

@@ -8,9 +8,11 @@ import { formatEventDateTime } from "@/utils/formatDate";
 
 const MyPayouts = () => {
   const [payouts, setPayouts] = useState([]);
+  const [committeePayouts, setCommitteePayouts] = useState([]);
   const [events, setEvents] = useState([]);
   const [totalSales, setTotalSales] = useState({}); // ✅ NEW
   const [loading, setLoading] = useState(false);
+  const [secondLoading, setSecondLoading] = useState(false);
 
   /* Filter */
   const [eventId, setEventId] = useState("");
@@ -33,8 +35,25 @@ const MyPayouts = () => {
     }
   };
 
+  // Committee payouts list........
+  const fetchCommitteePayouts = async (params = {}) => {
+    try {
+      setSecondLoading(true);
+      const res = await api.get("/api/v1/committee/committee-payouts");
+      //  console.log("res",res.data.data || []);
+      setCommitteePayouts(res.data.data || []);
+    } catch (err) {
+      Swal.fire("Error", "Failed to load payouts", "error");
+    } finally {
+      setSecondLoading(false);
+    }
+  };
+
+
+
   useEffect(() => {
     fetchPayoutsList();
+    fetchCommitteePayouts();
   }, []);
 
   /* ================= APPLY FILTER ================= */
@@ -169,6 +188,67 @@ const MyPayouts = () => {
               </tbody>
             </table>
           </div>
+
+
+          {committeePayouts.length > 0 && (
+            <>
+              <h5 className="mt-3,mb-3">COMMITTEE MEMBER PAYOUT</h5>
+              {/* ================= COMMITTEE MEMBER PAYOUT TABLE ================= */}
+              <div className="table-responsive my-staff-table">
+                <table className="table table-width-992">
+                  <thead className="table-dark">
+                    <tr>
+                      <th style={{ width: '5%' }}>S.No</th>
+                      <th style={{ width: '15%' }}>Event</th>
+                      <th style={{ width: '20%' }}>Paid Amount</th>
+                      <th style={{ width: '15%' }}>Txn Ref</th>
+                      <th style={{ width: '30%' }}>Remarks</th>
+                      <th style={{ width: '15%' }}>Created</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {secondLoading ? (
+                      <tr>
+                        <td colSpan="7" className="text-center">
+                          Loading...
+                        </td>
+                      </tr>
+                    ) : committeePayouts.length ? (
+                      committeePayouts.map((row, i) => {
+                        const currency = row.event?.currencyName?.Currency_symbol || "₹";
+                        return (
+                          <tr key={row.id}>
+                            <td>{i + 1}</td>
+                            <td>{row.event?.name || "-"}</td>
+
+                            <td>
+                              {currency}
+                              {row.paid_amount}
+                            </td>
+                            <td>{row.txn_ref}</td>
+                            <td>{row.remarks || "-"}</td>
+                            <td>{formatEventDateTime(row.createdAt)}</td>
+                          </tr>
+                        );
+                      })
+                    ) : (
+                      <tr>
+                        <td colSpan="7" className="text-center">
+                          No payouts found
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+            </>)}
+
+
+
+
+
         </div>
       </section>
 

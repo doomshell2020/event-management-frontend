@@ -93,6 +93,7 @@ const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
                     subPaths: [
                         `/event/edit-event/${eventDetails.id}/committee/manage-committee-tickets`,
                         `/event/edit-event/${eventDetails.id}/committee/manage-committee-groups`,
+                        `/event/edit-event/${eventDetails.id}/committee/manage-committee-commissions`,
                     ]
                 },
                 { serial: 4, label: "Publish Event", path: `/event/edit-event/${eventDetails.id}/publish-event`, subPaths: [] },

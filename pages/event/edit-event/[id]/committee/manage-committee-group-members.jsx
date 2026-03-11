@@ -142,6 +142,11 @@ const CommitteeGroupMembersPage = () => {
                     Groups
                   </Link>
                 </li>
+                <li>
+                  <Link href={`/event/edit-event/${id}/committee/manage-committee-commissions`} className="text-16">
+                    Committee Commissions
+                  </Link>
+                </li>
               </ul>
 
               {/* SEARCH & ADD MEMBER */}

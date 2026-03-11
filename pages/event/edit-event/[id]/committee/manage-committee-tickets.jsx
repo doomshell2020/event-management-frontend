@@ -185,7 +185,7 @@ const CommitteeTicketsPage = () => {
             fetchAssignedTickets();      // refresh table
         } catch (err) {
             console.error("Ticket update failed", err);
-            const apiErrorMsg =err.response?.data?.error?.message ||
+            const apiErrorMsg = err.response?.data?.error?.message ||
                 err.response?.data?.message ||
                 err.message ||
                 "Something went wrong. Please try again.";
@@ -269,6 +269,11 @@ const CommitteeTicketsPage = () => {
                                     <li>
                                         <Link href={`/event/edit-event/${id}/committee/manage-committee-groups`} className="text-16">
                                             Groups
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link href={`/event/edit-event/${id}/committee/manage-committee-commissions`} className="text-16">
+                                            Committee Commissions
                                         </Link>
                                     </li>
                                 </ul>
