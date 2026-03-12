@@ -678,9 +678,9 @@ const ManagePackages = () => {
                                                                                             <td>
                                                                                                 {currencyName}
                                                                                                 {(
-                                                                                                    Number(data.price) > 0
-                                                                                                        ? Number(data.price)
-                                                                                                        : Number(data.pricings?.[0]?.price ?? 0)
+                                                                                                    Number(data?.price) > 0
+                                                                                                        ? Number(data?.price)
+                                                                                                        : Number(data?.pricings?.[0]?.price ?? 0)
                                                                                                 )}
                                                                                                 {/* {data?.price || 0} */}
                                                                                             </td>
@@ -825,8 +825,8 @@ const ManagePackages = () => {
                                             <td>{ticket.title}</td>
                                             <td>{currencyName}
                                                 {/* {ticket.price} */}
-                                                {ticket.price > 0
-                                                    ? ticket.price
+                                                {ticket?.price > 0
+                                                    ? ticket?.price
                                                     : ticket.pricings?.[0]?.price ?? 0}
                                             </td>
                                             <td>
@@ -858,9 +858,9 @@ const ManagePackages = () => {
                                                     (
                                                         (packageForm.ticketQty?.[ticket.id] || 0) *
                                                         (
-                                                            Number(ticket.price) > 0
-                                                                ? Number(ticket.price)
-                                                                : Number(ticket.pricings?.[0]?.price ?? 0)
+                                                            Number(ticket?.price) > 0
+                                                                ? Number(ticket?.price)
+                                                                : Number(ticket?.pricings?.[0]?.price ?? 0)
                                                         )
                                                     ).toFixed(2)
                                                     // (

@@ -185,8 +185,8 @@ const EventsSalesList = () => {
                       <th>Orders</th>
                       <th>Tickets</th>
                       <th>Sales</th>
-                      <th>Paid</th>
-                      <th>Balance</th>
+                      <th>Paid Amount</th>
+                      <th>Pending Amount</th>
                       <th>Status</th>
                     </tr>
                   </thead>

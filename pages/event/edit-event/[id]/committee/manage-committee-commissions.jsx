@@ -27,6 +27,7 @@ const CommitteeCommissionsPage = () => {
     /* ---------------- STATES ---------------- */
     const [eventDetails, setEventDetails] = useState(null);
     const [committeeList, setCommitteeList] = useState([]);
+    console.log("----------committeeList", committeeList);
     const [loading, setLoading] = useState(false);
     const [processing, setProcessing] = useState(false);
 
@@ -48,12 +49,22 @@ const CommitteeCommissionsPage = () => {
             setLoading(false);
         }
     };
-
+    const fetchEventDetails = async (eventId) => {
+        try {
+            const res = await api.post(`/api/v1/events/event-list`, { id: eventId });
+            if (res.data.success && res.data.data.events.length > 0) {
+                setEventDetails(res.data.data.events[0]);
+            }
+        } catch (error) {
+            console.error("Error fetching event:", error);
+        }
+    };
 
     /* ---------------- INITIAL LOAD ---------------- */
     useEffect(() => {
         if (id) {
             fetchCommitteeMembers(id);
+            fetchEventDetails(id);
         }
     }, [id]);
     const showLoader = loading || processing;
@@ -115,7 +126,7 @@ const CommitteeCommissionsPage = () => {
                                 />
 
                                 <h4 className="text-24">
-                                    Committee Commissions Payouts
+                                    Committee Payouts
                                 </h4>
                                 <hr className="custom-hr" />
                                 {/* TABS */}
@@ -143,7 +154,7 @@ const CommitteeCommissionsPage = () => {
                                     </li>
                                     <li>
                                         <Link href={`/event/edit-event/${id}/committee/manage-committee-commissions`} className="active text-16">
-                                            Committee Commissions
+                                            Committee Payouts
                                         </Link>
                                     </li>
                                 </ul>
@@ -176,15 +187,16 @@ const CommitteeCommissionsPage = () => {
                                                     <table className="table table-bordered text-center align-middle mb-2 table-border-dark-soft table-mobile-width">
                                                         <thead className="table-primary">
                                                             <tr>
-                                                                <th>S.No.</th>
-                                                                <th>Name</th>
-                                                                <th>Email</th>
-                                                                <th>Sales</th>
-                                                                <th>Commission</th>
-                                                                <th>Paid</th>
-                                                                <th>Balance</th>
-                                                                <th>Status</th>
-                                                                <th>Action</th>
+                                                                <th style={{ width: "5%" }}>S.No.</th>
+                                                                <th style={{ width: "20%" }}>User Details</th>
+                                                                <th style={{ width: "10%" }}>Assigned Tickets</th>
+                                                                <th style={{ width: "10%" }}>Sold Tickets</th>
+                                                                <th style={{ width: "10%" }}>Sales</th>
+                                                                <th style={{ width: "10%" }}>Commission</th>
+                                                                <th style={{ width: "10%" }}>Paid Amount</th>
+                                                                <th style={{ width: "10%" }}>Pending Amount</th>
+                                                                <th style={{ width: "7%" }}>Status</th>
+                                                                <th style={{ width: "8%" }}>Action</th>
                                                             </tr>
                                                         </thead>
 
@@ -196,21 +208,40 @@ const CommitteeCommissionsPage = () => {
                                                                             <tr key={value.id}>
                                                                                 <td className="fw-bold">{index + 1}</td>
 
-                                                                                <td>
-                                                                                    {value.user?.first_name} {value.user?.last_name}
+                                                                                <td className="text-start">
+                                                                                    <div className="d-flex align-items-center gap-2">
+                                                                                        <div>
+                                                                                            <div className="fw-semibold">
+                                                                                                {value.user?.first_name} {value.user?.last_name}
+                                                                                            </div>
+
+                                                                                            <div className="fw-bold text-dark">
+                                                                                                {value.user?.email || "N/A"}
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
                                                                                 </td>
 
+
+                                                                                {/* <td>
+                                                                                    {value.user?.first_name} {value.user?.last_name}<br/>
+                                                                                      {value.user?.email || "N/A"}
+                                                                                </td> */}
+
                                                                                 <td>
-                                                                                    {value.user?.email || "N/A"}
+                                                                                    {value.total_assigned_tickets || 0}
+                                                                                </td>
+                                                                                <td>
+                                                                                    {value.total_sold_tickets || 0}
                                                                                 </td>
 
-                                                                                <td>{value.currency}{" "}{value.total_sales}</td>
+                                                                                <td>{value.currency}{""}{value.total_sales}</td>
 
-                                                                                <td>{value.total_commission}</td>
+                                                                                <td>{value.currency}{""}{value.total_commission}{" "}({value.commission}%)</td>
 
-                                                                                <td className="text-success">{value.total_paid}</td>
+                                                                                <td className="text-success">{value.currency}{""}{value.total_paid}</td>
 
-                                                                                <td className="text-danger">{value.balance}</td>
+                                                                                <td className="text-danger">{value.currency}{""}{value.balance}</td>
 
                                                                                 <td>
                                                                                     {value.payout_status === "Completed" && (

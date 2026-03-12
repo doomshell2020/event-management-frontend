@@ -5,7 +5,7 @@ import FrontendHeader from "@/shared/layout-components/frontelements/frontendhea
 import FrontendFooter from "@/shared/layout-components/frontelements/frontendfooter";
 import api from "@/utils/api";
 import { formatEventDateTime } from "@/utils/formatDate";
-
+import Moment from "react-moment";
 const MyPayouts = () => {
   const [payouts, setPayouts] = useState([]);
   const [committeePayouts, setCommitteePayouts] = useState([]);
@@ -99,96 +99,104 @@ const MyPayouts = () => {
         </div>
 
         <div className="container">
-          {/* ================= FILTER ================= */}
-          <Form
-            className="d-flex justify-content-end mb-3"
-            onSubmit={applyFilter}
-          >
-            <Form.Select
-              style={{ maxWidth: "300px" }}
-              value={eventId}
-              onChange={(e) => setEventId(e.target.value)}
-            >
-              <option value="">All Events</option>
-              {events.map((ev) => (
-                <option key={ev.id} value={ev.id}>
-                  {ev.name}
-                </option>
-              ))}
-            </Form.Select>
+          {payouts.length > 0 && (
+            <>
+              {/* ================= FILTER ================= */}
+              <Form
+                className="d-flex justify-content-end mb-3"
+                onSubmit={applyFilter}
+              >
+                <Form.Select
+                  style={{ maxWidth: "300px" }}
+                  value={eventId}
+                  onChange={(e) => setEventId(e.target.value)}
+                >
+                  <option value="">All Events</option>
+                  {events.map((ev) => (
+                    <option key={ev.id} value={ev.id}>
+                      {ev.name}
+                    </option>
+                  ))}
+                </Form.Select>
 
-            <Button type="submit" className="ms-2" size="sm">
-              Apply
-            </Button>
-          </Form>
+                <Button type="submit" className="ms-2" size="sm">
+                  Apply
+                </Button>
+              </Form>
 
-          {/* ================= TOTAL SALE SUMMARY ================= */}
-          <div className="mb-3 text-end">
-            <strong>Total Sales: </strong>
-            <span className="text-success">
-              {currency}
-              {totalSaleAmount.toLocaleString()}
-            </span>
-          </div>
+              {/* ================= TOTAL SALE SUMMARY ================= */}
+              <div className="mb-3 text-end">
+                <strong>Total Sales: </strong>
+                <span className="text-success">
+                  {currency}
+                  {totalSaleAmount.toLocaleString()}
+                </span>
+              </div>
 
-          {/* ================= TABLE ================= */}
-          <div className="table-responsive my-staff-table">
-            <table className="table table-width-992">
-              <thead className="table-dark">
-                <tr>
-                  <th style={{ width: '5%' }}>S.No</th>
-                  <th style={{ width: '10%' }}>Event</th>
-                  <th style={{ width: '10%' }}>Organizer</th>
-                  <th style={{ width: '15%' }}>Paid Amount</th>
-                  <th style={{ width: '10%' }}>Txn Ref</th>
-                  <th style={{ width: '29%' }}>Remarks</th>
-                  <th style={{ width: '11%' }}>Created</th>
-                </tr>
-              </thead>
+              {/* ================= TABLE ================= */}
+              <h5 className="mt-3,mb-3">ORGANIZER PAYOUT</h5>
+              <div className="table-responsive my-staff-table">
+                <table className="table table-width-992">
+                  <thead className="table-dark">
+                    <tr>
+                      <th style={{ width: '5%' }}>S.No</th>
+                      <th style={{ width: '10%' }}>Event</th>
+                      <th style={{ width: '10%' }}>Organizer</th>
+                      <th style={{ width: '15%' }}>Paid Amount</th>
+                      <th style={{ width: '10%' }}>Txn Ref</th>
+                      <th style={{ width: '29%' }}>Remarks</th>
+                      <th style={{ width: '11%' }}>Created</th>
+                    </tr>
+                  </thead>
 
-              <tbody>
-                {loading ? (
-                  <tr>
-                    <td colSpan="7" className="text-center">
-                      Loading...
-                    </td>
-                  </tr>
-                ) : payouts.length ? (
-                  payouts.map((row, i) => {
-                    const currency =
-                      row.event?.currencyName?.Currency_symbol || "₹";
-                    const organizer = row.event?.Organizer;
-
-                    return (
-                      <tr key={row.id}>
-                        <td>{i + 1}</td>
-                        <td>{row.event?.name || "-"}</td>
-                        <td>
-                          {organizer
-                            ? `${organizer.first_name} ${organizer.last_name}`
-                            : "-"}
+                  <tbody>
+                    {loading ? (
+                      <tr>
+                        <td colSpan="7" className="text-center">
+                          Loading...
                         </td>
-                        <td>
-                          {currency}
-                          {row.paid_amount}
-                        </td>
-                        <td>{row.txn_ref}</td>
-                        <td>{row.remarks || "-"}</td>
-                        <td>{formatEventDateTime(row.createdAt)}</td>
                       </tr>
-                    );
-                  })
-                ) : (
-                  <tr>
-                    <td colSpan="7" className="text-center">
-                      No payouts found
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                    ) : payouts.length ? (
+                      payouts.map((row, i) => {
+                        const currency =
+                          row.event?.currencyName?.Currency_symbol || "₹";
+                        const organizer = row.event?.Organizer;
 
+                        return (
+                          <tr key={row.id}>
+                            <td>{i + 1}</td>
+                            <td>{row.event?.name || "-"}</td>
+                            <td>
+                              {organizer
+                                ? `${organizer.first_name} ${organizer.last_name}`
+                                : "-"}
+                            </td>
+                            <td>
+                              {currency}
+                              {row.paid_amount}
+                            </td>
+                            <td>{row.txn_ref}</td>
+                            <td>{row.remarks || "-"}</td>
+                            {/* <td>{formatEventDateTime(row.createdAt)}</td> */}
+                            <td> {row?.createdAt ? (
+                              <Moment format="D MMM YYYY">
+                                {row?.createdAt}
+                              </Moment>
+                            ) : "--"}</td>
+                          </tr>
+                        );
+                      })
+                    ) : (
+                      <tr>
+                        <td colSpan="7" className="text-center">
+                          No payouts found
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </>)}
 
           {committeePayouts.length > 0 && (
             <>
@@ -228,7 +236,12 @@ const MyPayouts = () => {
                             </td>
                             <td>{row.txn_ref}</td>
                             <td>{row.remarks || "-"}</td>
-                            <td>{formatEventDateTime(row.createdAt)}</td>
+                            {/* <td>{formatEventDateTime(row.createdAt)}</td> */}
+                            <td> {row?.createdAt ? (
+                              <Moment format="D MMM YYYY">
+                                {row?.createdAt}
+                              </Moment>
+                            ) : "--"}</td>
                           </tr>
                         );
                       })
@@ -244,11 +257,6 @@ const MyPayouts = () => {
               </div>
 
             </>)}
-
-
-
-
-
         </div>
       </section>
 

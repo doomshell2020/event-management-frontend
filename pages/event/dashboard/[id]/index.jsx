@@ -254,7 +254,7 @@ const EventDashboardPage = () => {
                                                             <div>
                                                                 <p className="dash-label">TICKETS SOLD</p>
                                                                 <h4 className="dash-value">{soldTickets}</h4>
-                                                                <small>{soldPercent}% sold</small>
+                                                                {/* <small>{soldPercent}% sold</small> */}
                                                             </div>
                                                             <div className="dash-icon bg-success">
                                                                 <i className="fe fe-shopping-cart"></i>
