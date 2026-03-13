@@ -15,8 +15,6 @@ const FrontendHeader = ({ backgroundImage, isStripeShowing = false }) => {
   const router = useRouter();
   const dropdownRef = useRef(null);
   const { cartCount, eventId, committeeAssigned, committeePendingCount } = useCart();
-  // console.log("committeePendingCount",committeePendingCount);
-  // console.log("committeeAssigned",committeeAssigned);
   const { user } = useAuth();
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);

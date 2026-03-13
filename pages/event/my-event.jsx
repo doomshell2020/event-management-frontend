@@ -2,29 +2,14 @@ import React, { useMemo, useState, useRef, useEffect } from "react";
 import FrontendHeader from "@/shared/layout-components/frontelements/frontendheader";
 import FrontendFooter from "@/shared/layout-components/frontelements/frontendfooter";
 import Link from "next/link";
-import {
-    CForm,
-    CCol,
-    CFormLabel,
-    CFormFeedback,
-    CFormInput,
-    CInputGroupText,
-    CButton,
-    CFormCheck,
-    CFormTextarea,
-} from "@coreui/react";
-import { Breadcrumb, Card, Col, Form, InputGroup, Row } from "react-bootstrap";
-import moment from "moment-timezone";
 import Swal from "sweetalert2";
-import { useTable, usePagination, useGlobalFilter } from "react-table";
 import { format } from "date-fns"; // helps format dates
 import api from "@/utils/api";
 import EventSidebar from "../components/Event/EventSidebar";
 
 export default function OrganizerEvents({ userId }) {
     const [eventData, setEventData] = useState([]);
-    const [isOpen, setIsOpen] = useState(false);
-    const [isLeftRight, setIsLeftRight] = useState(false);
+    // console.log("eventData", eventData)
     const [backgroundImage, setIsMobile] = useState('/assets/front-images/about-slider_bg.jpg');
     const [loading, setLoading] = useState(true); // ✅ Added loading state
     // console.log('eventData :', eventData);
@@ -412,6 +397,7 @@ export default function OrganizerEvents({ userId }) {
                                                                     <div className="editIcos d-flex justify-content-between"
                                                                         style={{ gap: "2px" }}
                                                                     >
+
                                                                         <Link
                                                                             className="edit viewIcos"
                                                                             href={`/event/${event.id}/${event.slug}`}
@@ -457,7 +443,53 @@ export default function OrganizerEvents({ userId }) {
                                                                     </Link>
 
 
-                                                                    <div className="d-flex justify-content-between"
+
+                                                                    <div className="d-flex justify-content-between" style={{ gap: "2px" }}>
+                                                                        <Link
+                                                                            href="#"
+                                                                            className={`action_btn edit 
+        ${event.status == "N" ? "disable_btn" : "enable_btn"} 
+        ${event.admineventstatus == "N" ? "disable_btn" : ""}`}
+                                                                            onClick={(e) => {
+                                                                                e.preventDefault();
+
+                                                                                if (event.admineventstatus === "N") return; // admin ne disable kiya hai
+
+                                                                                handleStatusChange(
+                                                                                    event.id,
+                                                                                    event.status == "Y" ? "N" : "Y"
+                                                                                );
+                                                                            }}
+                                                                            title={
+                                                                                event.admineventstatus === "N"
+                                                                                    ? "Admin disabled this event"
+                                                                                    : event.status == "Y"
+                                                                                        ? "Disable Event"
+                                                                                        : "Enable Event"
+                                                                            }
+                                                                        >
+                                                                            {event.status == "N" ? (
+                                                                                <i className="bi bi-x-circle-fill"></i>
+                                                                            ) : (
+                                                                                <i className="bi bi-check-circle-fill text-success"></i>
+                                                                            )}
+                                                                        </Link>
+
+                                                                        <Link
+                                                                            className="action_btn excel_btn edit"
+                                                                            href={`/appointments/${event.id}`}
+                                                                            title="My Appointment"
+                                                                        >
+                                                                            <img
+                                                                                className="del-icon"
+                                                                                style={{ width: "16px" }}
+                                                                                src="/assets/front-images/export-icon.png"
+                                                                                alt=""
+                                                                            />
+                                                                        </Link>
+                                                                    </div>
+
+                                                                    {/* <div className="d-flex justify-content-between"
                                                                         style={{ gap: "2px" }}
                                                                     >
                                                                         <Link
@@ -492,13 +524,13 @@ export default function OrganizerEvents({ userId }) {
                                                                                 alt=""
                                                                             />
                                                                         </Link>
-                                                                    </div>
+                                                                    </div> */}
 
                                                                     <Link
                                                                         href={`/promotioncodes/${event.id}`}
                                                                         className="edit deleteIcos">
                                                                         <button type="button" className="edit p-0 m-0">
-                                                                             <i className="bi bi-gift-fill pe-1"></i>{" "}
+                                                                            <i className="bi bi-gift-fill pe-1"></i>{" "}
                                                                             Coupon Codes
                                                                         </button>
                                                                     </Link>

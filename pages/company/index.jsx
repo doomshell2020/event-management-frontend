@@ -83,12 +83,16 @@ export default function Companies({ userId }) {
                 });
             }
         } catch (error) {
+             const apiErrorMsg =
+                error.response?.data?.error?.details?.[0]?.msg ||
+                error.response?.data?.error?.message ||
+                error.response?.data?.message ||
+                error.message ||
+                "Something went wrong. Please try again.";
             Swal.fire({
                 icon: "error",
                 title: "Oops!",
-                text:
-                    error?.response?.data?.message ||
-                    "Something went wrong. Please try again later.",
+                text: apiErrorMsg
             });
         }
     };
