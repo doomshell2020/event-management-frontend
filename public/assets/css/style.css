@@ -4324,6 +4324,7 @@ span.stp2-monte25-nm {
   align-items: center;
 }
 
+
 .careyes-chekout-new .modal-header {
   align-items: center !important;
   border-bottom: 1px solid #757575 !important;
@@ -4682,6 +4683,12 @@ span.stp2-monte25-nm {
   font-size: 14px;
   font-family: var(--sathosi-bold-font-family);
   color: var(--black-color);
+}
+
+
+.careyes-chekout-new .modal-header .btn-close {
+    background-image: none;
+    font-size: 39px;
 }
 
 .careyes-chekout-new .care-new-check .checkout-innr .checkot-lft .ck-adon-event .mon25-add-inr .mnto-add-cnt .adon-time {
@@ -5799,6 +5806,10 @@ input[type="date"] {
     width: 250px;
     min-width: 250px;
   }
+  
+  .table-mobile-width-1200 {
+    min-width: 1150px;
+  }
 }
 
 @media (min-width: 992px) and (max-width: 1201px) {
@@ -6253,10 +6264,9 @@ input[type="date"] {
     justify-content: start;
   }
 
-  .careyes-chekout-new .cart-mdl-only .care-new-check.modal-body {
-    max-height: calc(100vh - 72px) !important;
-  }
-
+      .careyes-chekout-new .cart-mdl-only .care-new-check.modal-body {
+        max-height: calc(100vh - 132px) !important;
+    }
   .headernav .menuflexbox {
     gap: 16px;
   }
@@ -7199,7 +7209,7 @@ input[type="date"] {
   }
 
   .careyes-chekout-new .cart-mdl-only .chackout-box {
-    padding: 17px 14px;
+    padding: 17px 14px 30px;
   }
 
   .careyes-chekout-new .care-new-check .checkout-innr .checkot-rgt .checkot-tct-purcs .apply-cd input {
@@ -7511,4 +7521,7 @@ input[type="date"] {
 .section-title {
   font-weight: 600;
   margin-bottom: 12px;
+}
+.note-editor.note-airframe .note-placeholder, .note-editor.note-frame .note-placeholder {
+    display: none !important;
 }
