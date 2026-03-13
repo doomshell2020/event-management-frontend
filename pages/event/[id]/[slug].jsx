@@ -10,7 +10,7 @@ import Swal from "sweetalert2";
 import { useRouter } from "next/router";
 import api from "@/utils/api";
 import { isEventExpired, formatEventDateTime } from "@/utils/formatDate";
-
+import Cookies from "js-cookie";
 
 export async function getServerSideProps({ params }) {
   const { id, slug } = params;
@@ -48,6 +48,7 @@ export async function getServerSideProps({ params }) {
 
 const EventDetailPage = ({ event, slug }) => {
   const { token } = useAuth();
+  console.log("token", token);
   const router = useRouter();
   // console.log("event",event.is_empty_event)
   const [backgroundImage, setIsMobile] = useState("/assets/front-images/about-slider_bg.jpg");
@@ -143,7 +144,10 @@ const EventDetailPage = ({ event, slug }) => {
   const [slotIds, setSlotIds] = useState([]);
 
   const handleOpenCart = () => {
-    if (!token) {
+    const userToken = Cookies.get("userAuthToken");
+    const storedUser =
+      localStorage.getItem("user") || sessionStorage.getItem("user");
+    if (!userToken || !storedUser) {
       Swal.fire({
         icon: "warning",
         title: "Login Required",
@@ -161,7 +165,11 @@ const EventDetailPage = ({ event, slug }) => {
 
   // appointment cart...
   const handleOpenAppointmentCart = (slots, selectedSlots) => {
-    if (!token) {
+    const userToken = Cookies.get("userAuthToken");
+    const storedUser =
+      localStorage.getItem("user") || sessionStorage.getItem("user");
+    // if (!token) {
+    if (!userToken || !storedUser) {
       Swal.fire({
         icon: "warning",
         title: "Login Required",
