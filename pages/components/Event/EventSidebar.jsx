@@ -1,11 +1,13 @@
 "use client";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-
+import { handleLogout } from "@/utils/logout";
+import Swal from "sweetalert2";
 const EventSidebar = ({ eventId, eventDetails }) => {
-
-    const { is_free,entry_type } = eventDetails || {};
+ const router = useRouter();
+    const { is_free, entry_type } = eventDetails || {};
 
     const [isLeftRight, setIsLeftRight] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
@@ -68,7 +70,7 @@ const EventSidebar = ({ eventId, eventDetails }) => {
                         // { href: `/event/payouts/${eventId}`, icon: "bi bi-wallet2", label: "Payouts" },
 
                         // show Committee ONLY if event is NOT free
-                       (entry_type == 'event' && is_free == 'N') && {
+                        (entry_type == 'event' && is_free == 'N') && {
                             href: `/event/edit-event/${eventId}/committee/manage-committee`,
                             icon: "bi bi-people",
                             label: "Committee",
@@ -124,8 +126,36 @@ const EventSidebar = ({ eventId, eventDetails }) => {
                                             <span> Manage Companies </span>
                                         </Link>
                                     </li>
+                                    {/* <li>
+                                        <Link className="dropdown-item" href="#" >
+                                            <i className="bi bi-box-arrow-right"></i>
+                                            <span> Logout </span>
+                                        </Link>
+                                    </li> */}
+
                                     <li>
-                                        <Link className="dropdown-item" href="/">
+                                        <Link
+                                            className="dropdown-item"
+                                            href="#"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+
+                                                Swal.fire({
+                                                    title: "Are you sure?",
+                                                    text: "You want to logout?",
+                                                    icon: "warning",
+                                                    showCancelButton: true,
+                                                    confirmButtonColor: "#d33",
+                                                    cancelButtonColor: "#3085d6",
+                                                    confirmButtonText: "Yes, Logout",
+                                                    cancelButtonText: "No",
+                                                }).then((result) => {
+                                                    if (result.isConfirmed) {
+                                                        handleLogout(router);
+                                                    }
+                                                });
+                                            }}
+                                        >
                                             <i className="bi bi-box-arrow-right"></i>
                                             <span> Logout </span>
                                         </Link>
