@@ -108,7 +108,7 @@ const ManagePayments = () => {
 
                                     {/* TABLE */}
                                     <div className="table-responsive">
-                                        <table className="table table-hover align-middle table-mobile-width table-deta-no-wrap">
+                                        <table className="admin-table-deta-no-wrap table table-hover align-middle table-mobile-width table-deta-no-wrap">
                                             <thead className="bg-dark text-white">
                                                 <tr>
                                                     <th>Sr No.</th>

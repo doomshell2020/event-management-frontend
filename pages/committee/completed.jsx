@@ -114,7 +114,7 @@ const CommitteeCompleted = ({ counts, assets, completedData }) => {
                         />
 
                         <div className="table-responsive mt-4">
-                            <table className="table table-hover align-middle table-width-992">
+                            <table className="table table-hover align-middle table-width-992 admin-table-deta-no-wrap table-mobile-width-1200">
                                 <thead className="bg-dark text-white">
                                     <tr>
                                         <th>Sr No.</th>
