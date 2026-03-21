@@ -115,7 +115,6 @@ export const EventOrganizersList = () => {
             style: { width: "25%" },
             Cell: ({ row }) => {
                 const events = row.original.events || [];
-
                 if (!events.length) {
                     return (
                         <span style={{ fontSize: "12px", color: "#010101ff" }}>
@@ -154,26 +153,17 @@ export const EventOrganizersList = () => {
                                     >
                                         <span>
                                             <strong>Total Sales:</strong>{" "}
-                                            {formatCurrency(event.total_sales, currency)}
-                                            {/* {event.total_sales !== null
-                                                ? `${currency}${event.total_sales}`
-                                                : "0"} */}
+                                            {formatCurrency(event.total_sales - event.total_discount, currency)}
                                         </span>
 
                                         <span>
                                             <strong>Comm:</strong>{" "}
                                             {formatCurrency(event.total_tax, currency)}
-                                            {/* {event.total_tax !== null
-                                                ? `${currency}${event.total_tax}`
-                                                : "0"} */}
                                         </span>
 
                                         <span>
                                             <strong>Total:</strong>{" "}
                                             {formatCurrency(event.grand_total, currency)}
-                                            {/* {event.grand_total !== null
-                                                ? `${currency}${event.grand_total}`
-                                                : "0"} */}
                                         </span>
                                     </div>
                                 </div>
@@ -282,11 +272,19 @@ export const EventOrganizersList = () => {
 
     const formatCurrency = (value, symbol = "₹") => {
         const num = Number(value || 0);
-        return `${symbol}${num.toLocaleString("en-IN", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-        })}`;
+        // ✅ Round off
+        const rounded = Math.round(num);
+        return `${symbol}${rounded.toLocaleString("en-IN")}`;
     };
+
+
+    // const formatCurrency = (value, symbol = "₹") => {
+    //     const num = Number(value || 0);
+    //     return `${symbol}${num.toLocaleString("en-IN", {
+    //         minimumFractionDigits: 2,
+    //         maximumFractionDigits: 2,
+    //     })}`;
+    // };
 
     const handleStatusToggle = async (id, currentStatus) => {
         const newStatus = currentStatus == "Y" ? "N" : "Y";

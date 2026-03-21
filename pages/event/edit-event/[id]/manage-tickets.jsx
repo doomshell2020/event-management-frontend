@@ -119,7 +119,6 @@ const ManageTickets = () => {
 
     const [ticketsList, setTicketList] = useState([]);
     const [loading, setLoading] = useState(false);
-    // console.log('ticketsList :', ticketsList);
 
     const handleGetTicketsList = async () => {
         try {
@@ -251,6 +250,26 @@ const ManageTickets = () => {
         );
     };
 
+    const formatTime = (time) => {
+        if (!time) return "";
+
+        const [hour, minute] = time.split(":");
+        const date = new Date();
+        date.setHours(hour, minute);
+
+        return date.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+        });
+    };
+
+
+
+
+
+
+
     return (
         <>
             <FrontendHeader backgroundImage={backgroundImage} />
@@ -352,7 +371,8 @@ const ManageTickets = () => {
                                             {/* LEFT CONTENT */}
                                             <div className="col-sm-6 col-md-9">
                                                 <p className="body-text mb-3">
-                                                    <strong>{ticket.title}</strong> ({currencyName}{ticket.price})
+                                                    {/* <strong>{ticket.title}</strong> ({currencyName}{ticket.price}) */}
+                                                    <strong>{ticket.title}</strong> ({currencyName}{ticket.price || ticket.pricings?.[0]?.price || 0})
                                                     <br />
                                                     {ticket.type !== "comps" ? (
                                                         `Sold: ${ticket.sold_count || 0} / ${ticket.count}`
@@ -613,6 +633,38 @@ const ManageTickets = () => {
                                                 )}
 
                                             </div>
+
+
+                                            {ticket.access_type === "slot" && ticket.pricings?.length > 0 && (
+                                                <div className="mt-2">
+                                                    <table className="table table-sm table-bordered w-auto">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Name</th>
+                                                                <th>Date</th>
+                                                                <th>Start Time</th>
+                                                                <th>End Time</th>
+                                                                <th>Price</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {ticket.pricings.map((price, index) => (
+                                                                <tr key={index}>
+                                                                    <td>{price.slot?.slot_name}</td>
+                                                                    <td>{price.slot?.slot_date}</td>
+                                                                    <td>{formatTime(price.slot?.start_time)}</td>
+                                                                    <td>{formatTime(price.slot?.end_time)}</td>
+                                                                    <td>{currencyName}{price.price}</td>
+                                                                </tr>
+                                                            ))}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            )}
+
+
+
+
                                         </div>
                                     ))
 
@@ -729,7 +781,7 @@ const ManageTickets = () => {
                                     value={ticketForm.access_type || ""}
                                     onChange={handleInputChange}
                                     required
-                                    disabled={!!ticketId} 
+                                    disabled={!!ticketId}
                                 >
                                     <option value="" disabled>
                                         Select Access Type

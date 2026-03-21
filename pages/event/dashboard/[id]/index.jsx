@@ -18,6 +18,7 @@ const EventDashboardPage = () => {
     const backgroundImage = "/assets/front-images/about-slider_bg.jpg";
 
     const [eventDetails, setEventDetails] = useState(null);
+    // console.log("eventDetails",eventDetails)
     const [dashboardData, setDashboardData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isClient, setIsClient] = useState(false);
@@ -54,7 +55,7 @@ const EventDashboardPage = () => {
 
     /* ---------------- SAFE DATA ---------------- */
     const formatPrice = (amount) => {
-        return Number(amount || 0).toLocaleString();
+        return Math.round(Number(amount || 0)).toLocaleString();
     };
     const event = dashboardData?.event || {};
     const summary = dashboardData?.summary || {};
@@ -63,13 +64,22 @@ const EventDashboardPage = () => {
     const commissionBreakdown = dashboardData?.commissionBreakdown || {};
     const salesProgress = dashboardData?.salesProgress || {};
     const committeePerformance = dashboardData?.committeePerformance || {};
-
     const currency = event?.currencyName?.Currency_symbol || "₹";
 
     const totalTickets = summary?.totalTicketsCreated || 0;
     const soldTickets = summary?.totalTicketsSold || 0;
     const totalRevenue = summary?.totalRevenue || 0;
     const organizerEarning = summary?.netEarning || 0;
+
+    const totalAddons = summary?.totalAddonsCreated || 0;
+    const soldAddons = summary?.totalAddonsSold || 0;
+
+    const totalPackages = summary?.totalPackagesCreated || 0;
+    const soldPackages = summary?.totalPackagesSold || 0;
+
+    const totalAppointments = summary?.totalAppointmentsCreated || 0;
+    const soldAppointments = summary?.totalAppointmentsSold || 0;
+
 
 
     const organizerRevenue = revenueDistribution?.organizer || 0;
@@ -142,7 +152,7 @@ const EventDashboardPage = () => {
     /* ---------------- DONUT ---------------- */
 
     // const totalRevenue = organizerRevenue + platformFee + committeeFee;
-    
+
     const commissionPercent = commissionSplit?.percentage || {};
 
     const commissionDonutSeries = [
@@ -186,7 +196,7 @@ const EventDashboardPage = () => {
                         total: {
                             show: true,
                             label: "Total Revenue",
-                            formatter: () => `${currency}${totalRevenue.toLocaleString()}`
+                            formatter: () => `${currency}${formatPrice(totalRevenue)}`
                         }
                     }
                 }
@@ -239,6 +249,39 @@ const EventDashboardPage = () => {
                                                         <div className="d-flex justify-content-between align-items-center">
                                                             <div>
                                                                 <p className="dash-label">TOTAL TICKETS</p>
+                                                                <h4 className="dash-value">
+                                                                    <span
+                                                                        data-bs-toggle="tooltip"
+                                                                        data-bs-placement="top"
+                                                                        title="Total Sold Tickets"
+                                                                        style={{ cursor: "pointer" }}
+                                                                    >
+                                                                        {soldTickets}
+                                                                    </span>
+                                                                    {" / "}
+                                                                    <span
+                                                                        data-bs-toggle="tooltip"
+                                                                        data-bs-placement="top"
+                                                                        title="Total Tickets Created"
+                                                                        style={{ cursor: "pointer" }}
+                                                                    >
+                                                                        {totalTickets}
+                                                                    </span>
+                                                                </h4>
+                                                            </div>
+                                                            <div className="dash-icon bg-warning">
+                                                                <i className="fe fe-tag"></i>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+
+                                                {/* <div className="col-xl-3 col-lg-6 col-md-6 mb-3">
+                                                    <div className="card dashboard-card">
+                                                        <div className="d-flex justify-content-between align-items-center">
+                                                            <div>
+                                                                <p className="dash-label">TOTAL TICKETS</p>
                                                                 <h4 className="dash-value">{totalTickets}</h4>
                                                             </div>
                                                             <div className="dash-icon bg-secondary">
@@ -246,29 +289,138 @@ const EventDashboardPage = () => {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
+                                                </div> */}
 
-                                                <div className="col-xl-3 col-lg-6 col-md-6 mb-3">
+                                                {/* <div className="col-xl-3 col-lg-6 col-md-6 mb-3">
                                                     <div className="card dashboard-card">
                                                         <div className="d-flex justify-content-between align-items-center">
                                                             <div>
                                                                 <p className="dash-label">TICKETS SOLD</p>
                                                                 <h4 className="dash-value">{soldTickets}</h4>
-                                                                {/* <small>{soldPercent}% sold</small> */}
                                                             </div>
                                                             <div className="dash-icon bg-success">
                                                                 <i className="fe fe-shopping-cart"></i>
                                                             </div>
                                                         </div>
                                                     </div>
+                                                </div> */}
+
+                                                {/* Total Addons  */}
+                                                <div className="col-xl-3 col-lg-6 col-md-6 mb-3">
+                                                    <div className="card dashboard-card">
+                                                        <div className="d-flex justify-content-between align-items-center">
+                                                            <div>
+                                                                <p className="dash-label">Total Addons</p>
+                                                                <h4 className="dash-value">
+                                                                    <span
+                                                                        data-bs-toggle="tooltip"
+                                                                        data-bs-placement="top"
+                                                                        title="Total Sold Addons"
+                                                                        style={{ cursor: "pointer" }}
+                                                                    >
+                                                                        {soldAddons}
+                                                                    </span>
+                                                                    {" / "}
+                                                                    <span
+                                                                        data-bs-toggle="tooltip"
+                                                                        data-bs-placement="top"
+                                                                        title="Total Addons Created"
+                                                                        style={{ cursor: "pointer" }}
+                                                                    >
+                                                                        {totalAddons}
+                                                                    </span>
+                                                                </h4>
+                                                            </div>
+                                                            <div className="dash-icon bg-warning">
+                                                                <i className="fe fe-layers"></i>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
+
+                                                {/* Total Package  */}
+                                                <div className="col-xl-3 col-lg-6 col-md-6 mb-3">
+                                                    <div className="card dashboard-card">
+                                                        <div className="d-flex justify-content-between align-items-center">
+                                                            <div>
+                                                                <p className="dash-label">Total Packages</p>
+                                                                <h4 className="dash-value">
+                                                                    <span
+                                                                        data-bs-toggle="tooltip"
+                                                                        data-bs-placement="top"
+                                                                        title="Total Sold Packages"
+                                                                        style={{ cursor: "pointer" }}
+                                                                    >
+                                                                        {soldPackages}
+                                                                    </span>
+                                                                    {" / "}
+                                                                    <span
+                                                                        data-bs-toggle="tooltip"
+                                                                        data-bs-placement="top"
+                                                                        title="Total Packages Created"
+                                                                        style={{ cursor: "pointer" }}
+                                                                    >
+                                                                        {totalPackages}
+                                                                    </span>
+                                                                </h4>
+                                                            </div>
+                                                            <div className="dash-icon bg-warning">
+                                                                <i className="fe fe-layers"></i>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* Total Appointments  */}
+                                                <div className="col-xl-3 col-lg-6 col-md-6 mb-3">
+                                                    <div className="card dashboard-card">
+                                                        <div className="d-flex justify-content-between align-items-center">
+                                                            <div>
+                                                                <p className="dash-label">Total Appointments</p>
+                                                                <h4 className="dash-value">
+                                                                    <span
+                                                                        data-bs-toggle="tooltip"
+                                                                        data-bs-placement="top"
+                                                                        title="Total Sold Appointments"
+                                                                        style={{ cursor: "pointer" }}
+                                                                    >
+                                                                        {soldAppointments}
+                                                                    </span>
+                                                                    {" / "}
+                                                                    <span
+                                                                        data-bs-toggle="tooltip"
+                                                                        data-bs-placement="top"
+                                                                        title="Total Appointments Created"
+                                                                        style={{ cursor: "pointer" }}
+                                                                    >
+                                                                        {totalAppointments}
+                                                                    </span>
+                                                                </h4>
+                                                            </div>
+                                                            <div className="dash-icon bg-warning">
+                                                                <i className="fe fe-layers"></i>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+
+
+
 
                                                 <div className="col-xl-3 col-lg-6 col-md-6 mb-3">
                                                     <div className="card dashboard-card">
                                                         <div className="d-flex justify-content-between align-items-center">
                                                             <div>
+                                                                <span
+                                                                    data-bs-toggle="tooltip"
+                                                                    data-bs-placement="top"
+                                                                    title="Total revenue including taxes and fees."
+                                                                    style={{ cursor: "pointer" }}
+                                                                >
                                                                 <p className="dash-label">TOTAL REVENUE</p>
                                                                 <h4 className="dash-value">{currency}{formatPrice(totalRevenue)}</h4>
+                                                                </span>
                                                             </div>
                                                             <div className="dash-icon bg-info">
                                                                 <i className="fe fe-credit-card"></i>
@@ -281,8 +433,15 @@ const EventDashboardPage = () => {
                                                     <div className="card dashboard-card">
                                                         <div className="d-flex justify-content-between align-items-center">
                                                             <div>
-                                                                <p className="dash-label">ORGANIZER EARNINGS</p>
-                                                                <h4 className="dash-value">{currency}{formatPrice(organizerEarning)}</h4>
+                                                                <span
+                                                                    data-bs-toggle="tooltip"
+                                                                    data-bs-placement="top"
+                                                                    title="Organizer's total earnings after discounts and fees."
+                                                                    style={{ cursor: "pointer" }}
+                                                                >
+                                                                    <p className="dash-label">ORGANIZER EARNINGS</p>
+                                                                    <h4 className="dash-value">{currency}{formatPrice(organizerEarning)}</h4>
+                                                                </span>
                                                             </div>
                                                             <div className="dash-icon bg-warning">
                                                                 <i className="fe fe-credit-card"></i>
@@ -335,7 +494,7 @@ const EventDashboardPage = () => {
                                                                 </span>
 
                                                                 <span>
-                                                                    {currency}{organizerRevenue.toLocaleString()}
+                                                                    {currency}{formatPrice(organizerRevenue)}
                                                                     ({commissionPercent?.organizer}%)
                                                                 </span>
                                                             </div>
@@ -346,21 +505,22 @@ const EventDashboardPage = () => {
                                                                 </span>
 
                                                                 <span>
-                                                                    {currency}{platformFee.toLocaleString()}
+                                                                    {currency}{formatPrice(platformFee)}
                                                                     ({commissionPercent?.platform}%)
                                                                 </span>
                                                             </div>
 
-                                                            <div style={{ display: "flex", justifyContent: "space-between" }}>
-                                                                <span style={{ color: commissionColors.committee }}>
-                                                                    ● Committee Commission
-                                                                </span>
+                                                            {committeeMembers.length > 0 && (
+                                                                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                                                    <span style={{ color: commissionColors.committee }}>
+                                                                        ● Committee Commission
+                                                                    </span>
 
-                                                                <span>
-                                                                    {currency}{committeeFee.toLocaleString()}
-                                                                    ({commissionPercent?.committee}%)
-                                                                </span>
-                                                            </div>
+                                                                    <span>
+                                                                        {currency}{formatPrice(committeeFee)}
+                                                                        ({commissionPercent?.committee}%)
+                                                                    </span>
+                                                                </div>)}
 
                                                         </div>
 
@@ -384,7 +544,7 @@ const EventDashboardPage = () => {
                                                             Payment Gateway Fee ({commissionBreakdown?.gateway_charge}%)
                                                         </span>
                                                         <span className="text-success fw-bold">
-                                                            {currency}{commissionBreakdown?.gateway_fee || 0}
+                                                            {currency}{formatPrice(commissionBreakdown?.gateway_fee || 0)}
                                                         </span>
                                                     </div>
 
@@ -393,7 +553,7 @@ const EventDashboardPage = () => {
                                                             Platform Fee ({commissionBreakdown?.platform_charge}%)
                                                         </span>
                                                         <span className="text-info">
-                                                            {currency}{commissionBreakdown?.platform_fee || 0}
+                                                            {currency}{formatPrice(commissionBreakdown?.platform_fee || 0)}
                                                         </span>
                                                     </div>
 
@@ -498,125 +658,126 @@ const EventDashboardPage = () => {
 
                                             {/* ================= COMMITTEE PERFORMANCE ================= */}
 
-                                            <div className="col-12">
-                                                <div className="light-card">
+                                            {committeeMembers.length > 0 && (
+                                                <div className="col-12">
+                                                    <div className="light-card">
 
-                                                    <div className="card-top">
-                                                        <h6>Committee Performance</h6>
-                                                    </div>
+                                                        <div className="card-top">
+                                                            <h6>Committee Performance</h6>
+                                                        </div>
 
-                                                    {committeeMembers.length > 0 ? (
+                                                        {committeeMembers.length > 0 ? (
 
-                                                        committeeMembers.map((member, i) => {
+                                                            committeeMembers.map((member, i) => {
 
-                                                            const fullName = `${member.first_name} ${member.last_name}`;
-                                                            const percentage = member.earning_percentage || 0;
+                                                                const fullName = `${member.first_name} ${member.last_name}`;
+                                                                const percentage = member.earning_percentage || 0;
 
-                                                            const initials =
-                                                                (member.first_name?.charAt(0) || "") +
-                                                                (member.last_name?.charAt(0) || "");
+                                                                const initials =
+                                                                    (member.first_name?.charAt(0) || "") +
+                                                                    (member.last_name?.charAt(0) || "");
 
-                                                            return (
-                                                                <div
-                                                                    key={i}
-                                                                    style={{
-                                                                        display: "flex",
-                                                                        alignItems: "center",
-                                                                        justifyContent: "space-between",
-                                                                        marginBottom: "18px",
-                                                                        gap: "15px"
-                                                                    }}
-                                                                >
+                                                                return (
+                                                                    <div
+                                                                        key={i}
+                                                                        style={{
+                                                                            display: "flex",
+                                                                            alignItems: "center",
+                                                                            justifyContent: "space-between",
+                                                                            marginBottom: "18px",
+                                                                            gap: "15px"
+                                                                        }}
+                                                                    >
 
-                                                                    {/* LEFT SIDE */}
-                                                                    <div style={{ display: "flex", alignItems: "center", gap: "12px", minWidth: "200px" }}>
+                                                                        {/* LEFT SIDE */}
+                                                                        <div style={{ display: "flex", alignItems: "center", gap: "12px", minWidth: "200px" }}>
 
-                                                                        {/* Avatar */}
-                                                                        <div
-                                                                            style={{
-                                                                                width: "40px",
-                                                                                height: "40px",
-                                                                                borderRadius: "50%",
-                                                                                background: "linear-gradient(135deg,#4f7cff,#3358ff)",
-                                                                                color: "#fff",
-                                                                                display: "flex",
-                                                                                alignItems: "center",
-                                                                                justifyContent: "center",
-                                                                                fontWeight: "600",
-                                                                                fontSize: "14px"
-                                                                            }}
-                                                                        >
-                                                                            {initials.toUpperCase()}
-                                                                        </div>
-
-                                                                        <div>
-                                                                            <div style={{ fontWeight: "600" }}>{fullName}</div>
-                                                                            <div style={{ fontSize: "12px", color: "#888" }}>
-                                                                                Sales: {currency}{member.total_sales}
-                                                                            </div>
-                                                                        </div>
-
-                                                                    </div>
-
-                                                                    {/* CENTER PROGRESS BAR */}
-                                                                    <div style={{ flex: 1, padding: "0 10px" }}>
-
-                                                                        <div
-                                                                            style={{
-                                                                                width: "100%",
-                                                                                height: "8px",
-                                                                                background: "#eee",
-                                                                                borderRadius: "10px",
-                                                                                overflow: "hidden"
-                                                                            }}
-                                                                        >
+                                                                            {/* Avatar */}
                                                                             <div
                                                                                 style={{
-                                                                                    width: `${percentage}%`,
-                                                                                    height: "100%",
-                                                                                    background: "#f5a623",
-                                                                                    borderRadius: "10px"
+                                                                                    width: "40px",
+                                                                                    height: "40px",
+                                                                                    borderRadius: "50%",
+                                                                                    background: "linear-gradient(135deg,#4f7cff,#3358ff)",
+                                                                                    color: "#fff",
+                                                                                    display: "flex",
+                                                                                    alignItems: "center",
+                                                                                    justifyContent: "center",
+                                                                                    fontWeight: "600",
+                                                                                    fontSize: "14px"
                                                                                 }}
-                                                                            />
+                                                                            >
+                                                                                {initials.toUpperCase()}
+                                                                            </div>
+
+                                                                            <div>
+                                                                                <div style={{ fontWeight: "600" }}>{fullName}</div>
+                                                                                <div style={{ fontSize: "12px", color: "#888" }}>
+                                                                                    Sales: {currency}{formatPrice(member.total_sales)}
+                                                                                </div>
+                                                                            </div>
+
+                                                                        </div>
+
+                                                                        {/* CENTER PROGRESS BAR */}
+                                                                        <div style={{ flex: 1, padding: "0 10px" }}>
+
+                                                                            <div
+                                                                                style={{
+                                                                                    width: "100%",
+                                                                                    height: "8px",
+                                                                                    background: "#eee",
+                                                                                    borderRadius: "10px",
+                                                                                    overflow: "hidden"
+                                                                                }}
+                                                                            >
+                                                                                <div
+                                                                                    style={{
+                                                                                        width: `${percentage}%`,
+                                                                                        height: "100%",
+                                                                                        background: "#f5a623",
+                                                                                        borderRadius: "10px"
+                                                                                    }}
+                                                                                />
+                                                                            </div>
+
+                                                                        </div>
+
+                                                                        {/* RIGHT SIDE */}
+                                                                        <div style={{ textAlign: "right", minWidth: "120px" }}>
+
+                                                                            <div style={{ fontWeight: "600" }}>
+                                                                                {percentage}%
+                                                                            </div>
+
+                                                                            <div style={{ fontSize: "12px", color: "#28a745", fontWeight: "600" }}>
+                                                                                {currency}{formatPrice(member.earning)} earned
+                                                                            </div>
+
                                                                         </div>
 
                                                                     </div>
+                                                                );
+                                                            })
 
-                                                                    {/* RIGHT SIDE */}
-                                                                    <div style={{ textAlign: "right", minWidth: "120px" }}>
+                                                        ) : (
+                                                            <p className="text-muted">No committee members yet</p>
+                                                        )}
 
-                                                                        <div style={{ fontWeight: "600" }}>
-                                                                            {percentage}%
-                                                                        </div>
+                                                        <div className="summary-row">
+                                                            <span>
+                                                                Total Committee Earnings
+                                                                <b>
+                                                                    {" "}
+                                                                    {currency}
+                                                                    {formatPrice(committeePerformance?.totalCommitteeEarning || 0)}
+                                                                </b>
+                                                            </span>
+                                                        </div>
 
-                                                                        <div style={{ fontSize: "12px", color: "#28a745", fontWeight: "600" }}>
-                                                                            {currency}{member.earning?.toLocaleString()} earned
-                                                                        </div>
-
-                                                                    </div>
-
-                                                                </div>
-                                                            );
-                                                        })
-
-                                                    ) : (
-                                                        <p className="text-muted">No committee members yet</p>
-                                                    )}
-
-                                                    <div className="summary-row">
-                                                        <span>
-                                                            Total Committee Earnings
-                                                            <b>
-                                                                {" "}
-                                                                {currency}
-                                                                {committeePerformance?.totalCommitteeEarning?.toLocaleString() || 0}
-                                                            </b>
-                                                        </span>
                                                     </div>
-
                                                 </div>
-                                            </div>
-
+                                            )}
                                         </div>
 
                                     )}

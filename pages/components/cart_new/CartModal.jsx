@@ -44,7 +44,7 @@ export default function CartModal({ show, handleClose, eventId }) {
 
     const { cart, refreshCart, eventData, normalCart, addonCart, slotCart, loadingCart, setEventId, charges } = useCart();
     const finalEventId = eventId || eventData?.id;
-    // console.log("eventData.package---", eventData?.ticketPrices);
+    console.log("cart.cart-cart---", cart);
     const [isLoading, setIsLoading] = useState(true);
     const [cartLoading, setCartLoading] = useState(false);
     const [loadingId, setLoadingId] = useState(null); // track which pricing ID is loading
@@ -1067,6 +1067,22 @@ export default function CartModal({ show, handleClose, eventId }) {
         });
     };
 
+    // format time slots
+    const formatTimeSlots = (time) => {
+        if (!time) return "";
+
+        const [hour, minute] = time.split(":");
+        const date = new Date();
+        date.setHours(hour, minute);
+
+        return date.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+        });
+    };
+
+
     const [isBtnLoading, setIsBtnLoading] = useState(false);
 
     const handlePurchase = async (event) => {
@@ -1707,12 +1723,35 @@ export default function CartModal({ show, handleClose, eventId }) {
 
                                                                 {/* 🎟️ Ticket Prices */}
                                                                 {eventData.ticketPrices
-                                                                    ?.filter(tp => tp.ticket?.hidden !== "Y" && tp.ticket?.sold_out !== "Y")
+                                                                    ?.filter(tp =>
+                                                                    // tp.ticket?.hidden !== "Y" && tp.ticket?.sold_out !== "Y")
+                                                                    {
+                                                                        if (tp.ticket?.hidden == "Y" || tp.ticket?.sold_out == "Y") return false;
+
+                                                                        const now = new Date();
+
+                                                                        // SLOT CHECK
+                                                                        if (tp.slot) {
+                                                                            const slotDateTime = new Date(`${tp.slot.slot_date}T${tp.slot.end_time}`);
+                                                                            return slotDateTime > now;
+                                                                        }
+
+                                                                        // DATE CHECK
+                                                                        if (tp.date) {
+                                                                            const eventDate = new Date(tp.date);
+                                                                            eventDate.setHours(23, 59, 59, 999); // full day allow
+                                                                            return eventDate >= now;
+                                                                        }
+
+                                                                        return true;
+                                                                    })
+
                                                                     .map((tp, i) => {
                                                                         const pricingId = tp.id; // ✅ ticketPrice ID
                                                                         const cartItem = slotCart.find(item => item.uniqueId == pricingId);
                                                                         const isLoading = loadingId == pricingId;
                                                                         const isSoldOut = tp.ticket?.sold_out == "Y";
+                                                                        // console.log("tp-------", tp)
 
                                                                         return (
                                                                             <div key={`ticket-price-${i}`} className="ticket-item only-ticket">
@@ -1730,7 +1769,9 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                                         {tp.slot ? (
                                                                                             <p className="mt-2">
                                                                                                 {formatReadableDate(tp.slot.slot_date)} |{" "}
-                                                                                                {tp.slot.start_time} - {tp.slot.end_time}
+                                                                                                {/* {tp.slot.start_time} - {tp.slot.end_time} */}
+                                                                                                
+                                                                                                {formatTimeSlots(tp.slot.start_time)} - {formatTimeSlots(tp.slot.end_time)}
                                                                                             </p>
                                                                                         ) : tp.date ? (
                                                                                             <p className="mt-2">

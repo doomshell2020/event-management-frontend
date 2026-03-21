@@ -192,6 +192,7 @@ const ManageDateTime = () => {
         return `${yyyy}-${mm}-${dd}`;
     };
 
+
     // -------------------------
     // Open modal for a date
     // -------------------------
@@ -270,7 +271,12 @@ const ManageDateTime = () => {
 
         } catch (err) {
             console.error("Save error", err);
-            setModalError("Failed to save slots. Please try again!");
+            const apiErrorMsg =
+                err.response?.data?.error?.message ||
+                err.response?.data?.message ||
+                err.message ||
+                "Something went wrong. Try again.";
+            setModalError(apiErrorMsg || "Failed to save slots. Please try again!");
         }
 
         setIsSubmitting(false);
@@ -339,6 +345,20 @@ const ManageDateTime = () => {
     today.setHours(0, 0, 0, 0);
     const addDateAllowed = !(eventStart && eventEnd && (today < eventStart || today > eventEnd));
 
+    // format time slots
+    const formatTimeSlots = (time) => {
+        if (!time) return "";
+
+        const [hour, minute] = time.split(":");
+        const date = new Date();
+        date.setHours(hour, minute);
+
+        return date.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+        });
+    };
     // -------------------------
     // Render
     // -------------------------
@@ -348,7 +368,7 @@ const ManageDateTime = () => {
 
             <section id="myevent-deshbord" className="manage-date-page">
                 <div className="d-flex">
-                    <EventSidebar eventId={id}  eventDetails={eventDetails}/>
+                    <EventSidebar eventId={id} eventDetails={eventDetails} />
 
                     <div className="event-righcontent flex-grow-1">
                         <div className="dsa_contant">
@@ -368,7 +388,8 @@ const ManageDateTime = () => {
                                                 onChange={(d) => setCalendarDate(d)}
                                                 value={calendarDate}
                                                 onClickDay={(d) => openForDate(d)}
-                                                minDate={eventStart || undefined}
+                                                // minDate={eventStart || undefined}
+                                                minDate={eventStart && eventStart > today ? eventStart : today}
                                                 maxDate={eventEnd || undefined}
                                                 tileDisabled={({ date }) => {
                                                     if (eventStart && date < eventStart) return true;
@@ -425,44 +446,44 @@ const ManageDateTime = () => {
                                                             >
                                                                 {/* LEFT: Date Column */}
                                                                 <div className="d-flex align-items-start justify-content-between">
-                                                                <div className="d-flex gap-2 align-items-center">
-                                                                    <div className="manage-dete-dateboax">
-                                                                        {String(new Date(dKey).getDate()).padStart(2, "0")}
-                                                                    </div>
-                                                                    <div>
-                                                                    <div className="text-muted" style={{ fontSize: 14 }}>
-                                                                        {new Date(dKey).toLocaleString("default", { month: "long" })}
-                                                                    </div>
-                                                                    <div style={{ fontSize: 13, fontWeight: 700 }}>
-                                                                        {new Date(dKey)
-                                                                            .toLocaleString("default", { weekday: "short" })
-                                                                            .toUpperCase()}
-                                                                    </div>
-                                                                    </div>
-                                                                </div>
-
-                                                                {/* RIGHT: Buttons */}
-                                                                <div className="text-end" >
-
-                                                                    <div className="text-start">
-                                                                        {arr.map((s, idx) => (
-                                                                            <div key={idx} className="d-inline-block me-1">
-
-                                                                                <button
-                                                                                    className="btn btn-sm btn-light border"
-                                                                                    title="Remove slot"
-                                                                                    onClick={() => removeLocalSlot(s.id)}
-                                                                                >
-                                                                                    ✕
-                                                                                </button>
+                                                                    <div className="d-flex gap-2 align-items-center">
+                                                                        <div className="manage-dete-dateboax">
+                                                                            {String(new Date(dKey).getDate()).padStart(2, "0")}
+                                                                        </div>
+                                                                        <div>
+                                                                            <div className="text-muted" style={{ fontSize: 14 }}>
+                                                                                {new Date(dKey).toLocaleString("default", { month: "long" })}
                                                                             </div>
-                                                                        ))}
+                                                                            <div style={{ fontSize: 13, fontWeight: 700 }}>
+                                                                                {new Date(dKey)
+                                                                                    .toLocaleString("default", { weekday: "short" })
+                                                                                    .toUpperCase()}
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    {/* RIGHT: Buttons */}
+                                                                    <div className="text-end" >
+
+                                                                        <div className="text-start">
+                                                                            {arr.map((s, idx) => (
+                                                                                <div key={idx} className="d-inline-block me-1">
+
+                                                                                    <button
+                                                                                        className="btn btn-sm btn-light border"
+                                                                                        title="Remove slot"
+                                                                                        onClick={() => removeLocalSlot(s.id)}
+                                                                                    >
+                                                                                        ✕
+                                                                                    </button>
+                                                                                </div>
+                                                                            ))}
+                                                                        </div>
                                                                     </div>
                                                                 </div>
-</div>
                                                                 {/* MIDDLE: Slot Pills */}
                                                                 <div >
-                                                                    <div style={{ fontWeight: 600,textAlign:"right" }}>
+                                                                    <div style={{ fontWeight: 600, textAlign: "right" }}>
                                                                         {arr.length} time slot{arr.length > 1 ? "s" : ""}
                                                                     </div>
 
@@ -487,7 +508,8 @@ const ManageDateTime = () => {
                                                                                         marginTop: 2,
                                                                                     }}
                                                                                 >
-                                                                                    {s.start_time} - {s.end_time}
+                                                                                    {/* {s.start_time} - {s.end_time} */}
+                                                                                    {formatTimeSlots(s?.start_time)} - {formatTimeSlots(s?.end_time)}
                                                                                 </div>
 
                                                                                 {s.description && (
@@ -503,7 +525,7 @@ const ManageDateTime = () => {
                                                                     </div>
                                                                 </div>
 
-                                                                
+
                                                             </div>
                                                         );
                                                     })}
@@ -515,7 +537,7 @@ const ManageDateTime = () => {
                                 </div>
 
                                 {/* Modal for adding/editing slots */}
-                                <Modal show={showModal} onHide={() => setShowModal(false)} size="lg"  centered>
+                                <Modal show={showModal} onHide={() => setShowModal(false)} size="lg" centered>
                                     <Modal.Header closeButton>
                                         <Modal.Title>
                                             <div>
@@ -533,7 +555,7 @@ const ManageDateTime = () => {
                                         className={validateDefault ? "was-validated" : ""}
                                     >
                                         <Modal.Body>
-                                             {/* ERROR MESSAGE INSIDE MODAL */}
+                                            {/* ERROR MESSAGE INSIDE MODAL */}
                                             {modalError && (
                                                 <div className="text-danger me-auto fw-bold">
                                                     {modalError}
@@ -545,11 +567,12 @@ const ManageDateTime = () => {
                                                     <Form.Label>Date *</Form.Label>
                                                     <DatePicker
                                                         selected={selectedDate}
+                                                        minDate={new Date()}
                                                         onChange={(d) => {
                                                             if (eventStart && eventEnd && (d < eventStart || d > eventEnd)) {
                                                                 setModalError("This date is outside the event's date range.");
                                                                 return;
-                                                            }else{
+                                                            } else {
                                                                 setModalError("");
                                                             }
                                                             setSelectedDate(d);
@@ -605,7 +628,9 @@ const ManageDateTime = () => {
                                                                 showTimeSelect
                                                                 showTimeSelectOnly
                                                                 timeIntervals={15}
-                                                                dateFormat="HH:mm"
+                                                                // dateFormat="HH:mm"
+                                                                dateFormat="hh:mm aa"
+                                                                timeFormat="hh:mm aa"
                                                                 className="form-control"
                                                                 required
                                                             />
@@ -620,7 +645,9 @@ const ManageDateTime = () => {
                                                                 showTimeSelect
                                                                 showTimeSelectOnly
                                                                 timeIntervals={15}
-                                                                dateFormat="HH:mm"
+                                                                // dateFormat="HH:mm"
+                                                                dateFormat="hh:mm aa"
+                                                                timeFormat="hh:mm aa"
                                                                 className="form-control"
                                                                 required
                                                             />
@@ -737,7 +764,7 @@ const ManageDateTime = () => {
                                             )}
                                         </Modal.Body>
 
-                                        <Modal.Footer>                                           
+                                        <Modal.Footer>
 
                                             <Button variant="secondary" onClick={() => setShowModal(false)} disabled={isSubmitting}>
                                                 Close
