@@ -412,7 +412,6 @@ const DashboardPage = () => {
 
 
 
-                                {/* ================= CHARTS ================= */}
                                 <div className="contant_bg container-fluid">
                                     {loading ? (
                                         <div className="text-center my-5">
@@ -474,6 +473,7 @@ const DashboardPage = () => {
                                                 </div>
 
                                                 {/* Total Tickets Created */}
+                                                {totalTickets !== 0 && (
                                                 <div className="col-xl-3 col-lg-6 col-md-6 mb-3">
                                                     <div className="card dashboard-card">
                                                         <div className="d-flex justify-content-between align-items-center">
@@ -506,8 +506,10 @@ const DashboardPage = () => {
                                                         </div>
                                                     </div>
                                                 </div>
+                                                )}
 
                                                 {/* Total Addons  */}
+                                                {totalAddons !== 0 && (
                                                 <div className="col-xl-3 col-lg-6 col-md-6 mb-3">
                                                     <div className="card dashboard-card">
                                                         <div className="d-flex justify-content-between align-items-center">
@@ -540,8 +542,10 @@ const DashboardPage = () => {
                                                         </div>
                                                     </div>
                                                 </div>
+                                                )}
 
                                                 {/* Total Package  */}
+                                                {totalPackages !== 0 && (
                                                 <div className="col-xl-3 col-lg-6 col-md-6 mb-3">
                                                     <div className="card dashboard-card">
                                                         <div className="d-flex justify-content-between align-items-center">
@@ -574,8 +578,10 @@ const DashboardPage = () => {
                                                         </div>
                                                     </div>
                                                 </div>
+                                                )}
 
                                                 {/* Total Appointments  */}
+                                                {totalAppointments !== 0 && (
                                                 <div className="col-xl-3 col-lg-6 col-md-6 mb-3">
                                                     <div className="card dashboard-card">
                                                         <div className="d-flex justify-content-between align-items-center">
@@ -607,8 +613,8 @@ const DashboardPage = () => {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
-
+                                                </div>)}
+                                                       
                                                 {/* Total Revenue */}
                                                 <div className="col-xl-3 col-lg-6 col-md-6 mb-3">
                                                     <div className="card dashboard-card">

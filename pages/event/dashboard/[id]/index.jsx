@@ -243,74 +243,46 @@ const EventDashboardPage = () => {
                                             {/* ================= TOP CARDS ================= */}
 
                                             <div className="row mb-4">
-
-                                                <div className="col-xl-3 col-lg-6 col-md-6 mb-3">
-                                                    <div className="card dashboard-card">
-                                                        <div className="d-flex justify-content-between align-items-center">
-                                                            <div>
-                                                                <p className="dash-label">TOTAL TICKETS</p>
-                                                                <h4 className="dash-value">
-                                                                    <span
-                                                                        data-bs-toggle="tooltip"
-                                                                        data-bs-placement="top"
-                                                                        title="Total Sold Tickets"
-                                                                        style={{ cursor: "pointer" }}
-                                                                    >
-                                                                        {soldTickets}
-                                                                    </span>
-                                                                    {" / "}
-                                                                    <span
-                                                                        data-bs-toggle="tooltip"
-                                                                        data-bs-placement="top"
-                                                                        title="Total Tickets Created"
-                                                                        style={{ cursor: "pointer" }}
-                                                                    >
-                                                                        {totalTickets}
-                                                                    </span>
-                                                                </h4>
-                                                            </div>
-                                                            <div className="dash-icon bg-warning">
-                                                                <i className="fe fe-tag"></i>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-
-                                                {/* <div className="col-xl-3 col-lg-6 col-md-6 mb-3">
-                                                    <div className="card dashboard-card">
-                                                        <div className="d-flex justify-content-between align-items-center">
-                                                            <div>
-                                                                <p className="dash-label">TOTAL TICKETS</p>
-                                                                <h4 className="dash-value">{totalTickets}</h4>
-                                                            </div>
-                                                            <div className="dash-icon bg-secondary">
-                                                                <i className="fe fe-tag"></i>
+                                                {totalTickets !== 0 && (
+                                                    <div className="col-xl-3 col-lg-6 col-md-6 mb-3">
+                                                        <div className="card dashboard-card">
+                                                            <div className="d-flex justify-content-between align-items-center">
+                                                                <div>
+                                                                    <p className="dash-label">TOTAL TICKETS</p>
+                                                                    <h4 className="dash-value">
+                                                                        <span
+                                                                            data-bs-toggle="tooltip"
+                                                                            data-bs-placement="top"
+                                                                            title="Total Sold Tickets"
+                                                                            style={{ cursor: "pointer" }}
+                                                                        >
+                                                                            {soldTickets}
+                                                                        </span>
+                                                                        {" / "}
+                                                                        <span
+                                                                            data-bs-toggle="tooltip"
+                                                                            data-bs-placement="top"
+                                                                            title="Total Tickets Created"
+                                                                            style={{ cursor: "pointer" }}
+                                                                        >
+                                                                            {totalTickets}
+                                                                        </span>
+                                                                    </h4>
+                                                                </div>
+                                                                <div className="dash-icon bg-warning">
+                                                                    <i className="fe fe-tag"></i>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div> */}
-
-                                                {/* <div className="col-xl-3 col-lg-6 col-md-6 mb-3">
-                                                    <div className="card dashboard-card">
-                                                        <div className="d-flex justify-content-between align-items-center">
-                                                            <div>
-                                                                <p className="dash-label">TICKETS SOLD</p>
-                                                                <h4 className="dash-value">{soldTickets}</h4>
-                                                            </div>
-                                                            <div className="dash-icon bg-success">
-                                                                <i className="fe fe-shopping-cart"></i>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div> */}
-
+                                                )}
                                                 {/* Total Addons  */}
+                                                {totalAddons !== 0 && (
                                                 <div className="col-xl-3 col-lg-6 col-md-6 mb-3">
                                                     <div className="card dashboard-card">
                                                         <div className="d-flex justify-content-between align-items-center">
                                                             <div>
-                                                                <p className="dash-label">Total Addons</p>
+                                                                <p className="dash-label">TOTAL ADDONS</p>
                                                                 <h4 className="dash-value">
                                                                     <span
                                                                         data-bs-toggle="tooltip"
@@ -337,13 +309,14 @@ const EventDashboardPage = () => {
                                                         </div>
                                                     </div>
                                                 </div>
-
+                                                )}
                                                 {/* Total Package  */}
+                                                {totalPackages !== 0 && (
                                                 <div className="col-xl-3 col-lg-6 col-md-6 mb-3">
                                                     <div className="card dashboard-card">
                                                         <div className="d-flex justify-content-between align-items-center">
                                                             <div>
-                                                                <p className="dash-label">Total Packages</p>
+                                                                <p className="dash-label">TOTAL PACKAGES</p>
                                                                 <h4 className="dash-value">
                                                                     <span
                                                                         data-bs-toggle="tooltip"
@@ -369,14 +342,15 @@ const EventDashboardPage = () => {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
+                                                </div>)}
 
                                                 {/* Total Appointments  */}
+                                                {totalAppointments !== 0 && (
                                                 <div className="col-xl-3 col-lg-6 col-md-6 mb-3">
                                                     <div className="card dashboard-card">
                                                         <div className="d-flex justify-content-between align-items-center">
                                                             <div>
-                                                                <p className="dash-label">Total Appointments</p>
+                                                                <p className="dash-label">TOTAL APPOINTMENTS</p>
                                                                 <h4 className="dash-value">
                                                                     <span
                                                                         data-bs-toggle="tooltip"
@@ -403,7 +377,7 @@ const EventDashboardPage = () => {
                                                         </div>
                                                     </div>
                                                 </div>
-
+                                                )}
 
 
 
@@ -418,8 +392,8 @@ const EventDashboardPage = () => {
                                                                     title="Total revenue including taxes and fees."
                                                                     style={{ cursor: "pointer" }}
                                                                 >
-                                                                <p className="dash-label">TOTAL REVENUE</p>
-                                                                <h4 className="dash-value">{currency}{formatPrice(totalRevenue)}</h4>
+                                                                    <p className="dash-label">TOTAL REVENUE</p>
+                                                                    <h4 className="dash-value">{currency}{formatPrice(totalRevenue)}</h4>
                                                                 </span>
                                                             </div>
                                                             <div className="dash-icon bg-info">
