@@ -2,13 +2,15 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import dynamic from "next/dynamic";
 import { Spinner } from "react-bootstrap";
-
+import Swal from "sweetalert2";
 import FrontendHeader from "@/shared/layout-components/frontelements/frontendheader";
 import FrontendFooter from "@/shared/layout-components/frontelements/frontendfooter";
 import EventSidebar from "@/pages/components/Event/EventSidebar";
 import EventHeaderSection from "@/pages/components/Event/EventProgressBar";
 import api from "@/utils/api";
-
+import ExcelJS from "exceljs";
+import { saveAs } from "file-saver";
+import moment from "moment";
 const ReactApexChart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 const EventDashboardPage = () => {
@@ -22,7 +24,7 @@ const EventDashboardPage = () => {
     const [dashboardData, setDashboardData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isClient, setIsClient] = useState(false);
-
+    const [excelLoading, setExcelLoading] = useState(false);
     useEffect(() => setIsClient(true), []);
 
     useEffect(() => {
@@ -150,11 +152,7 @@ const EventDashboardPage = () => {
     };
 
     /* ---------------- DONUT ---------------- */
-
-    // const totalRevenue = organizerRevenue + platformFee + committeeFee;
-
     const commissionPercent = commissionSplit?.percentage || {};
-
     const commissionDonutSeries = [
         organizerRevenue,
         platformFee,
@@ -204,6 +202,111 @@ const EventDashboardPage = () => {
         }
     };
 
+
+    const handleDownloadDashboardExcel = async () => {
+        if (!dashboardData) return;
+        setExcelLoading(true);
+        try {
+            const workbook = new ExcelJS.Workbook();
+
+            /* ================= SHEET 1: SUMMARY ================= */
+            const sheet = workbook.addWorksheet("Dashboard Summary");
+
+            sheet.columns = [
+                { header: "Event Name", key: "eventName", width: 25 },
+                { header: "Total Tickets", key: "totalTickets", width: 18 },
+                { header: "Sold Tickets", key: "soldTickets", width: 18 },
+                { header: "Total Addons", key: "totalAddons", width: 18 },
+                { header: "Sold Addons", key: "soldAddons", width: 18 },
+                { header: "Total Packages", key: "totalPackages", width: 18 },
+                { header: "Sold Packages", key: "soldPackages", width: 18 },
+                { header: "Total Appointments", key: "totalAppointments", width: 18 },
+                { header: "Sold Appointments", key: "soldAppointments", width: 18 },
+                { header: "Total Revenue", key: "totalRevenue", width: 20 },
+                { header: "Organizer Earnings", key: "organizerEarning", width: 22 },
+            ];
+
+            sheet.addRow({
+                eventName: event?.name,
+                totalTickets,
+                soldTickets,
+                totalAddons,
+                soldAddons,
+                totalPackages,
+                soldPackages,
+                totalAppointments,
+                soldAppointments,
+                totalRevenue: `${currency}${formatPrice(totalRevenue)}`,
+                organizerEarning: `${currency}${formatPrice(organizerEarning)}`,
+            });
+
+            sheet.getRow(1).eachCell((cell) => {
+                cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
+                cell.fill = {
+                    type: "pattern",
+                    pattern: "solid",
+                    fgColor: { argb: "000000" },
+                };
+                cell.alignment = { horizontal: "center" };
+            });
+
+
+            /* ================= SHEET 2: REVENUE ================= */
+            const revenueSheet = workbook.addWorksheet("Revenue");
+
+            revenueSheet.columns = [
+                { header: "Type", key: "type", width: 25 },
+                { header: "Amount", key: "amount", width: 20 },
+            ];
+
+            revenueSheet.addRows([
+                { type: "Organizer", amount: `${currency}${formatPrice(organizerRevenue)}`  },
+                { type: "Platform", amount: `${currency}${formatPrice(platformFee)}`},
+                { type: "Payment Gateway", amount: `${currency}${formatPrice(commissionBreakdown?.gateway_fee)}`  },
+                { type: "Committee", amount: `${currency}${formatPrice(committeeFee)}`  },
+            ]);
+
+            /* ================= SHEET 3: COMMITTEE ================= */
+            const committeeSheet = workbook.addWorksheet("Committee");
+
+            committeeSheet.columns = [
+                { header: "Name", key: "name", width: 25 },
+                { header: "Sales", key: "sales", width: 20 },
+                { header: "Earning", key: "earning", width: 20 },
+                // { header: "Percentage", key: "percentage", width: 15 },
+            ];
+
+            committeeMembers.forEach((m) => {
+                committeeSheet.addRow({
+                    name: `${m.first_name} ${m.last_name}`,
+                    sales: `${currency}${formatPrice(m.total_sales)}`,
+                    earning: `${currency}${formatPrice(m.earning)}`,
+                    // percentage: m.earning_percentage + "%",
+                });
+            });
+
+            /* ================= DOWNLOAD ================= */
+            const buffer = await workbook.xlsx.writeBuffer();
+
+            saveAs(
+                new Blob([buffer]),
+                `Dashboard_Report_${event?.name}_${moment().format("YYYYMMDD")}.xlsx`
+            );
+
+        } catch (error) {
+            console.error("Excel error:", error);
+            Swal.fire("Error", "Failed to download report", "error");
+        } finally {
+            setExcelLoading(false);
+        }
+    };
+
+
+
+
+
+
+
     return (
         <>
             <FrontendHeader backgroundImage={backgroundImage} />
@@ -222,10 +325,30 @@ const EventDashboardPage = () => {
                                     eventDetails={eventDetails}
                                     isProgressBarShow={false}
                                 />
+                                <div className="d-flex justify-content-between align-items-center mb-2">
+                                    <h4 className="text-24">
+                                        Sales Dashboard - {event?.name}
+                                    </h4>
 
-                                <h4 className="text-24">
-                                    Sales Dashboard - {event?.name}
-                                </h4>
+                                    <button className="export-btn"
+                                        data-bs-toggle="tooltip"
+                                        title="Download report"
+                                        onClick={handleDownloadDashboardExcel}
+                                        disabled={excelLoading}>
+                                        {excelLoading ? (
+                                            <>
+                                                <span className="spinner-border spinner-border-sm me-2" />
+                                                Downloading...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <i className="bi bi-file-earmark-excel-fill me-2"></i>
+                                                ⬇ Export
+                                            </>
+                                        )}
+
+                                    </button>
+                                </div>
 
                                 <hr className="custom-hr" />
 
@@ -534,8 +657,6 @@ const EventDashboardPage = () => {
                                                 </div>
 
                                             </div>
-
-                                            {/* ================= SALES PROGRESS ================= */}
 
                                             {/* ================= SALES PROGRESS ================= */}
                                             {totalTickets !== 0 && (
