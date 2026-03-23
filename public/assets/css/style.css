@@ -7563,3 +7563,11 @@ input[type="date"] {
 .export-btn:hover {
   background: #1e40af;
 }
+
+.note-modal {
+  display: none !important;
+}
+
+.note-modal.open {
+  display: block !important;
+}
