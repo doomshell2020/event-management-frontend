@@ -326,37 +326,6 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
     }
 
     // Apply Coupon Code
-    // const handleApplyCoupon = async () => {
-    //     setCouponLoading(true);
-    //     if (!coupon) {
-    //         setCouponLoading(false);
-    //         return;
-    //     }
-    //     try {
-    //         const response = await api.get(`/api/v1/coupons/check-eligibility/${eventId}`, {
-    //             params: { couponCode: coupon },
-    //         });
-    //         if (response.data.success) {
-    //             setCouponDetails(response.data.data);
-    //             setCouponSuccessMessage(response.data.message);
-    //             setCouponError("");
-    //             localStorage.setItem("couponCode", coupon);
-    //         } else {
-    //             setCouponError(response.data.message || "Invalid coupon code.");
-    //             setCouponSuccessMessage("");
-    //         }
-    //         setCouponLoading(false);
-    //     } catch (error) {
-    //         console.error("Error applying coupon:", error.message);
-    //         const errorMessage =
-    //             error.response?.data?.message ||
-    //             "An error occurred while applying the coupon.";
-    //         setCouponError(errorMessage);
-    //         setCouponSuccessMessage("");
-    //         // clearMessages();
-    //         setCouponLoading(false);
-    //     }
-    // };
 
     const handleApplyCoupon = async () => {
         setCouponLoading(true);
@@ -412,8 +381,6 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
 
 
 
-
-
     // Remove Coupon Code
     const handleRemoveCoupon = async () => {
         setCouponDetails("");
@@ -421,6 +388,8 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
         setCouponError("");
         setCouponSuccessMessage("");
     };
+
+    const isBelowMinimum = finalTotal > 0 && finalTotal < 50;
 
 
     return (
@@ -662,24 +631,37 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
 
                                                     {cart.length > 0 && (
                                                         <div className="by-nw-btn accomofl-ck-bt">
+                                                            {/* ❗ Error Message */}
+                                                            {isBelowMinimum && (
+                                                                <p style={{ color: "red", textAlign: "center", marginBottom: "10px" }}>
+                                                                    Minimum amount should be {currencySymbol}{" "}50.Please contact the event organizer for assistance.
+                                                                </p>
+                                                            )}
                                                             <Button
                                                                 variant=""
                                                                 className="btn"
                                                                 type="submit"
                                                                 style={{
-                                                                    backgroundColor: "#df3b67ff",
+                                                                    // backgroundColor: "#df3b67ff",
+                                                                    backgroundColor: isBelowMinimum ? "#ccc" : "#df3b67ff",
                                                                     color: "white",
                                                                     borderRadius: "30px",
                                                                     padding: "10px 24px",
                                                                     fontWeight: "600",
                                                                     border: "none",
-                                                                    width: "50%",          // full width hat gaya
+                                                                    width: "50%",
                                                                     display: "block",
-                                                                    margin: "20px auto 0",      // button center me aa jayega
+                                                                    margin: "20px auto 0",
                                                                     opacity: isBtnLoading ? 0.7 : 1,
-                                                                    cursor: isBtnLoading ? "not-allowed" : "pointer"
+                                                                    // cursor: isBtnLoading ? "not-allowed" : "pointer"
+                                                                    cursor: isBelowMinimum || isBtnLoading ? "not-allowed" : "pointer"
                                                                 }}
                                                                 onClick={(e) => {
+                                                                    if (isBelowMinimum) {
+                                                                        e.preventDefault();
+                                                                        return;
+                                                                    }
+
                                                                     if (finalTotal == 0) {
                                                                         e.preventDefault();
                                                                         handleFreeTicket();
@@ -688,7 +670,12 @@ export default function CartModal({ show, handleClose, eventId, slotIds }) {
                                                             >
                                                                 {finalTotal == 0
                                                                     ? "FREE TICKET"
-                                                                    : "PURCHASE"}
+                                                                    : isBelowMinimum
+                                                                        ? `MIN ${currencySymbol} 50 REQUIRED`
+                                                                        : "PURCHASE"}
+                                                                {/* {finalTotal == 0
+                                                                    ? "FREE TICKET"
+                                                                    : "PURCHASE"} */}
 
                                                             </Button>
                                                         </div>
