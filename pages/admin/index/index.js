@@ -186,6 +186,8 @@ const Dashboard = () => {
     return new Intl.NumberFormat('en-IN').format(value || 0);
   };
 
+
+
   const formatCurrencyAmount = (row, key) => {
     const symbol = row?.event?.currencyName?.Currency_symbol || "";
     const amount = row?.[key];
@@ -195,6 +197,9 @@ const Dashboard = () => {
     return `${symbol} ${Math.round(Number(amount)).toLocaleString("en-IN")}`;
   };
 
+  const formatPrice = (amount) => {
+    return `${Math.round(Number(amount || 0)).toLocaleString("en-IN")}`;
+  };
 
 
   // const formatCurrencyAmount = (row, key) => {
@@ -470,23 +475,23 @@ const Dashboard = () => {
                         }}
                       >
                         {counts?.organizers?.active || 0}</Link></span> {" / "} <span title="Inactive Event Organizers">
-                           <Link
-                        href={{
-                          pathname: "/admin/event-organizers/",
-                          query: { status: "N" },
-                        }}
-                        target="_blank"
-                        title="Inactive Event Organizers"
-                        style={{
-                          cursor: "pointer",
-                          // textDecoration: "underline",
-                          color: "#ffffff",
-                          marginRight: "4px",
-                        }}
-                      >
+                        <Link
+                          href={{
+                            pathname: "/admin/event-organizers/",
+                            query: { status: "N" },
+                          }}
+                          target="_blank"
+                          title="Inactive Event Organizers"
+                          style={{
+                            cursor: "pointer",
+                            // textDecoration: "underline",
+                            color: "#ffffff",
+                            marginRight: "4px",
+                          }}
+                        >
                           {counts?.organizers?.inactive || 0}
-                          </Link>
-                          </span></h2>
+                        </Link>
+                      </span></h2>
                   </div>
                 </Col>
               </Row>
@@ -507,39 +512,39 @@ const Dashboard = () => {
                     <span className="text-white">Total Events</span>
                     <h2 className="text-white mb-0" style={{ fontSize: "20px" }}>
                       <span title="Active Events">
-                         <Link
-                        href={{
-                          pathname: "/admin/events",
-                          query: { status: "Y" },
-                        }}
-                        target="_blank"
-                        title="Active Event"
-                        style={{
-                          cursor: "pointer",
-                          // textDecoration: "underline",
-                          color: "#ffffff",
-                          marginRight: "4px",
-                        }}
-                      >
-                        {counts?.events?.active || 0} </Link></span> {" / "} <span title="Inactive Events">
-                           <Link
-                        href={{
-                          pathname: "/admin/events/",
-                          query: { status: "N" },
-                        }}
-                        target="_blank"
-                        title="Inactive Event"
-                        style={{
-                          cursor: "pointer",
-                          // textDecoration: "underline",
-                          color: "#ffffff",
-                          marginRight: "4px",
-                        }}
-                      >
+                        <Link
+                          href={{
+                            pathname: "/admin/events",
+                            query: { status: "Y" },
+                          }}
+                          target="_blank"
+                          title="Active Event"
+                          style={{
+                            cursor: "pointer",
+                            // textDecoration: "underline",
+                            color: "#ffffff",
+                            marginRight: "4px",
+                          }}
+                        >
+                          {counts?.events?.active || 0} </Link></span> {" / "} <span title="Inactive Events">
+                        <Link
+                          href={{
+                            pathname: "/admin/events/",
+                            query: { status: "N" },
+                          }}
+                          target="_blank"
+                          title="Inactive Event"
+                          style={{
+                            cursor: "pointer",
+                            // textDecoration: "underline",
+                            color: "#ffffff",
+                            marginRight: "4px",
+                          }}
+                        >
                           {counts?.events?.inactive || 0}
-                          </Link>
-                          </span>
-                          
+                        </Link>
+                      </span>
+
                     </h2>
                   </div>
                 </Col>
@@ -560,7 +565,7 @@ const Dashboard = () => {
                   <div className="mt-0">
                     <span className="text-white">Total Sales</span>
                     <h2 className="text-white mb-0" style={{ fontSize: "20px" }} title="Total Sales Amount (Including Tax)">
-                      {formatNumber(counts?.total_sales)}
+                      {formatPrice(counts?.total_sales)}
                     </h2>
                   </div>
                 </Col>
@@ -581,7 +586,7 @@ const Dashboard = () => {
                   <div className="mt-0">
                     <span className="text-white">Total Earning</span>
                     <h2 className="text-white mb-0" style={{ fontSize: "20px" }} title="Total Earning include free event">
-                      {formatNumber(counts?.total_earning + counts?.total_free_event_earnings)}
+                      {formatPrice(counts?.total_earning + counts?.total_free_event_earnings)}
                     </h2>
                   </div>
                 </Col>
