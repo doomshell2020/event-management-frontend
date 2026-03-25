@@ -329,7 +329,9 @@ const DashboardPage = () => {
     };
 
 
-
+    const filteredSales = liveSales?.filter(
+        (item) => (item?.totalTickets || 0) > 0
+    );
 
 
 
@@ -474,147 +476,147 @@ const DashboardPage = () => {
 
                                                 {/* Total Tickets Created */}
                                                 {totalTickets !== 0 && (
-                                                <div className="col-xl-3 col-lg-6 col-md-6 mb-3">
-                                                    <div className="card dashboard-card">
-                                                        <div className="d-flex justify-content-between align-items-center">
-                                                            <div>
-                                                                <p className="dash-label">Total Tickets</p>
-                                                                <h4 className="dash-value">
-                                                                    <span
-                                                                        data-bs-toggle="tooltip"
-                                                                        data-bs-placement="top"
-                                                                        title="Total Sold Tickets"
-                                                                        style={{ cursor: "pointer" }}
-                                                                    >
-                                                                        {soldTickets}
-                                                                    </span>
-                                                                    {" / "}
-                                                                    <span
-                                                                        data-bs-toggle="tooltip"
-                                                                        data-bs-placement="top"
-                                                                        title="Total Tickets Created"
-                                                                        style={{ cursor: "pointer" }}
-                                                                    >
-                                                                        {totalTickets}
-                                                                    </span>
-                                                                </h4>
-                                                                <small>Across all events</small>
-                                                            </div>
-                                                            <div className="dash-icon bg-warning">
-                                                                <i className="fe fe-layers"></i>
+                                                    <div className="col-xl-3 col-lg-6 col-md-6 mb-3">
+                                                        <div className="card dashboard-card">
+                                                            <div className="d-flex justify-content-between align-items-center">
+                                                                <div>
+                                                                    <p className="dash-label">Total Tickets</p>
+                                                                    <h4 className="dash-value">
+                                                                        <span
+                                                                            data-bs-toggle="tooltip"
+                                                                            data-bs-placement="top"
+                                                                            title="Total Sold Tickets"
+                                                                            style={{ cursor: "pointer" }}
+                                                                        >
+                                                                            {soldTickets}
+                                                                        </span>
+                                                                        {" / "}
+                                                                        <span
+                                                                            data-bs-toggle="tooltip"
+                                                                            data-bs-placement="top"
+                                                                            title="Total Tickets Created"
+                                                                            style={{ cursor: "pointer" }}
+                                                                        >
+                                                                            {totalTickets}
+                                                                        </span>
+                                                                    </h4>
+                                                                    <small>Across all events</small>
+                                                                </div>
+                                                                <div className="dash-icon bg-warning">
+                                                                    <i className="fe fe-layers"></i>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
                                                 )}
 
                                                 {/* Total Addons  */}
                                                 {totalAddons !== 0 && (
-                                                <div className="col-xl-3 col-lg-6 col-md-6 mb-3">
-                                                    <div className="card dashboard-card">
-                                                        <div className="d-flex justify-content-between align-items-center">
-                                                            <div>
-                                                                <p className="dash-label">Total Addons</p>
-                                                                <h4 className="dash-value">
-                                                                    <span
-                                                                        data-bs-toggle="tooltip"
-                                                                        data-bs-placement="top"
-                                                                        title="Total Sold Addons"
-                                                                        style={{ cursor: "pointer" }}
-                                                                    >
-                                                                        {soldAddons}
-                                                                    </span>
-                                                                    {" / "}
-                                                                    <span
-                                                                        data-bs-toggle="tooltip"
-                                                                        data-bs-placement="top"
-                                                                        title="Total Addons Created"
-                                                                        style={{ cursor: "pointer" }}
-                                                                    >
-                                                                        {totalAddons}
-                                                                    </span>
-                                                                </h4>
-                                                                <small>Across all events</small>
-                                                            </div>
-                                                            <div className="dash-icon bg-warning">
-                                                                <i className="fe fe-layers"></i>
+                                                    <div className="col-xl-3 col-lg-6 col-md-6 mb-3">
+                                                        <div className="card dashboard-card">
+                                                            <div className="d-flex justify-content-between align-items-center">
+                                                                <div>
+                                                                    <p className="dash-label">Total Addons</p>
+                                                                    <h4 className="dash-value">
+                                                                        <span
+                                                                            data-bs-toggle="tooltip"
+                                                                            data-bs-placement="top"
+                                                                            title="Total Sold Addons"
+                                                                            style={{ cursor: "pointer" }}
+                                                                        >
+                                                                            {soldAddons}
+                                                                        </span>
+                                                                        {" / "}
+                                                                        <span
+                                                                            data-bs-toggle="tooltip"
+                                                                            data-bs-placement="top"
+                                                                            title="Total Addons Created"
+                                                                            style={{ cursor: "pointer" }}
+                                                                        >
+                                                                            {totalAddons}
+                                                                        </span>
+                                                                    </h4>
+                                                                    <small>Across all events</small>
+                                                                </div>
+                                                                <div className="dash-icon bg-warning">
+                                                                    <i className="fe fe-layers"></i>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
                                                 )}
 
                                                 {/* Total Package  */}
                                                 {totalPackages !== 0 && (
-                                                <div className="col-xl-3 col-lg-6 col-md-6 mb-3">
-                                                    <div className="card dashboard-card">
-                                                        <div className="d-flex justify-content-between align-items-center">
-                                                            <div>
-                                                                <p className="dash-label">Total Packages</p>
-                                                                <h4 className="dash-value">
-                                                                    <span
-                                                                        data-bs-toggle="tooltip"
-                                                                        data-bs-placement="top"
-                                                                        title="Total Sold Packages"
-                                                                        style={{ cursor: "pointer" }}
-                                                                    >
-                                                                        {soldPackages}
-                                                                    </span>
-                                                                    {" / "}
-                                                                    <span
-                                                                        data-bs-toggle="tooltip"
-                                                                        data-bs-placement="top"
-                                                                        title="Total Packages Created"
-                                                                        style={{ cursor: "pointer" }}
-                                                                    >
-                                                                        {totalPackages}
-                                                                    </span>
-                                                                </h4>
-                                                                <small>Across all events</small>
-                                                            </div>
-                                                            <div className="dash-icon bg-warning">
-                                                                <i className="fe fe-layers"></i>
+                                                    <div className="col-xl-3 col-lg-6 col-md-6 mb-3">
+                                                        <div className="card dashboard-card">
+                                                            <div className="d-flex justify-content-between align-items-center">
+                                                                <div>
+                                                                    <p className="dash-label">Total Packages</p>
+                                                                    <h4 className="dash-value">
+                                                                        <span
+                                                                            data-bs-toggle="tooltip"
+                                                                            data-bs-placement="top"
+                                                                            title="Total Sold Packages"
+                                                                            style={{ cursor: "pointer" }}
+                                                                        >
+                                                                            {soldPackages}
+                                                                        </span>
+                                                                        {" / "}
+                                                                        <span
+                                                                            data-bs-toggle="tooltip"
+                                                                            data-bs-placement="top"
+                                                                            title="Total Packages Created"
+                                                                            style={{ cursor: "pointer" }}
+                                                                        >
+                                                                            {totalPackages}
+                                                                        </span>
+                                                                    </h4>
+                                                                    <small>Across all events</small>
+                                                                </div>
+                                                                <div className="dash-icon bg-warning">
+                                                                    <i className="fe fe-layers"></i>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
                                                 )}
 
                                                 {/* Total Appointments  */}
                                                 {totalAppointments !== 0 && (
-                                                <div className="col-xl-3 col-lg-6 col-md-6 mb-3">
-                                                    <div className="card dashboard-card">
-                                                        <div className="d-flex justify-content-between align-items-center">
-                                                            <div>
-                                                                <p className="dash-label">Total Appointments</p>
-                                                                <h4 className="dash-value">
-                                                                    <span
-                                                                        data-bs-toggle="tooltip"
-                                                                        data-bs-placement="top"
-                                                                        title="Total Sold Appointments"
-                                                                        style={{ cursor: "pointer" }}
-                                                                    >
-                                                                        {soldAppointments}
-                                                                    </span>
-                                                                    {" / "}
-                                                                    <span
-                                                                        data-bs-toggle="tooltip"
-                                                                        data-bs-placement="top"
-                                                                        title="Total Appointments Created"
-                                                                        style={{ cursor: "pointer" }}
-                                                                    >
-                                                                        {totalAppointments}
-                                                                    </span>
-                                                                </h4>
-                                                                <small>Across all events</small>
-                                                            </div>
-                                                            <div className="dash-icon bg-warning">
-                                                                <i className="fe fe-layers"></i>
+                                                    <div className="col-xl-3 col-lg-6 col-md-6 mb-3">
+                                                        <div className="card dashboard-card">
+                                                            <div className="d-flex justify-content-between align-items-center">
+                                                                <div>
+                                                                    <p className="dash-label">Total Appointments</p>
+                                                                    <h4 className="dash-value">
+                                                                        <span
+                                                                            data-bs-toggle="tooltip"
+                                                                            data-bs-placement="top"
+                                                                            title="Total Sold Appointments"
+                                                                            style={{ cursor: "pointer" }}
+                                                                        >
+                                                                            {soldAppointments}
+                                                                        </span>
+                                                                        {" / "}
+                                                                        <span
+                                                                            data-bs-toggle="tooltip"
+                                                                            data-bs-placement="top"
+                                                                            title="Total Appointments Created"
+                                                                            style={{ cursor: "pointer" }}
+                                                                        >
+                                                                            {totalAppointments}
+                                                                        </span>
+                                                                    </h4>
+                                                                    <small>Across all events</small>
+                                                                </div>
+                                                                <div className="dash-icon bg-warning">
+                                                                    <i className="fe fe-layers"></i>
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                </div>)}
-                                                       
+                                                    </div>)}
+
                                                 {/* Total Revenue */}
                                                 <div className="col-xl-3 col-lg-6 col-md-6 mb-3">
                                                     <div className="card dashboard-card">
@@ -724,7 +726,7 @@ const DashboardPage = () => {
 
                                             {eventFilter !== "completed" && (
                                                 <>
-                                                    {liveSales?.length > 0 && (
+                                                    {filteredSales?.length > 0 && (
                                                         <>
                                                             <div className="col-md-8 mb-4">
                                                                 <div className="light-card p-3">
@@ -736,16 +738,13 @@ const DashboardPage = () => {
 
                                                                     <div className="row g-3">
 
-                                                                        {liveSales?.length > 0 ? (
-                                                                            liveSales.map((value) => {
+                                                                        {/* {liveSales?.length > 0 ? (
+                                                                            liveSales.map((value) => { */}
+                                                                        {filteredSales?.length > 0 ? (
+                                                                            filteredSales.map((value) => {
                                                                                 const sold = value?.soldTickets || 0;
                                                                                 const total = value?.totalTickets || 0;
-                                                                                const remaining = value?.remaining || 0;
-                                                                                const revenue = value?.revenue || 0;
 
-                                                                                const progress =
-                                                                                    value?.progress ??
-                                                                                    (total > 0 ? Math.round((sold / total) * 100) : 0);
                                                                                 return (
                                                                                     <div className="col-md-12" key={value.event_id}>
                                                                                         <div className="light-card p-3">

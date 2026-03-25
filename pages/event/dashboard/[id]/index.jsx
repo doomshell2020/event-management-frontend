@@ -83,6 +83,9 @@ const EventDashboardPage = () => {
     const soldAppointments = summary?.totalAppointmentsSold || 0;
 
 
+    const totalAttendees = summary?.totalAttendees || 0;
+
+
 
     const organizerRevenue = revenueDistribution?.organizer || 0;
     const platformFee = revenueDistribution?.platform || 0;
@@ -260,10 +263,10 @@ const EventDashboardPage = () => {
             ];
 
             revenueSheet.addRows([
-                { type: "Organizer", amount: `${currency}${formatPrice(organizerRevenue)}`  },
-                { type: "Platform", amount: `${currency}${formatPrice(platformFee)}`},
-                { type: "Payment Gateway", amount: `${currency}${formatPrice(commissionBreakdown?.gateway_fee)}`  },
-                { type: "Committee", amount: `${currency}${formatPrice(committeeFee)}`  },
+                { type: "Organizer", amount: `${currency}${formatPrice(organizerRevenue)}` },
+                { type: "Platform", amount: `${currency}${formatPrice(platformFee)}` },
+                { type: "Payment Gateway", amount: `${currency}${formatPrice(commissionBreakdown?.gateway_fee)}` },
+                { type: "Committee", amount: `${currency}${formatPrice(committeeFee)}` },
             ]);
 
             /* ================= SHEET 3: COMMITTEE ================= */
@@ -502,7 +505,40 @@ const EventDashboardPage = () => {
                                                     </div>
                                                 )}
 
-
+                                                {/* Total Attendees  */}
+                                                {totalAttendees !== 0 && (
+                                                    <div className="col-xl-3 col-lg-6 col-md-6 mb-3">
+                                                        <div className="card dashboard-card">
+                                                            <div className="d-flex justify-content-between align-items-center">
+                                                                <div>
+                                                                    <p className="dash-label">TOTAL ATTENDEES</p>
+                                                                    <h4 className="dash-value">
+                                                                        <span
+                                                                            data-bs-toggle="tooltip"
+                                                                            data-bs-placement="top"
+                                                                            title="Total Attendees"
+                                                                            style={{ cursor: "pointer" }}
+                                                                        >
+                                                                            {totalAttendees}
+                                                                        </span>
+                                                                        {" / "}
+                                                                        <span
+                                                                            data-bs-toggle="tooltip"
+                                                                            data-bs-placement="top"
+                                                                            title="Total Expected Attendees"
+                                                                            style={{ cursor: "pointer" }}
+                                                                        >
+                                                                            {soldTickets}
+                                                                        </span>
+                                                                    </h4>
+                                                                </div>
+                                                                <div className="dash-icon bg-success">
+                                                                    <i className="fe fe-users"></i>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
 
 
                                                 <div className="col-xl-3 col-lg-6 col-md-6 mb-3">
