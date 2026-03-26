@@ -43,14 +43,17 @@ const CalendarPage = () => {
         const calendarEvents =
           response?.data?.data?.events?.map((event) => {
             const startDate = new Date(event.date_from);
+            const endDate = new Date(event.date_to);
 
             return {
               id: event.id,
               slug: event.slug,
-              status: event.status,   // 🔥 IMPORTANT
+              status: event.status,
               title: event.name,
               start: startDate,
-              end: startDate,         // no long bars
+              // end: endDate,
+              end: startDate,
+              realEnd: new Date(event.date_to),
             };
           }) || [];
 
@@ -69,35 +72,57 @@ const CalendarPage = () => {
     }
   };
 
+  // const CustomEvent = ({ event }) => {
+  //   const isActive = event.status === "Y";
+
+  //   return (
+  //     <div
+  //       title={
+  //         isActive
+  //           ? "Click to view event details"
+  //           : "Details not available"
+  //       }
+  //       style={{
+  //         background: isActive ? "#2563eb" : "#9ca3af",
+  //         color: "#fff",
+  //         borderRadius: 6,
+  //         padding: "2px 6px",
+  //         fontSize: 12,
+  //         cursor: isActive ? "pointer" : "not-allowed",
+  //         opacity: isActive ? 1 : 0.6,
+  //         whiteSpace: "nowrap",
+  //         overflow: "hidden",
+  //         textOverflow: "ellipsis",
+  //       }}
+  //     >
+  //       {event.title}
+  //     </div>
+  //   );
+  // };
+
   const CustomEvent = ({ event }) => {
     const isActive = event.status === "Y";
 
     return (
       <div
-        title={
-          isActive
-            ? "Click to view event details"
-            : "Details not available"
-        }
+        title={`📌 ${event.title}
+📅 ${moment(event.start).format("DD MMM YYYY")} - ${moment(event.realEnd).format("DD MMM YYYY")}
+${isActive ? "👉 Click for details" : "🚫 Not available"}`}
         style={{
           background: isActive ? "#2563eb" : "#9ca3af",
           color: "#fff",
           borderRadius: 6,
-          padding: "2px 6px",
-          fontSize: 12,
+          padding: "3px 6px",
+          fontSize: 11,
           cursor: isActive ? "pointer" : "not-allowed",
-          opacity: isActive ? 1 : 0.6,
-          whiteSpace: "nowrap",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
+          opacity: isActive ? 1 : 0.7,
+          transition: "0.2s",
         }}
       >
         {event.title}
       </div>
     );
   };
-
-
 
   return (
     <>

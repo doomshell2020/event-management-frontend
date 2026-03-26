@@ -4687,8 +4687,8 @@ span.stp2-monte25-nm {
 
 
 .careyes-chekout-new .modal-header .btn-close {
-    background-image: none;
-    font-size: 39px;
+  background-image: none;
+  font-size: 39px;
 }
 
 .careyes-chekout-new .care-new-check .checkout-innr .checkot-lft .ck-adon-event .mon25-add-inr .mnto-add-cnt .adon-time {
@@ -5806,7 +5806,7 @@ input[type="date"] {
     width: 250px;
     min-width: 250px;
   }
-  
+
   .table-mobile-width-1200 {
     min-width: 1150px;
   }
@@ -6264,9 +6264,15 @@ input[type="date"] {
     justify-content: start;
   }
 
-      .careyes-chekout-new .cart-mdl-only .care-new-check.modal-body {
+  /* .careyes-chekout-new .cart-mdl-only .care-new-check.modal-body {
         max-height: calc(100vh - 132px) !important;
-    }
+    } */
+
+  .careyes-chekout-new .cart-mdl-only .care-new-check.modal-body {
+    max-height: calc(100vh - 132px) !important;
+    padding-bottom: 30px;
+  }
+
   .headernav .menuflexbox {
     gap: 16px;
   }
@@ -7523,34 +7529,48 @@ input[type="date"] {
   margin-bottom: 12px;
 }
 
-.light-card{
-  background:#fff;
-  border-radius:12px;
-  box-shadow:0 2px 8px rgba(0,0,0,0.05);
+.light-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-.light-progress{
-  height:8px;
-  border-radius:10px;
+.light-progress {
+  height: 8px;
+  border-radius: 10px;
 }
 
-.sales-box p{
-  font-size:12px;
-  color:#777;
+.sales-box p {
+  font-size: 12px;
+  color: #777;
 }
 
-.sales-box h4{
-  font-weight:700;}
-  
-.note-editor.note-airframe .note-placeholder, .note-editor.note-frame .note-placeholder {
-    display: none !important;
+.sales-box h4 {
+  font-weight: 700;
+}
+
+.note-editor.note-airframe .note-placeholder,
+.note-editor.note-frame .note-placeholder {
+  display: none !important;
 }
 
 
 
+.export-btn {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s;
+}
 
-
-
+.export-btn:hover {
+  background: #1e40af;
+}
 
 .note-modal {
   display: none !important;

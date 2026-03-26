@@ -47,9 +47,9 @@ const ManageTicketPricing = () => {
 
             if (res.data.success) {
                 const filteredTickets = (res.data.data || []).filter(
-                (ticket) => ticket.type !== "comps"
-            );
-                setTicketsList(filteredTickets );
+                    (ticket) => ticket.type !== "comps"
+                );
+                setTicketsList(filteredTickets);
                 // setTicketsList(res.data.data || []);
             } else {
                 setTicketsList([]);
@@ -220,6 +220,31 @@ const ManageTicketPricing = () => {
     };
     const [backgroundImage] = useState("/assets/front-images/about-slider_bg.jpg");
 
+
+
+    // format time slots
+    const formatTimeSlots = (time) => {
+        if (!time) return "";
+
+        const [hour, minute] = time.split(":");
+        const date = new Date();
+        date.setHours(hour, minute);
+
+        return date.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+        });
+    };
+
+
+
+
+
+
+
+
+
     return (
         <>
             <FrontendHeader backgroundImage={backgroundImage} />
@@ -336,7 +361,7 @@ const ManageTicketPricing = () => {
                                                                     {slot.slot_date
                                                                         ? moment(slot.slot_date).format("DD-MM-YYYY")
                                                                         : ""}{" "}
-                                                                        ({slot.start_time} - {slot.end_time})
+                                                                    ({formatTimeSlots(slot.start_time)} - {formatTimeSlots(slot.end_time)})
                                                                     )
                                                                 </option>
 
@@ -386,7 +411,14 @@ const ManageTicketPricing = () => {
                                                             <td>
                                                                 {row.date ? moment(row.date).format("DD-MM-YYYY") : "-"}
                                                             </td>
-                                                            <td>{row.slot ? `${row.slot.slot_name} (${row.slot.start_time.slice(0, 5)} - ${row.slot.end_time.slice(0, 5)})` : "-"}</td>
+                                                            {/* <td>{row.slot ? `${row.slot.slot_name} (${row.slot.start_time.slice(0, 5)} - ${row.slot.end_time.slice(0, 5)})` : "-"}</td> */}
+                                                            <td>
+                                                                {row.slot ? (
+                                                                    `${row.slot.slot_name} (${formatTimeSlots(row.slot.start_time.slice(0, 5))} - ${formatTimeSlots(row.slot.end_time.slice(0, 5))})`
+                                                                ) : (
+                                                                    "-"
+                                                                )}
+                                                            </td>
                                                         </tr>
                                                     ))}
                                                 </tbody>

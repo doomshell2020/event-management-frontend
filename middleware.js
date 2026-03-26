@@ -46,7 +46,7 @@ export function middleware(request) {
   // -----------------------------
   // 👤 USER ROUTE PROTECTION
   // -----------------------------
-  const protectedUserRoutes = ["/profile", "/dashboard", "/orders", "/cart", "/event"];
+  const protectedUserRoutes = ["/profile", "/dashboard", "/orders", "/cart", "/event","/event/dashboard"];
   const isProtectedUserRoute = protectedUserRoutes.some((route) =>
     pathname.startsWith(route)
   );

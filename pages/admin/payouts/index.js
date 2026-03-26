@@ -70,6 +70,14 @@ const EventsSalesList = () => {
     );
   }, [filteredEvents]);
 
+ const formatPrice = (amount) => {
+    return `${Math.round(Number(amount || 0)).toLocaleString("en-IN")}`;
+  };
+
+
+
+
+
   return (
     <div>
       <Seo title="Events Sales Summary" />
@@ -130,7 +138,8 @@ const EventsSalesList = () => {
                     Total Sales
                   </small>
                   <h3 className="fw-bold mt-2">
-                    ₹{totals.sales}
+                    {/* ₹{totals.sales} */}
+                    {formatPrice(totals.sales)}
                   </h3>
                 </Card.Body>
               </Card>
@@ -143,7 +152,8 @@ const EventsSalesList = () => {
                     Total Paid
                   </small>
                   <h3 className="fw-bold text-success mt-2">
-                    ₹{totals.paid}
+                    {/* ₹{totals.paid} */}
+                    {formatPrice(totals.paid)}
                   </h3>
                 </Card.Body>
               </Card>
@@ -156,7 +166,8 @@ const EventsSalesList = () => {
                     Balance
                   </small>
                   <h3 className="fw-bold text-danger mt-2">
-                    ₹{totals.balance}
+                    {/* ₹{totals.balance} */}
+                    {formatPrice(totals.balance)}
                   </h3>
                 </Card.Body>
               </Card>
@@ -223,15 +234,15 @@ const EventsSalesList = () => {
                           <td>{ev.total_tickets}</td>
 
                           <td>
-                            {ev.currency_symbol}{ev.total_sales}
+                            {ev.currency_symbol}{formatPrice(ev.total_sales)}
                           </td>
 
                           <td className="text-success">
-                            {ev.currency_symbol}{ev.total_paid}
+                            {ev.currency_symbol}{formatPrice(ev.total_paid)}
                           </td>
 
                           <td className="text-danger">
-                            {ev.currency_symbol}{ev.balance}
+                            {ev.currency_symbol}{formatPrice(ev.balance)}
                           </td>
 
                           <td>

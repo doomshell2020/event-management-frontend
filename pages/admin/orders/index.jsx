@@ -178,8 +178,9 @@ export const OrdersList = () => {
         const amount = row?.[key];
 
         if (!amount) return "-";
+        const roundedAmount = Math.round(Number(amount));
 
-        return `${symbol} ${Number(amount).toLocaleString("en-IN")}`;
+        return `${symbol} ${roundedAmount.toLocaleString("en-IN")}`;
     };
     const [orderList, setOrdersList] = useState([]);
     const [isLoading, setIsLoading] = useState(true);

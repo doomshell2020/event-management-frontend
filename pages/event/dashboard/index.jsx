@@ -41,11 +41,9 @@ const DashboardPage = () => {
                         `/api/v1/dashboard/organizer`
                     );
                 }
-
                 if (dashRes.data.success) {
                     setDashboardData(dashRes.data.data);
                 }
-
             } catch (err) {
                 console.error("Fetch dashboard data error:", err);
             } finally {
@@ -104,6 +102,16 @@ const DashboardPage = () => {
 
     const totalTickets = summary?.totalTicketsCreated || 0;
     const soldTickets = summary?.totalTicketsSold || 0;
+
+    const totalAddons = summary?.totalAddonsCreated || 0;
+    const soldAddons = summary?.totalAddonsSold || 0;
+
+    const totalPackages = summary?.totalPackagesCreated || 0;
+    const soldPackages = summary?.totalPackagesSold || 0;
+
+    const totalAppointments = summary?.totalAppointmentsCreated || 0;
+    const soldAppointments = summary?.totalAppointmentsSold || 0;
+
     const totalRevenue = summary?.totalRevenue || 0;
 
     // Sales Progress..
@@ -130,6 +138,7 @@ const DashboardPage = () => {
     const commissionColors = {
         organizer: "#22c55e", // green
         platform: "#6366f1",  // indigo
+        gateway: "#0ea5e9",
         committee: "#f59e0b", // orange
     };
 
@@ -203,26 +212,51 @@ const DashboardPage = () => {
     const committeeFee = revenueDistribution?.committeeFee || 0;
     const gatewayFee = revenueDistribution?.gatewayFee || 0;
 
+    const committeePerfData = dashboardData?.committeePerformance || {};
+
+    const committeeSummary = committeePerfData?.summary || {};
+    const committeeMembers = committeePerfData?.members || [];
+
+    const committeeTotalAssigned = committeeSummary?.totalAssigned || 0;
+    const committeeTotalSold = committeeSummary?.totalSold || 0;
+    const committeeTotalPaid = committeeSummary?.totalPaid || 0;
+    const committeeConversionRate = committeeSummary?.conversionRate || 0;
+    const committeeTotalEarning = committeeSummary?.totalCommitteeEarning || 0;
+    const committeeAvgConversion = committeeSummary?.avgConversion || 0;
+
+
+
     const commissionDonutSeries = [
         organizerEarning,
         platformFee,
+        gatewayFee,
         committeeFee
     ];
+
+    const hasCommittee = committeeMembers?.length > 0;
+    const series = hasCommittee
+        ? [organizerEarning, platformFee, gatewayFee, committeeFee]
+        : [organizerEarning, platformFee, gatewayFee];
 
     const commissionDonutOptions = {
         chart: {
             type: "donut"
         },
-
-        labels: [
-            "Organizer Earnings",
-            "Platform Commission",
-            "Committee Commission"
-        ],
+        tooltip: {
+            y: {
+                formatter: function (val) {
+                    return formatPrice(val);
+                }
+            }
+        },
+        labels: hasCommittee
+            ? ["Organizer Earnings", "Platform Commission", "Payment Gateway Commission", "Committee Commission"]
+            : ["Organizer Earnings", "Payment Gateway Commission", "Platform Commission"],
 
         colors: [
             "#22c55e",
             "#6366f1",
+            "#0ea5e9",
             "#f59e0b"
         ],
 
@@ -241,6 +275,24 @@ const DashboardPage = () => {
             width: 0
         },
 
+        // plotOptions: {
+        //     pie: {
+        //         donut: {
+        //             size: "70%",
+        //             labels: {
+        //                 show: true,
+        //                 total: {
+        //                     show: true,
+        //                     label: "Total Revenue",
+        //                     formatter: function () {
+        //                         return `${formatPrice(totalRevenue)}`;
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
+
         plotOptions: {
             pie: {
                 donut: {
@@ -248,42 +300,38 @@ const DashboardPage = () => {
                     labels: {
                         show: true,
 
+                        value: {
+                            formatter: function (val) {
+                                return formatPrice(Math.round(val)); // ✅ hover center fix
+                            }
+                        },
+
                         total: {
                             show: true,
                             label: "Total Revenue",
-
                             formatter: function () {
-                                return `${(totalRevenue
-                                ).toLocaleString()}`;
+                                return formatPrice(Math.round(totalRevenue)); // ✅ initial center fix
                             }
                         }
                     }
                 }
             }
         }
+
+
+
+
+
+
+
+
+
     };
 
 
-
-
-    const committeePerfData = dashboardData?.committeePerformance || {};
-
-    const committeeSummary = committeePerfData?.summary || {};
-    const committeeMembers = committeePerfData?.members || [];
-
-    const committeeTotalAssigned = committeeSummary?.totalAssigned || 0;
-    const committeeTotalSold = committeeSummary?.totalSold || 0;
-    const committeeTotalPaid = committeeSummary?.totalPaid || 0;
-    const committeeConversionRate = committeeSummary?.conversionRate || 0;
-    const committeeTotalEarning = committeeSummary?.totalCommitteeEarning || 0;
-    const committeeAvgConversion = committeeSummary?.avgConversion || 0;
-
-
-
-
-
-
-
+    const filteredSales = liveSales?.filter(
+        (item) => (item?.totalTickets || 0) > 0
+    );
 
 
 
@@ -352,7 +400,7 @@ const DashboardPage = () => {
                                         <select className="form-select form-select-sm" style={{ width: "220px" }}
                                             onChange={(e) => setSelectedEventId(e.target.value)}
                                         >
-                                            <option>Select individual event</option>
+                                            <option value="">Select individual event</option>
                                             {events?.map((event) => (
                                                 <option key={event.id} value={event.id}>
                                                     {event.name}
@@ -366,7 +414,6 @@ const DashboardPage = () => {
 
 
 
-                                {/* ================= CHARTS ================= */}
                                 <div className="contant_bg container-fluid">
                                     {loading ? (
                                         <div className="text-center my-5">
@@ -428,36 +475,147 @@ const DashboardPage = () => {
                                                 </div>
 
                                                 {/* Total Tickets Created */}
-                                                <div className="col-xl-3 col-lg-6 col-md-6 mb-3">
-                                                    <div className="card dashboard-card">
-                                                        <div className="d-flex justify-content-between align-items-center">
-                                                            <div>
-                                                                <p className="dash-label">Total Tickets Created</p>
-                                                                <h4 className="dash-value">{totalTickets}</h4>
-                                                                <small>Across all events</small>
-                                                            </div>
-                                                            <div className="dash-icon bg-warning">
-                                                                <i className="fe fe-layers"></i>
+                                                {totalTickets !== 0 && (
+                                                    <div className="col-xl-3 col-lg-6 col-md-6 mb-3">
+                                                        <div className="card dashboard-card">
+                                                            <div className="d-flex justify-content-between align-items-center">
+                                                                <div>
+                                                                    <p className="dash-label">Total Tickets</p>
+                                                                    <h4 className="dash-value">
+                                                                        <span
+                                                                            data-bs-toggle="tooltip"
+                                                                            data-bs-placement="top"
+                                                                            title="Total Sold Tickets"
+                                                                            style={{ cursor: "pointer" }}
+                                                                        >
+                                                                            {soldTickets}
+                                                                        </span>
+                                                                        {" / "}
+                                                                        <span
+                                                                            data-bs-toggle="tooltip"
+                                                                            data-bs-placement="top"
+                                                                            title="Total Tickets Created"
+                                                                            style={{ cursor: "pointer" }}
+                                                                        >
+                                                                            {totalTickets}
+                                                                        </span>
+                                                                    </h4>
+                                                                    <small>Across all events</small>
+                                                                </div>
+                                                                <div className="dash-icon bg-warning">
+                                                                    <i className="fe fe-layers"></i>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
+                                                )}
 
-                                                {/* Total Tickets Sold */}
-                                                <div className="col-xl-3 col-lg-6 col-md-6 mb-3">
-                                                    <div className="card dashboard-card">
-                                                        <div className="d-flex justify-content-between align-items-center">
-                                                            <div>
-                                                                <p className="dash-label">Total Tickets Sold</p>
-                                                                <h4 className="dash-value">{soldTickets}</h4>
-                                                                <small>{soldPercent}% conversion</small>
-                                                            </div>
-                                                            <div className="dash-icon bg-success">
-                                                                <i className="fe fe-shopping-cart"></i>
+                                                {/* Total Addons  */}
+                                                {totalAddons !== 0 && (
+                                                    <div className="col-xl-3 col-lg-6 col-md-6 mb-3">
+                                                        <div className="card dashboard-card">
+                                                            <div className="d-flex justify-content-between align-items-center">
+                                                                <div>
+                                                                    <p className="dash-label">Total Addons</p>
+                                                                    <h4 className="dash-value">
+                                                                        <span
+                                                                            data-bs-toggle="tooltip"
+                                                                            data-bs-placement="top"
+                                                                            title="Total Sold Addons"
+                                                                            style={{ cursor: "pointer" }}
+                                                                        >
+                                                                            {soldAddons}
+                                                                        </span>
+                                                                        {" / "}
+                                                                        <span
+                                                                            data-bs-toggle="tooltip"
+                                                                            data-bs-placement="top"
+                                                                            title="Total Addons Created"
+                                                                            style={{ cursor: "pointer" }}
+                                                                        >
+                                                                            {totalAddons}
+                                                                        </span>
+                                                                    </h4>
+                                                                    <small>Across all events</small>
+                                                                </div>
+                                                                <div className="dash-icon bg-warning">
+                                                                    <i className="fe fe-layers"></i>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
+                                                )}
+
+                                                {/* Total Package  */}
+                                                {totalPackages !== 0 && (
+                                                    <div className="col-xl-3 col-lg-6 col-md-6 mb-3">
+                                                        <div className="card dashboard-card">
+                                                            <div className="d-flex justify-content-between align-items-center">
+                                                                <div>
+                                                                    <p className="dash-label">Total Packages</p>
+                                                                    <h4 className="dash-value">
+                                                                        <span
+                                                                            data-bs-toggle="tooltip"
+                                                                            data-bs-placement="top"
+                                                                            title="Total Sold Packages"
+                                                                            style={{ cursor: "pointer" }}
+                                                                        >
+                                                                            {soldPackages}
+                                                                        </span>
+                                                                        {" / "}
+                                                                        <span
+                                                                            data-bs-toggle="tooltip"
+                                                                            data-bs-placement="top"
+                                                                            title="Total Packages Created"
+                                                                            style={{ cursor: "pointer" }}
+                                                                        >
+                                                                            {totalPackages}
+                                                                        </span>
+                                                                    </h4>
+                                                                    <small>Across all events</small>
+                                                                </div>
+                                                                <div className="dash-icon bg-warning">
+                                                                    <i className="fe fe-layers"></i>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Total Appointments  */}
+                                                {totalAppointments !== 0 && (
+                                                    <div className="col-xl-3 col-lg-6 col-md-6 mb-3">
+                                                        <div className="card dashboard-card">
+                                                            <div className="d-flex justify-content-between align-items-center">
+                                                                <div>
+                                                                    <p className="dash-label">Total Appointments</p>
+                                                                    <h4 className="dash-value">
+                                                                        <span
+                                                                            data-bs-toggle="tooltip"
+                                                                            data-bs-placement="top"
+                                                                            title="Total Sold Appointments"
+                                                                            style={{ cursor: "pointer" }}
+                                                                        >
+                                                                            {soldAppointments}
+                                                                        </span>
+                                                                        {" / "}
+                                                                        <span
+                                                                            data-bs-toggle="tooltip"
+                                                                            data-bs-placement="top"
+                                                                            title="Total Appointments Created"
+                                                                            style={{ cursor: "pointer" }}
+                                                                        >
+                                                                            {totalAppointments}
+                                                                        </span>
+                                                                    </h4>
+                                                                    <small>Across all events</small>
+                                                                </div>
+                                                                <div className="dash-icon bg-warning">
+                                                                    <i className="fe fe-layers"></i>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>)}
 
                                                 {/* Total Revenue */}
                                                 <div className="col-xl-3 col-lg-6 col-md-6 mb-3">
@@ -521,7 +679,7 @@ const DashboardPage = () => {
                                                         {isClient && (
                                                             <ReactApexChart
                                                                 options={commissionDonutOptions}
-                                                                series={commissionDonutSeries}
+                                                                series={series}
                                                                 type="donut"
                                                                 height={260}
                                                             />
@@ -533,29 +691,42 @@ const DashboardPage = () => {
                                                             <span style={{ color: commissionColors.organizer }}>
                                                                 ● Organizer Earnings
                                                             </span>
-                                                            <span>₹{organizerEarning?.toLocaleString()}</span>
+                                                            <span>{formatPrice(organizerEarning)}</span>
                                                         </div>
 
                                                         <div style={{ display: "flex", justifyContent: "space-between" }}>
                                                             <span style={{ color: commissionColors.platform }}>
                                                                 ● Platform Commission
                                                             </span>
-                                                            <span>₹{platformFee?.toLocaleString()}</span>
+                                                            <span>{formatPrice(platformFee)}</span>
                                                         </div>
 
                                                         <div style={{ display: "flex", justifyContent: "space-between" }}>
-                                                            <span style={{ color: commissionColors.committee }}>
-                                                                ● Committee Commission
+                                                            <span style={{ color: commissionColors.gateway }}>
+                                                                ● Payment Gateway Commission
                                                             </span>
-                                                            <span>₹{committeeFee?.toLocaleString()}</span>
+                                                            <span>{formatPrice(gatewayFee)}</span>
                                                         </div>
+
+
+
+
+
+                                                        {committeeMembers.length > 0 && (
+                                                            <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                                                <span style={{ color: commissionColors.committee }}>
+                                                                    ● Committee Commission
+                                                                </span>
+                                                                <span>{formatPrice(committeeFee)}</span>
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>
 
                                             {eventFilter !== "completed" && (
                                                 <>
-                                                    {liveSales?.length > 0 && (
+                                                    {filteredSales?.length > 0 && (
                                                         <>
                                                             <div className="col-md-8 mb-4">
                                                                 <div className="light-card p-3">
@@ -567,16 +738,13 @@ const DashboardPage = () => {
 
                                                                     <div className="row g-3">
 
-                                                                        {liveSales?.length > 0 ? (
-                                                                            liveSales.map((value) => {
+                                                                        {/* {liveSales?.length > 0 ? (
+                                                                            liveSales.map((value) => { */}
+                                                                        {filteredSales?.length > 0 ? (
+                                                                            filteredSales.map((value) => {
                                                                                 const sold = value?.soldTickets || 0;
                                                                                 const total = value?.totalTickets || 0;
-                                                                                const remaining = value?.remaining || 0;
-                                                                                const revenue = value?.revenue || 0;
 
-                                                                                const progress =
-                                                                                    value?.progress ??
-                                                                                    (total > 0 ? Math.round((sold / total) * 100) : 0);
                                                                                 return (
                                                                                     <div className="col-md-12" key={value.event_id}>
                                                                                         <div className="light-card p-3">
@@ -606,7 +774,7 @@ const DashboardPage = () => {
                                                                                                 {/* Right Side */}
                                                                                                 <div className="text-end">
                                                                                                     <h5 className="text-success mb-0">
-                                                                                                        {value?.revenue?.toLocaleString() || 0}
+                                                                                                        {formatPrice(value?.revenue || 0)}
                                                                                                     </h5>
                                                                                                     <small className="text-muted">Net earnings</small>
                                                                                                 </div>
@@ -636,7 +804,7 @@ const DashboardPage = () => {
                                                                                                 </div>
 
                                                                                                 <div className="sales-box">
-                                                                                                    <h4>{value?.revenue?.toLocaleString() || 0}</h4>
+                                                                                                    <h4>{formatPrice(value?.revenue || 0)}</h4>
                                                                                                     <p className="mb-1">Revenue</p>
                                                                                                 </div>
 

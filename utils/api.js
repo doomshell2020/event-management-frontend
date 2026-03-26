@@ -43,7 +43,8 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status == 401) {
+    if (error.response?.status == 403) {
+    // if (error.response?.status === 401 || error.response?.status === 403) {
       const url = error.config?.url || "";
       if (url.includes("/admin")) {
         Cookies.remove("adminAuthToken");
@@ -55,6 +56,12 @@ api.interceptors.response.use(
         localStorage.removeItem("userAuthToken");
       }
       console.warn("⚠️ Unauthorized: Token expired or invalid");
+      // console.warn("⚠️ User unauthorized or inactive");
+
+      // ✅ redirect
+      window.location.href = url.includes("/admin")
+        ? "/admin/auth"
+        : "/login";
       // Optionally redirect if needed:
       // window.location.href = "/login";
       // window.location.href = "/admin/auth";

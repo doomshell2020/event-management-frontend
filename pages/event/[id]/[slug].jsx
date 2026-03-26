@@ -48,7 +48,6 @@ export async function getServerSideProps({ params }) {
 
 const EventDetailPage = ({ event, slug }) => {
   const { token } = useAuth();
-  console.log("token", token);
   const router = useRouter();
   // console.log("event",event.is_empty_event)
   const [backgroundImage, setIsMobile] = useState("/assets/front-images/about-slider_bg.jpg");

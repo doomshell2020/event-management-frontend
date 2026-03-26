@@ -41,7 +41,9 @@ const PayoutsList = () => {
     const [remarks, setRemarks] = useState("");
     const [submitted, setSubmitted] = useState(false);
     const [submitting, setSubmitting] = useState(false);
-
+    const formatPrice = (amount) => {
+        return `${Math.round(Number(amount || 0)).toLocaleString("en-IN")}`;
+    };
     /* ================= FETCH ================= */
     const fetchPayouts = async (params = {}) => {
         try {
@@ -136,7 +138,7 @@ const PayoutsList = () => {
                 Header: "Paid Amount",
                 accessor: row => {
                     const currency = row.event?.currencyName?.Currency_symbol || "₹";
-                    return `${currency}${row.paid_amount}`;
+                    return `${currency}${formatPrice(row.paid_amount)}`;
                 }
             },
             { Header: "Txn Ref", accessor: "txn_ref" },

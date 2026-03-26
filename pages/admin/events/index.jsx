@@ -26,7 +26,7 @@ import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import Link from "next/link";
 import AsyncSelect from "react-select/async";
-import { formatEventDateTime, formatPrice } from "@/utils/formatDate";
+import { formatEventDateTime } from "@/utils/formatDate";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { useRouter } from "next/router";
@@ -47,6 +47,7 @@ export const Events = () => {
     const [loadingStaff, setLoadingStaff] = useState(false);
     const [selectedEventId, setSelectedEventId] = useState(null);
     const [status, setStatus] = useState("");
+
     const [COLUMNS, setCOLUMNS] = useState([
 
         // ===== S.NO =====
@@ -445,7 +446,11 @@ export const Events = () => {
                     return <span className="text-muted">Free Event</span>;
                 }
 
-                const totalSales = formatPrice(event?.total_sales);
+                const totalAmount = Number(event?.total_sales) || 0;
+                const totalDiscount = Number(event?.total_discount) || 0;
+                // const totalSales = formatPrice(event?.total_sales);
+                const totalSales = formatPrice(totalAmount - totalDiscount);
+
                 const commission = formatPrice(event?.platform_fee_tax);
                 const payment_gateway_commission = formatPrice(event?.payment_gateway_tax);
 
@@ -464,7 +469,7 @@ export const Events = () => {
                         <div className="mt-1">
                             <small title="Platform Commission">
                                 Platform Commission ({event?.Organizer?.default_platform_charges}%): <span className="fw-semibold">{event?.currencyName?.Currency_symbol}{" "}{commission}</span>
-                            </small><br/>
+                            </small><br />
                             <small title="Payment Gateway Commission">
                                 Payment Gateway Commission ({row?.original?.admin_payment_gateway_charges}%): <span className="fw-semibold">{event?.currencyName?.Currency_symbol}{" "}{payment_gateway_commission}</span>
                             </small>
@@ -635,71 +640,13 @@ export const Events = () => {
         }).format(value);
     };
 
-    //     const formatEventDate = (dateString) => {
-    //     if (!dateString) return "";
-
-    //     try {
-    //         const date = new Date(dateString.replace(" ", "T")); // handles "YYYY-MM-DD HH:mm:ss"
-
-    //         const day = date.getDate().toString().padStart(2, "0");
-    //         const month = date.toLocaleString("en-GB", { month: "short" }); // e.g. "Nov"
-    //         const year = date.getFullYear();
-
-    //         let hours = date.getHours();
-    //         const minutes = date.getMinutes().toString().padStart(2, "0");
-    //         const ampm = hours >= 12 ? "PM" : "AM";
-    //         hours = hours % 12 || 12; // convert to 12-hour format
-
-    //         return `${day}-${month}-${year} ${hours}:${minutes} ${ampm}`;
-    //     } catch (error) {
-    //         console.error("Invalid date:", dateString);
-    //         return "";
-    //     }
-    // };
-
-
-
-    //     const formatEventDate = (from) => {
-    //     if (!from || typeof from !== "string") return "--";
-
-    //     let date;
-
-    //     // Case 1: "YYYY-MM-DD HH:mm:ss" OR "YYYY-MM-DD HH:mm"
-    //     if (from.includes(" ")) {
-    //         const [datePart, timePart = "00:00"] = from.split(" ");
-
-    //         if (!datePart) return "--";
-
-    //         const [year, month, day] = datePart.split("-").map(Number);
-    //         const [hour = 0, minute = 0] = timePart.split(":").map(Number);
-
-    //         date = new Date(year, month - 1, day, hour, minute);
-    //     }
-    //     // Case 2: ISO or other valid date string
-    //     else {
-    //         date = new Date(from);
-    //         if (isNaN(date.getTime())) return "--";
-    //     }
-
-    //     const day = date.getDate();
-    //     const year = date.getFullYear();
-    //     const month = date.toLocaleString("en-US", { month: "long" });
-
-    //     const suffix =
-    //         day % 10 === 1 && day !== 11 ? "st" :
-    //         day % 10 === 2 && day !== 12 ? "nd" :
-    //         day % 10 === 3 && day !== 13 ? "rd" : "th";
-
-    //     const time = date.toLocaleTimeString("en-US", {
-    //         hour: "2-digit",
-    //         minute: "2-digit",
-    //         hour12: true,
-    //     });
-
-    //     return `${month} ${day}${suffix} ${year} @${time}`;
-    // };
-
-
+    const formatPrice = (value) => {
+        if (value === null || value === undefined || value === "") return "0";
+        const number = Number(value);
+        if (isNaN(number)) return "0";
+        const rounded = Math.round(number);
+        return rounded.toLocaleString();
+    };
 
 
     const formatTableDate = (dateStr) => {
@@ -1374,8 +1321,6 @@ export const Events = () => {
         return `${title}:\n${items}`;
     };
 
-
-
     const onExportLinkPress = () => {
         const excelData = eventList.map((item, index) => {
 
@@ -1468,7 +1413,6 @@ export const Events = () => {
 
         saveAs(data, `Events_${getCurrentDate()}.xlsx`);
     };
-
 
     const loadUserOptions = async (inputValue) => {
         if (inputValue.length < 2) return [];
