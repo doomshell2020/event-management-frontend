@@ -7545,3 +7545,17 @@ input[type="date"] {
 .note-editor.note-airframe .note-placeholder, .note-editor.note-frame .note-placeholder {
     display: none !important;
 }
+
+
+
+
+
+
+
+.note-modal {
+  display: none !important;
+}
+
+.note-modal.open {
+  display: block !important;
+}
