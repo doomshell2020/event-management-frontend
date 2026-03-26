@@ -82,13 +82,218 @@ const ManageAttendees = () => {
         }
     };
 
+
+
+    // const handleDownloadAttendeesExcel = async () => {
+    //     if (!eventDetails?.id) return;
+
+    //     setExcelLoading(true);
+
+    //     try {
+    //         // ✅ FIXED API URL
+    //         const response = await api.get(
+    //             `/api/v1/tickets/attendees-list/${eventDetails.id}?page=1&limit=1000000`
+    //         );
+
+    //         const { records } = response.data.data;
+
+    //         if (!records.length) {
+    //             Swal.fire("Info", "No attendees found", "info");
+    //             return;
+    //         }
+
+    //         const workbook = new ExcelJS.Workbook();
+    //         const worksheet = workbook.addWorksheet("Attendees");
+
+    //         // ✅ Columns
+    //         worksheet.columns = [
+    //             { header: "Sr No", key: "srNo", width: 8 },
+    //             { header: "Name", key: "name", width: 25 },
+    //             { header: "Email", key: "email", width: 30 },
+    //             { header: "Mobile", key: "mobile", width: 18 },
+    //             { header: "Event Name", key: "eventName", width: 18 },
+    //             { header: "Ticket Type", key: "type", width: 35 },
+    //             { header: "Category", key: "category", width: 15 },
+    //             // { header: "Price", key: "price", width: 15 },
+    //             {
+    //                 header: "Price",
+    //                 key: "price",
+    //                 width: 15,
+    //                 style: {
+    //                     numFmt: `"${eventDetails?.currencyName?.Currency_symbol}" #,##0.00`,
+    //                     alignment: { horizontal: "right" } // ✅ always right
+    //                 }
+    //             },
+    //             { header: "Status", key: "status", width: 15 },
+    //             { header: "Scanned Date", key: "date", width: 18 },
+    //         ];
+
+    //         // ✅ Header Styling
+    //         // worksheet.getRow(1).eachCell(cell => {
+    //         //     cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
+    //         //     cell.fill = {
+    //         //         type: "pattern",
+    //         //         pattern: "solid",
+    //         //         fgColor: { argb: "FF343A40" } // dark grey
+    //         //     };
+    //         //     cell.alignment = {
+    //         //         vertical: "middle",
+    //         //         horizontal: "center"
+    //         //     };
+    //         // });
+    //         worksheet.getRow(1).eachCell(cell => {
+    //             cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
+    //             cell.fill = {
+    //                 type: "pattern",
+    //                 pattern: "solid",
+    //                 fgColor: { argb: "FF343A40" }
+    //             };
+    //             cell.alignment = {
+    //                 vertical: "middle",
+    //                 horizontal: "center" // ✅ center header
+    //             };
+    //         });
+
+
+    //         worksheet.views = [{ state: "frozen", ySplit: 1 }];
+
+    //         // ✅ Add Rows
+
+    //         records.forEach((item, index) => {
+
+    //             let type = "-";
+    //             let category = "Unknown";
+
+    //             if (item?.ticketPricing?.ticket?.title) {
+    //                 type = item.ticketPricing.ticket.title;
+    //                 category = "Ticket";
+    //             } else if (item?.ticketType?.title) {
+    //                 type = item.ticketType.title;
+    //                 category = "Ticket";
+    //             } else if (item?.addonType?.name) {
+    //                 type = item.addonType.name;
+    //                 category = "Addon";
+    //             } else if (item?.package?.name) {
+    //                 type = item.package.name;
+    //                 category = "Package";
+    //             } else if (item?.appointment?.wellnessList?.name) {
+    //                 type = item?.appointment?.wellnessList?.name;
+    //                 category = "Appointment";
+    //             }
+
+    //             const Price =
+    //                 item?.ticketPricing?.price ||
+    //                 item?.ticketType?.price ||
+    //                 item?.addonType?.price ||
+    //                 item?.package?.grandtotal ||
+    //                 item?.appointment?.price ||
+    //                 0;
+
+    //             const row = worksheet.addRow({
+    //                 srNo: index + 1,
+    //                 name: `${item?.user?.first_name || ""} ${item?.user?.last_name || ""}`.trim(),
+    //                 email: item?.user?.email || "-",
+    //                 mobile: item?.user?.mobile || "-",
+    //                 eventName: eventDetails.name || "-",
+    //                 type: type,
+    //                 category: category,
+    //                 price: Price, // ✅ raw number (important)
+    //                 status: item?.is_scanned === "Y" ? "Scanned" : "Not Scanned",
+    //                 date: item?.scanned_date
+    //                     ? moment(item.scanned_date).format("DD-MM-YYYY")
+    //                     : "-"
+    //             });
+
+    //             // ✅ Row Alignment
+    //             row.eachCell((cell, colNumber) => {
+    //                 if (colNumber === 8) {
+    //                     // Price column
+    //                     cell.alignment = { horizontal: "right" }; // ✅ right align price
+    //                 } else {
+    //                     cell.alignment = { horizontal: "left" }; // ✅ बाकी left
+    //                 }
+    //             });
+
+    //             // ✅ Currency Format (Excel format)
+    //             row.getCell("price").numFmt = `"${eventDetails?.currencyName?.Currency_symbol}" #,##0.00`;
+    //         });
+
+
+
+    //         // records.forEach((item, index) => {
+
+    //         //     // 🔥 Type Logic (same as UI)
+    //         //     let type = "-";
+    //         //     let category = "Unknown";
+
+    //         //     if (item?.ticketPricing?.ticket?.title) {
+    //         //         type = item.ticketPricing.ticket.title;
+    //         //         category = "Ticket";
+    //         //     } else if (item?.ticketType?.title) {
+    //         //         type = item.ticketType.title;
+    //         //         category = "Ticket";
+    //         //     } else if (item?.addonType?.name) {
+    //         //         type = item.addonType.name;
+    //         //         category = "Addon";
+    //         //     } else if (item?.package?.name) {
+    //         //         type = item.package.name;
+    //         //         category = "Package";
+    //         //     } else if (item?.appointment?.wellnessList?.name) {
+    //         //         type = item?.appointment?.wellnessList?.name;
+    //         //         category = "Appointment";
+    //         //     }
+
+    //         //     const Price =
+    //         //         item?.ticketPricing?.price ||
+    //         //         item?.ticketType?.price ||
+    //         //         item?.addonType?.price ||
+    //         //         item?.package?.grandtotal ||
+    //         //         item?.appointment?.price ||
+    //         //         "-";
+
+    //         //     worksheet.addRow({
+    //         //         srNo: index + 1,
+    //         //         name: `${item?.user?.first_name || ""} ${item?.user?.last_name || ""}`.trim(),
+    //         //         email: item?.user?.email || "-",
+    //         //         mobile: item?.user?.mobile || "-",
+    //         //         eventName: eventDetails.name || "-",
+    //         //         type: type,
+    //         //         category: category,
+    //         //         price: `${eventDetails?.currencyName?.Currency_symbol} ${Price}`,
+    //         //         status: item?.is_scanned === "Y" ? "Scanned" : "Not Scanned",
+    //         //         date: item?.scanned_date
+    //         //             ? moment(item.scanned_date).format("DD-MM-YYYY")
+    //         //             : "-"
+    //         //     });
+    //         // });
+
+    //         // ✅ Auto filter add (pro feature)
+    //         worksheet.autoFilter = {
+    //             from: "A1",
+    //             to: "H1",
+    //         };
+
+    //         const buffer = await workbook.xlsx.writeBuffer();
+
+    //         saveAs(
+    //             new Blob([buffer]),
+    //             `Attendees_${eventDetails.name}_${moment().format("YYYYMMDD_HHmmss")}.xlsx`
+    //         );
+
+    //     } catch (error) {
+    //         console.error("Excel download failed:", error);
+    //         Swal.fire("Error", "Failed to download Excel", "error");
+    //     } finally {
+    //         setExcelLoading(false);
+    //     }
+    // };
+
     const handleDownloadAttendeesExcel = async () => {
         if (!eventDetails?.id) return;
 
         setExcelLoading(true);
 
         try {
-            // ✅ FIXED API URL
             const response = await api.get(
                 `/api/v1/tickets/attendees-list/${eventDetails.id}?page=1&limit=1000000`
             );
@@ -103,27 +308,38 @@ const ManageAttendees = () => {
             const workbook = new ExcelJS.Workbook();
             const worksheet = workbook.addWorksheet("Attendees");
 
-            // ✅ Columns
+            const currencySymbol =
+                eventDetails?.currencyName?.Currency_symbol || "₹";
+
+            // ✅ Columns (ALL styling here only)
             worksheet.columns = [
-                { header: "Sr No", key: "srNo", width: 8 },
-                { header: "Name", key: "name", width: 25 },
-                { header: "Email", key: "email", width: 30 },
-                { header: "Mobile", key: "mobile", width: 18 },
-                { header: "Event Name", key: "eventName", width: 18 },
-                { header: "Ticket Type", key: "type", width: 35 },
-                { header: "Category", key: "category", width: 15 },
-                { header: "Price", key: "price", width: 15 },
-                { header: "Status", key: "status", width: 15 },
-                { header: "Scanned Date", key: "date", width: 18 },
+                { header: "Sr No", key: "srNo", width: 8, style: { alignment: { horizontal: "left" } } },
+                { header: "Name", key: "name", width: 25, style: { alignment: { horizontal: "left" } } },
+                { header: "Email", key: "email", width: 30, style: { alignment: { horizontal: "left" } } },
+                { header: "Mobile", key: "mobile", width: 18, style: { alignment: { horizontal: "left" } } },
+                { header: "Event Name", key: "eventName", width: 25, style: { alignment: { horizontal: "left" } } },
+                { header: "Ticket Type", key: "type", width: 35, style: { alignment: { horizontal: "left" } } },
+                { header: "Category", key: "category", width: 15, style: { alignment: { horizontal: "left" } } },
+                {
+                    header: "Price",
+                    key: "price",
+                    width: 15,
+                    style: {
+                        numFmt: `"${currencySymbol}" #,##0.00`,
+                        alignment: { horizontal: "right" }
+                    }
+                },
+                { header: "Status", key: "status", width: 15, style: { alignment: { horizontal: "left" } } },
+                { header: "Scanned Date", key: "date", width: 18, style: { alignment: { horizontal: "left" } } },
             ];
 
-            // ✅ Header Styling
+            // ✅ Header Style
             worksheet.getRow(1).eachCell(cell => {
                 cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
                 cell.fill = {
                     type: "pattern",
                     pattern: "solid",
-                    fgColor: { argb: "FF343A40" } // dark grey
+                    fgColor: { argb: "FF343A40" }
                 };
                 cell.alignment = {
                     vertical: "middle",
@@ -136,7 +352,6 @@ const ManageAttendees = () => {
             // ✅ Add Rows
             records.forEach((item, index) => {
 
-                // 🔥 Type Logic (same as UI)
                 let type = "-";
                 let category = "Unknown";
 
@@ -157,13 +372,13 @@ const ManageAttendees = () => {
                     category = "Appointment";
                 }
 
-                const Price =
+                const price =
                     item?.ticketPricing?.price ||
                     item?.ticketType?.price ||
                     item?.addonType?.price ||
                     item?.package?.grandtotal ||
                     item?.appointment?.price ||
-                    "-";
+                    0; // ✅ ALWAYS number
 
                 worksheet.addRow({
                     srNo: index + 1,
@@ -173,7 +388,7 @@ const ManageAttendees = () => {
                     eventName: eventDetails.name || "-",
                     type: type,
                     category: category,
-                    price: `${eventDetails?.currencyName?.Currency_symbol} ${Price}`,
+                    price: price,
                     status: item?.is_scanned === "Y" ? "Scanned" : "Not Scanned",
                     date: item?.scanned_date
                         ? moment(item.scanned_date).format("DD-MM-YYYY")
@@ -181,10 +396,10 @@ const ManageAttendees = () => {
                 });
             });
 
-            // ✅ Auto filter add (pro feature)
+            // ✅ Auto Filter
             worksheet.autoFilter = {
                 from: "A1",
-                to: "H1",
+                to: "J1",
             };
 
             const buffer = await workbook.xlsx.writeBuffer();
@@ -201,8 +416,6 @@ const ManageAttendees = () => {
             setExcelLoading(false);
         }
     };
-
-
 
     return (
         <>

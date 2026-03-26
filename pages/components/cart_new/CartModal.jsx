@@ -44,7 +44,6 @@ export default function CartModal({ show, handleClose, eventId }) {
 
     const { cart, refreshCart, eventData, normalCart, addonCart, slotCart, loadingCart, setEventId, charges } = useCart();
     const finalEventId = eventId || eventData?.id;
-    console.log("cart.cart-cart---", cart);
     const [isLoading, setIsLoading] = useState(true);
     const [cartLoading, setCartLoading] = useState(false);
     const [loadingId, setLoadingId] = useState(null); // track which pricing ID is loading
