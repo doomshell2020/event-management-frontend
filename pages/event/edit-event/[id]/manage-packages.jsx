@@ -365,12 +365,17 @@ const ManagePackages = () => {
         } catch (err) {
             Swal.close();
             console.error("Error updating package:", err);
-
-            Swal.fire(
-                "Error",
-                "Something went wrong while updating package!",
-                "error"
-            );
+            const apiErrorMsg =
+                err.response?.data?.error?.message ||
+                err.response?.data?.message ||
+                err.message ||
+                "Something went wrong. Try again.";
+            Swal.fire("Error", apiErrorMsg, "error");
+            // Swal.fire(
+            //     "Error",
+            //     "Something went wrong while updating package!",
+            //     "error"
+            // );
         } finally {
             setIsSubmitting(false);
         }

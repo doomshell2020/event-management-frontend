@@ -114,6 +114,9 @@ const DashboardPage = () => {
 
     const totalRevenue = summary?.totalRevenue || 0;
 
+    const totalSoldPackageTickets = summary?.totalSoldPackageTickets || 0;
+    const totalSoldPackageAddons = summary?.totalSoldPackageAddons || 0;
+
     // Sales Progress..
     const potentialRevenue = salesProgress?.potentialRevenue || 0;
     const soldRunningEventTickets = salesProgress?.soldTickets || 0;
@@ -250,8 +253,8 @@ const DashboardPage = () => {
             }
         },
         labels: hasCommittee
-            ? ["Organizer Earnings", "Platform Commission", "Payment Gateway Commission", "Committee Commission"]
-            : ["Organizer Earnings", "Payment Gateway Commission", "Platform Commission"],
+            ? ["Organizer Earnings", "Platform Commission", "Gateway Commission", "Committee Commission"]
+            : ["Organizer Earnings", "Gateway Commission", "Platform Commission"],
 
         colors: [
             "#22c55e",
@@ -488,7 +491,7 @@ const DashboardPage = () => {
                                                                             title="Total Sold Tickets"
                                                                             style={{ cursor: "pointer" }}
                                                                         >
-                                                                            {soldTickets}
+                                                                            {soldTickets+totalSoldPackageTickets}
                                                                         </span>
                                                                         {" / "}
                                                                         <span
@@ -524,7 +527,7 @@ const DashboardPage = () => {
                                                                             title="Total Sold Addons"
                                                                             style={{ cursor: "pointer" }}
                                                                         >
-                                                                            {soldAddons}
+                                                                            {soldAddons+totalSoldPackageAddons}
                                                                         </span>
                                                                         {" / "}
                                                                         <span

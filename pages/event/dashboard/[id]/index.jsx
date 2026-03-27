@@ -85,6 +85,9 @@ const EventDashboardPage = () => {
 
     const totalAttendees = summary?.totalAttendees || 0;
 
+    const totalSoldPackageTickets = summary?.totalSoldPackageTickets || 0;
+    const totalSoldPackageAddons = summary?.totalSoldPackageAddons || 0;
+
 
 
     const organizerRevenue = revenueDistribution?.organizer || 0;
@@ -382,7 +385,7 @@ const EventDashboardPage = () => {
                                                                             title="Total Sold Tickets"
                                                                             style={{ cursor: "pointer" }}
                                                                         >
-                                                                            {soldTickets}
+                                                                            {soldTickets + totalSoldPackageTickets}
                                                                         </span>
                                                                         {" / "}
                                                                         <span
@@ -416,7 +419,7 @@ const EventDashboardPage = () => {
                                                                             title="Total Sold Addons"
                                                                             style={{ cursor: "pointer" }}
                                                                         >
-                                                                            {soldAddons}
+                                                                            {soldAddons + totalSoldPackageAddons}
                                                                         </span>
                                                                         {" / "}
                                                                         <span

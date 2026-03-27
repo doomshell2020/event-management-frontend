@@ -7579,3 +7579,16 @@ input[type="date"] {
 .note-modal.open {
   display: block !important;
 }
+
+
+#myevent-deshbord .event_names .dropdown.edit-event-dropdown ul.dropdown-menu li a .text-muted {
+    color: #2c2c2c !important;
+}
+
+.apexcharts-datalabel-label {
+    font-size: 12px;
+}
+
+.card.dashboard-card {
+    height: 100%;
+}

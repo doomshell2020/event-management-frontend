@@ -364,6 +364,7 @@ const ManageTickets = () => {
                                     ) : ticketsList.length == 0 ? (
                                         <p className="text-muted">No tickets found for this event.</p>
                                     ) : (ticketsList.map((ticket) => (
+
                                         <div
                                             key={ticket.id}
                                             className="row item_bg m-0 p-2 mb-3 align-items-center manage-ticket-type"
