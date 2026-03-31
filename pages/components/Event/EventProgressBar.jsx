@@ -118,6 +118,25 @@ const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
         return index >= 0 ? index : 0;
     }, [pathname, steps]);
 
+    const getNewPath = (id) => {
+        const parts = pathname.split("/").filter(Boolean);
+
+        const eventIndex = parts.findIndex(p => p === "event");
+
+        if (eventIndex !== -1) {
+            // event ke baad jo first number mile usko replace karo
+            for (let i = eventIndex + 1; i < parts.length; i++) {
+                if (/^\d+$/.test(parts[i])) {
+                    parts[i] = String(id);
+                    break;
+                }
+            }
+        }
+
+        return "/" + parts.join("/") + "/";
+    };
+
+
 
     return (
         <>
@@ -154,7 +173,8 @@ const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
                                     <li key={index}>
                                         <Link
                                             className="dropdown-item"
-                                            href={`/event/edit-event/${item.id}`}
+                                            // href={`/event/edit-event/${item.id}`}
+                                            href={getNewPath(item.id)}
                                             onClick={() => setIsDropdownOpen(false)}
                                         >
                                             {item.name}
