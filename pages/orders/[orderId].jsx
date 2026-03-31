@@ -15,6 +15,7 @@ export default function MyOrdersDetails() {
     );
 
     const [orderData, setOrderData] = useState(null);
+    console.log("---orderData",orderData);
 
     const [baseUrls, setBaseUrls] = useState(null);
     const [loading, setLoading] = useState(true);

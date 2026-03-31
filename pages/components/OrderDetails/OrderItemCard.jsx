@@ -9,7 +9,7 @@ const OrderItemCard = ({
     baseUrls
 }) => {
     const type = item?.type;
-
+    console.log("item-------", item)
     const isTicket = type == "ticket";
     const isAppointment = type == "appointment";
     const isAddon = type == "addon";
@@ -17,7 +17,7 @@ const OrderItemCard = ({
     const isCommitteeSale = type == "committesale";
     const isComps = type == "comps";
     const isTicketPrice = type == "ticket_price"; // ✅ NEW
-
+    const isScanned = item?.is_scanned === 'Y';
     // Complimentary
     const isFreeTicket = isComps;
 
@@ -103,7 +103,7 @@ const OrderItemCard = ({
                             </div>
 
                             <div>
-                               <strong>Time: </strong> {format(new Date(`1970-01-01T${item?.appointment?.slot_start_time}`), "hh:mm a")}
+                                <strong>Time: </strong> {format(new Date(`1970-01-01T${item?.appointment?.slot_start_time}`), "hh:mm a")}
                                 {" - "}
                                 {format(new Date(`1970-01-01T${item?.appointment?.slot_end_time}`), "hh:mm a")}
                             </div>
@@ -143,12 +143,32 @@ const OrderItemCard = ({
             <div className="row align-items-center">
                 <div className="col-md-12 d-flex justify-content-md-end justify-content-start mt-3 mt-md-0">
                     {item?.qr_image && (
-                        <div className="border rounded-3 p-2 bg-light">
+                        <div className="border rounded-3 p-2 bg-light" style={{position:"relative"}}>
                             <img
                                 src={`${baseUrls?.qr_image_url}${item.qr_image}`}
                                 alt="QR Code"
-                                style={{ width: "110px" }}
-                            />
+                                style={{
+                                    width: "110px",
+                                    filter: isScanned ? "blur(1px)" : "none",
+                                    opacity: isScanned ? 0.7 : 1
+                                }}/>
+                                {isScanned && (
+                                    <div style={{
+                                        position: "absolute",
+                                        top: "50%",
+                                        left: "40%",
+                                        transform: "translate(-50%, -50%) rotate(322deg)",
+                                        color: "#ff0000",
+                                        fontSize: "14px",
+                                        fontWeight: "bold",
+                                        border: "2px solid red",
+                                        padding: "2px 10px",
+                                        borderRadius: "4px",
+                                        background: "rgba(255,255,255,0.7)"
+                                    }}>
+                                        SCANNED
+                                    </div>
+                                )}
                             <h6 className="text-center mb-2 mt-2 fw-bold">
                                 Scan to verify
                             </h6>
