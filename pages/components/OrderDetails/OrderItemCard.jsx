@@ -145,8 +145,7 @@ const OrderItemCard = ({
                     {item?.qr_image && (
                         <div className="border rounded-3 p-2 bg-light" style={{position:"relative"}}>
                             <img
-                                // src={`${baseUrls?.qr_image_url}${item.qr_image}`}
-                                src={`https://api.eboxtickets.com/uploads/qr_codes/qr_314_1774939304954_0e9d8d.png`}
+                                src={`${baseUrls?.qr_image_url}${item.qr_image}`}
                                 alt="QR Code"
                                 style={{
                                     width: "110px",
