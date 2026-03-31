@@ -145,7 +145,8 @@ const OrderItemCard = ({
                     {item?.qr_image && (
                         <div className="border rounded-3 p-2 bg-light" style={{position:"relative"}}>
                             <img
-                                src={`${baseUrls?.qr_image_url}${item.qr_image}`}
+                                // src={`${baseUrls?.qr_image_url}${item.qr_image}`}
+                                src={`https://api.eboxtickets.com/uploads/qr_codes/qr_314_1774939304954_0e9d8d.png`}
                                 alt="QR Code"
                                 style={{
                                     width: "110px",
@@ -155,14 +156,14 @@ const OrderItemCard = ({
                                 {isScanned && (
                                     <div style={{
                                         position: "absolute",
-                                        top: "50%",
-                                        left: "40%",
+                                        top: "62px",
+                                        left: "61px",
                                         transform: "translate(-50%, -50%) rotate(322deg)",
                                         color: "#ff0000",
-                                        fontSize: "14px",
+                                        fontSize: "13px",
                                         fontWeight: "bold",
                                         border: "2px solid red",
-                                        padding: "2px 10px",
+                                        padding: "3px 23px",
                                         borderRadius: "4px",
                                         background: "rgba(255,255,255,0.7)"
                                     }}>
