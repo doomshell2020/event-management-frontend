@@ -65,7 +65,7 @@ const EventSidebar = ({ eventId, eventDetails }) => {
                         { href: `/event/dashboard/${eventId}`, icon: "bi bi-speedometer2", label: "Dashboard" },
                         { href: `/event/edit-event/${eventId}`, icon: "bi bi-sliders", label: "Settings" },
                         { href: `/event/payments/${eventId}`, icon: "bi bi-credit-card", label: "Payments" },
-                        { href: `/event/export-tickets/${eventId}`, icon: "bi bi-wallet2", label: "Export Tickets" },
+                        { href: `/event/export-tickets/${eventId}`, icon: "bi bi-wallet2", label: "Sold Tickets" },
                         { href: `/event/attendees/${eventId}`, icon: "bi bi-people", label: "Attendees" },
                         // { href: `/event/analytics/${eventId}`, icon: "bi bi-bar-chart", label: "Analytics" },
                         // { href: `/event/payouts/${eventId}`, icon: "bi bi-wallet2", label: "Payouts" },
@@ -77,7 +77,7 @@ const EventSidebar = ({ eventId, eventDetails }) => {
                             label: "Committee",
                         },
 
-                        { href: `/event/edit-event/${eventId}/manage-tickets`, icon: "fas fa-ticket-alt", label: "Tickets" },
+                        { href: `/event/edit-event/${eventId}/manage-tickets`, icon: "fas fa-ticket-alt", label: "Manage Tickets" },
                     ]
                         .filter(Boolean)
                         .map((item, idx) => (

@@ -7,7 +7,7 @@ import api from "@/utils/api";
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 import moment from "moment";
-import { formatEventDateTime } from "@/utils/formatDate";
+import { formatEventDateTime, formatDate } from "@/utils/formatDate";
 
 import FrontendHeader from "@/shared/layout-components/frontelements/frontendheader";
 import FrontendFooter from "@/shared/layout-components/frontelements/frontendfooter";
@@ -37,7 +37,7 @@ const ExportTickets = () => {
     const [totalPages, setTotalPages] = useState(1);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalRecords, setTotalRecords] = useState(0);
-    const [limit] = useState(5);
+    const [limit] = useState(20);
     const [loading, setLoading] = useState(true);
     const [backgroundImage] = useState("/assets/front-images/about-slider_bg.jpg");
     const [excelLoading, setExcelLoading] = useState(false);
@@ -291,17 +291,18 @@ const ExportTickets = () => {
                                         <h6 className="fw-bold">Total Records: {totalRecords}</h6>
                                     </div>
 
-                                    <div className="table-responsive">
+                                    <div className="table-responsive" style={{ overflowX: "auto" }}>
                                         <table className="table table-hover align-middle shadow-sm rounded table-deta-no-wrap table-width-992">
                                             <thead className="bg-dark text-white">
                                                 <tr>
-                                                    <th style={{ width: "10%",fontWeight:"normal" }}>Sr No.</th>
-                                                    <th style={{ width: "15%",fontWeight:"normal" }}>QR Code</th>
-                                                    <th style={{ width: "15%",fontWeight:"normal" }}>Email</th>
-                                                    <th style={{ width: "15%",fontWeight:"normal" }}>Name</th>
-                                                    <th style={{ width: "10%",fontWeight:"normal" }}>Amount</th>
-                                                    <th style={{ width: "15%",fontWeight:"normal" }}>Type</th>
-                                                    <th style={{ width: "20%",fontWeight:"normal" }}>Purchased Date</th>
+                                                    <th style={{ width: "5%", fontWeight: "normal" }}>Sr No.</th>
+                                                    <th style={{ width: "12%", fontWeight: "normal" }}>QR Code</th>
+                                                    <th style={{ width: "15%", fontWeight: "normal" }}>Email</th>
+                                                    <th style={{ width: "15%", fontWeight: "normal" }}>Name</th>
+                                                    <th style={{ width: "8%", fontWeight: "normal" }}>Amount</th>
+                                                    <th style={{ width: "10%", fontWeight: "normal" }}>Type</th>
+                                                    <th style={{ width: "25%", fontWeight: "normal" }}>Purchased Date</th>
+                                                    <th style={{ width: "20%", fontWeight: "normal" }}>Scan Details</th>
                                                 </tr>
                                             </thead>
 
@@ -325,13 +326,13 @@ const ExportTickets = () => {
                                                     ticketData.map((item, index) => {
                                                         const srNo = index + 1 + (currentPage - 1) * limit;
                                                         const currencyName = item?.event?.currencyName?.Currency_symbol || '₹'
-
+                                                        const isScanned = item?.is_scanned === 'Y';
                                                         return (
                                                             <tr key={index}>
                                                                 <td className="fw-semibold">{srNo}</td>
 
                                                                 {/* QR Code – Larger */}
-                                                                <td>
+                                                                <td style={{ position: "relative" }}>
                                                                     <img
                                                                         src={`${qrBasePath}${item.qr_image}`}
                                                                         alt="QR Code"
@@ -342,9 +343,28 @@ const ExportTickets = () => {
                                                                             borderRadius: "8px",
                                                                             border: "1px solid #ddd",
                                                                             padding: "5px",
-                                                                            background: "#fff"
+                                                                            background: "#fff",
+                                                                            filter: isScanned ? "blur(1px)" : "none",
+                                                                            opacity: isScanned ? 0.7 : 1
                                                                         }}
                                                                     />
+                                                                    {isScanned && (
+                                                                        <div style={{
+                                                                            position: "absolute",
+                                                                            top: "50%",
+                                                                            left: "40%",
+                                                                            transform: "translate(-50%, -50%) rotate(322deg)",
+                                                                            color: "#ff0000",
+                                                                            fontSize: "14px",
+                                                                            fontWeight: "bold",
+                                                                            border: "2px solid red",
+                                                                            padding: "2px 10px",
+                                                                            borderRadius: "4px",
+                                                                            background: "rgba(255,255,255,0.7)"
+                                                                        }}>
+                                                                            SCANNED
+                                                                        </div>
+                                                                    )}
                                                                 </td>
 
                                                                 {/* Email */}
@@ -376,6 +396,38 @@ const ExportTickets = () => {
                                                                 {/* Purchased Date */}
                                                                 <td className="text-muted">
                                                                     {formatEventDateTime(item.createdAt)}
+                                                                </td>
+                                                                {/* Scan Details */}
+                                                                <td>
+                                                                    {item.is_scanned === 'Y' ? (
+                                                                        <div style={{
+                                                                            fontSize: "12px",
+                                                                            lineHeight: "1.5",
+                                                                            display: "flex",
+                                                                            flexDirection: "column",
+                                                                            gap: "3px"
+                                                                        }}>
+                                                                            <span>
+                                                                                <strong style={{ color: "#555" }}>Date:</strong> {formatDate(item.scanned_date)}
+                                                                            </span>
+                                                                            <span>
+                                                                                <strong style={{ color: "#555" }}>By:</strong>{" "}
+                                                                                {item?.scanner?.first_name || "N/A"} {item?.scanner?.last_name || ""}
+                                                                                <br />
+                                                                                <small style={{ color: "#888" }}>
+                                                                                    {item?.scanner?.email || ""}
+                                                                                </small>
+                                                                            </span>
+                                                                        </div>
+                                                                    ) : (
+                                                                        <span style={{
+                                                                            color: "#999",
+                                                                            fontSize: "12px",
+                                                                            fontStyle: "italic"
+                                                                        }}>
+                                                                            Not Scanned
+                                                                        </span>
+                                                                    )}
                                                                 </td>
                                                             </tr>
                                                         );
