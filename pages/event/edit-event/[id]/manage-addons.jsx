@@ -151,10 +151,15 @@ const ManageAddons = () => {
                 });
             }
         } catch (err) {
+            const apiErrorMsg =
+                err.response?.data?.error?.message ||
+                err.response?.data?.message ||
+                err.message ||
+                "Something went wrong. Try again.";
             Swal.fire({
                 icon: "error",
                 title: "Error creating addon!",
-                text: err.message,
+                text: apiErrorMsg,
             });
         } finally {
             setIsSubmitting(false);

@@ -8,7 +8,6 @@ import Swal from "sweetalert2";
 const EventSidebar = ({ eventId, eventDetails }) => {
  const router = useRouter();
     const { is_free, entry_type } = eventDetails || {};
-
     const [isLeftRight, setIsLeftRight] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     const pathname = usePathname();

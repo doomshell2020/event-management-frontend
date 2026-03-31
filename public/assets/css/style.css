@@ -7592,3 +7592,11 @@ input[type="date"] {
 .card.dashboard-card {
     height: 100%;
 }
+
+.dash-icon.bg-primary {
+    background-color: #ff5b5b !important;
+}
+
+.card.dashboard-card small {
+    font-size: 13px;
+}

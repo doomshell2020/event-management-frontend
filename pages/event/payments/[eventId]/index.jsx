@@ -20,7 +20,7 @@ const ManagePayments = () => {
     const [totalPages, setTotalPages] = useState(1);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalRecords, setTotalRecords] = useState(0);
-    const [limit] = useState(5);
+    const [limit] = useState(20);
     const [loading, setLoading] = useState(true);
     const [backgroundImage] = useState("/assets/front-images/about-slider_bg.jpg");
 
@@ -89,7 +89,7 @@ const ManagePayments = () => {
                 <div className="d-flex">
 
                     {/* Sidebar */}
-                    <EventSidebar eventId={eventId} />
+                    <EventSidebar eventId={eventId} eventDetails={eventDetails} />
 
                     <div className="event-righcontent">
                         <div className="dsa_contant">

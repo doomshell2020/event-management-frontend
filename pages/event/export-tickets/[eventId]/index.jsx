@@ -253,7 +253,7 @@ const ExportTickets = () => {
                 <div className="d-flex">
 
                     {/* Sidebar */}
-                    <EventSidebar eventId={eventId} />
+                    <EventSidebar eventId={eventId} eventDetails={eventDetails} />
 
                     <div className="event-righcontent">
                         <div className="dsa_contant">

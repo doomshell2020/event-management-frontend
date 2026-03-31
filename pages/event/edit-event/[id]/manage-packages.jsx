@@ -665,6 +665,13 @@ const ManagePackages = () => {
                                                                                         ? item.ticketType
                                                                                         : item.addonType;
                                                                                     // console.log("item", item)
+
+                                                                                    const price =
+                                                                                        Number(data?.price) > 0
+                                                                                            ? Number(data?.price)
+                                                                                            : Number(data?.pricings?.[0]?.price ?? 0);
+
+                                                                                    const total = Number(item.qty || 0) * price;
                                                                                     return (
                                                                                         <tr key={item.id}>
                                                                                             <td>{index + 1}</td>
@@ -679,14 +686,15 @@ const ManagePackages = () => {
                                                                                             >
                                                                                                 {data?.title || data?.name || "-"}
                                                                                             </td>
-                                                                                            <td>{item.qty}</td>
+                                                                                            <td>{item.qty} x {currencyName}{price}</td>
                                                                                             <td>
                                                                                                 {currencyName}
-                                                                                                {(
+                                                                                                {total.toFixed(2)}
+                                                                                                {/* {(
                                                                                                     Number(data?.price) > 0
                                                                                                         ? Number(data?.price)
                                                                                                         : Number(data?.pricings?.[0]?.price ?? 0)
-                                                                                                )}
+                                                                                                )} */}
                                                                                                 {/* {data?.price || 0} */}
                                                                                             </td>
                                                                                         </tr>
