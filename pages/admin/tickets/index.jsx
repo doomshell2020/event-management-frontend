@@ -18,7 +18,8 @@ import api from "@/utils/api";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import moment from "moment";
-import Link from "next/link";
+import ExcelJS from "exceljs";
+import { saveAs } from "file-saver";
 import AsyncSelect from "react-select/async";
 export const TicketList = () => {
     const [COLUMNS, setCOLUMNS] = useState([
@@ -316,20 +317,20 @@ export const TicketList = () => {
         },
 
 
-        {
-            Header: "Qty.",
-            accessor: "qty",
-            className: "borderrigth",
-            Cell: ({ row }) => {
-                const qty = row.original?.count;
+        // {
+        //     Header: "Qty.",
+        //     accessor: "qty",
+        //     className: "borderrigth",
+        //     Cell: ({ row }) => {
+        //         const qty = row.original?.count;
 
-                return (
-                    <div>
-                        {qty ?? "-"}
-                    </div>
-                );
-            },
-        },
+        //         return (
+        //             <div>
+        //                 {qty ?? "-"}
+        //             </div>
+        //         );
+        //     },
+        // },
         // {
         //     Header: "Customer Pay",
         //     accessor: "CustomerPay",
@@ -377,6 +378,7 @@ export const TicketList = () => {
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [selectedEvent, setSelectedEvent] = useState(null);
     const [selectedEmail, setSelectedEmail] = useState(null);
+    const [excelLoading, setExcelLoading] = useState(false);
     const getTicketList = async () => {
         try {
             setIsLoading(true);
@@ -471,119 +473,132 @@ export const TicketList = () => {
         getTicketList(); // reload full list
     };
 
+    const handleDownloadTickets = async () => {
+        setExcelLoading(true);
 
+        try {
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet("Tickets");
 
-    const getCurrentDate = () => {
-        const d = new Date();
-        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-    };
-    const headers = [
-        "Buy Date & Time",
-        "Ticket",
-        "Event Name",
-        "Event Date & Time",
-        "Customer Name",
-        "Mobile",
-        "Buy Ticket",
-        // "Amount",
-        // "Commission(8%)",
-    ];
-    const formatDateTime = (date) => {
-        if (!date) return "----";
-        const d = new Date(date);
-        return `${d.toLocaleDateString()} ${d.toLocaleTimeString()}`;
-    };
-    const calculateCommission = (amount, percent = 8) => {
-        if (!amount) return "0";
-        return ((Number(amount) * percent) / 100).toFixed(2);
-    };
+            // ✅ Columns (same as CSV headers)
+            worksheet.columns = [
+                { header: "Sr No", key: "srNo", width: 10 },
+                { header: "Buy Date & Time", key: "buyDate", width: 25 },
+                { header: "Ticket", key: "ticket", width: 35 },
+                { header: "Event Name", key: "eventName", width: 25 },
+                { header: "Event Date & Time", key: "eventDate", width: 30 },
+                { header: "Customer Name", key: "customerName", width: 30 },
+                { header: "Mobile", key: "mobile", width: 18 },
+                // { header: "Buy Ticket", key: "count", width: 15 },
+            ];
 
-    const getTicketDisplayName = (item) => {
-        const type = item?.type;
+            // ✅ Header Styling
+            worksheet.getRow(1).eachCell((cell) => {
+                cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
+                cell.fill = {
+                    type: "pattern",
+                    pattern: "solid",
+                    fgColor: { argb: "FF343A40" },
+                };
+                cell.alignment = {
+                    vertical: "middle",
+                    horizontal: "center",
+                };
+            });
 
-        switch (type) {
-            case "ticket":
-                return `Ticket - ${item.ticketType?.title || "-"}`;
+            // Freeze header
+            worksheet.views = [{ state: "frozen", ySplit: 1 }];
 
-            case "comps":
-                return `Comps - ${item.ticketType?.title || "-"}`;
+            // ✅ Helper Functions (same as your CSV)
+            const formatDateTime = (date) => {
+                if (!date) return "----";
+                const d = new Date(date);
+                return `${d.toLocaleDateString()} ${d.toLocaleTimeString()}`;
+            };
 
-            case "committesale":
-                return `Committee - ${item.ticketType?.title || "-"}`;
+            const getTicketDisplayName = (item) => {
+                const type = item?.type;
 
-            case "addon":
-                return `Addon - ${item.addonType?.name || "-"}`;
-
-            case "appointment":
-                return `Appointment - ${item.appointment?.wellnessList?.name || "-"}`;
-
-            case "package":
-                return `Package - ${item.package?.name || "-"}`;
-
-            case "ticket_price":
-                if (item.ticketPricing?.ticket?.title) {
-                    const slotName = item.ticketPricing?.slot?.slot_name;
-                    return slotName
-                        ? `Ticket - ${item.ticketPricing.ticket.title} (${slotName})`
-                        : `Ticket - ${item.ticketPricing.ticket.title}`;
+                switch (type) {
+                    case "ticket":
+                        return `Ticket - ${item.ticketType?.title || "-"}`;
+                    case "comps":
+                        return `Comps - ${item.ticketType?.title || "-"}`;
+                    case "committesale":
+                        return `Committee - ${item.ticketType?.title || "-"}`;
+                    case "addon":
+                        return `Addon - ${item.addonType?.name || "-"}`;
+                    case "appointment":
+                        return `Appointment - ${item.appointment?.wellnessList?.name || "-"}`;
+                    case "package":
+                        return `Package - ${item.package?.name || "-"}`;
+                    case "ticket_price":
+                        if (item.ticketPricing?.ticket?.title) {
+                            const slotName = item.ticketPricing?.slot?.slot_name;
+                            return slotName
+                                ? `Ticket - ${item.ticketPricing.ticket.title} (${slotName})`
+                                : `Ticket - ${item.ticketPricing.ticket.title}`;
+                        }
+                        return "-";
+                    default:
+                        return "-";
                 }
-                return "-";
+            };
 
-            default:
-                return "-";
+            // ✅ Add Rows (converted from csvData logic)
+            ticketList.forEach((item, index) => {
+                const order = item?.order || {};
+                const user = order?.user || {};
+                const event = order?.event || {};
+
+                worksheet.addRow({
+                    srNo: index + 1,
+                    buyDate: formatDateTime(order?.created),
+                    ticket: getTicketDisplayName(item),
+                    eventName: event?.name || "----",
+                    eventDate: `${formatDateTime(event?.date_from)} - ${formatDateTime(event?.date_to)}`,
+                    customerName:
+                        `${user?.first_name || ""} ${user?.last_name || ""}`.trim() || "----",
+                    mobile: user?.mobile || "----",
+                    // count: item?.count || 0,
+                });
+            });
+
+            // ✅ Auto Width (dynamic)
+            worksheet.columns.forEach((column) => {
+                let maxLength = column.header.length;
+
+                column.eachCell({ includeEmpty: true }, (cell) => {
+                    const value = cell.value ? cell.value.toString() : "";
+                    maxLength = Math.max(maxLength, value.length);
+                });
+
+                column.width = maxLength + 5;
+            });
+
+            // ✅ Auto Filter
+            worksheet.autoFilter = {
+                from: "A1",
+                to: "H1",
+            };
+
+            // ✅ Download
+            const buffer = await workbook.xlsx.writeBuffer();
+
+            saveAs(
+                new Blob([buffer]),
+                `Ticket_${new Date().toISOString().slice(0, 10)}.xlsx`
+            );
+
+        } catch (error) {
+            console.error("Excel download failed:", error);
+        } finally {
+            setExcelLoading(false);
         }
     };
 
 
-    const csvData = ticketList.map((item) => {
-        const order = item?.order || {};
-        const user = order?.user || {};
-        const event = order?.event || {};
-        const currency = event?.currencyName?.Currency_symbol || "";
 
-        const amount = order?.sub_total || 0;
-        const commission = calculateCommission(amount);
-
-        return {
-            "Buy Date & Time": formatDateTime(order?.created),
-
-            // ✅ Ticket name + type
-            "Ticket": getTicketDisplayName(item),
-
-            "Event Name": event?.name || "----",
-            "Event Date & Time": `${formatDateTime(event?.date_from)} - ${formatDateTime(event?.date_to)}`,
-            "Customer Name":
-                `${user?.first_name || ""} ${user?.last_name || ""}`.trim() || "----",
-            "Mobile": user?.mobile || "----",
-            "Buy Ticket": item?.count || 0,
-            // "Amount": `${currency}${amount}`,
-            // "Commission (8%)": `${currency}${commission}`,
-        };
-    });
-
-    const onExportLinkPress = () => {
-        const rows = [
-            headers,
-            ...csvData.map((row) =>
-                headers.map((header) => {
-                    const value = row[header] ?? "";
-                    return `"${String(value).replace(/"/g, '""')}"`;
-                })
-            ),
-        ];
-
-        const csvContent =
-            "data:text/csv;charset=utf-8,\uFEFF" +
-            rows.map((e) => e.join(",")).join("\n");
-
-        const link = document.createElement("a");
-        link.href = encodeURI(csvContent);
-        link.download = `Ticket_${getCurrentDate()}.csv`;
-
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    };
 
     const loadUserOptions = async (inputValue) => {
         if (inputValue.length < 2) return [];
@@ -807,11 +822,6 @@ export const TicketList = () => {
                                     />
                                 </Form.Group>
 
-
-
-
-
-
                                 <Form.Group className="mb-3">
                                     <Form.Label>Ticket Number</Form.Label>
                                     <Form.Control
@@ -871,8 +881,26 @@ export const TicketList = () => {
                         <Card.Header className="">
                             <div className="d-flex justify-content-between">
                                 <h4 className="card-title mg-b-0">Ticket Manager</h4>
-                                <Button onClick={onExportLinkPress}>
+                                {/* <Button onClick={onExportLinkPress}>
                                     Export CSV
+                                </Button> */}
+                                <Button
+                                    variant="success"
+                                    className="btn-sm d-flex align-items-center"
+                                    onClick={handleDownloadTickets}
+                                    disabled={excelLoading}
+                                >
+                                    {excelLoading ? (
+                                        <>
+                                            <span className="spinner-border spinner-border-sm me-2" />
+                                            Downloading...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <i className="bi bi-file-earmark-excel-fill me-2"></i>
+                                            Download Tickets
+                                        </>
+                                    )}
                                 </Button>
                             </div>
                         </Card.Header>
