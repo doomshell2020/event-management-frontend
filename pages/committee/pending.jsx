@@ -94,7 +94,6 @@ const CommitteePending = ({ pendingRequests, counts, assets }) => {
     };
 
     const pendingList = requests.filter(item => item.status == "N");
-
     // ✅ Handle Approve / Ignore
     const handleAction = async (itemId, actionType) => {
         // console.log('itemId, actionType :', itemId, actionType);
@@ -256,7 +255,8 @@ const CommitteePending = ({ pendingRequests, counts, assets }) => {
                                                         <div>{ticket.title}</div>
                                                         <div className="text-muted fs-13">
                                                             {event?.currencyName?.Currency_symbol}
-                                                            {ticket.price} × {item.no_tickets}
+                                                            {/* {ticket.price} × {item.no_tickets} */}
+                                                            {ticket?.price || ticket?.pricings?.[0]?.price || 0}{" "} × {item.no_tickets}
                                                         </div>
                                                     </td>
 

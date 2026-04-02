@@ -70,7 +70,8 @@ const EventSidebar = ({ eventId, eventDetails }) => {
                         // { href: `/event/payouts/${eventId}`, icon: "bi bi-wallet2", label: "Payouts" },
 
                         // show Committee ONLY if event is NOT free
-                        (entry_type == 'event' && is_free == 'N') && {
+                        // (entry_type == 'event' && entry_type == 'multi' && is_free == 'N') && {
+                        (is_free !== 'Y') && {
                             href: `/event/edit-event/${eventId}/committee/manage-committee`,
                             icon: "bi bi-people",
                             label: "Committee",

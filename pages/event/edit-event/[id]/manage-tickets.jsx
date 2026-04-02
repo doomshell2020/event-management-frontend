@@ -723,7 +723,7 @@ const ManageTickets = () => {
                                     required
                                     value={ticketForm.type}
                                     onChange={handleInputChange}
-                                    disabled={eventTypes == "multi"}
+                                    // disabled={eventTypes == "multi"}
                                 >
                                     <option value="">Choose Type</option>
                                     <option value="open_sales">Open Sales</option>

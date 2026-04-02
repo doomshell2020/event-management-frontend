@@ -319,7 +319,8 @@ const CommitteeApproved = ({ approvedRequests, counts, assets }) => {
                                                         <div>{ticket.title}</div>
                                                         <div className="text-muted fs-13">
                                                             {event?.currencyName?.Currency_symbol}
-                                                            {ticket.price} × {item.no_tickets}
+                                                            {/* {ticket.price} × {item.no_tickets} */}
+                                                            {ticket?.price || ticket?.pricings?.[0]?.price || 0}{" "} × {item.no_tickets}
                                                         </div>
                                                     </td>
 

@@ -68,9 +68,23 @@ const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
                         `/event/edit-event/${eventDetails.id}/manage-packages`,
                     ]
                 },
-                { serial: 3, label: "Manage Date & Time", path: `/event/edit-event/${eventDetails.id}/manage-date-time`, subPaths: [] },
-                { serial: 4, label: "Ticket Pricing", path: `/event/edit-event/${eventDetails.id}/ticket-pricing`, subPaths: [] },
-                { serial: 5, label: "Publish Event", path: `/event/edit-event/${eventDetails.id}/publish-event`, subPaths: [] },
+                // new section added in multi event... Manage Committee..01-04-2026
+                {
+                    serial: 3,
+                    label: "Manage Committee",
+                    path: `/event/edit-event/${eventDetails.id}/committee/manage-committee`,
+                    subPaths: [
+                        `/event/edit-event/${eventDetails.id}/committee/manage-committee-tickets`,
+                        `/event/edit-event/${eventDetails.id}/committee/manage-committee-groups`,
+                        `/event/edit-event/${eventDetails.id}/committee/manage-committee-commissions`,
+                    ]
+                },
+
+
+
+                { serial: 4, label: "Manage Date & Time", path: `/event/edit-event/${eventDetails.id}/manage-date-time`, subPaths: [] },
+                { serial: 5, label: "Ticket Pricing", path: `/event/edit-event/${eventDetails.id}/ticket-pricing`, subPaths: [] },
+                { serial: 6, label: "Publish Event", path: `/event/edit-event/${eventDetails.id}/publish-event`, subPaths: [] },
             ];
         } else {
             // Paid / Normal event type

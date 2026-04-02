@@ -1750,56 +1750,272 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                         const cartItem = slotCart.find(item => item.uniqueId == pricingId);
                                                                         const isLoading = loadingId == pricingId;
                                                                         const isSoldOut = tp.ticket?.sold_out == "Y";
-                                                                        // console.log("tp-------", tp)
+                                                                        const isCommittee = tp?.ticket.type == "committee_sales";
+                                                                        const committeeStatus = tp?.ticket.committee_status || null;
 
+                                                                        // console.log('ticket.committeeAssignedTickets :', ticket.committeeAssignedTickets);
+                                                                        const committeeMembers = isCommittee
+                                                                            ? tp?.ticket.committeeAssignedTickets
+                                                                                ?.filter(ct =>
+                                                                                    ct.status == "Y" &&
+                                                                                    ct.committeeMember?.status == "Y" &&
+                                                                                    ct.committeeMember?.user
+                                                                                )
+                                                                                ?.map(ct => ({
+                                                                                    id: ct.committeeMember.user.id,
+                                                                                    name: `${ct.committeeMember.user.first_name} ${ct.committeeMember.user.last_name}`.trim(),
+                                                                                    email: ct.committeeMember.user.email
+                                                                                })) || []
+                                                                            : [];
+
+                                                                        // console.log('committeeMembers :', committeeMembers);
+                                                                        // ✅ Filter questions that belong to this ticket
+                                                                        const ticketQuestions = eventData.questions?.filter(q =>
+                                                                            q.ticket_type_id
+                                                                                .split(",")
+                                                                                .map(id => id.trim())
+                                                                                .includes(tp.ticket.id.toString())
+                                                                        ) || [];
                                                                         return (
-                                                                            <div key={`ticket-price-${i}`} className="ticket-item only-ticket">
+                                                                            <div
+                                                                                key={`ticket-price-${i}`}
+                                                                                className={`ticket-item only-ticket ${isCommittee ? "committee-ticket" : ""}`}
+                                                                                style={{ display: "flex", flexDirection: "column", gap: "10px", padding: "10px 15px" }}
+                                                                            >
                                                                                 <div className="d-flex justify-content-between align-items-start ticket-infobox">
-                                                                                    <div className="ticket-info">
-                                                                                        {/* 🎫 Ticket Title */}
-                                                                                        <strong style={{ fontSize: "15px" }}>
-                                                                                            {tp.ticket?.title}
-                                                                                            <span className="ms-2 badge bg-light text-dark">
-                                                                                                {tp.ticket?.access_type?.toUpperCase()}
-                                                                                            </span>
+                                                                                    {/* LEFT INFO */}
+                                                                                    <div className="ticket-info" style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                                                                                        {/* <strong style={{ fontSize: "15px" }}>
+                                                                                            {tp?.ticket.title}
+                                                                                            {isCommittee && <span className="ticket-type-badge committee">COMMITTEE</span>}
                                                                                         </strong>
+                                                                                        <p className="mt-1 mb-0">Base Price: {currencySymbol}{formatPrice(tp?.price)}</p> */}
 
-                                                                                        {/* 📅 Date / Slot Info */}
-                                                                                        {tp.slot ? (
-                                                                                            <p className="mt-2">
-                                                                                                {formatReadableDate(tp.slot.slot_date)} |{" "}
-                                                                                                {/* {tp.slot.start_time} - {tp.slot.end_time} */}
-                                                                                                
-                                                                                                {formatTimeSlots(tp.slot.start_time)} - {formatTimeSlots(tp.slot.end_time)}
+                                                                                        <div className="ticket-info">
+                                                                                            {/* 🎫 Ticket Title */}
+                                                                                            <strong style={{ fontSize: "15px" }}>
+                                                                                                {tp.ticket?.title}
+                                                                                                 {isCommittee && <span className="ticket-type-badge committee">COMMITTEE</span>}
+                                                                                                <span className="ms-2 badge bg-light text-dark">
+                                                                                                    {tp.ticket?.access_type?.toUpperCase()}
+                                                                                                </span>
+                                                                                            </strong>
+
+                                                                                            {/* 📅 Date / Slot Info */}
+                                                                                            {tp.slot ? (
+                                                                                                <p className="mt-2">
+                                                                                                    {formatReadableDate(tp.slot.slot_date)} |{" "}
+                                                                                                    {/* {tp.slot.start_time} - {tp.slot.end_time} */}
+
+                                                                                                    {formatTimeSlots(tp.slot.start_time)} - {formatTimeSlots(tp.slot.end_time)}
+                                                                                                </p>
+                                                                                            ) : tp.date ? (
+                                                                                                <p className="mt-2">
+                                                                                                    {formatReadableDate(tp.date)}
+                                                                                                </p>
+                                                                                            ) : (
+                                                                                                <p className="mt-2">Full Event Access</p>
+                                                                                            )}
+
+                                                                                            {/* 💰 Price */}
+                                                                                            <p className="fw-bold mb-0">
+                                                                                                Price: {currencySymbol}{formatPrice(tp.price)}
                                                                                             </p>
-                                                                                        ) : tp.date ? (
-                                                                                            <p className="mt-2">
-                                                                                                {formatReadableDate(tp.date)}
-                                                                                            </p>
-                                                                                        ) : (
-                                                                                            <p className="mt-2">Full Event Access</p>
+                                                                                        </div>
+
+                                                                                        {isCommittee && committeeStatus == null && (
+                                                                                            <select
+                                                                                                className="form-select"
+                                                                                                style={{ height: "auto", borderRadius: "5px" }}
+                                                                                                value={selectedMembers[tp?.ticket.id]?.id || ""}
+                                                                                                onChange={(e) => {
+                                                                                                    const member = committeeMembers.find(m => m.id == e.target.value);
+                                                                                                    setSelectedMembers(prev => ({
+                                                                                                        ...prev,
+                                                                                                        [tp?.ticket.id]: member
+                                                                                                    }));
+                                                                                                }}
+                                                                                            >
+                                                                                                <option value="">Select Member</option>
+                                                                                                {committeeMembers.map(member => (
+                                                                                                    <option key={member.id} value={member.id}>
+                                                                                                        {member.name}
+                                                                                                    </option>
+                                                                                                ))}
+                                                                                            </select>
                                                                                         )}
-
-                                                                                        {/* 💰 Price */}
-                                                                                        <p className="fw-bold mb-0">
-                                                                                            Price: {currencySymbol}{formatPrice(tp.price)}
-                                                                                        </p>
                                                                                     </div>
 
-                                                                                    {/* ➕ Counter / Sold Out */}
+                                                                                    {/* RIGHT ACTION */}
                                                                                     {isSoldOut ? (
                                                                                         <div className="sold-out-box">Sold Out</div>
+                                                                                    ) : isCommittee ? (
+                                                                                        committeeStatus == "approved" ? (
+                                                                                            <Counter
+                                                                                                count={cartItem?.count || 0}
+                                                                                                loading={isLoading}
+                                                                                                onInc={() => increaseTicket(ticket)}
+                                                                                                onDec={() => decreaseTicket(ticket)}
+                                                                                            />
+                                                                                        ) : committeeStatus == "pending" ? (
+                                                                                            <div className="committee-status pending">Request Sent</div>
+                                                                                        ) : committeeStatus == "rejected" ? (
+                                                                                            <div className="committee-status rejected">Rejected</div>
+                                                                                        ) : (
+                                                                                            selectedMembers[tp?.ticket.id] && (
+                                                                                                <button
+                                                                                                    className="btn btn-sm primery-button"
+                                                                                                    onClick={() => {
+
+                                                                                                        const validation = validateTicketQuestions(tp?.ticket?.id, ticketQuestions);
+
+                                                                                                        if (!validation.valid) {
+                                                                                                            Swal.fire({
+                                                                                                                icon: "warning",
+                                                                                                                title: "Incomplete Information",
+                                                                                                                text: validation.message
+                                                                                                            });
+                                                                                                            return;
+                                                                                                        }
+
+                                                                                                        requestCommitteeTicket(tp?.ticket, selectedMembers[tp?.ticket.id]);
+                                                                                                    }}
+
+                                                                                                >
+                                                                                                    Request
+                                                                                                </button>
+                                                                                            )
+                                                                                        )
                                                                                     ) : (
                                                                                         <Counter
                                                                                             count={cartItem?.count || 0}
                                                                                             loading={isLoading}
-                                                                                            onInc={() => increaseSlot(tp)}   // ✅ pass ticketPrice object
+                                                                                            onInc={() => {
+                                                                                                const validation = validateTicketQuestions(tp?.ticket.id, ticketQuestions);
+                                                                                                if (!validation.valid) {
+                                                                                                    Swal.fire({
+                                                                                                        icon: "warning",
+                                                                                                        title: "Incomplete Information",
+                                                                                                        text: validation.message,
+                                                                                                    });
+                                                                                                    return;
+                                                                                                }
+                                                                                                increaseSlot(tp);
+                                                                                            }}
                                                                                             onDec={() => decreaseSlot(tp)}
                                                                                         />
                                                                                     )}
                                                                                 </div>
+
+                                                                                {/* 🎯 Questions for this ticket only */}
+                                                                                {ticketQuestions.map(q => (
+                                                                                    <div key={q.id} className="ticket-question" style={{ marginTop: "5px" }}>
+                                                                                        {/* ✅ Question Label */}
+                                                                                        <label style={{ fontWeight: 500 }}>{q.question}</label>
+
+                                                                                        {/* 🎯 Agree → Yes / No */}
+                                                                                        {q.type == "Agree" && (
+                                                                                            <div>
+                                                                                                <label style={{ marginRight: "10px" }}>
+                                                                                                    <input
+                                                                                                        type="radio"
+                                                                                                        name={`q_${tp?.ticket.id}_${q.id}`}
+                                                                                                        value="Y"
+                                                                                                        checked={ticketAnswers?.[tp?.ticket.id]?.[q.id] == "Y"}
+                                                                                                        onChange={(e) => handleQuestionChange(tp?.ticket.id, q.id, e.target.value)}
+                                                                                                    /> Yes
+                                                                                                </label>
+                                                                                                <label>
+                                                                                                    <input
+                                                                                                        type="radio"
+                                                                                                        name={`q_${tp?.ticket.id}_${q.id}`}
+                                                                                                        value="N"
+                                                                                                        checked={ticketAnswers?.[tp?.ticket.id]?.[q.id] == "N"}
+                                                                                                        onChange={(e) => handleQuestionChange(tp?.ticket.id, q.id, e.target.value)}
+                                                                                                    /> No
+                                                                                                </label>
+                                                                                            </div>
+                                                                                        )}
+
+                                                                                        {/* 🎯 Select → Dropdown */}
+                                                                                        {q.type == "Select" && (
+                                                                                            <select
+                                                                                                className="form-select"
+                                                                                                style={{ height: "auto", borderRadius: "5px" }}
+                                                                                                value={ticketAnswers?.[tp?.ticket.id]?.[q.id] || ""}
+                                                                                                onChange={(e) => handleQuestionChange(tp?.ticket.id, q.id, e.target.value)}
+                                                                                            >
+                                                                                                <option value="">Select</option>
+                                                                                                {q.questionItems.map(item => (
+                                                                                                    <option key={item.id} value={item.items}>
+                                                                                                        {item.items}
+                                                                                                    </option>
+                                                                                                ))}
+                                                                                            </select>
+                                                                                        )}
+
+                                                                                        {/* 🎯 Text → Input */}
+                                                                                        {q.type == "Text" && (
+                                                                                            <input
+                                                                                                type="text"
+                                                                                                className="form-control"
+                                                                                                placeholder={`Type your answer`}
+                                                                                                value={ticketAnswers?.[tp?.ticket.id]?.[q.id] || ""}
+                                                                                                onChange={(e) => handleQuestionChange(tp?.ticket.id, q.id, e.target.value)}
+                                                                                            />
+                                                                                        )}
+                                                                                    </div>
+                                                                                ))}
                                                                             </div>
                                                                         );
+                                                                        // return (
+                                                                        //     <div key={`ticket-price-${i}`} className="ticket-item only-ticket">
+                                                                        //         <div className="d-flex justify-content-between align-items-start ticket-infobox">
+                                                                        //             <div className="ticket-info">
+                                                                        //                 {/* 🎫 Ticket Title */}
+                                                                        //                 <strong style={{ fontSize: "15px" }}>
+                                                                        //                     {tp.ticket?.title}
+                                                                        //                     <span className="ms-2 badge bg-light text-dark">
+                                                                        //                         {tp.ticket?.access_type?.toUpperCase()}
+                                                                        //                     </span>
+                                                                        //                 </strong>
+
+                                                                        //                 {/* 📅 Date / Slot Info */}
+                                                                        //                 {tp.slot ? (
+                                                                        //                     <p className="mt-2">
+                                                                        //                         {formatReadableDate(tp.slot.slot_date)} |{" "}
+                                                                        //                         {/* {tp.slot.start_time} - {tp.slot.end_time} */}
+
+                                                                        //                         {formatTimeSlots(tp.slot.start_time)} - {formatTimeSlots(tp.slot.end_time)}
+                                                                        //                     </p>
+                                                                        //                 ) : tp.date ? (
+                                                                        //                     <p className="mt-2">
+                                                                        //                         {formatReadableDate(tp.date)}
+                                                                        //                     </p>
+                                                                        //                 ) : (
+                                                                        //                     <p className="mt-2">Full Event Access</p>
+                                                                        //                 )}
+
+                                                                        //                 {/* 💰 Price */}
+                                                                        //                 <p className="fw-bold mb-0">
+                                                                        //                     Price: {currencySymbol}{formatPrice(tp.price)}
+                                                                        //                 </p>
+                                                                        //             </div>
+
+                                                                        //             {/* ➕ Counter / Sold Out */}
+                                                                        //             {isSoldOut ? (
+                                                                        //                 <div className="sold-out-box">Sold Out</div>
+                                                                        //             ) : (
+                                                                        //                 <Counter
+                                                                        //                     count={cartItem?.count || 0}
+                                                                        //                     loading={isLoading}
+                                                                        //                     onInc={() => increaseSlot(tp)}   // ✅ pass ticketPrice object
+                                                                        //                     onDec={() => decreaseSlot(tp)}
+                                                                        //                 />
+                                                                        //             )}
+                                                                        //         </div>
+                                                                        //     </div>
+                                                                        // );
                                                                     })}
 
                                                             </div>

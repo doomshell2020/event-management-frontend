@@ -182,7 +182,6 @@ const TicketDetails = ({ pendingRequests, counts, event_id }) => {
                         {ticketData.length > 0 ? (
                           ticketData.map((item) => {
                             const available = item.count - item.usedticket;
-
                             return (
                               <tr key={item.id}>
                                 <td className="px-3">
@@ -195,7 +194,8 @@ const TicketDetails = ({ pendingRequests, counts, event_id }) => {
                                 </td>
                                 <td className="px-3 text-end fw-semibold">
                                   {eventInfo?.currencyName?.Currency_symbol}
-                                  {item.ticket?.price}{" "}
+                                  {/* {item.ticket?.price}{" "} */}
+                                  {item?.ticket?.price || item?.ticket?.pricings?.[0]?.price || 0}{" "}
                                   <small className="text-muted body-text">
                                     {eventInfo?.currencyName?.Currency}
                                   </small>

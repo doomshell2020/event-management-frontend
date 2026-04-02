@@ -80,7 +80,7 @@ export async function getServerSideProps(context) {
 }
 
 const CommitteeCompleted = ({ counts, assets, completedData }) => {
-// console.log('assets :', assets);
+    // console.log('assets :', assets);
     // console.log('completedData :', completedData);
 
     const [activeTab, setMyActiveTab] = useState("completed");
@@ -198,7 +198,10 @@ const CommitteeCompleted = ({ counts, assets, completedData }) => {
                                                         <div>{item["ticketType.title"]}</div>
                                                         <div className="text-muted fs-13">
                                                             {item["event.currencyName.Currency_symbol"]}
-                                                            {item["ticketType.price"]}
+                                                            {/* {item["ticketType.price"]}  */}
+                                                            {item["ticketType.price"] > 0 ? item["ticketType.price"]
+                                                                    : item["ticketType.pricings.price"]
+                                                            }
                                                         </div>
                                                     </td>
 

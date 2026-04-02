@@ -139,9 +139,8 @@ export default function MyOrders({ userId }) {
                                                                                     "inline-block",
                                                                             }}
                                                                         >
-                                                                            Order ID
+                                                                            Order ID :
                                                                         </strong>
-                                                                        :
                                                                         {orderUID}
                                                                     </p>
 
@@ -153,9 +152,9 @@ export default function MyOrders({ userId }) {
                                                                                     "inline-block",
                                                                             }}
                                                                         >
-                                                                            Purchased
+                                                                            Purchased :
                                                                         </strong>
-                                                                        :
+                                                                        
                                                                         {purchaseDate}
                                                                     </p>
 
@@ -173,15 +172,15 @@ export default function MyOrders({ userId }) {
                                                                                     ?.type ===
                                                                                 "appointment"
                                                                                     ? "Appointments"
-                                                                                    : "Total Tickets"}
+                                                                                    : "Total Tickets"} :
                                                                             </strong>
-                                                                            :
+                                                                            
                                                                             {totalTickets}
                                                                         </p>
 
                                                                         <p className="time m-0 p-0">
-                                                                            <strong style={{ width: "70px", display: "inline-block" }}>Amount</strong>
-                                                                            <span style={{ width: "10px", display: "inline-block", fontWeight: "bold" }}>:</span>{eventCurrency}{order.grand_total}
+                                                                            <strong style={{ width: "70px", display: "inline-block" }}>Amount :</strong>
+                                                                            <span style={{ width: "10px", display: "inline-block", fontWeight: "bold" }}></span>{eventCurrency}{order.grand_total}
                                                                         </p>
                                                                     </div>
 
@@ -195,9 +194,9 @@ export default function MyOrders({ userId }) {
                                                                                     "inline-block",
                                                                             }}
                                                                         >
-                                                                            Start Date
+                                                                            Start Date :
                                                                         </strong>
-                                                                        :
+                                                                        
                                                                         {formatEventDateTime(
                                                                             event?.date_from,
                                                                             eventTimezone
@@ -214,9 +213,9 @@ export default function MyOrders({ userId }) {
                                                                                     "inline-block",
                                                                             }}
                                                                         >
-                                                                            End Date
+                                                                            End Date :
                                                                         </strong>
-                                                                        :
+                                                                        
                                                                         {formatEventDateTime(
                                                                             event?.date_to,
                                                                             eventTimezone
