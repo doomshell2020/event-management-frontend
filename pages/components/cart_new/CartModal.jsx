@@ -825,6 +825,21 @@ export default function CartModal({ show, handleClose, eventId }) {
         }
     };
 
+    const [committeeCounts, setCommitteeCounts] = useState({});
+    const increaseCommitteeTicket = (ticketId) => {
+        setCommitteeCounts(prev => ({
+            ...prev,
+            [ticketId]: (prev[ticketId] || 0) + 1
+        }));
+    };
+
+    const decreaseCommitteeTicket = (ticketId) => {
+        setCommitteeCounts(prev => ({
+            ...prev,
+            [ticketId]: Math.max((prev[ticketId] || 0) - 1, 0)
+        }));
+    };
+
     const [couponCode, setCouponCode] = useState("");
     const [appliedCoupon, setAppliedCoupon] = useState(null);
     // console.log("couponCode",couponCode);
@@ -896,22 +911,6 @@ export default function CartModal({ show, handleClose, eventId }) {
     // DISCOUNT (ONLY on ticket price)
     // --------------------
     let discountAmount = 0;
-
-    // if (appliedCoupon) {
-    //     if (appliedCoupon.discount_type == "percentage") {
-    //         discountAmount = (sub_total * appliedCoupon.discount) / 100;
-    //     } else {
-    //         discountAmount = appliedCoupon.discount;
-    //     }
-
-    //     // Prevent discount from exceeding subtotal
-    //     if (discountAmount > sub_total) {
-    //         discountAmount = sub_total;
-    //     }
-    // }
-
-    // console.log("appliedCoupon", appliedCoupon)
-
     if (appliedCoupon) {
         discountAmount = Number(appliedCoupon.discount || 0);
 
@@ -1118,11 +1117,20 @@ export default function CartModal({ show, handleClose, eventId }) {
     // Store selected committee member per ticket
     const [selectedMembers, setSelectedMembers] = useState({});
 
-    const requestCommitteeTicket = async (ticket, selectedMember) => {
-
+    const requestCommitteeTicket = async (ticket, selectedMember, count) => {
+        // console.log("count---", count)
         // 1️⃣ Prepare question answers
         const questionAnswers = buildQuestionAnswers(ticket.id);
 
+
+        if (!count || count <= 0) {
+            Swal.fire({
+                icon: "warning",
+                title: "Invalid Count",
+                text: "Please select at least 1 ticket"
+            });
+            return;
+        }
         try {
             Swal.fire({
                 title: "Requesting ticket...",
@@ -1137,7 +1145,8 @@ export default function CartModal({ show, handleClose, eventId }) {
                 event_id: finalEventId,
                 item_type: "committesale",
                 ticket_id: ticket.id,
-                count: 1,
+                // count: 1,
+                count: count,
                 committee_member_id: selectedMember.id,
                 questionAnswers
             };
@@ -1492,7 +1501,6 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                         </div>
                                                                     ))}
 
-
                                                                 {/* 🎟️ TICKETS */}
                                                                 {eventData.entry_type != 'multi' && eventData.tickets
                                                                     ?.filter(ticket => ticket.hidden != "Y" && ticket.sold_out != "Y")
@@ -1502,7 +1510,6 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                         const isSoldOut = ticket.sold_out == "Y";
                                                                         const isCommittee = ticket.type == "committee_sales";
                                                                         const committeeStatus = ticket.committee_status || null;
-
                                                                         // console.log('ticket.committeeAssignedTickets :', ticket.committeeAssignedTickets);
                                                                         const committeeMembers = isCommittee
                                                                             ? ticket.committeeAssignedTickets
@@ -1568,45 +1575,41 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                                     {/* RIGHT ACTION */}
                                                                                     {isSoldOut ? (
                                                                                         <div className="sold-out-box">Sold Out</div>
+
                                                                                     ) : isCommittee ? (
-                                                                                        committeeStatus == "approved" ? (
+                                                                                        <>
                                                                                             <Counter
-                                                                                                count={cartItem?.count || 0}
-                                                                                                loading={isLoading}
-                                                                                                onInc={() => increaseTicket(ticket)}
-                                                                                                onDec={() => decreaseTicket(ticket)}
+                                                                                                count={committeeCounts[ticket.id] || 0}
+                                                                                                loading={false}
+                                                                                                onInc={() => increaseCommitteeTicket(ticket.id)}
+                                                                                                onDec={() => decreaseCommitteeTicket(ticket.id)}
                                                                                             />
-                                                                                        ) : committeeStatus == "pending" ? (
-                                                                                            <div className="committee-status pending">Request Sent</div>
-                                                                                        ) : committeeStatus == "rejected" ? (
-                                                                                            <div className="committee-status rejected">Rejected</div>
-                                                                                        ) : (
-                                                                                            selectedMembers[ticket.id] && (
-                                                                                                <button
-                                                                                                    className="btn btn-sm primery-button"
-                                                                                                    onClick={() => {
 
-                                                                                                        const validation = validateTicketQuestions(ticket.id, ticketQuestions);
+                                                                                            {selectedMembers[ticket.id] &&
+                                                                                                (committeeCounts[ticket.id] || 0) > 0 && (
+                                                                                                    <button
+                                                                                                        className="btn btn-sm primery-button"
+                                                                                                        onClick={() => {
 
-                                                                                                        if (!validation.valid) {
-                                                                                                            Swal.fire({
-                                                                                                                icon: "warning",
-                                                                                                                title: "Incomplete Information",
-                                                                                                                text: validation.message
-                                                                                                            });
-                                                                                                            return;
-                                                                                                        }
+                                                                                                            const validation = validateTicketQuestions(ticket.id, ticketQuestions);
 
-                                                                                                        requestCommitteeTicket(ticket, selectedMembers[ticket.id]);
-                                                                                                    }}
+                                                                                                            if (!validation.valid) {
+                                                                                                                Swal.fire({
+                                                                                                                    icon: "warning",
+                                                                                                                    title: "Incomplete Information",
+                                                                                                                    text: validation.message
+                                                                                                                });
+                                                                                                                return;
+                                                                                                            }
 
-                                                                                                >
-                                                                                                    Request
-                                                                                                </button>
+                                                                                                            requestCommitteeTicket(ticket, selectedMembers[ticket.id],committeeCounts[ticket.id]);
+                                                                                                        }}
 
-
-                                                                                            )
-                                                                                        )
+                                                                                                    >
+                                                                                                        Request
+                                                                                                    </button>
+                                                                                                )}
+                                                                                        </>
                                                                                     ) : (
                                                                                         <Counter
                                                                                             count={cartItem?.count || 0}
@@ -1767,8 +1770,6 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                                     email: ct.committeeMember.user.email
                                                                                 })) || []
                                                                             : [];
-
-                                                                        // console.log('committeeMembers :', committeeMembers);
                                                                         // ✅ Filter questions that belong to this ticket
                                                                         const ticketQuestions = eventData.questions?.filter(q =>
                                                                             q.ticket_type_id
@@ -1785,17 +1786,11 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                                 <div className="d-flex justify-content-between align-items-start ticket-infobox">
                                                                                     {/* LEFT INFO */}
                                                                                     <div className="ticket-info" style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                                                                                        {/* <strong style={{ fontSize: "15px" }}>
-                                                                                            {tp?.ticket.title}
-                                                                                            {isCommittee && <span className="ticket-type-badge committee">COMMITTEE</span>}
-                                                                                        </strong>
-                                                                                        <p className="mt-1 mb-0">Base Price: {currencySymbol}{formatPrice(tp?.price)}</p> */}
-
                                                                                         <div className="ticket-info">
                                                                                             {/* 🎫 Ticket Title */}
                                                                                             <strong style={{ fontSize: "15px" }}>
                                                                                                 {tp.ticket?.title}
-                                                                                                 {isCommittee && <span className="ticket-type-badge committee">COMMITTEE</span>}
+                                                                                                {isCommittee && <span className="ticket-type-badge committee">COMMITTEE</span>}
                                                                                                 <span className="ms-2 badge bg-light text-dark">
                                                                                                     {tp.ticket?.access_type?.toUpperCase()}
                                                                                                 </span>
@@ -1850,25 +1845,20 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                                     {isSoldOut ? (
                                                                                         <div className="sold-out-box">Sold Out</div>
                                                                                     ) : isCommittee ? (
-                                                                                        committeeStatus == "approved" ? (
-                                                                                            <Counter
-                                                                                                count={cartItem?.count || 0}
-                                                                                                loading={isLoading}
-                                                                                                onInc={() => increaseTicket(ticket)}
-                                                                                                onDec={() => decreaseTicket(ticket)}
+                                                                                        <>
+                                                                                             <Counter
+                                                                                                count={committeeCounts[tp?.ticket.id] || 0}
+                                                                                                loading={false}
+                                                                                                onInc={() => increaseCommitteeTicket(tp?.ticket.id)}
+                                                                                                onDec={() => decreaseCommitteeTicket(tp?.ticket.id)}
                                                                                             />
-                                                                                        ) : committeeStatus == "pending" ? (
-                                                                                            <div className="committee-status pending">Request Sent</div>
-                                                                                        ) : committeeStatus == "rejected" ? (
-                                                                                            <div className="committee-status rejected">Rejected</div>
-                                                                                        ) : (
-                                                                                            selectedMembers[tp?.ticket.id] && (
+                                                                                            {/* {selectedMembers[tp?.ticket.id] && ( */}
+                                                                                            {selectedMembers[tp?.ticket.id] &&
+                                                                                                (committeeCounts[tp?.ticket.id] || 0) > 0 && (
                                                                                                 <button
                                                                                                     className="btn btn-sm primery-button"
                                                                                                     onClick={() => {
-
                                                                                                         const validation = validateTicketQuestions(tp?.ticket?.id, ticketQuestions);
-
                                                                                                         if (!validation.valid) {
                                                                                                             Swal.fire({
                                                                                                                 icon: "warning",
@@ -1878,14 +1868,12 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                                                             return;
                                                                                                         }
 
-                                                                                                        requestCommitteeTicket(tp?.ticket, selectedMembers[tp?.ticket.id]);
+                                                                                                        requestCommitteeTicket(tp?.ticket, selectedMembers[tp?.ticket.id],committeeCounts[tp?.ticket.id]);
                                                                                                     }}
-
                                                                                                 >
                                                                                                     Request
-                                                                                                </button>
-                                                                                            )
-                                                                                        )
+                                                                                                </button>)}
+                                                                                        </>
                                                                                     ) : (
                                                                                         <Counter
                                                                                             count={cartItem?.count || 0}
@@ -1908,64 +1896,66 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                                 </div>
 
                                                                                 {/* 🎯 Questions for this ticket only */}
-                                                                                {ticketQuestions.map(q => (
-                                                                                    <div key={q.id} className="ticket-question" style={{ marginTop: "5px" }}>
-                                                                                        {/* ✅ Question Label */}
-                                                                                        <label style={{ fontWeight: 500 }}>{q.question}</label>
+                                                                                {
+                                                                                    ticketQuestions.map(q => (
+                                                                                        <div key={q.id} className="ticket-question" style={{ marginTop: "5px" }}>
+                                                                                            {/* ✅ Question Label */}
+                                                                                            <label style={{ fontWeight: 500 }}>{q.question}</label>
 
-                                                                                        {/* 🎯 Agree → Yes / No */}
-                                                                                        {q.type == "Agree" && (
-                                                                                            <div>
-                                                                                                <label style={{ marginRight: "10px" }}>
-                                                                                                    <input
-                                                                                                        type="radio"
-                                                                                                        name={`q_${tp?.ticket.id}_${q.id}`}
-                                                                                                        value="Y"
-                                                                                                        checked={ticketAnswers?.[tp?.ticket.id]?.[q.id] == "Y"}
-                                                                                                        onChange={(e) => handleQuestionChange(tp?.ticket.id, q.id, e.target.value)}
-                                                                                                    /> Yes
-                                                                                                </label>
-                                                                                                <label>
-                                                                                                    <input
-                                                                                                        type="radio"
-                                                                                                        name={`q_${tp?.ticket.id}_${q.id}`}
-                                                                                                        value="N"
-                                                                                                        checked={ticketAnswers?.[tp?.ticket.id]?.[q.id] == "N"}
-                                                                                                        onChange={(e) => handleQuestionChange(tp?.ticket.id, q.id, e.target.value)}
-                                                                                                    /> No
-                                                                                                </label>
-                                                                                            </div>
-                                                                                        )}
+                                                                                            {/* 🎯 Agree → Yes / No */}
+                                                                                            {q.type == "Agree" && (
+                                                                                                <div>
+                                                                                                    <label style={{ marginRight: "10px" }}>
+                                                                                                        <input
+                                                                                                            type="radio"
+                                                                                                            name={`q_${tp?.ticket.id}_${q.id}`}
+                                                                                                            value="Y"
+                                                                                                            checked={ticketAnswers?.[tp?.ticket.id]?.[q.id] == "Y"}
+                                                                                                            onChange={(e) => handleQuestionChange(tp?.ticket.id, q.id, e.target.value)}
+                                                                                                        /> Yes
+                                                                                                    </label>
+                                                                                                    <label>
+                                                                                                        <input
+                                                                                                            type="radio"
+                                                                                                            name={`q_${tp?.ticket.id}_${q.id}`}
+                                                                                                            value="N"
+                                                                                                            checked={ticketAnswers?.[tp?.ticket.id]?.[q.id] == "N"}
+                                                                                                            onChange={(e) => handleQuestionChange(tp?.ticket.id, q.id, e.target.value)}
+                                                                                                        /> No
+                                                                                                    </label>
+                                                                                                </div>
+                                                                                            )}
 
-                                                                                        {/* 🎯 Select → Dropdown */}
-                                                                                        {q.type == "Select" && (
-                                                                                            <select
-                                                                                                className="form-select"
-                                                                                                style={{ height: "auto", borderRadius: "5px" }}
-                                                                                                value={ticketAnswers?.[tp?.ticket.id]?.[q.id] || ""}
-                                                                                                onChange={(e) => handleQuestionChange(tp?.ticket.id, q.id, e.target.value)}
-                                                                                            >
-                                                                                                <option value="">Select</option>
-                                                                                                {q.questionItems.map(item => (
-                                                                                                    <option key={item.id} value={item.items}>
-                                                                                                        {item.items}
-                                                                                                    </option>
-                                                                                                ))}
-                                                                                            </select>
-                                                                                        )}
+                                                                                            {/* 🎯 Select → Dropdown */}
+                                                                                            {q.type == "Select" && (
+                                                                                                <select
+                                                                                                    className="form-select"
+                                                                                                    style={{ height: "auto", borderRadius: "5px" }}
+                                                                                                    value={ticketAnswers?.[tp?.ticket.id]?.[q.id] || ""}
+                                                                                                    onChange={(e) => handleQuestionChange(tp?.ticket.id, q.id, e.target.value)}
+                                                                                                >
+                                                                                                    <option value="">Select</option>
+                                                                                                    {q.questionItems.map(item => (
+                                                                                                        <option key={item.id} value={item.items}>
+                                                                                                            {item.items}
+                                                                                                        </option>
+                                                                                                    ))}
+                                                                                                </select>
+                                                                                            )}
 
-                                                                                        {/* 🎯 Text → Input */}
-                                                                                        {q.type == "Text" && (
-                                                                                            <input
-                                                                                                type="text"
-                                                                                                className="form-control"
-                                                                                                placeholder={`Type your answer`}
-                                                                                                value={ticketAnswers?.[tp?.ticket.id]?.[q.id] || ""}
-                                                                                                onChange={(e) => handleQuestionChange(tp?.ticket.id, q.id, e.target.value)}
-                                                                                            />
-                                                                                        )}
-                                                                                    </div>
-                                                                                ))}
+                                                                                            {/* 🎯 Text → Input */}
+                                                                                            {q.type == "Text" && (
+                                                                                                <input
+                                                                                                    type="text"
+                                                                                                    className="form-control"
+                                                                                                    placeholder={`Type your answer`}
+                                                                                                    value={ticketAnswers?.[tp?.ticket.id]?.[q.id] || ""}
+                                                                                                    onChange={(e) => handleQuestionChange(tp?.ticket.id, q.id, e.target.value)}
+                                                                                                />
+                                                                                            )}
+                                                                                        </div>
+                                                                                    ))
+                                                                                }
                                                                             </div>
                                                                         );
                                                                         // return (
@@ -2020,7 +2010,8 @@ export default function CartModal({ show, handleClose, eventId }) {
 
                                                             </div>
 
-                                                        )}
+                                                        )
+                                                        }
                                                     </Col>
                                                 </Row>
                                             </div>
