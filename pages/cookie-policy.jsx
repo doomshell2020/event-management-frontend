@@ -1,145 +1,106 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import FrontendHeader from "@/shared/layout-components/frontelements/frontendheader";
 import FrontendFooter from "@/shared/layout-components/frontelements/frontendfooter";
 import api from "@/utils/api";
-import Swal from "sweetalert2";
-import Link from "next/link";
+import PulseLoader from "react-spinners/PulseLoader";
+import { usePathname } from "next/navigation";
 
-const RegisterPage = () => {
-  
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    gender: "",
-    dob: "2000-01-01"
-  });
-
-
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
+const CmsPage = () => {
   const backgroundImage = "/assets/front-images/about-slider_bg.jpg";
+  const pathname = usePathname();
 
-  /* ---------------- HELPERS ---------------- */
-  const isValidEmail = (email) =>
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const [htmlContent, setHtmlContent] = useState("");
+  const [pageName, setPageName] = useState("");
+  const [notFound, setNotFound] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const isStrongPassword = (password) =>
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(password);
-
-  const isValidName = (name) =>
-    /^[A-Za-z\s]{2,}$/.test(name);
-
-  const isValidDOB = (dob) => {
-    const birthDate = new Date(dob);
-    const today = new Date();
-    const age =
-      today.getFullYear() -
-      birthDate.getFullYear() -
-      (today < new Date(today.getFullYear(), birthDate.getMonth(), birthDate.getDate()) ? 1 : 0);
-    return age >= 13;
+  // Remove last segment from pathname
+  const getModifiedPath = (path) => {
+    if (!path) return "";
+    const parts = path.split("/");
+    parts.pop(); // remove last segment
+    return parts.join("/") || "/";
   };
 
-  /* ---------------- HANDLE CHANGE ---------------- */
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  /* ---------------- VALIDATION ---------------- */
-  const validateForm = () => {
-    if (!isValidName(formData.firstName)) {
-      Swal.fire("Invalid First Name", "First name must contain at least 2 letters.", "error");
-      return false;
-    }
-
-    if (!isValidName(formData.lastName)) {
-      Swal.fire("Invalid Last Name", "Last name must contain at least 2 letters.", "error");
-      return false;
-    }
-
-    if (!isValidEmail(formData.email)) {
-      Swal.fire("Invalid Email", "Please enter a valid email address.", "error");
-      return false;
-    }
-
-    if (!isStrongPassword(formData.password)) {
-      Swal.fire(
-        "Weak Password",
-        "Password must be at least 8 characters and include uppercase, lowercase, and a number.",
-        "error"
-      );
-      return false;
-    }
-
-    if (!formData.gender) {
-      Swal.fire("Missing Gender", "Please select your gender.", "error");
-      return false;
-    }
-
-    if (!isValidDOB(formData.dob)) {
-      Swal.fire("Invalid Date of Birth", "You must be at least 13 years old to register.", "error");
-      return false;
-    }
-
-    return true;
-  };
-
-  /* ---------------- SUBMIT ---------------- */
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!validateForm()) return;
-
-    setLoading(true);
+  const fetchData = async (path) => {
     try {
-      const response = await api.post("/api/v1/auth/register", formData);
+      const encodedPath = encodeURIComponent(path);
+      const response = await api.get(`/api/v1/cms/${encodedPath}`);
 
-      if (response.data?.success) {
-        Swal.fire(
-          "Success",
-          "Registration successful! Please check your email for verification.",
-          "success"
-        );
-
-        setFormData({
-          firstName: "",
-          lastName: "",
-          email: "",
-          password: "",
-          gender: "",
-          dob: ""
-        });
+      if (response.status === 200) {
+        const { descr, title } = response.data.data;
+        setHtmlContent(descr);
+        setPageName(title);
+        setNotFound(false);
       } else {
-        Swal.fire("Error", response.data?.message || "Something went wrong!", "error");
+        setNotFound(true);
       }
     } catch (error) {
-      const apiErrorMsg =
-        error.response?.data?.error?.message ||
-        error.response?.data?.message ||
-        "Registration failed. Try again later.";
-
-      Swal.fire("Error", apiErrorMsg, "error");
+      console.error("Error fetching CMS:", error);
+      setNotFound(true);
     } finally {
       setLoading(false);
     }
   };
 
+  useEffect(() => {
+    const modifiedPath = getModifiedPath(pathname);
+    if (modifiedPath) {
+      fetchData(modifiedPath);
+    }
+  }, [pathname]);
+
+  if (loading) {
+    return (
+      <div className="loader inner-loader" style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+        <PulseLoader color="#36d7b7" />
+      </div>
+    );
+  }
+
+  if (notFound) {
+    return <div className="text-center py-5">Page Not Found</div>;
+  }
+
   return (
     <>
       <FrontendHeader backgroundImage={backgroundImage} />
 
-  <section className="py-5">
+      <section className="py-5">
         <div className="container">
-          <div className="section-heading">
-            <h1>Cookie Policy</h1>
-          </div>
+
+          {loading ? (
+            <div
+              className="loader inner-loader"
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                minHeight: "300px", // only content area height
+              }}
+            >
+              <PulseLoader color="#36d7b7" />
+            </div>
+          ) : notFound ? (
+            <div className="text-center py-5">Page Not Found</div>
+          ) : (
+            <>
+              <div className="section-heading">
+                <h1>{pageName}</h1>
+              </div>
+
+              <div
+                dangerouslySetInnerHTML={{ __html: htmlContent }}
+              />
+            </>
+          )}
+
         </div>
-</section>
+      </section>
+
       <FrontendFooter />
     </>
   );
 };
 
-export default RegisterPage;
+export default CmsPage;
