@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { Spinner } from "react-bootstrap"; // Using Bootstrap spinner
-
+import Swal from "sweetalert2";
 import FrontendHeader from "@/shared/layout-components/frontelements/frontendheader";
 import FrontendFooter from "@/shared/layout-components/frontelements/frontendfooter";
 import EventSidebar from "@/pages/components/Event/EventSidebar";
 import api from "@/utils/api";
 import Moment from "react-moment";
+import ExcelJS from "exceljs";
+import { saveAs } from "file-saver";
+import moment from "moment";
 // 🔹 ApexCharts (SSR disabled)
 const ReactApexChart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
@@ -20,6 +23,7 @@ const DashboardPage = () => {
     const [isClient, setIsClient] = useState(false);
     const [selectedEventId, setSelectedEventId] = useState(null);
     const [eventFilter, setEventFilter] = useState("all");
+    const [excelLoading, setExcelLoading] = useState(false);
 
     /* ---------------- CLIENT CHECK ---------------- */
     useEffect(() => setIsClient(true), []);
@@ -94,8 +98,7 @@ const DashboardPage = () => {
     const salesProgress = dashboardData?.salesProgress || {};
     const historicalReport = dashboardData?.historicalSalesReport || {};
 
-    const allEvents = dashboardData?.events || [];
-
+    // const allEvents = dashboardData?.events || [];
     const totalEvents = summary?.total_events || 0;
     const totalRunningEvents = summary?.running_events || 0;
     const totalCompletedEvents = summary?.completed_events || 0;
@@ -277,25 +280,6 @@ const DashboardPage = () => {
         stroke: {
             width: 0
         },
-
-        // plotOptions: {
-        //     pie: {
-        //         donut: {
-        //             size: "70%",
-        //             labels: {
-        //                 show: true,
-        //                 total: {
-        //                     show: true,
-        //                     label: "Total Revenue",
-        //                     formatter: function () {
-        //                         return `${formatPrice(totalRevenue)}`;
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
-
         plotOptions: {
             pie: {
                 donut: {
@@ -320,22 +304,223 @@ const DashboardPage = () => {
                 }
             }
         }
-
-
-
-
-
-
-
-
-
     };
-
 
     const filteredSales = liveSales?.filter(
         (item) => (item?.totalTickets || 0) > 0
     );
 
+    const handleDownloadDashboardExcel = async () => {
+        if (!dashboardData) return;
+        setExcelLoading(true);
+
+        try {
+            const workbook = new ExcelJS.Workbook();
+            const sheet = workbook.addWorksheet("Dashboard Report");
+
+            const currency = dashboardData?.currency || "₹";
+
+            let rowIndex = 1;
+
+            /* ================= HEADER ================= */
+            const addHeader = (headers) => {
+                const row = sheet.getRow(rowIndex);
+
+                headers.forEach((h, i) => {
+                    const cell = row.getCell(i + 1);
+                    cell.value = h;
+
+                    cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
+                    cell.fill = {
+                        type: "pattern",
+                        pattern: "solid",
+                        fgColor: { argb: "FF000000" }
+                    };
+
+                    cell.alignment = { horizontal: "center" };
+                });
+
+                rowIndex++;
+            };
+
+            /* ================= ROW ================= */
+            const addRow = (data) => {
+                const row = sheet.getRow(rowIndex);
+
+                data.forEach((val, i) => {
+                    const cell = row.getCell(i + 1);
+                    cell.value = val;
+
+                    // Alignment
+                    if (i >= 4) {
+                        cell.alignment = { horizontal: "right" };
+                    } else {
+                        cell.alignment = { horizontal: "left" };
+                    }
+                });
+
+                rowIndex++;
+            };
+
+            /* ================= HEADER ================= */
+            addHeader([
+                "S.No",
+                "Event Name",
+                "Event Start Date",
+                "Event End Date",
+                "Total Tickets",
+                "Sold Tickets",
+                "Total Addons",
+                "Sold Addons",
+                "Total Packages",
+                "Sold Packages",
+                "Total Appointments",
+                "Sold Appointments",
+                "Total Revenue",
+                "Total Organizer Earnings",
+                "Platform Commission",
+                "Payment Gateway Commission",
+                "Total Paid Committee Member"
+            ]);
+
+            /* ================= TOTAL ================= */
+            let totals = {
+                totalTickets: 0,
+                soldTickets: 0,
+                totalAddons: 0,
+                soldAddons: 0,
+                totalPackages: 0,
+                soldPackages: 0,
+                totalAppointments: 0,
+                soldAppointments: 0,
+                revenue: 0,
+                organizerEarning: 0,
+                PlatformFee: 0,
+                PaymentGatewayFee: 0,
+                totalPayout: 0
+            };
+
+            /* ================= DATA ================= */
+            (dashboardData?.events || []).forEach((ev, index) => {
+
+                totals.totalTickets += Number(ev.totalTickets || 0);
+                totals.soldTickets += Number(ev.soldTickets || 0);
+                totals.totalAddons += Number(ev.totalAddons || 0);
+                totals.soldAddons += Number(ev.soldAddons || 0);
+                totals.totalPackages += Number(ev.totalPackages || 0);
+                totals.soldPackages += Number(ev.soldPackages || 0);
+                totals.totalAppointments += Number(ev.totalAppointments || 0);
+                totals.soldAppointments += Number(ev.soldAppointments || 0);
+                totals.revenue += Number(ev.revenue || 0);
+                totals.organizerEarning += Number(ev.organizerEarning || 0);
+                totals.PlatformFee += Number(ev.PlatformFee || 0);
+                totals.PaymentGatewayFee += Number(ev.PaymentGatewayFee || 0);
+                totals.totalPayout += Number(ev.totalPayout || 0);
+
+                addRow([
+                    index + 1,
+                    ev.name || "-",
+                    ev.date_from ? moment(ev.date_from).format("DD-MM-YYYY") : "-",
+                    ev.date_to ? moment(ev.date_to).format("DD-MM-YYYY") : "-",
+
+                    ev.totalTickets || 0,
+                    ev.soldTickets || 0,
+
+                    ev.totalAddons || 0,
+                    ev.soldAddons || 0,
+
+                    ev.totalPackages || 0,
+                    ev.soldPackages || 0,
+
+                    ev.totalAppointments || 0,
+                    ev.soldAppointments || 0,
+
+                    // Currency only here
+                    `${currency}${formatPrice(ev.revenue || 0)}`,
+                    `${currency}${formatPrice(ev.organizerEarning || 0)}`,
+                    `${currency}${formatPrice(ev.PlatformFee || 0)}`,
+                    `${currency}${formatPrice(ev.PaymentGatewayFee || 0)}`,
+                    `${currency}${formatPrice(ev.totalPayout || 0)}`
+                ]);
+            });
+
+            /* ================= TOTAL ROW ================= */
+            rowIndex++;
+
+            const totalRow = sheet.getRow(rowIndex);
+
+            totalRow.getCell(2).value = "TOTAL";
+
+            totalRow.getCell(5).value = totals.totalTickets;
+            totalRow.getCell(6).value = totals.soldTickets;
+            totalRow.getCell(7).value = totals.totalAddons;
+            totalRow.getCell(8).value = totals.soldAddons;
+            totalRow.getCell(9).value = totals.totalPackages;
+            totalRow.getCell(10).value = totals.soldPackages;
+            totalRow.getCell(11).value = totals.totalAppointments;
+            totalRow.getCell(12).value = totals.soldAppointments;
+
+            // NO currency in total
+            // totalRow.getCell(13).value = totals.revenue;
+            // totalRow.getCell(14).value = totals.organizerEarning;
+            // totalRow.getCell(15).value = totals.PlatformFee;
+            // totalRow.getCell(16).value = totals.PaymentGatewayFee;
+            // totalRow.getCell(17).value = totals.totalPayout;
+            totalRow.getCell(13).value = formatPrice(totals.revenue);
+            totalRow.getCell(14).value = formatPrice(totals.organizerEarning);
+            totalRow.getCell(15).value = formatPrice(totals.PlatformFee);
+            totalRow.getCell(16).value = formatPrice(totals.PaymentGatewayFee);
+            totalRow.getCell(17).value = formatPrice(totals.totalPayout);
+
+            totalRow.font = { bold: true };
+
+            for (let i = 1; i <= 17; i++) {
+                const cell = totalRow.getCell(i);
+
+                cell.fill = {
+                    type: "pattern",
+                    pattern: "solid",
+                    fgColor: { argb: "FFEFEFEF" }
+                };
+
+                cell.alignment = {
+                    horizontal: i >= 5 ? "right" : "left"
+                };
+            }
+
+            /* ================= AUTO WIDTH ================= */
+            sheet.columns.forEach((column) => {
+                let maxLength = 0;
+
+                column.eachCell({ includeEmpty: true }, (cell) => {
+                    let val = cell.value ? cell.value.toString() : "";
+                    val = val.replace(/₹/g, ""); // remove currency for better calc
+                    maxLength = Math.max(maxLength, val.length);
+                });
+
+                column.width = Math.max(12, maxLength + 2);
+            });
+
+            /* ================= CUSTOM WIDTH ================= */
+            sheet.getColumn(2).width = 30; // Event Name
+            sheet.getColumn(3).width = 18;
+            sheet.getColumn(4).width = 18;
+
+            /* ================= DOWNLOAD ================= */
+            const buffer = await workbook.xlsx.writeBuffer();
+
+            saveAs(
+                new Blob([buffer]),
+                `Dashboard_Report_${moment().format("YYYYMMDD_HHmmss")}.xlsx`
+            );
+
+        } catch (error) {
+            console.error("Excel error:", error.message);
+            Swal.fire("Error", "Failed to download report", "error");
+        } finally {
+            setExcelLoading(false);
+        }
+    };
 
 
 
@@ -413,8 +598,25 @@ const DashboardPage = () => {
 
                                     </div>
 
-                                </div>
 
+                                    <button className="export-btn"
+                                        data-bs-toggle="tooltip"
+                                        title="Download report"
+                                        onClick={handleDownloadDashboardExcel}
+                                        disabled={excelLoading}>
+                                        {excelLoading ? (
+                                            <>
+                                                <span className="spinner-border spinner-border-sm me-2" />
+                                                Downloading...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <i className="bi bi-file-earmark-excel-fill me-2"></i>
+                                                ⬇ Export
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
 
 
                                 <div className="contant_bg container-fluid">
@@ -491,7 +693,7 @@ const DashboardPage = () => {
                                                                             title="Total Sold Tickets"
                                                                             style={{ cursor: "pointer" }}
                                                                         >
-                                                                            {soldTickets+totalSoldPackageTickets}
+                                                                            {soldTickets + totalSoldPackageTickets}
                                                                         </span>
                                                                         {" / "}
                                                                         <span
@@ -527,7 +729,7 @@ const DashboardPage = () => {
                                                                             title="Total Sold Addons"
                                                                             style={{ cursor: "pointer" }}
                                                                         >
-                                                                            {soldAddons+totalSoldPackageAddons}
+                                                                            {soldAddons + totalSoldPackageAddons}
                                                                         </span>
                                                                         {" / "}
                                                                         <span

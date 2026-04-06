@@ -13,19 +13,7 @@ import FrontendHeader from "@/shared/layout-components/frontelements/frontendhea
 import FrontendFooter from "@/shared/layout-components/frontelements/frontendfooter";
 import EventHeaderSection from "@/pages/components/Event/EventProgressBar";
 import EventSidebar from "@/pages/components/Event/EventSidebar";
-
-
-import {
-    Row,
-    Button,
-    Col,
-    Card,
-    Tabs,
-    Tab,
-    Table,
-    Spinner,
-    Form,
-} from "react-bootstrap";
+import { Button, ButtonGroup, Dropdown ,OverlayTrigger, Tooltip} from "react-bootstrap";
 
 const ExportTickets = () => {
     const router = useRouter();
@@ -41,7 +29,7 @@ const ExportTickets = () => {
     const [loading, setLoading] = useState(true);
     const [backgroundImage] = useState("/assets/front-images/about-slider_bg.jpg");
     const [excelLoading, setExcelLoading] = useState(false);
-
+    const [selected, setSelected] = useState("all");
     // Fetch Event Details
     const fetchEventDetails = async (eventId) => {
         setLoading(true);
@@ -63,7 +51,7 @@ const ExportTickets = () => {
         setLoading(true);
         try {
             const res = await api.get(
-                `/api/v1/orders/organizer/ticket-exports?eventId=${eventId}&page=${page}&limit=${limit}`
+                `/api/v1/orders/organizer/ticket-exports?eventId=${eventId}&page=${page}&limit=${limit}&status=${selected}`
             );
 
             if (res.data.success) {
@@ -93,7 +81,13 @@ const ExportTickets = () => {
     useEffect(() => {
         if (!eventId) return;
         fetchTickets(eventId, currentPage);  // ✔ runs every time page changes
-    }, [currentPage]);  // remove eventId to avoid re-calling event details
+    }, [currentPage, selected]);  // remove eventId to avoid re-calling event details
+
+    useEffect(() => {
+        if (!eventId) return;
+        // jab filter change ho → page reset karo
+        setCurrentPage(1);
+    }, [selected]);
 
 
     // Pagination Button Handler
@@ -146,7 +140,7 @@ const ExportTickets = () => {
 
         try {
             const response = await api.get(
-                `/api/v1/orders/organizer/ticket-exports?eventId=${eventDetails.id}&page=1&limit=100000`
+                `/api/v1/orders/organizer/ticket-exports?eventId=${eventDetails.id}&page=1&limit=100000&status=${selected}`
             );
 
             const { records, qr_base_path } = response.data.data;
@@ -261,29 +255,67 @@ const ExportTickets = () => {
                             <section id="post-eventpg">
 
                                 <EventHeaderSection eventDetails={eventDetails} isProgressBarShow={false} />
+                                <div className="d-flex justify-content-between align-items-center flex-wrap mb-3">
+                                    <h4 className="text-24 mb-0">Payments</h4>
+                                    <div className="d-flex align-items-center gap-2">
+                                        <Button
+                                            variant="success"
+                                            className="btn-sm d-flex align-items-center"
+                                            onClick={handleDownloadOrdersExcel}
+                                            disabled={excelLoading}
+                                        >
+                                            {excelLoading ? (
+                                                <>
+                                                    <span className="spinner-border spinner-border-sm me-2" />
+                                                    Downloading...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <i className="bi bi-file-earmark-excel-fill me-2"></i>
+                                                    Download Orders
+                                                </>
+                                            )}
+                                        </Button>
+                                        <OverlayTrigger
+                                            placement="top"
+                                            overlay={
+                                                <Tooltip id="ticket-filter-tooltip">
+                                                    Show All / Scanned / Not Scanned tickets
+                                                </Tooltip>
+                                            }
+                                        >
 
-                                <h4 className="text-24">Payments</h4>
+                                            <ButtonGroup className="ms-2 mt-2 mb-2">
+                                                <Dropdown>
+                                                    <Dropdown.Toggle className="btn ripple btn-success d-flex align-items-center justify-content-center"
+                                                        style={{ height: "32px", minWidth: "130px" }}
+                                                    >
+                                                        {selected === "all"
+                                                            ? "All"
+                                                            : selected === "scanned"
+                                                                ? "Scanned"
+                                                                : "Not Scanned"}
+                                                    </Dropdown.Toggle>
+
+                                                    <Dropdown.Menu className="tx-13">
+                                                        <Dropdown.Item onClick={() => setSelected("all")}>
+                                                            All
+                                                        </Dropdown.Item>
+
+                                                        <Dropdown.Item onClick={() => setSelected("scanned")}>
+                                                            Scanned
+                                                        </Dropdown.Item>
+
+                                                        <Dropdown.Item onClick={() => setSelected("not_scanned")}>
+                                                            Not Scanned
+                                                        </Dropdown.Item>
+                                                    </Dropdown.Menu>
+                                                </Dropdown>
+                                            </ButtonGroup>
+                                        </OverlayTrigger>
+                                    </div>
+                                </div>
                                 <hr className="custom-hr" />
-
-                                <Button
-                                    variant="success"
-                                    className="btn-sm d-flex align-items-center"
-                                    onClick={handleDownloadOrdersExcel}
-                                    disabled={excelLoading}
-                                >
-                                    {excelLoading ? (
-                                        <>
-                                            <span className="spinner-border spinner-border-sm me-2" />
-                                            Downloading...
-                                        </>
-                                    ) : (
-                                        <>
-                                            <i className="bi bi-file-earmark-excel-fill me-2"></i>
-                                            Download Orders
-                                        </>
-                                    )}
-                                </Button>
-
 
                                 <div className="stripe-table mt-4">
 
