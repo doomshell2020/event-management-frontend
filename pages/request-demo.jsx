@@ -24,7 +24,8 @@ const RequestDemo = () => {
     ];
 
     const isPastTime = (time) => {
-        const now = new Date();
+        // const now = new Date();
+        const now = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
 
         const selected = new Date(date);
 
