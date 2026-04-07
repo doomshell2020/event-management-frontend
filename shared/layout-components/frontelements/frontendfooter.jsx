@@ -58,7 +58,7 @@ const FrontendFooter = () => {
             <li><Link href="/delivery-policy">Delivery Policy</Link></li>
             <li><Link href="/branding">Branding</Link></li>
             <li><Link href="/cookie-policy">Cookie Policy</Link></li>
-            {/* <li><Link href="/request-demo">Request Demo</Link></li> */}
+            <li><Link href="/request-demo">Request Demo</Link></li>
           </ul>
         </div>
       </div>
