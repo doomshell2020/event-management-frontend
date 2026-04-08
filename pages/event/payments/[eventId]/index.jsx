@@ -138,7 +138,7 @@ const ManagePayments = () => {
                                                     </tr>
                                                 ) : (
                                                     orderData.map((item, index) => {
-                                                    // console.log('item :', item);
+                                                    console.log('item :', item);
                                                         const srNo = index + 1 + (currentPage - 1) * limit;
                                                         const currencyName = item?.event?.currencyName?.Currency_symbol || '₹'
 
@@ -163,11 +163,18 @@ const ManagePayments = () => {
                                                                 <td className="fw-bold">{currencyName} {item.grand_total}</td>
 
                                                                 {/* Paid/Unpaid */}
-                                                                <td>
+                                                                {/* <td>
                                                                     {item.status == "Y" ? (
                                                                         <span className="badge bg-success">Paid</span>
                                                                     ) : (
                                                                         <span className="badge bg-secondary">Unpaid</span>
+                                                                    )}
+                                                                </td> */}
+                                                                <td>
+                                                                    {item.grand_total == 0 ? (
+                                                                        <span className="badge bg-secondary">Complimentary</span>
+                                                                    ) : (
+                                                                        <span className="badge bg-success">Paid</span>
                                                                     )}
                                                                 </td>
 

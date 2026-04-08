@@ -92,7 +92,9 @@ const EventDashboardPage = () => {
 
     const organizerRevenue = revenueDistribution?.organizer || 0;
     const platformFee = revenueDistribution?.platform || 0;
+    const gatewayFee = revenueDistribution?.gateway || 0;
     const committeeFee = revenueDistribution?.committee || 0;
+    // console.log("revenueDistribution-=-=-=-=-=-",revenueDistribution);
     const ticketTotal = salesProgress?.tickets?.total || 0;
     const ticketSold = salesProgress?.tickets?.sold || 0;
     const ticketPercent = salesProgress?.tickets?.percentage || 0;
@@ -126,6 +128,7 @@ const EventDashboardPage = () => {
         organizer: "#22c55e",
         platform: "#6366f1",
         committee: "#f59e0b",
+        gateway: "#ef4444",
     };
 
     /* ---------------- REVENUE BAR ---------------- */
@@ -159,20 +162,23 @@ const EventDashboardPage = () => {
 
     /* ---------------- DONUT ---------------- */
     const commissionPercent = commissionSplit?.percentage || {};
+    // console.log("commissionPercent--",commissionPercent)
     const commissionDonutSeries = [
         organizerRevenue,
         platformFee,
+        gatewayFee,
         committeeFee,
     ];
 
     const commissionDonutOptions = {
         chart: { type: "donut" },
 
-        labels: ["Organizer Earnings", "Platform Commission", "Committee Commission"],
+        labels: ["Organizer Earnings", "Platform Commission","Payment Gateway Commission", "Committee Commission"],
 
         colors: [
             commissionColors.organizer,
             commissionColors.platform,
+            commissionColors.gateway,
             commissionColors.committee,
         ],
 
@@ -591,7 +597,7 @@ const EventDashboardPage = () => {
 
                                             <div className="row mb-4">
 
-                                                <div className="col-md-6 mb-3">
+                                                {/* <div className="col-md-6 mb-3">
                                                     <div className="card dashboard-card">
                                                         <h6>Revenue Distribution</h6>
 
@@ -604,7 +610,7 @@ const EventDashboardPage = () => {
                                                             />
                                                         )}
                                                     </div>
-                                                </div>
+                                                </div> */}
 
                                                 <div className="col-md-6 mb-3">
                                                     <div className="card dashboard-card">
@@ -642,9 +648,22 @@ const EventDashboardPage = () => {
 
                                                                 <span>
                                                                     {currency}{formatPrice(platformFee)}
+                                                                    ({commissionPercent?.gateway}%)
+                                                                </span>
+                                                            </div>
+
+                                                            <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                                                <span style={{ color: commissionColors.gateway }}>
+                                                                    ● Payment Gateway Commission
+                                                                </span>
+
+                                                                <span>
+                                                                    {currency}{formatPrice(gatewayFee)}
                                                                     ({commissionPercent?.platform}%)
                                                                 </span>
                                                             </div>
+
+
 
                                                             {committeeMembers.length > 0 && (
                                                                 <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -663,11 +682,78 @@ const EventDashboardPage = () => {
                                                     </div>
                                                 </div>
 
+
+                                                {totalTickets !== 0 && (
+                                                    <div className="col-md-6 mb-4">
+                                                        <div className="light-card">
+
+                                                            <div className="card-top">
+                                                                <h6>Sales Progress</h6>
+                                                                <span className="fw-bold">{combinedPercent}%</span>
+                                                            </div>
+
+                                                            <div className="progress light-progress mb-4">
+                                                                <div
+                                                                    className="progress-bar bg-success"
+                                                                    style={{ width: `${combinedPercent}%` }}
+                                                                />
+                                                            </div>
+
+                                                            <div className="row g-3">
+
+                                                                {/* Sold Tickets */}
+                                                                <div className="col-6">
+                                                                    <div className="sales-box">
+                                                                        <p>Sold <br />TICKETS</p>
+                                                                        <h4>{ticketSold}</h4>
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* Remaining Tickets */}
+                                                                <div className="col-6">
+                                                                    <div className="sales-box">
+                                                                        <p>Remaining <br />TICKETS</p>
+                                                                        <h4>{ticketRemaining}</h4>
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* Sold Addons */}
+                                                                <div className="col-6">
+                                                                    <div className="sales-box">
+                                                                        <p>Sold <br />ADDONS</p>
+                                                                        <h4>{addonSold}</h4>
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* Remaining Addons */}
+                                                                <div className="col-6">
+                                                                    <div className="sales-box">
+                                                                        <p>Remaining <br />ADDONS</p>
+                                                                        <h4>{addonRemaining}</h4>
+                                                                    </div>
+                                                                </div>
+
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+
+                                                )}
+
+
+
+
+
+
+
+
+
+
                                             </div>
 
                                             {/* ================= COMMISSION BREAKDOWN ================= */}
 
-                                            <div className="col-md-6 mb-4">
+                                            {/* <div className="col-md-6 mb-4">
 
                                                 <div className="light-card">
 
@@ -695,10 +781,10 @@ const EventDashboardPage = () => {
 
                                                 </div>
 
-                                            </div>
+                                            </div> */}
 
                                             {/* ================= SALES PROGRESS ================= */}
-                                            {totalTickets !== 0 && (
+                                            {/* {totalTickets !== 0 && (
                                                 <div className="col-md-6 mb-4">
                                                     <div className="light-card">
 
@@ -716,7 +802,6 @@ const EventDashboardPage = () => {
 
                                                         <div className="row g-3">
 
-                                                            {/* Sold Tickets */}
                                                             <div className="col-6">
                                                                 <div className="sales-box">
                                                                     <p>Sold <br />TICKETS</p>
@@ -724,7 +809,6 @@ const EventDashboardPage = () => {
                                                                 </div>
                                                             </div>
 
-                                                            {/* Remaining Tickets */}
                                                             <div className="col-6">
                                                                 <div className="sales-box">
                                                                     <p>Remaining <br />TICKETS</p>
@@ -732,7 +816,6 @@ const EventDashboardPage = () => {
                                                                 </div>
                                                             </div>
 
-                                                            {/* Sold Addons */}
                                                             <div className="col-6">
                                                                 <div className="sales-box">
                                                                     <p>Sold <br />ADDONS</p>
@@ -740,7 +823,6 @@ const EventDashboardPage = () => {
                                                                 </div>
                                                             </div>
 
-                                                            {/* Remaining Addons */}
                                                             <div className="col-6">
                                                                 <div className="sales-box">
                                                                     <p>Remaining <br />ADDONS</p>
@@ -753,7 +835,7 @@ const EventDashboardPage = () => {
                                                     </div>
                                                 </div>
 
-                                            )}
+                                            )} */}
 
                                             {/* ================= COMMITTEE PERFORMANCE ================= */}
 

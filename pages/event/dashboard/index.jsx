@@ -222,7 +222,6 @@ const DashboardPage = () => {
 
     const committeeSummary = committeePerfData?.summary || {};
     const committeeMembers = committeePerfData?.members || [];
-
     const committeeTotalAssigned = committeeSummary?.totalAssigned || 0;
     const committeeTotalSold = committeeSummary?.totalSold || 0;
     const committeeTotalPaid = committeeSummary?.totalPaid || 0;
@@ -588,7 +587,7 @@ const DashboardPage = () => {
                                         <select className="form-select form-select-sm" style={{ width: "220px" }}
                                             onChange={(e) => setSelectedEventId(e.target.value)}
                                         >
-                                            <option value="">Select individual event</option>
+                                            <option value="">All Events</option>
                                             {events?.map((event) => (
                                                 <option key={event.id} value={event.id}>
                                                     {event.name}
@@ -1048,13 +1047,13 @@ const DashboardPage = () => {
                                                                         <div className="sales-box">
                                                                             <p>Sold</p>
                                                                             <h4>{soldRunningEventTickets}</h4>
-                                                                            <p className="dash-label mb-1">{formatPrice(soldRevenue)} revenue</p>
+                                                                            {/* <p className="dash-label mb-1">{formatPrice(soldRevenue)} revenue</p> */}
                                                                         </div>
 
                                                                         <div className="sales-box">
                                                                             <p>Remaining</p>
                                                                             <h4>{totalRunningEventTickets - soldRunningEventTickets}</h4>
-                                                                            <p className="dash-label mb-1">{formatPrice(potentialRevenue)} potential</p>
+                                                                            {/* <p className="dash-label mb-1">{formatPrice(potentialRevenue)} potential</p> */}
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -1103,7 +1102,7 @@ const DashboardPage = () => {
                                                                 <div className="card dashboard-card h-100 p-3 text-center">
                                                                     <div className="d-flex justify-content-center align-items-center">
                                                                         <div>
-                                                                            <p className="dash-label mb-1">Total Commissions</p>
+                                                                            <p className="dash-label mb-1">Total Payable Commission</p>
                                                                             <h4 className="dash-value">{formatPrice(totalCommissions)}</h4>
                                                                         </div>
 
@@ -1136,7 +1135,7 @@ const DashboardPage = () => {
                                                                         <th>Date</th>
                                                                         <th>Tickets</th>
                                                                         <th>Revenue</th>
-                                                                        <th>Commission</th>
+                                                                        <th>Payable Commission</th>
                                                                         <th>Net Earnings</th>
                                                                     </tr>
                                                                 </thead>
@@ -1205,7 +1204,7 @@ const DashboardPage = () => {
                                                                 <div className="card dashboard-card h-100 p-3 text-center">
                                                                     <div className="d-flex justify-content-center align-items-center">
                                                                         <div>
-                                                                            <p className="dash-label mb-1">Total Paid</p>
+                                                                            <p className="dash-label mb-1">Total Sale</p>
                                                                             <h4 className="dash-value">{formatPrice(committeeTotalPaid)}</h4>
                                                                         </div>
 

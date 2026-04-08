@@ -246,11 +246,11 @@ export default function OrganizerEvents({ userId }) {
                                         <table className="table table-hover mb-0 table-mobile-width">
                                             <thead className="table-dark table_bg">
                                                 <tr>
-                                                    <th style={{ width: "2%" }} scope="col">#</th>
-                                                    <th style={{ width: "14%" }} scope="col">Image</th>
-                                                    <th style={{ width: "8%" }} scope="col">Details</th>
-                                                    <th style={{ width: "18%" }} scope="col">Events Dates</th>
-                                                    <th style={{ width: "15%" }} scope="col">Action</th>
+                                                    <th style={{ width: "5%" }} scope="col">#</th>
+                                                    <th style={{ width: "15%" }} scope="col">Image</th>
+                                                    <th style={{ width: "30%" }} scope="col">Details</th>
+                                                    <th style={{ width: "25%" }} scope="col">Events Dates</th>
+                                                    <th style={{ width: "25%" }} scope="col">Action</th>
                                                     {/* <th style={{ width: "16%" }} scope="col">Ticket Types</th> */}
                                                     {/* <th style={{ width: "17%" }} scope="col">Date and Time</th> */}
                                                     {/* <th style={{ width: "8%" }} scope="col">Venue</th> */}

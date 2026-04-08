@@ -125,13 +125,13 @@ const MyPayouts = () => {
               </Form>
 
               {/* ================= TOTAL SALE SUMMARY ================= */}
-              <div className="mb-3 text-end">
+              {/* <div className="mb-3 text-end">
                 <strong>Total Sales: </strong>
                 <span className="text-success">
                   {currency}
                   {totalSaleAmount.toLocaleString()}
                 </span>
-              </div>
+              </div> */}
 
               {/* ================= TABLE ================= */}
               <h5 className="mt-3,mb-3">ORGANIZER PAYOUT</h5>
