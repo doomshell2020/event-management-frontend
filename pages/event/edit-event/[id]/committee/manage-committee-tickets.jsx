@@ -308,7 +308,12 @@ const CommitteeTicketsPage = () => {
                                                             <tr>
                                                                 {ticketTypes.map((t) => (
                                                                     <th key={t.id}>
-                                                                        {t.title} {currencySymbol}({t.price})
+                                                                        {/* {t.title} {currencySymbol}({t.price}) */}
+                                                                        {t.title} {currencySymbol}(
+                                                                        {parseFloat(t.price) === 0
+                                                                            ? t?.pricings?.[0]?.price
+                                                                            : t.price}
+                                                                        )
                                                                     </th>
                                                                 ))}
                                                                 <th>Total</th>
@@ -350,7 +355,9 @@ const CommitteeTicketsPage = () => {
                                                                     <th key={t.id} className="text-center">
                                                                         {t.title}
                                                                         <br />
-                                                                        <small>({currencySymbol}{t.price})</small>
+                                                                        <small>({currencySymbol} {parseFloat(t.price) === 0
+                                                                            ? t?.pricings?.[0]?.price
+                                                                            : t.price})</small>
                                                                     </th>
                                                                 ))}
                                                             </tr>
@@ -480,7 +487,10 @@ const CommitteeTicketsPage = () => {
                             <div>
                                 <div className="fw-semibold">{t.title}</div>
                                 <div className="text-muted text-12">
-                                    {currencySymbol}{t.price}
+                                    {/* {currencySymbol}{t.price} */}
+                                    {currencySymbol} {parseFloat(t.price) === 0
+                                        ? t?.pricings?.[0]?.price
+                                        : t.price}
                                 </div>
                             </div>
 

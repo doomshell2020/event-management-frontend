@@ -27,7 +27,6 @@ const CommitteeCommissionsPage = () => {
     /* ---------------- STATES ---------------- */
     const [eventDetails, setEventDetails] = useState(null);
     const [committeeList, setCommitteeList] = useState([]);
-    console.log("----------committeeList", committeeList);
     const [loading, setLoading] = useState(false);
     const [processing, setProcessing] = useState(false);
 

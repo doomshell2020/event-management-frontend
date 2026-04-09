@@ -43,6 +43,10 @@ const EventDetailsPage = () => {
     const content = getHtmlEditorContent(noteRef);
     const [editorData, setEditorData] = useState({ content: "" });
     const [errors, setErrors] = useState({});
+    const [enableRefund, setEnableRefund] = useState(false);
+    const [refundAllowed, setRefundAllowed] = useState("");
+    const [refundDeadline, setRefundDeadline] = useState("");
+    const [cancellationPolicy, setCancellationPolicy] = useState("");
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -288,12 +292,15 @@ const EventDetailsPage = () => {
             });
             fd.append("desp", content.trim())
             if (image) fd.append("feat_image", image);
-
-            // Debug check:
-            // for (let pair of fd.entries()) {
-            //     console.log(pair[0] + ": ", pair[1]);
-            // }
             // return false
+
+            fd.append("refund_enabled", enableRefund ? "Y" : "N");
+
+            if (enableRefund) {
+                fd.append("refund_allowed", refundAllowed);
+                fd.append("refund_deadline", refundDeadline);
+                fd.append("cancellation_policy", cancellationPolicy);
+            }
 
             const response = await api.post("/api/v1/events/create", fd, {
                 headers: { "Content-Type": "multipart/form-data" },
@@ -355,6 +362,31 @@ const EventDetailsPage = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+
+    const handleRefundToggle = (e) => {
+        const checked = e.target.checked;
+        setEnableRefund(checked);
+
+        // agar unchecked kare to values reset ho jaye
+        if (!checked) {
+            setRefundAllowed("");
+            setRefundDeadline("");
+            setCancellationPolicy("");
+        }
+    };
+
+    const handleRefundAllowedChange = (e) => {
+        setRefundAllowed(e.target.value);
+    };
+
+    const handleRefundDeadlineChange = (e) => {
+        setRefundDeadline(e.target.value);
+    };
+
+    const handleCancellationPolicyChange = (e) => {
+        setCancellationPolicy(e.target.value);
     };
 
 
@@ -644,24 +676,24 @@ const EventDetailsPage = () => {
                                                 </div>
 
                                                 {/* {formData.is_free != "Y" && ( */}
-                                                    <>
-                                                        {/* Currency */}
-                                                        <div className="col-lg-3 col-md-6 mb-3 mt-0">
-                                                            <label className="form-label">Currency <span className="text-danger">*</span></label>
-                                                            <select
-                                                                className="form-select rounded-0"
-                                                                name="payment_currency"
-                                                                value={formData.payment_currency}
-                                                                onChange={handleChange}
-                                                                required
-                                                            >
-                                                                <option value="">Payment Type</option>
-                                                                <option value="1">INR</option>
-                                                                <option value="2">USD</option>
-                                                            </select>
-                                                        </div>
+                                                <>
+                                                    {/* Currency */}
+                                                    <div className="col-lg-3 col-md-6 mb-3 mt-0">
+                                                        <label className="form-label">Currency <span className="text-danger">*</span></label>
+                                                        <select
+                                                            className="form-select rounded-0"
+                                                            name="payment_currency"
+                                                            value={formData.payment_currency}
+                                                            onChange={handleChange}
+                                                            required
+                                                        >
+                                                            <option value="">Payment Type</option>
+                                                            <option value="1">INR</option>
+                                                            <option value="2">USD</option>
+                                                        </select>
+                                                    </div>
 
-                                                    </>
+                                                </>
 
                                                 {/* )} */}
 
@@ -906,6 +938,70 @@ const EventDetailsPage = () => {
                                                         </select>
                                                     </div>
                                                 )}
+
+
+                                                <div className="col-12">
+                                                    <div className="form-check mb-3">
+                                                        <input
+                                                            type="checkbox"
+                                                            className="form-check-input"
+                                                            id="refundCheck"
+                                                            checked={enableRefund}
+                                                            onChange={handleRefundToggle}
+                                                        />
+                                                        <label className="form-check-label" htmlFor="refundCheck">
+                                                            Enable Cancellation & Refund
+                                                        </label>
+                                                    </div>
+
+                                                    {enableRefund && (
+                                                        <div className="row">
+                                                            {/* Refund Allowed */}
+                                                            <div className="col-md-4">
+                                                                <label className="form-label">Refund<span className="text-danger">*</span></label>
+                                                                <select className="form-control"
+                                                                    value={refundAllowed}
+                                                                    onChange={handleRefundAllowedChange}
+                                                                    required={enableRefund}
+                                                                >
+                                                                    <option value="">Select</option>
+                                                                    <option value="Y">Allowed</option>
+                                                                    <option value="N">Not Allowed</option>
+                                                                </select>
+                                                            </div>
+
+                                                            {/* Refund Deadline */}
+                                                            <div className="col-md-4">
+                                                                <label className="form-label">Refund Deadline<span className="text-danger">*</span></label>
+                                                                <input
+                                                                    type="number"
+                                                                    className="form-control"
+                                                                    placeholder="e.g. 7 days before event"
+                                                                    value={refundDeadline}
+                                                                    onChange={handleRefundDeadlineChange}
+                                                                    required={enableRefund}
+                                                                />
+                                                            </div>
+
+                                                            {/* Cancellation Policy */}
+                                                            <div className="col-md-4">
+                                                                <label className="form-label">Cancellation Policy<span className="text-danger">*</span></label>
+                                                                <textarea
+                                                                    className="form-control"
+                                                                    placeholder="Enter cancellation policy"
+                                                                    value={cancellationPolicy}
+                                                                    onChange={handleCancellationPolicyChange}
+                                                                    required={enableRefund}
+                                                                ></textarea>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+
+
+
+
+
 
 
                                                 {/* Description */}
