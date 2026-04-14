@@ -36,6 +36,10 @@ const MyEventsPage = () => {
     const [countries, setCountries] = useState([]);
     const [timezones, setTimezones] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [enableRefund, setEnableRefund] = useState(false);
+    const [refundAllowed, setRefundAllowed] = useState("");
+    const [refundDeadline, setRefundDeadline] = useState("");
+    const [cancellationPolicy, setCancellationPolicy] = useState("");
 
     const noteRef = useRef(null);
     const [editorData, setEditorData] = useState({ content: "" });
@@ -99,9 +103,13 @@ const MyEventsPage = () => {
                     approve_timer: event.approve_timer || "",
                     is_free: event.is_free == "Y" ? "Y" : "N",
                     allow_register: event.allow_register == "Y" ? "Y" : "N",
-                    entry_type: event.entry_type
-                });
+                    entry_type: event.entry_type,
 
+                });
+                setEnableRefund(event.refund_enabled === "Y")
+                setRefundAllowed(event.refund_allowed)
+                setRefundDeadline(event.refund_deadline)
+                setCancellationPolicy(event.cancellation_policy)
                 // console.log('entry_type :', formData);
                 setEditorData({ content: event.desp || "" });
                 // ✅ Set checkbox states if applicable
@@ -213,6 +221,13 @@ const MyEventsPage = () => {
             // ✅ Append image only if present
             if (image) fd.append("feat_image", image);
             fd.append("desp", content);
+            fd.append("refund_enabled", enableRefund ? "Y" : "N");
+
+            if (enableRefund) {
+                fd.append("refund_allowed", refundAllowed);
+                fd.append("refund_deadline", refundDeadline);
+                fd.append("cancellation_policy", cancellationPolicy);
+            }
 
             const endpoint =
                 formData.is_free == "Y"
@@ -262,6 +277,38 @@ const MyEventsPage = () => {
             setIsFormSubmit(false);
         }
     };
+
+
+    const handleRefundToggle = (e) => {
+        const checked = e.target.checked;
+        setEnableRefund(checked);
+
+        // agar unchecked kare to values reset ho jaye
+        if (!checked) {
+            setRefundAllowed("");
+            setRefundDeadline("");
+            setCancellationPolicy("");
+        }
+    };
+
+    const handleRefundAllowedChange = (e) => {
+        setRefundAllowed(e.target.value);
+    };
+
+    const handleRefundDeadlineChange = (e) => {
+        setRefundDeadline(e.target.value);
+    };
+
+    const handleCancellationPolicyChange = (e) => {
+        setCancellationPolicy(e.target.value);
+    };
+
+
+
+
+
+
+
 
     const handleImagePreview = () => {
         const imageUrl = eventDetails?.feat_image || eventDetails?.image_url;
@@ -860,6 +907,72 @@ const MyEventsPage = () => {
                                                             placeholder="Youtube URL"
                                                         />
                                                     </div>
+
+
+                                                    <div className="col-12">
+                                                        <div className="form-check mb-3">
+                                                            <input
+                                                                type="checkbox"
+                                                                className="form-check-input"
+                                                                id="refundCheck"
+                                                                checked={enableRefund}
+                                                                onChange={handleRefundToggle}
+                                                            />
+                                                            <label className="form-check-label" htmlFor="refundCheck">
+                                                                Enable Cancellation & Refund
+                                                            </label>
+                                                        </div>
+
+                                                        {enableRefund && (
+                                                            <div className="row">
+                                                                {/* Refund Allowed */}
+                                                                <div className="col-md-4">
+                                                                    <label className="form-label">Refund<span className="text-danger">*</span></label>
+                                                                    <select className="form-control"
+                                                                        value={refundAllowed}
+                                                                        onChange={handleRefundAllowedChange}
+                                                                        required={enableRefund}
+                                                                    >
+                                                                        <option value="">Select</option>
+                                                                        <option value="Y">Allowed</option>
+                                                                        <option value="N">Not Allowed</option>
+                                                                    </select>
+                                                                </div>
+
+                                                                {/* Refund Deadline */}
+                                                                <div className="col-md-4">
+                                                                    <label className="form-label">Refund Deadline<span className="text-danger">*</span></label>
+                                                                    <input
+                                                                        type="number"
+                                                                        className="form-control"
+                                                                        placeholder="e.g. 7 days before event"
+                                                                        value={refundDeadline}
+                                                                        onChange={handleRefundDeadlineChange}
+                                                                        required={enableRefund}
+                                                                    />
+                                                                </div>
+
+                                                                {/* Cancellation Policy */}
+                                                                <div className="col-md-4">
+                                                                    <label className="form-label">Cancellation Policy<span className="text-danger">*</span></label>
+                                                                    <textarea
+                                                                        className="form-control"
+                                                                        placeholder="Enter cancellation policy"
+                                                                        value={cancellationPolicy}
+                                                                        onChange={handleCancellationPolicyChange}
+                                                                        required={enableRefund}
+                                                                    ></textarea>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
+
+
+
+
+
+
+
 
 
                                                     <div className="col-md-12 mb-3">

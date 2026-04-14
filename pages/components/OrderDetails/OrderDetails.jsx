@@ -3,7 +3,7 @@ import OrderItemCard from "./OrderItemCard";
 import PaymentSummary from "./PaymentSummary";
 
 
-const OrderDetails = ({ orderData, handleCancelAppointment, baseUrls }) => {
+const OrderDetails = ({ orderData, handleCancelAppointment,handleSendCancelRequest,handleShowRejectReason, baseUrls }) => {
     if (!orderData) return null;
 
     const { event, orderItems } = orderData;
@@ -66,6 +66,8 @@ const OrderDetails = ({ orderData, handleCancelAppointment, baseUrls }) => {
                         item={item}
                         orderData={orderData}
                         handleCancelAppointment={handleCancelAppointment}
+                        handleSendCancelRequest={handleSendCancelRequest}
+                        handleShowRejectReason={handleShowRejectReason}
                         baseUrls={baseUrls}
                     />
                 ))}

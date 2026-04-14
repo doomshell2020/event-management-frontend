@@ -5,7 +5,7 @@ import FrontendHeader from "@/shared/layout-components/frontelements/frontendhea
 import FrontendFooter from "@/shared/layout-components/frontelements/frontendfooter";
 import api from "@/utils/api";
 import { formatEventDateTime } from "@/utils/formatDate";
-
+import Swal from "sweetalert2";
 export default function MyOrders({ userId }) {
     const [backgroundImage, setIsMobile] = useState(
         "/assets/front-images/about-slider_bg.jpg"
@@ -37,6 +37,125 @@ export default function MyOrders({ userId }) {
     useEffect(() => {
         fetchOrders();
     }, [userId]);
+
+    const handleOrderCancelRequest = async (orderId, event) => {
+    const { refund_allowed, refund_deadline, date_from, cancellation_policy } = event;
+    console.log("event",event)
+
+    // ❌ Refund not allowed
+    if (refund_allowed !== "Y") {
+        return Swal.fire({
+            icon: "error",
+            title: "Not Allowed",
+            text: "This order cannot be cancelled as per event policy.",
+        });
+    }
+
+    // ❌ Deadline check
+    const today = new Date();
+    const eventDate = new Date(date_from);
+
+    const lastCancelDate = new Date(eventDate);
+    lastCancelDate.setDate(eventDate.getDate() - Number(refund_deadline));
+
+    if (today > lastCancelDate) {
+        return Swal.fire({
+            icon: "error",
+            title: "Deadline Passed",
+            text: `Cancellation allowed only before ${refund_deadline} days of event.`,
+        });
+    }
+
+    // ✅ Confirmation Modal
+    const result = await Swal.fire({
+        title: "Cancel Order?",
+        icon: "warning",
+        html: `
+            <div style="text-align:left; max-height:150px; overflow:auto; margin-bottom:10px;">
+                <b>Cancellation Policy</b><br/>
+                ${cancellation_policy || "No policy available"}<br/><br/>
+
+                <b>Important Info</b><br/>
+                • Cancellation allowed before ${refund_deadline} days<br/>
+                • Refund allowed: ${refund_allowed === "Y" ? "Yes" : "No"}<br/><br/>
+
+                <b>Terms</b><br/>
+                • Admin approval required<br/>
+                • Refund as per policy
+            </div>
+
+            <div style="display:flex; align-items:center; gap:8px;">
+                <input type="checkbox" id="acceptTerms"/>
+                <label for="acceptTerms">I agree to Terms</label>
+            </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: "Send Request",
+        focusConfirm: false,
+        preConfirm: () => {
+            const checkbox = document.getElementById("acceptTerms");
+            if (!checkbox.checked) {
+                Swal.showValidationMessage("Please accept terms");
+                return false;
+            }
+            return true;
+        }
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+        // 🔥 LOADER START
+        Swal.fire({
+            title: "Sending Request...",
+            text: "Please wait",
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading(),
+        });
+
+        const response = await api.put(
+            `/api/v1/orders/${orderId}/cancel-request`
+        );
+
+        if (response.data?.success) {
+            Swal.fire({
+                icon: "success",
+                title: "Request Sent",
+                text: "Your order cancellation request has been sent.",
+            });
+
+            fetchOrders();
+        } else {
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: response.data?.message || "Request failed",
+            });
+        }
+
+    } catch (error) {
+        console.error("Order cancel error:", error);
+
+        const msg =
+            error.response?.data?.message ||
+            error.message ||
+            "Something went wrong";
+
+        Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: msg,
+        });
+    }
+};
+
+
+
+
+
+
+
+
 
     return (
         <>
@@ -76,9 +195,9 @@ export default function MyOrders({ userId }) {
 
                                     const purchaseDate = order?.createdAt
                                         ? formatEventDateTime(
-                                              order.createdAt,
-                                              eventTimezone
-                                          )
+                                            order.createdAt,
+                                            eventTimezone
+                                        )
                                         : "N/A";
 
                                     const totalTickets =
@@ -92,17 +211,81 @@ export default function MyOrders({ userId }) {
                                     // console.log('eventCurrency :', eventCurrency);
                                     return (
                                         <div key={order.id} className="col-lg-6 col-md-12 mb-3 mb-sm-4">
-
                                             {/* ✅ ONLY CHANGE IS HERE (class condition added) */}
                                             <div
-                                                className={`up_events position-relative ${
-                                                    order?.orderItems?.[0]
-                                                        ?.type ===
+                                                className={`up_events position-relative ${order?.orderItems?.[0]
+                                                    ?.type ===
                                                     "appointment"
-                                                        ? "appointment-card"
-                                                        : "ticket-card"
-                                                }`}
+                                                    ? "appointment-card"
+                                                    : "ticket-card"
+                                                    }`}
                                             >
+
+                                                <div style={{
+                                                    position: "absolute",
+                                                    top: "10px",
+                                                    right: "10px",
+                                                    zIndex: 10
+                                                }}>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.preventDefault(); // link trigger na ho
+                                                            handleOrderCancelRequest(order?.id,order.event);
+                                                        }}
+                                                        disabled={
+                                                            order?.cancel_request_status === "pending" ||
+                                                            order?.cancel_request_status === "approved" ||
+                                                            order?.cancel_request_status === "rejected"
+                                                        }
+                                                        style={{
+                                                            padding: "7px 20px",
+                                                            borderRadius: "6px",
+                                                            fontSize: "12px",
+                                                            fontWeight: "500",
+                                                            border: "1px solid",
+                                                            backgroundColor: "#fff",
+                                                            borderColor:
+                                                                order?.cancel_request_status === "pending"
+                                                                    ? "#facc15"
+                                                                    : order?.cancel_request_status === "approved"
+                                                                        ? "#16a34a"
+                                                                        : order?.cancel_request_status === "rejected"
+                                                                            ? "#dc2626"
+                                                                            : "#dc2626",
+                                                            color:
+                                                                order?.cancel_request_status === "pending"
+                                                                    ? "#92400e"
+                                                                    : order?.cancel_request_status === "approved"
+                                                                        ? "#16a34a"
+                                                                        : order?.cancel_request_status === "rejected"
+                                                                            ? "#dc2626"
+                                                                            : "#dc2626",
+                                                            cursor:
+                                                                order?.cancel_request_status ? "not-allowed" : "pointer",
+                                                            opacity:
+                                                                order?.cancel_request_status ? 0.7 : 1,
+                                                            background:
+                                                                order?.cancel_request_status === "approved"
+                                                                    ? "#dcfce7"
+                                                                    : order?.cancel_request_status === "pending"
+                                                                        ? "#fef9c3"
+                                                                        : "#fff"
+                                                        }}
+                                                    >
+                                                        {order?.cancel_request_status === "pending"
+                                                            ? "Pending"
+                                                            : order?.cancel_request_status === "approved"
+                                                                ? "Cancelled"
+                                                                : order?.cancel_request_status === "rejected"
+                                                                    ? "Rejected"
+                                                                    : "Cancel Order"}
+                                                    </button>
+                                                </div>
+
+
+
+
+
                                                 <Link
                                                     href={`/orders/${order.id}`}
                                                 >
@@ -154,7 +337,7 @@ export default function MyOrders({ userId }) {
                                                                         >
                                                                             Purchased :
                                                                         </strong>
-                                                                        
+
                                                                         {purchaseDate}
                                                                     </p>
 
@@ -170,11 +353,11 @@ export default function MyOrders({ userId }) {
                                                                             >
                                                                                 {order?.orderItems?.[0]
                                                                                     ?.type ===
-                                                                                "appointment"
+                                                                                    "appointment"
                                                                                     ? "Appointments"
                                                                                     : "Total Tickets"} :
                                                                             </strong>
-                                                                            
+
                                                                             {totalTickets}
                                                                         </p>
 
@@ -196,7 +379,7 @@ export default function MyOrders({ userId }) {
                                                                         >
                                                                             Start Date :
                                                                         </strong>
-                                                                        
+
                                                                         {formatEventDateTime(
                                                                             event?.date_from,
                                                                             eventTimezone
@@ -215,7 +398,7 @@ export default function MyOrders({ userId }) {
                                                                         >
                                                                             End Date :
                                                                         </strong>
-                                                                        
+
                                                                         {formatEventDateTime(
                                                                             event?.date_to,
                                                                             eventTimezone

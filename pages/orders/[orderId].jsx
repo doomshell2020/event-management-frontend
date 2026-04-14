@@ -15,6 +15,7 @@ export default function MyOrdersDetails() {
     );
 
     const [orderData, setOrderData] = useState(null);
+    // console.log("orderData---",orderData)
     const [baseUrls, setBaseUrls] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -91,6 +92,131 @@ export default function MyOrdersDetails() {
         }
     };
 
+    const handleSendCancelRequest = async (order_item_id, event) => {
+        const { refund_allowed, refund_deadline, date_from, cancellation_policy } = event;
+        if (refund_allowed !== "Y") {
+            return Swal.fire({
+                icon: "error",
+                title: "Not Allowed",
+                text: "You cannot cancel this ticket. This event does not allow cancellations.",
+            });
+        }
+
+        // 🛑 شرط 2: Deadline check
+        const today = new Date();
+        const eventDate = new Date(date_from);
+
+        // last allowed cancel date = eventDate - refund_deadline days
+        const lastCancelDate = new Date(eventDate);
+        lastCancelDate.setDate(eventDate.getDate() - Number(refund_deadline));
+
+        if (today > lastCancelDate) {
+            return Swal.fire({
+                icon: "error",
+                title: "Deadline Passed",
+                text: `Cancellation was allowed only before ${refund_deadline} days of the event.`,
+            });
+        }
+
+        // ✅ Swal with policy + checkbox
+        const result = await Swal.fire({
+            title: "Send Cancellation Request?",
+            icon: "warning",
+            html: `
+            <div style="text-align:left; max-height:150px; overflow:auto; margin-bottom:10px;">
+                <b>Cancellation Policy</b><br/>
+                ${cancellation_policy || "No policy available"}<br/><br/>
+
+                <b>Important Info</b><br/>
+                • Cancellation allowed before ${refund_deadline} days of event.<br/>
+                • Refund allowed: ${refund_allowed === "Y" ? "Yes" : "No"}<br/><br/>
+
+                <b>Terms & Conditions</b><br/>
+                • Cancellation request will be reviewed by admin.<br/>
+                • Refund will be processed as per policy.<br/>
+                • Once approved, ticket will be cancelled permanently.
+            </div>
+
+            <div style="display:flex; align-items:center; gap:8px;">
+                <input type="checkbox" id="acceptTerms"/>
+                <label for="acceptTerms">I agree to the Terms & Conditions</label>
+            </div>
+        `,
+            showCancelButton: true,
+            confirmButtonText: "Send Request",
+            focusConfirm: false,
+            preConfirm: () => {
+                const checkbox = document.getElementById("acceptTerms");
+                if (!checkbox.checked) {
+                    Swal.showValidationMessage("You must accept the Terms & Conditions");
+                    return false;
+                }
+                return true;
+            }
+        });
+
+        if (!result.isConfirmed) return;
+
+        try {
+            Swal.fire({
+                title: "Sending Request...",
+                text: "Please wait",
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading(),
+            });
+
+            const response = await api.put(
+                `/api/v1/orders/cancel-request/${order_item_id}`
+            );
+
+            if (response.data?.success) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Request Sent",
+                    text: "Your cancellation request has been sent successfully.",
+                });
+
+                fetchOrders();
+            } else {
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: response.data?.message || "Cancellation failed.",
+                });
+            }
+
+        } catch (error) {
+            console.error("Cancel error:", error);
+            const apiErrorMsg =
+                error.response?.data?.error?.message ||
+                error.response?.data?.message ||
+                error.message ||
+                "Something went wrong. Try again.";
+            Swal.fire("Error", apiErrorMsg, "error");
+            // Swal.fire({
+            //     icon: "error",
+            //     title: "Error",
+            //     text: "Something went wrong. Please try again.",
+            // });
+        }
+    };
+
+
+    const handleShowRejectReason = (reason) => {
+        Swal.fire({
+            icon: "info",
+            title: "Request Not Approved",
+            html: `
+            <div style="font-size:14px; color:#374151;">
+                <p>Your cancel request couldn’t be approved.</p>
+                <p><strong>Reason:</strong> ${reason || "No specific reason provided."}</p>
+            </div>
+        `,
+            confirmButtonText: "Got it",
+            confirmButtonColor: "#2563eb"
+        });
+    };
+
     return (
         <>
             <FrontendHeader backgroundImage={backgroundImage} />
@@ -128,10 +254,10 @@ export default function MyOrdersDetails() {
                                         <div className="ticker_imgmn">
                                             <img
                                                 src={
-                                                orderData?.event?.feat_image
-                                                    ? `${baseUrls?.event_image_url}${orderData.event.feat_image}`
-                                                    : "/assets/front-images/my-tacket-section.jpg"
-                                            }
+                                                    orderData?.event?.feat_image
+                                                        ? `${baseUrls?.event_image_url}${orderData.event.feat_image}`
+                                                        : "/assets/front-images/my-tacket-section.jpg"
+                                                }
                                                 alt="Event"
                                             />
                                         </div>
@@ -142,6 +268,9 @@ export default function MyOrdersDetails() {
                                 <OrderDetails
                                     orderData={orderData}
                                     handleCancelAppointment={handleCancelAppointment}
+                                    handleSendCancelRequest={handleSendCancelRequest}
+                                    handleShowRejectReason={handleShowRejectReason}
+
                                     baseUrls={baseUrls}
                                 />
                             </div>

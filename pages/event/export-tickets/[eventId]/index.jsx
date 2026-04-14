@@ -13,7 +13,7 @@ import FrontendHeader from "@/shared/layout-components/frontelements/frontendhea
 import FrontendFooter from "@/shared/layout-components/frontelements/frontendfooter";
 import EventHeaderSection from "@/pages/components/Event/EventProgressBar";
 import EventSidebar from "@/pages/components/Event/EventSidebar";
-import { Button, ButtonGroup, Dropdown ,OverlayTrigger, Tooltip} from "react-bootstrap";
+import { Button, ButtonGroup, Dropdown, OverlayTrigger, Tooltip } from "react-bootstrap";
 
 const ExportTickets = () => {
     const router = useRouter();
@@ -356,9 +356,12 @@ const ExportTickets = () => {
                                                     </tr>
                                                 ) : (
                                                     ticketData.map((item, index) => {
+                                                        // console.log("item",item)
                                                         const srNo = index + 1 + (currentPage - 1) * limit;
                                                         const currencyName = item?.event?.currencyName?.Currency_symbol || '₹'
                                                         const isScanned = item?.is_scanned === 'Y';
+                                                        const isCancelled = item?.cancel_status === 'cancel';
+                                                        const showOverlay = isScanned || isCancelled;
                                                         return (
                                                             <tr key={index}>
                                                                 <td className="fw-semibold">{srNo}</td>
@@ -376,25 +379,29 @@ const ExportTickets = () => {
                                                                             border: "1px solid #ddd",
                                                                             padding: "5px",
                                                                             background: "#fff",
-                                                                            filter: isScanned ? "blur(1px)" : "none",
-                                                                            opacity: isScanned ? 0.7 : 1
+                                                                            filter: showOverlay ? "blur(1px)" : "none",
+                                                                            opacity: showOverlay ? 0.7 : 1
+                                                                            // filter: isScanned ? "blur(1px)" : "none",
+                                                                            // opacity: isScanned ? 0.7 : 1
                                                                         }}
                                                                     />
-                                                                    {isScanned && (
+                                                                    {showOverlay && (
                                                                         <div style={{
                                                                             position: "absolute",
                                                                             top: "50%",
                                                                             left: "40%",
                                                                             transform: "translate(-50%, -50%) rotate(322deg)",
-                                                                            color: "#ff0000",
+                                                                            // color: "#ff0000",
+                                                                            color: isCancelled ? "#dc2626" : "#ff0000",
                                                                             fontSize: "14px",
                                                                             fontWeight: "bold",
-                                                                            border: "2px solid red",
+                                                                            // border: "2px solid red",
+                                                                            border: `2px solid ${isCancelled ? "#dc2626" : "#ff0000"}`,
                                                                             padding: "2px 10px",
                                                                             borderRadius: "4px",
                                                                             background: "rgba(255,255,255,0.7)"
                                                                         }}>
-                                                                            SCANNED
+                                                                            {isCancelled ? "CANCELLED" : "SCANNED"}
                                                                         </div>
                                                                     )}
                                                                 </td>
