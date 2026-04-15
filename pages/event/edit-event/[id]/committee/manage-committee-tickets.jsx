@@ -224,6 +224,19 @@ const CommitteeTicketsPage = () => {
 
     const showLoader = loading || processing;
 
+    const getTicketPrice = (t) => {
+        if (parseFloat(t.price) === 0) {
+            return t?.pricings?.[0]?.price;
+        }
+        return t.price;
+    };
+
+
+
+
+
+
+
     return (
         <>
             <FrontendHeader backgroundImage={backgroundImage} />
@@ -478,43 +491,48 @@ const CommitteeTicketsPage = () => {
                         />
                     </div>
 
-                    {ticketTypes.map((t) => (
-                        <div
-                            key={t.id}
-                            className="d-flex justify-content-between align-items-center mb-3"
-                        >
-                            {/* Ticket Info */}
-                            <div>
-                                <div className="fw-semibold">{t.title}</div>
-                                <div className="text-muted text-12">
-                                    {/* {currencySymbol}{t.price} */}
-                                    {currencySymbol} {parseFloat(t.price) === 0
-                                        ? t?.pricings?.[0]?.price
-                                        : t.price}
+                    {ticketTypes
+                        .filter((t) => {
+                            const price = getTicketPrice(t);
+                            return price && parseFloat(price) > 0;
+                        })
+                        .map((t) => (
+                            <div
+                                key={t.id}
+                                className="d-flex justify-content-between align-items-center mb-3"
+                            >
+                                {/* Ticket Info */}
+                                <div>
+                                    <div className="fw-semibold">{t.title}</div>
+                                    <div className="text-muted text-12">
+                                        {/* {currencySymbol}{t.price} */}
+                                        {currencySymbol} {parseFloat(t.price) === 0
+                                            ? t?.pricings?.[0]?.price
+                                            : t.price}
+                                    </div>
+                                </div>
+
+                                {/* Quantity Input */}
+                                <div style={{ width: "120px" }}>
+                                    <Form.Control
+                                        type="number"
+                                        min="0"
+                                        placeholder="Qty"
+                                        disabled={isSubmitting}
+                                        value={ticketCounts[t.id] || ""}
+                                        isInvalid={ticketCounts[t.id] == "" && validateDefault}
+                                        onChange={(e) => {
+                                            let value = e.target.value.replace(/[^0-9]/g, "");
+                                            if (Number(value) < 0) value = 0;
+                                            setTicketCounts({
+                                                ...ticketCounts,
+                                                [t.id]: value
+                                            });
+                                        }}
+                                    />
                                 </div>
                             </div>
-
-                            {/* Quantity Input */}
-                            <div style={{ width: "120px" }}>
-                                <Form.Control
-                                    type="number"
-                                    min="0"
-                                    placeholder="Qty"
-                                    disabled={isSubmitting}
-                                    value={ticketCounts[t.id] || ""}
-                                    isInvalid={ticketCounts[t.id] == "" && validateDefault}
-                                    onChange={(e) => {
-                                        let value = e.target.value.replace(/[^0-9]/g, "");
-                                        if (Number(value) < 0) value = 0;
-                                        setTicketCounts({
-                                            ...ticketCounts,
-                                            [t.id]: value
-                                        });
-                                    }}
-                                />
-                            </div>
-                        </div>
-                    ))}
+                        ))}
 
                 </Modal.Body>
 

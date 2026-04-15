@@ -40,7 +40,7 @@ const EventDetailsPage = () => {
     const [image, setImage] = useState(null);
     const [loading, setLoading] = useState(false);
     const noteRef = useRef(null);
-    const content = getHtmlEditorContent(noteRef);
+    // const content = getHtmlEditorContent(noteRef);
     const [editorData, setEditorData] = useState({ content: "" });
     const [errors, setErrors] = useState({});
     const [enableRefund, setEnableRefund] = useState(false);
@@ -286,6 +286,7 @@ const EventDetailsPage = () => {
         setLoading(true);
 
         try {
+            const content = getHtmlEditorContent(noteRef).trim();
             const fd = new FormData();
             Object.entries(formData).forEach(([key, value]) => {
                 fd.append(key, value);
@@ -1012,14 +1013,6 @@ const EventDetailsPage = () => {
                                                         initialContent={editorData.content}
                                                         onChange={(content) => editorData({ ...editorData, content })}
                                                     />
-                                                    {/* <textarea
-                                                        rows="5"
-                                                        className="form-control rounded-0"
-                                                        name="desp"
-                                                        value={formData.desc}
-                                                        onChange={handleChange}
-                                                        placeholder="Compose message..."
-                                                    ></textarea> */}
                                                 </div>
 
                                             </div>
