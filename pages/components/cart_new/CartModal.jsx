@@ -135,6 +135,9 @@ export default function CartModal({ show, handleClose, eventId }) {
 
         if (!pricingId) return;
         const maxLimit = Number(ticketPrice?.ticket?.count || 0);
+        const totalSalesTickets = Number(ticketPrice?.ticket?.sales_count || 0);
+        const totalPackageAssignedTickets = Number(ticketPrice?.ticket?.package_assigned_count || 0);
+        const totalSales = totalSalesTickets + totalPackageAssignedTickets
 
         try {
             setLoadingId(pricingId);
@@ -144,8 +147,27 @@ export default function CartModal({ show, handleClose, eventId }) {
             );
 
             const currentCount = existing?.count || 0;
+            const usedTickets = totalSales + currentCount;
+
+            if (usedTickets >= maxLimit) {
+                const remaining = maxLimit - usedTickets;
+
+                await Swal.fire({
+                    icon: "warning",
+                    title: "Booking Limit Reached",
+                    text:
+                        remaining <= 0
+                            ? "This ticket has reached its booking limit and is now sold out."
+                            : `Only ${remaining} ticket(s) left.`,
+                });
+
+                return;
+            }
+
+
 
             // 🚫 MAX LIMIT VALIDATION
+            // if (maxLimit > 0 && currentCount >= maxLimit) {
             if (maxLimit > 0 && currentCount >= maxLimit) {
                 Swal.fire({
                     icon: "warning",
@@ -333,6 +355,27 @@ export default function CartModal({ show, handleClose, eventId }) {
             return false;
         }
 
+        const maxLimit = Number(ticket?.count || 0);
+        const totalSalesTickets = Number(ticket?.sales_count || 0);
+        const totalPackageAssignedTickets = Number(ticket?.package_assigned_count || 0);
+        const totalSales = totalSalesTickets + totalPackageAssignedTickets
+        const usedTickets = totalSales + inCart;
+        if (usedTickets >= maxLimit) {
+            const remaining = maxLimit - usedTickets;
+
+            await Swal.fire({
+                icon: "warning",
+                title: "Booking Limit Reached",
+                text:
+                    remaining <= 0
+                        ? "This ticket has reached its booking limit and is now sold out."
+                        : `Only ${remaining} ticket(s) left.`,
+            });
+
+            return;
+        }
+
+
         try {
             setLoadingId(ticketId);
 
@@ -507,8 +550,11 @@ export default function CartModal({ show, handleClose, eventId }) {
 
     const increaseAddon = async (addon) => {
         const addonId = addon?.id;
-        const totalSale = Number(addon?.sales_count || 0);
         const totalAddon = Number(addon?.count || 0);
+        const totalSalesAddonCount = Number(addon?.sales_count || 0);
+        const totalPackageAssignedCount = Number(addon?.package_assigned_count || 0);
+        // const totalSale = Number(addon?.sales_count || 0);
+        const totalSale = totalSalesAddonCount + totalPackageAssignedCount;
 
         try {
             setLoadingId(addonId);
@@ -692,7 +738,7 @@ export default function CartModal({ show, handleClose, eventId }) {
         const packageId = pkg?.id;
         if (!packageId) return;
         const packageLimit = pkg?.package_limit;
-
+        const totalPackage = pkg?.total_package;
         const inCart = cart.reduce((total, item) => {
             if (item.item_type == "package" && item.uniqueId == packageId) {
                 return total + (item.count || 0);
@@ -710,7 +756,16 @@ export default function CartModal({ show, handleClose, eventId }) {
             });
             return false; // stop further execution
         }
-
+        // 🚫 TOTAL AVAILABILITY VALIDATION (global stock)
+        if (totalPackage > 0 && inCart >= totalPackage) {
+            Swal.fire({
+                icon: "error",
+                title: "Out of Stock",
+                text: `Only ${totalPackage} package(s) available.`,
+                confirmButtonText: "Okay",
+            });
+            return false;
+        }
 
         try {
             setLoadingId(`package-${packageId}`);
@@ -1602,7 +1657,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                                                                 return;
                                                                                                             }
 
-                                                                                                            requestCommitteeTicket(ticket, selectedMembers[ticket.id],committeeCounts[ticket.id]);
+                                                                                                            requestCommitteeTicket(ticket, selectedMembers[ticket.id], committeeCounts[ticket.id]);
                                                                                                         }}
 
                                                                                                     >
@@ -1846,7 +1901,7 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                                         <div className="sold-out-box">Sold Out</div>
                                                                                     ) : isCommittee ? (
                                                                                         <>
-                                                                                             <Counter
+                                                                                            <Counter
                                                                                                 count={committeeCounts[tp?.ticket.id] || 0}
                                                                                                 loading={false}
                                                                                                 onInc={() => increaseCommitteeTicket(tp?.ticket.id)}
@@ -1855,24 +1910,24 @@ export default function CartModal({ show, handleClose, eventId }) {
                                                                                             {/* {selectedMembers[tp?.ticket.id] && ( */}
                                                                                             {selectedMembers[tp?.ticket.id] &&
                                                                                                 (committeeCounts[tp?.ticket.id] || 0) > 0 && (
-                                                                                                <button
-                                                                                                    className="btn btn-sm primery-button"
-                                                                                                    onClick={() => {
-                                                                                                        const validation = validateTicketQuestions(tp?.ticket?.id, ticketQuestions);
-                                                                                                        if (!validation.valid) {
-                                                                                                            Swal.fire({
-                                                                                                                icon: "warning",
-                                                                                                                title: "Incomplete Information",
-                                                                                                                text: validation.message
-                                                                                                            });
-                                                                                                            return;
-                                                                                                        }
+                                                                                                    <button
+                                                                                                        className="btn btn-sm primery-button"
+                                                                                                        onClick={() => {
+                                                                                                            const validation = validateTicketQuestions(tp?.ticket?.id, ticketQuestions);
+                                                                                                            if (!validation.valid) {
+                                                                                                                Swal.fire({
+                                                                                                                    icon: "warning",
+                                                                                                                    title: "Incomplete Information",
+                                                                                                                    text: validation.message
+                                                                                                                });
+                                                                                                                return;
+                                                                                                            }
 
-                                                                                                        requestCommitteeTicket(tp?.ticket, selectedMembers[tp?.ticket.id],committeeCounts[tp?.ticket.id]);
-                                                                                                    }}
-                                                                                                >
-                                                                                                    Request
-                                                                                                </button>)}
+                                                                                                            requestCommitteeTicket(tp?.ticket, selectedMembers[tp?.ticket.id], committeeCounts[tp?.ticket.id]);
+                                                                                                        }}
+                                                                                                    >
+                                                                                                        Request
+                                                                                                    </button>)}
                                                                                         </>
                                                                                     ) : (
                                                                                         <Counter

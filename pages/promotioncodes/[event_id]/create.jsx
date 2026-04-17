@@ -253,54 +253,6 @@ const CreatePromotionCode = () => {
                                                     required
                                                 />
                                             </div>
-
-                                            {/* <div className="col-lg-4 col-md-6">
-                                                <label className="form-label fw-semibold">
-                                                    Discount Value <span className="text-danger">*</span>
-                                                </label>
-
-                                                <input
-                                                    type="number"
-                                                    min="1"
-                                                    className="form-control rounded-0"
-                                                    placeholder="Enter value"
-                                                    value={discountValue}
-                                                    onChange={(e) => setDiscountValue(e.target.value)}
-                                                    required
-                                                />
-                                            </div> */}
-
-
-                                            {/* Applicable For */}
-                                            {/* <div className="col-lg-4 col-md-6">
-                                                <label className="form-label fw-semibold">
-                                                    Applicable For <span className="text-danger">*</span>
-                                                </label>
-
-                                                <select
-                                                    className="form-select rounded-0"
-                                                    value={applicableFor}
-                                                    onChange={(e) => setApplicableFor(e.target.value)}
-                                                    required
-                                                >
-                                                    <option value="">Select Option</option>
-
-                                                    {eventDetails?.is_free === "Y" ? (
-                                                        // If event is FREE → Only Appointment
-                                                        <option value="appointment">Appointment</option>
-                                                    ) : (
-                                                        // If NOT free → Show all options
-                                                        <>
-                                                            <option value="ticket">Ticket</option>
-                                                            <option value="addon">Addon</option>
-                                                            <option value="appointment">Appointment</option>
-                                                            <option value="committesale">Committesale</option>
-                                                            <option value="package">Package</option>
-                                                            <option value="all">Complete Order</option>
-                                                        </>
-                                                    )}
-                                                </select>
-                                            </div> */}
                                             <div className="col-lg-4 col-md-6">
                                                 <label className="form-label fw-semibold">
                                                     Applicable For <span className="text-danger">*</span>
@@ -321,11 +273,11 @@ const CreatePromotionCode = () => {
                                                             <option value="ticket">Ticket</option>
                                                             <option value="addon">Addon</option>
                                                             <option value="appointment">Appointment</option>
-
+                                                            <option value="committesale">Committesale</option>
                                                             {/* Committesale only when entry_type === "multi" */}
-                                                            {eventDetails?.entry_type === "event" && (
+                                                            {/* {eventDetails?.entry_type === "event" && (
                                                                 <option value="committesale">Committesale</option>
-                                                            )}
+                                                            )} */}
 
                                                             <option value="package">Package</option>
                                                             <option value="all">Complete Order</option>
