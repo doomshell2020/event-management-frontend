@@ -434,7 +434,8 @@ const EventDetailPage = ({ event, slug }) => {
                         {/* IMAGE */}
                         <div className="event-appo-img">
                           <img
-                            src={w.Image}
+                            // src={w.Image}
+                            src={"https://api.eboxtickets.com/uploads/wellness/wellnessImage-1776413528096-f56a62fb0c385b90.jpg"}
                             className="card-img-top"
                             style={{ objectFit: "cover" }}
                             alt={w.name}
@@ -483,9 +484,11 @@ const EventDetailPage = ({ event, slug }) => {
                                             toggleSlotSelection(w.id, slot)
                                           }
                                           style={{
-                                            border: isSelected
-                                              ? "2px solid #21a67a"
-                                              : "1px solid #e1e1e1",
+                                            // border: isSelected
+                                            //   ? "2px solid #21a67a"
+                                            //   : "1px solid #e1e1e1",
+                                            border: "2px solid",
+                                            borderColor: isSelected ? "#21a67a" : "#e1e1e1",
                                             padding: "12px",
                                             borderRadius: "9px",
                                             marginBottom: "10px",
@@ -542,7 +545,7 @@ const EventDetailPage = ({ event, slug }) => {
                                     })}
 
                                     {/* SUMMARY */}
-                                    {selectedCount > 0 && (
+                                    {/* {selectedCount > 0 && (
                                       <div
                                         style={{
                                           padding: "12px",
@@ -561,13 +564,46 @@ const EventDetailPage = ({ event, slug }) => {
                                           {totalPrice}
                                         </div>
                                       </div>
-                                    )}
+                                    )} */}
+                                    <div
+                                      className="summary-box"
+                                      style={{
+                                        padding: "12px",
+                                        background: "#f8fdfb",
+                                        border: "1px solid #d7f2ea",
+                                        borderRadius: "8px",
+                                        marginBottom: "15px",
+                                        display: "flex",
+                                        justifyContent: "space-between",
+                                        alignItems: "center",
+                                        fontSize: "14px",
+                                        height: "48px", // ✅ FIXED HEIGHT
+                                        opacity: selectedCount > 0 ? 1 : 0,
+                                        transition: "opacity 0.2s ease"
+                                      }}
+                                    >
+                                      <div>
+                                        {selectedCount > 0 ? `${selectedCount} slots selected` : ""}
+                                      </div>
+
+                                      <div style={{ fontWeight: "bold" }}>
+                                        {selectedCount > 0 ? `Total: ${currency} ${totalPrice}` : ""}
+                                      </div>
+                                    </div>
+
+
+
 
                                     {/* BOOK BUTTON */}
                                     {w.wellnessSlots?.length > 0 && (
-                                      <div className="text-center">
+                                      <div className="text-center"
+                                        style={{
+                                          marginTop: "10px",
+                                          minHeight: "50px" // 👈 reserve space for button
+                                        }}
+                                      >
                                         <button
-                                          className="btn mt-3 w-100 fw-bold"
+                                          className="btn w-100 fw-bold"
                                           disabled={selectedCount == 0}
                                           style={{
                                             background:
@@ -581,7 +617,6 @@ const EventDetailPage = ({ event, slug }) => {
                                             color: "#fff",
                                             borderRadius: "50px",
                                             padding: "10px 30px",
-                                            border: "none",
                                             border: "none",
                                             cursor: selectedCount > 0 ? "pointer" : "not-allowed",
                                             transition: "all 0.3s ease",

@@ -83,6 +83,7 @@ const MyEventsPage = () => {
 
             if (res.data.success && res.data.data.events.length > 0) {
                 const event = res.data.data.events[0];
+                console.log("event", event);
                 setEventDetails(event);
 
                 // ✅ Set formData state with event details
@@ -114,6 +115,18 @@ const MyEventsPage = () => {
                 setEditorData({ content: event.desp || "" });
                 // ✅ Set checkbox states if applicable
                 setIsFree(event.is_free == "Y");
+                const gateData = event.eventGates || [];
+                // console.log("gateData---",gateData)
+                if (gateData.length > 0) {
+                    setEnableGate(true); // checkbox ON
+                    setGates(
+                        gateData.map(g => ({
+                            name: g.title
+                        }))
+                    );
+                }
+
+
             } else {
                 console.error("Event not found");
             }
@@ -185,6 +198,32 @@ const MyEventsPage = () => {
     const handleFileChange = (e) => {
         setImage(e.target.files[0]);
     };
+
+    const [enableGate, setEnableGate] = useState(false);
+    const [gates, setGates] = useState([
+        { name: "" }
+    ]);
+    const handleGateToggle = () => {
+        setEnableGate(!enableGate);
+    };
+
+    const addGate = () => {
+        setGates([...gates, { name: "" }]);
+    };
+
+    const removeGate = (index) => {
+        if (gates.length === 1) return; // prevent delete last
+        const updated = gates.filter((_, i) => i !== index);
+        setGates(updated);
+    };
+
+    const handleGateChange = (index, value) => {
+        const updated = [...gates];
+        updated[index].name = value;
+        setGates(updated);
+    };
+
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -962,6 +1001,83 @@ const MyEventsPage = () => {
                                                                         onChange={handleCancellationPolicyChange}
                                                                         required={enableRefund}
                                                                     ></textarea>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
+
+                                                    {/* Add Gates for this Event */}
+                                                    <div className="col-12">
+                                                        <div className="form-check mb-3">
+                                                            <input
+                                                                type="checkbox"
+                                                                className="form-check-input"
+                                                                id="gateCheck"
+                                                                required
+                                                                checked={enableGate}
+                                                                onChange={handleGateToggle}
+                                                            />
+                                                            <label className="form-check-label fw-semibold" htmlFor="gateCheck">
+                                                                Add Gates for this Event
+                                                            </label>
+                                                        </div>
+
+                                                        {enableGate && (
+                                                            <div className="row">
+                                                                {gates.map((gate, index) => (
+                                                                    <div className="col-md-6 mb-3" key={index}>
+                                                                        <div className="border rounded-3 p-3 bg-light h-100 shadow-sm">
+
+                                                                            {/* Gate Title */}
+                                                                            <div className="d-flex justify-content-between align-items-center mb-2">
+                                                                                <label className="form-label mb-0 fw-semibold">
+                                                                                    Gate {index + 1}
+                                                                                </label>
+
+                                                                                {/* Remove Button */}
+                                                                                {gates.length > 1 && (
+                                                                                    <button
+                                                                                        type="button"
+                                                                                        className="btn btn-outline-danger btn-sm"
+                                                                                        onClick={() => removeGate(index)}
+                                                                                    >
+                                                                                        Remove
+                                                                                    </button>
+                                                                                )}
+                                                                            </div>
+
+                                                                            {/* Gate Input */}
+                                                                            <input
+                                                                                type="text"
+                                                                                className="form-control"
+                                                                                placeholder="Enter gate name (e.g. Gate A, VIP Entry)"
+                                                                                required
+                                                                                value={gate.name}
+                                                                                onChange={(e) =>
+                                                                                    handleGateChange(index, e.target.value)
+                                                                                }
+                                                                            />
+                                                                        </div>
+                                                                    </div>
+                                                                ))}
+
+                                                                {/* Bottom Section */}
+                                                                <div className="col-12 mt-2">
+                                                                    <div className="d-flex justify-content-between align-items-center border-top pt-3">
+
+                                                                        <small className="text-muted">
+                                                                            You can add multiple gates for this event
+                                                                        </small>
+
+                                                                        <button
+                                                                            type="button"
+                                                                            className="btn btn-success px-3"
+                                                                            onClick={addGate}
+                                                                        >
+                                                                            + Add Gate
+                                                                        </button>
+
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         )}

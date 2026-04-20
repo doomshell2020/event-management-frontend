@@ -21,7 +21,8 @@ const ManageTickets = () => {
     const [openDropdown, setOpenDropdown] = useState(null);
     const currencyName = eventDetails?.currencyName?.Currency_symbol || null;
     const eventTypes = eventDetails?.entry_type || null;
-    // console.log('eventDetails :', eventDetails);
+    const [gatesList, setGatesList] = useState([])
+    // console.log('gatesList :', gatesList);
 
     const [accessTypeLabels, setAccessTypeLabels] = useState({
         event: "Full Event Access",
@@ -38,7 +39,9 @@ const ManageTickets = () => {
         hidden: "Y",
         access_type: "",
         ticketImage: null,
+        gate_id:null
     });
+    // console.log("ticketForm",ticketForm)
 
     // console.log('ticketForm :', ticketForm);
     useEffect(() => {
@@ -163,7 +166,6 @@ const ManageTickets = () => {
 
     const handleCreateTicket = async (event) => {
         event.preventDefault();
-
         const form = event.currentTarget;
         if (!form.checkValidity()) {
             event.stopPropagation();
@@ -181,6 +183,7 @@ const ManageTickets = () => {
             formData.append("count", ticketForm.count);
             formData.append("hidden", ticketForm.hidden);
             formData.append("access_type", ticketForm.access_type);
+            formData.append("gate_id", ticketForm.gate_id); // new added gate_id according to new functionality..
             formData.append("event_id", id);
             if (ticketForm.ticketImage) {
                 formData.append("ticketImage", ticketForm.ticketImage);
@@ -208,6 +211,7 @@ const ManageTickets = () => {
                     hidden: "Y",
                     access_type: "",
                     ticketImage: null,
+                    gate_id:null
                 });
                 setShow(false);
                 setTicketId(null);
@@ -269,7 +273,17 @@ const ManageTickets = () => {
         });
     };
 
-
+    const handleOpenTicketModal = async () => {
+        try {
+            setShow(true); // modal open first (fast UX)
+            const res = await api.get(`/api/v1/events/gate-list/${id}`);
+            if (res.data.success) {
+                setGatesList(res.data.data.gates || []);
+            }
+        } catch (error) {
+            console.error("Error fetching gates:", error);
+        }
+    };
 
 
 
@@ -338,7 +352,8 @@ const ManageTickets = () => {
                                             <button
                                                 className="primery-button fw-normal px-2 text-white button-mobile-fullwidth"
                                                 style={{ backgroundColor: "#00ad00" }}
-                                                onClick={() => setShow(true)}
+                                                // onClick={() => setShow(true)}
+                                                onClick={handleOpenTicketModal}
                                             >
                                                 <i className="bi bi-plus"></i> Add Ticket
                                             </button>
@@ -519,8 +534,10 @@ const ManageTickets = () => {
                                                                                 hidden: ticket.hidden,
                                                                                 access_type: ticket.access_type,
                                                                                 ticketImage: ticket.ticket_image,
+                                                                                gate_id: ticket.gate_id
                                                                             });
-                                                                            setShow(true);
+                                                                            // setShow(true);
+                                                                            handleOpenTicketModal();
                                                                             setOpenDropdown(null);
                                                                         }}
                                                                     >
@@ -723,7 +740,7 @@ const ManageTickets = () => {
                                     required
                                     value={ticketForm.type}
                                     onChange={handleInputChange}
-                                    // disabled={eventTypes == "multi"}
+                                // disabled={eventTypes == "multi"}
                                 >
                                     <option value="">Choose Type</option>
                                     <option value="open_sales">Open Sales</option>
@@ -827,6 +844,29 @@ const ManageTickets = () => {
                                 </select>
                                 <div className="invalid-feedback">Please select visibility.</div>
                             </div>
+
+                            <div className="col-md-6">
+                                <label className="form-label">Gate</label>
+                                <select
+                                    name="gate_id"
+                                    required
+                                    className="form-select"
+                                    value={ticketForm.gate_id || ""}
+                                    onChange={handleInputChange}
+                                >
+                                    <option value="">Choose Gate</option>
+
+                                    {gatesList.map((gate) => (
+                                        <option key={gate.id} value={gate.id}>
+                                            {gate.title}
+                                        </option>
+                                    ))}
+
+                                </select>
+                                <div className="invalid-feedback">Please select a gate.</div>
+                            </div>
+
+
 
                             <div className="col-md-12">
                                 <label className="form-label d-flex align-items-center gap-2">
