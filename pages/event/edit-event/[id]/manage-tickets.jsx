@@ -8,7 +8,7 @@ import FrontendHeader from "@/shared/layout-components/frontelements/frontendhea
 import FrontendFooter from "@/shared/layout-components/frontelements/frontendfooter";
 import EventHeaderSection from "@/pages/components/Event/EventProgressBar";
 import EventSidebar from "@/pages/components/Event/EventSidebar";
-import { Eye, EyeOff, Lock, Settings, CheckCircle, XCircle, Ticket } from "lucide-react";
+import { Eye, EyeOff, Lock, Settings, CheckCircle, XCircle, Ticket, DoorOpen } from "lucide-react";
 import { Form, Button, Modal } from "react-bootstrap";
 
 const ManageTickets = () => {
@@ -39,7 +39,7 @@ const ManageTickets = () => {
         hidden: "Y",
         access_type: "",
         ticketImage: null,
-        gate_id:null
+        gate_id: null
     });
     // console.log("ticketForm",ticketForm)
 
@@ -211,7 +211,7 @@ const ManageTickets = () => {
                     hidden: "Y",
                     access_type: "",
                     ticketImage: null,
-                    gate_id:null
+                    gate_id: null
                 });
                 setShow(false);
                 setTicketId(null);
@@ -394,6 +394,12 @@ const ManageTickets = () => {
                                                 <p className="body-text mb-3">
                                                     {/* <strong>{ticket.title}</strong> ({currencyName}{ticket.price}) */}
                                                     <strong>{ticket.title}</strong> ({currencyName}{ticket.price || ticket.pricings?.[0]?.price || 0})
+                                                    {ticket?.gates?.title && (
+                                                        <span className="ms-2 d-inline-flex align-items-center text-success">
+                                                            <DoorOpen size={14} className="me-1" />
+                                                            {ticket.gates.title}
+                                                        </span>
+                                                    )}
                                                     <br />
                                                     {ticket.type !== "comps" ? (
                                                         `Sold: ${ticket.sold_count || 0} / ${ticket.count}`
@@ -469,6 +475,15 @@ const ManageTickets = () => {
                                                                     )}
                                                                 </p>
                                                             </div>
+                                                            {/* 
+                                                            <div className="col-md-3">
+                                                                {ticket?.gates?.title ? (
+                                                                    <p className="body-text mb-0 d-flex align-items-center manage-ticket-table">
+                                                                        <DoorOpen size={16} className="me-2 text-success" />
+                                                                        {ticket.gates.title}
+                                                                    </p>
+                                                                ) : null}
+                                                            </div> */}
                                                         </>
                                                     ) : (
                                                         /* COMPS ONLY */
