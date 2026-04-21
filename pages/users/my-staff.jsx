@@ -12,11 +12,9 @@ const MyStaff = () => {
     // console.log('staff :', staff);
     const [events, setEvents] = useState([]);
     const [loading, setLoading] = useState(false);
-
     const [show, setShow] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
     const [staffId, setStaffId] = useState(null);
-
     const [formData, setFormData] = useState({
         first_name: "",
         last_name: "",
@@ -26,6 +24,14 @@ const MyStaff = () => {
         status: 'Y',
         eventId: [],
     });
+
+
+    const [showGateModal, setShowGateModal] = useState(false);
+    const [selectedStaff, setSelectedStaff] = useState(null);
+    const [eventGateMap, setEventGateMap] = useState({});
+    const [eventsData, setEventsData] = useState({});
+    const [savingGate, setSavingGate] = useState(false);
+    const [loadingGateId, setLoadingGateId] = useState(null);
 
     // console.log('formData :', formData);
     const [errors, setErrors] = useState({});
@@ -47,6 +53,8 @@ const MyStaff = () => {
     useEffect(() => {
         fetchStaff();
     }, []);
+
+
 
     /* ================= VALIDATION ================= */
     const validateForm = () => {
@@ -118,6 +126,7 @@ const MyStaff = () => {
     };
 
     /* ================= OPEN MODAL ================= */
+
     const openAddModal = () => {
         setIsEdit(false);
         setStaffId(null);
@@ -156,6 +165,29 @@ const MyStaff = () => {
         setErrors({});
         setShow(true);
     };
+
+    // Get access functionality modal...
+    const openGateAccessModal = async (staff) => {
+        try {
+            setLoadingGateId(staff.id); // 👈 start loading
+            setSelectedStaff(staff);
+
+            const res = await api.get(`/api/v1/users/staff/${staff.id}/gate-access`);
+
+            if (res.data.success) {
+                setEventsData(res.data.data);
+                setEventGateMap(res.data.data.assigned || {});
+                setShowGateModal(true);
+            }
+
+        } catch (error) {
+            Swal.fire("Error", "Failed to load gate access data", "error");
+        } finally {
+            setLoadingGateId(null); // 👈 stop loading
+        }
+    };
+
+
 
 
     return (
@@ -221,6 +253,18 @@ const MyStaff = () => {
                                                     >
                                                         <i className="bi bi-pencil-square text-primary"></i>
                                                     </Button>
+
+                                                    {/* NEW BUTTON */}
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline-success"
+                                                        className="ms-1"
+                                                        disabled={loadingGateId === row.id}
+                                                        onClick={() => openGateAccessModal(row)}
+                                                    >
+                                                        {loadingGateId === row.id ? "Loading..." : "Gates"}
+                                                    </Button>
+
                                                 </td>
                                             </tr>
                                         ))
@@ -354,6 +398,143 @@ const MyStaff = () => {
                     </Modal.Footer>
                 </Form>
             </Modal>
+
+
+            {/* ================= MODAL GATE ACCESS FUNCTIONALITY... ================= */}
+            <Modal
+                show={showGateModal}
+                onHide={() => setShowGateModal(false)}
+                backdrop="static"
+                size="lg"
+                centered
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title className="fw-semibold">
+                        Gate Access - {selectedStaff?.first_name}
+                    </Modal.Title>
+                </Modal.Header>
+
+                <Modal.Body className="px-4 py-3">
+
+                    {eventsData?.events?.length ? (
+                        eventsData.events.map(eventId => (
+                            <div
+                                key={eventId}
+                                className="mb-4 p-3 rounded shadow-sm border bg-light"
+                            >
+                                {/* Event Title */}
+                                <h6 className="mb-2 fw-bold text-dark">
+                                    {eventsData.eventNames?.[eventId] || `Event ${eventId}`}
+                                </h6>
+
+                                {/* Gates */}
+                                {eventsData.gates?.[eventId]?.length ? (
+                                    <div className="d-flex flex-wrap gap-3">
+
+                                        {eventsData.gates[eventId].map(gate => (
+                                            <label
+                                                key={gate.id}
+                                                className="d-flex align-items-center gap-2 px-3 py-2 border rounded bg-white shadow-sm"
+                                                style={{
+                                                    cursor: "pointer",
+                                                    minWidth: "140px"
+                                                }}
+                                            >
+                                                <input
+                                                    type="radio"
+                                                    name={`event-${eventId}`}   // ✅ group per event
+                                                    checked={eventGateMap[eventId] === gate.id}
+                                                    onChange={() => {
+                                                        setEventGateMap(prev => ({
+                                                            ...prev,
+                                                            [eventId]: gate.id
+                                                        }));
+                                                    }}
+                                                    style={{ cursor: "pointer" }}
+                                                />
+
+                                                <span className="fw-medium text-dark">
+                                                    {gate.name}
+                                                </span>
+                                            </label>
+                                        ))}
+
+                                    </div>
+                                ) : (
+                                    <p className="text-muted small mt-2 mb-0">
+                                        No gates available
+                                    </p>
+                                )}
+                            </div>
+                        ))
+                    ) : (
+                        <p className="text-center text-muted">No events assigned</p>
+                    )}
+
+                </Modal.Body>
+
+                <Modal.Footer className="px-4 py-3">
+                    <Button
+                        variant="outline-secondary"
+                        onClick={() => setShowGateModal(false)}
+                    >
+                        Cancel
+                    </Button>
+
+                    <Button
+                        variant="success"
+                        disabled={savingGate}
+                        onClick={async () => {
+                            try {
+                                setSavingGate(true);
+
+                                await api.post("/api/v1/users/staff/gate-access", {
+                                    user_id: selectedStaff.id,
+                                    eventGateMap
+                                });
+
+                                Swal.fire("Success", "Gate access saved successfully", "success");
+
+                                setShowGateModal(false);
+
+                            } catch (error) {
+                                Swal.fire(
+                                    "Error",
+                                    error.response?.data?.message || "Failed to save",
+                                    "error"
+                                );
+                            } finally {
+                                setSavingGate(false);
+                            }
+                        }}
+                    >
+                        {savingGate ? "Saving..." : "Save Changes"}
+                    </Button>
+
+
+
+
+
+
+                    {/* <Button
+                        variant="success"
+                        onClick={() => {
+                            console.log("SAVE DATA:", {
+                                user_id: selectedStaff?.id,
+                                eventGateMap
+                            });
+                        }}
+                    >
+                        Save Changes
+                    </Button> */}
+                </Modal.Footer>
+            </Modal>
+
+
+
+
+
+
 
             <FrontendFooter />
         </>

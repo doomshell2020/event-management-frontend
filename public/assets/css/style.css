@@ -7604,3 +7604,12 @@ input[type="date"] {
 .summary-box {
   transition: all 0.25s ease;
 }
+
+
+.cursor-pointer:hover {
+    text-decoration: underline;
+}
+
+label:hover {
+    background-color: #f8f9fa;
+}

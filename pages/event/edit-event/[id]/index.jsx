@@ -83,7 +83,6 @@ const MyEventsPage = () => {
 
             if (res.data.success && res.data.data.events.length > 0) {
                 const event = res.data.data.events[0];
-                console.log("event", event);
                 setEventDetails(event);
 
                 // ✅ Set formData state with event details
@@ -116,12 +115,14 @@ const MyEventsPage = () => {
                 // ✅ Set checkbox states if applicable
                 setIsFree(event.is_free == "Y");
                 const gateData = event.eventGates || [];
-                // console.log("gateData---",gateData)
                 if (gateData.length > 0) {
-                    setEnableGate(true); // checkbox ON
+                    setEnableGate(true);
+
                     setGates(
                         gateData.map(g => ({
-                            name: g.title
+                            id: g.id,                 // ✅ important
+                            name: g.title,
+                            isUsed: g.tickets && g.tickets.length > 0 // ✅ key logic
                         }))
                     );
                 }
@@ -228,7 +229,6 @@ const MyEventsPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsFormSubmit(true);
-
         // ✅ Slug validation
         const slugError = validateSlug(formData.slug);
         if (slugError) {
@@ -267,6 +267,8 @@ const MyEventsPage = () => {
                 fd.append("refund_deadline", refundDeadline);
                 fd.append("cancellation_policy", cancellationPolicy);
             }
+
+            fd.append("gates",JSON.stringify(gates))
 
             const endpoint =
                 formData.is_free == "Y"
@@ -341,10 +343,6 @@ const MyEventsPage = () => {
     const handleCancellationPolicyChange = (e) => {
         setCancellationPolicy(e.target.value);
     };
-
-
-
-
 
 
 
@@ -1039,6 +1037,7 @@ const MyEventsPage = () => {
                                                                                     <button
                                                                                         type="button"
                                                                                         className="btn btn-outline-danger btn-sm"
+                                                                                        disabled={gate.isUsed}
                                                                                         onClick={() => removeGate(index)}
                                                                                     >
                                                                                         Remove
@@ -1057,6 +1056,11 @@ const MyEventsPage = () => {
                                                                                     handleGateChange(index, e.target.value)
                                                                                 }
                                                                             />
+                                                                            {gate.isUsed && (
+                                                                                <small className="text-danger d-block mt-1">
+                                                                                    This gate is assigned to a ticket and cannot be removed
+                                                                                </small>
+                                                                            )}
                                                                         </div>
                                                                     </div>
                                                                 ))}
