@@ -65,8 +65,11 @@ const OrderItemCard = ({
                             ? item?.appointment?.wellnessList?.name
                             : "";
 
-
-
+    const gateName =
+        (isTicket || isCommitteeSale || isComps)
+            ? item?.ticketType?.gates?.title
+            : ticketPricing?.ticket?.gates?.title ?? null;
+    // console.log("gateName", gateName)
     return (
         <div
             className="border-5 p-4 bg-white rounded-3 mb-3 ticktes-detail-box"
@@ -145,7 +148,7 @@ const OrderItemCard = ({
                     <div className="fw-semibold fs-6">{title}</div>
 
                     {itemName && (
-                        <div className="text-muted">{itemName}</div>
+                        <div className="text-muted">{itemName}{" "}({gateName})</div>
                     )}
 
                     {isAppointment && (
