@@ -148,23 +148,45 @@ const MyEventsPage = () => {
 
                 // Gallery Prefill
                 const galleryData = event.gallery || [];
-                if (galleryData.length > 0) {
-                    setEnableGallery(true);
+                if (event?.gallery) {
+                    const formatted = event?.gallery.map(img => ({
+                        id: img.id,
+                        image: img.image
+                    }));
 
-                    setGallery(
-                        galleryData.map(img => img.image) // 🔥 only URL string
-                    );
+                    setGallery(formatted);
+                    setEnableGallery(formatted.length > 0);
                 }
+                // if (galleryData.length > 0) {
+                //     setEnableGallery(true);
+
+                //     setGallery(
+                //         galleryData.map(img => img.image) // 🔥 only URL string
+                //     );
+                // }
                 // Sliders Prefill
                 const sliderData = event.sliders || [];
 
                 if (sliderData.length > 0) {
                     setEnableSliders(true);
 
-                    setSlider({
-                        images: sliderData.map(slide => slide.image) // 🔥 URL string
-                    });
+                    const formatted = [...sliderData] // copy array
+                        .sort((a, b) => a.sort_order - b.sort_order) // 🔥 FIX
+                        .map(slide => ({
+                            id: slide.id,
+                            image: slide.image,
+                            sort_order: slide.sort_order
+                        }));
+
+                    setSlider({ images: formatted });
                 }
+                // if (sliderData.length > 0) {
+                //     setEnableSliders(true);
+
+                //     setSlider({
+                //         images: sliderData.map(slide => slide.image) // 🔥 URL string
+                //     });
+                // }
 
 
 
@@ -350,44 +372,111 @@ const MyEventsPage = () => {
                 }
 
                 // ================= GALLERY UPDATE =================
+                // if (enableGallery) {
+                //     const newGalleryFiles = gallery.filter(f => typeof f !== "string");
+
+                //     if (newGalleryFiles.length > 0) {
+                //         const galleryFd = new FormData();
+                //         galleryFd.append("event_id", eventId);
+
+                //         newGalleryFiles.forEach((file) => {
+                //             galleryFd.append("gallery_images", file);
+                //         });
+
+                //         await api.post(
+                //             "/api/v1/events/update/event-gallery",
+                //             galleryFd,
+                //             { headers: { "Content-Type": "multipart/form-data" } }
+                //         );
+                //     }
+                // }
+
                 if (enableGallery) {
-                    const newGalleryFiles = gallery.filter(f => typeof f !== "string");
+                    const galleryFd = new FormData();
 
-                    if (newGalleryFiles.length > 0) {
-                        const galleryFd = new FormData();
-                        galleryFd.append("event_id", eventId);
+                    galleryFd.append("event_id", eventId);
 
-                        newGalleryFiles.forEach((file) => {
-                            galleryFd.append("gallery_images", file);
-                        });
+                    // ✅ deleted images
+                    galleryFd.append("deleted_ids", JSON.stringify(deletedGalleryIds));
 
-                        await api.post(
-                            "/api/v1/events/update/event-gallery",
-                            galleryFd,
-                            { headers: { "Content-Type": "multipart/form-data" } }
-                        );
-                    }
+                    // ✅ new images
+                    gallery.forEach((item) => {
+                        if (item.file) {
+                            galleryFd.append("gallery_images", item.file);
+                        }
+                    });
+
+                    // ✅ existing images (keep)
+                    const existingIds = gallery
+                        .filter(item => item.id)
+                        .map(item => item.id);
+
+                    galleryFd.append("keep_images", JSON.stringify(existingIds));
+
+                    await api.post(
+                        "/api/v1/events/update/event-gallery",
+                        galleryFd,
+                        { headers: { "Content-Type": "multipart/form-data" } }
+                    );
                 }
 
-            
                 // ================= SLIDER UPDATE =================
                 if (enableSliders) {
-                    const newSliderFiles = slider.images.filter(f => typeof f !== "string");
 
-                    if (newSliderFiles.length > 0) {
-                        const sliderFd = new FormData();
-                        sliderFd.append("event_id", eventId);
+                    const sliderFd = new FormData();
 
-                        newSliderFiles.forEach((file) => {
-                            sliderFd.append("slider_images", file);
-                        });
+                    sliderFd.append("event_id", eventId);
 
-                        await api.post(
-                            "/api/v1/events/update/event-sliders",
-                            sliderFd,
-                            { headers: { "Content-Type": "multipart/form-data" } }
-                        );
-                    }
+                    // ✅ delete
+                    sliderFd.append("deleted_ids", JSON.stringify(deletedSliderIds));
+
+                    // ✅ new files
+                    slider.images.forEach((item) => {
+                        if (item.file) {
+                            sliderFd.append("slider_images", item.file);
+                        }
+                    });
+
+                    // ✅ keep old
+                    const keepIds = slider.images
+                        .filter(item => item.id)
+                        .map(item => item.id);
+
+                    sliderFd.append("keep_ids", JSON.stringify(keepIds));
+
+                    // ✅ order (VERY IMPORTANT 🔥)
+                    sliderFd.append(
+                        "order",
+                        JSON.stringify(
+                            slider.images.map((item, index) => ({
+                                id: item.id || null,
+                                sort_order: index
+                            }))
+                        )
+                    );
+
+                    await api.post("/api/v1/events/update/event-sliders", sliderFd,
+                        { headers: { "Content-Type": "multipart/form-data" } }
+                    );
+
+
+
+                    // const newSliderFiles = slider.images.filter(f => typeof f !== "string");
+
+                    // if (newSliderFiles.length > 0) {
+                    //     const sliderFd = new FormData();
+                    //     sliderFd.append("event_id", eventId);
+
+                    //     newSliderFiles.forEach((file) => {
+                    //         sliderFd.append("slider_images", file);
+                    //     });
+
+                    //     await api.post(
+                    //         "/api/v1/events/update/event-sliders",
+                    //         sliderFd,
+                    //         { headers: { "Content-Type": "multipart/form-data" } }
+                    //     );
+                    // }
                 }
 
 
@@ -592,14 +681,34 @@ const MyEventsPage = () => {
         setEnableGallery(!enableGallery);
     };
 
+    // const handleGalleryUpload = (e) => {
+    //     const files = Array.from(e.target.files);
+    //     setGallery([...gallery, ...files]);
+    // };
+
     const handleGalleryUpload = (e) => {
         const files = Array.from(e.target.files);
-        setGallery([...gallery, ...files]);
+
+        const newFiles = files.map(file => ({
+            file // ✅ wrap inside object
+        }));
+
+        setGallery(prev => [...prev, ...newFiles]);
     };
+    const [deletedGalleryIds, setDeletedGalleryIds] = useState([]);
 
     const removeGallery = (index) => {
-        setGallery(gallery.filter((_, i) => i !== index));
+        const item = gallery[index];
+
+        if (item?.id) {
+            setDeletedGalleryIds(prev => [...prev, item.id]);
+        }
+
+        setGallery(prev => prev.filter((_, i) => i !== index));
     };
+    // const removeGallery = (index) => {
+    //     setGallery(gallery.filter((_, i) => i !== index));
+    // };
 
     const [enableSliders, setEnableSliders] = useState(false);
 
@@ -612,42 +721,77 @@ const MyEventsPage = () => {
         setEnableSliders(!enableSliders);
     };
 
-    const handleSliderChange = (field, value) => {
-        setSlider({ ...slider, [field]: value });
-    };
+    // const handleSliderImages = (e) => {
+    //     const files = Array.from(e.target.files);
+
+    //     // limit (max 5 at a time)
+    //     if (files.length > 5) {
+    //         alert("You can upload max 5 images at a time");
+    //         return;
+    //     }
+
+    //     setSlider({
+    //         ...slider,
+    //         images: [...slider.images, ...files],
+    //     });
+
+    //     e.target.value = null;
+    // };
 
     const handleSliderImages = (e) => {
         const files = Array.from(e.target.files);
 
-        // limit (max 5 at a time)
-        if (files.length > 5) {
-            alert("You can upload max 5 images at a time");
-            return;
-        }
+        const newFiles = files.map(file => ({
+            file,
+            tempId: Date.now() + Math.random(), // ✅ UNIQUE
+        }));
 
-        setSlider({
-            ...slider,
-            images: [...slider.images, ...files],
-        });
-
-        e.target.value = null;
+        setSlider(prev => ({
+            ...prev,
+            images: [...prev.images, ...newFiles],
+        }));
     };
 
+    const [deletedSliderIds, setDeletedSliderIds] = useState([]);
+
     const removeSliderImage = (index) => {
+        const item = slider.images[index];
+
+        if (item?.id) {
+            setDeletedSliderIds(prev => [...prev, item.id]);
+        }
+
         const updated = slider.images.filter((_, i) => i !== index);
         setSlider({ ...slider, images: updated });
     };
+
+    // const removeSliderImage = (index) => {
+    //     const updated = slider.images.filter((_, i) => i !== index);
+    //     setSlider({ ...slider, images: updated });
+    // };
 
     // 🔥 DRAG END FUNCTION
     const handleDragEnd = (result) => {
         if (!result.destination) return;
 
-        const items = Array.from(slider.images);
-        const [movedItem] = items.splice(result.source.index, 1);
-        items.splice(result.destination.index, 0, movedItem);
+        setSlider(prev => {
+            const items = Array.from(prev.images);
+            const [moved] = items.splice(result.source.index, 1);
+            items.splice(result.destination.index, 0, moved);
 
-        setSlider({ ...slider, images: items });
+            return { ...prev, images: items };
+        });
     };
+
+    // const handleDragEnd = (result) => {
+    //     if (!result.destination) return;
+
+    //     const items = Array.from(slider.images);
+    //     const [movedItem] = items.splice(result.source.index, 1);
+    //     items.splice(result.destination.index, 0, movedItem);
+
+    //     setSlider({ ...slider, images: items });
+    // };
 
 
 
@@ -1442,7 +1586,7 @@ const MyEventsPage = () => {
                                                             <div className="row">
 
                                                                 {/* Upload Input */}
-                                                                <div className="col-4 mb-3">
+                                                                <div className="col-12 mb-3">
                                                                     <input
                                                                         type="file"
                                                                         multiple
@@ -1458,9 +1602,9 @@ const MyEventsPage = () => {
 
                                                                             <img
                                                                                 src={
-                                                                                    typeof img === "string"
-                                                                                        ? img
-                                                                                        : URL.createObjectURL(img)
+                                                                                    img.image
+                                                                                        ? img.image                  // old
+                                                                                        : URL.createObjectURL(img.file) // new
                                                                                 }
                                                                                 className="img-fluid rounded-3"
                                                                             />
@@ -1520,60 +1664,110 @@ const MyEventsPage = () => {
                                                                     <Droppable droppableId="sliderImages" direction="horizontal">
                                                                         {(provided) => (
                                                                             <div
-                                                                                className="row mt-3"
                                                                                 ref={provided.innerRef}
                                                                                 {...provided.droppableProps}
+                                                                                style={{
+                                                                                    display: "flex",
+                                                                                    flexWrap: "wrap",
+                                                                                    gap: "15px",
+                                                                                    marginTop: "20px",
+                                                                                }}
                                                                             >
-                                                                                {slider.images.map((img, index) => (
-                                                                                    <Draggable
-                                                                                        key={index.toString()}
-                                                                                        draggableId={index.toString()}
-                                                                                        index={index}
-                                                                                    >
-                                                                                        {(provided) => (
-                                                                                            <div
-                                                                                                className="col-md-3 mb-3"
-                                                                                                ref={provided.innerRef}
-                                                                                                {...provided.draggableProps}
-                                                                                                {...provided.dragHandleProps}
-                                                                                            >
-                                                                                                <div className="position-relative border rounded p-2 bg-light">
+                                                                                {slider.images.map((img, index) => {
+                                                                                    const uniqueId = img.id
+                                                                                        ? `old-${img.id}`
+                                                                                        : `new-${img.tempId}`;
 
-                                                                                                    {/* Primary Badge */}
-                                                                                                    {index === 0 && (
-                                                                                                        <span className="badge bg-primary position-absolute top-0 start-0">
-                                                                                                            Primary
-                                                                                                        </span>
-                                                                                                    )}
-
-                                                                                                    {/* Image */}
-                                                                                                    <img
-                                                                                                        src={
-                                                                                                            typeof img === "string"
-                                                                                                                ? img
-                                                                                                                : URL.createObjectURL(img)
-                                                                                                        }
-                                                                                                        className="img-fluid rounded mb-2"
-                                                                                                    />
-                                                                                                    {/* <img
-                                                                                                        src={URL.createObjectURL(img)}
-                                                                                                        className="img-fluid rounded mb-2"
-                                                                                                    /> */}
-
-                                                                                                    {/* Remove Button */}
-                                                                                                    <button
-                                                                                                        type="button"
-                                                                                                        className="btn btn-sm btn-danger position-absolute top-0 end-0"
-                                                                                                        onClick={() => removeSliderImage(index)}
+                                                                                    return (
+                                                                                        <Draggable
+                                                                                            key={uniqueId}
+                                                                                            draggableId={uniqueId}
+                                                                                            index={index}
+                                                                                        >
+                                                                                            {(provided, snapshot) => (
+                                                                                                <div
+                                                                                                    ref={provided.innerRef}
+                                                                                                    {...provided.draggableProps}
+                                                                                                    {...provided.dragHandleProps}
+                                                                                                    style={{
+                                                                                                        width: "180px",
+                                                                                                        ...provided.draggableProps.style, // ✅ MUST
+                                                                                                    }}
+                                                                                                >
+                                                                                                    <div
+                                                                                                        style={{
+                                                                                                            position: "relative",
+                                                                                                            borderRadius: "12px",
+                                                                                                            padding: "10px",
+                                                                                                            background: "#fff",
+                                                                                                            boxShadow: snapshot.isDragging
+                                                                                                                ? "0 10px 25px rgba(0,0,0,0.25)"
+                                                                                                                : "0 3px 10px rgba(0,0,0,0.1)",
+                                                                                                            transform: snapshot.isDragging
+                                                                                                                ? "rotate(2deg) scale(1.05)"
+                                                                                                                : "none",
+                                                                                                            transition: "0.2s",
+                                                                                                            cursor: "grab",
+                                                                                                        }}
                                                                                                     >
-                                                                                                        ×
-                                                                                                    </button>
+                                                                                                        {/* Primary */}
+                                                                                                        {index === 0 && (
+                                                                                                            <span
+                                                                                                                style={{
+                                                                                                                    position: "absolute",
+                                                                                                                    top: "5px",
+                                                                                                                    left: "5px",
+                                                                                                                    background: "#4f46e5",
+                                                                                                                    color: "#fff",
+                                                                                                                    fontSize: "12px",
+                                                                                                                    padding: "3px 8px",
+                                                                                                                    borderRadius: "6px",
+                                                                                                                }}
+                                                                                                            >
+                                                                                                                Primary
+                                                                                                            </span>
+                                                                                                        )}
 
+                                                                                                        {/* Image */}
+                                                                                                        <img
+                                                                                                            src={
+                                                                                                                img.image
+                                                                                                                    ? img.image
+                                                                                                                    : URL.createObjectURL(img.file)
+                                                                                                            }
+                                                                                                            style={{
+                                                                                                                width: "100%",
+                                                                                                                height: "120px",
+                                                                                                                objectFit: "cover",
+                                                                                                                borderRadius: "8px",
+                                                                                                            }}
+                                                                                                        />
+
+                                                                                                        {/* Delete */}
+                                                                                                        <button
+                                                                                                            type="button"
+                                                                                                            onClick={() => removeSliderImage(index)}
+                                                                                                            style={{
+                                                                                                                position: "absolute",
+                                                                                                                top: "5px",
+                                                                                                                right: "5px",
+                                                                                                                background: "red",
+                                                                                                                color: "#fff",
+                                                                                                                border: "none",
+                                                                                                                borderRadius: "50%",
+                                                                                                                width: "22px",
+                                                                                                                height: "22px",
+                                                                                                                cursor: "pointer",
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            ×
+                                                                                                        </button>
+                                                                                                    </div>
                                                                                                 </div>
-                                                                                            </div>
-                                                                                        )}
-                                                                                    </Draggable>
-                                                                                ))}
+                                                                                            )}
+                                                                                        </Draggable>
+                                                                                    );
+                                                                                })}
 
                                                                                 {provided.placeholder}
                                                                             </div>
