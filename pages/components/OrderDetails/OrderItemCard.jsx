@@ -148,7 +148,7 @@ const OrderItemCard = ({
                     <div className="fw-semibold fs-6">{title}</div>
 
                     {itemName && (
-                        <div className="text-muted">{itemName}{" "}({gateName})</div>
+                        <div className="text-muted">{itemName}{" "}{gateName ? `(${gateName})` : null}</div>
                     )}
 
                     {isAppointment && (

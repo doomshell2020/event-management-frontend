@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import FrontendHeader from "@/shared/layout-components/frontelements/frontendheader";
 import FrontendFooter from "@/shared/layout-components/frontelements/frontendfooter";
 import Link from "next/link";
@@ -11,6 +11,18 @@ import { useRouter } from "next/router";
 import api from "@/utils/api";
 import { isEventExpired, formatEventDateTime } from "@/utils/formatDate";
 import Cookies from "js-cookie";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+
+// ...
+import ImageGallery from "react-image-gallery";
+import ImageViewer from "react-simple-image-viewer";
+import "react-image-gallery/styles/css/image-gallery.css";
+// ...
+
+import { Navigation, Pagination, Autoplay } from "swiper/modules";
 
 export async function getServerSideProps({ params }) {
   const { id, slug } = params;
@@ -47,6 +59,8 @@ export async function getServerSideProps({ params }) {
 }
 
 const EventDetailPage = ({ event, slug }) => {
+  // console.log("event.exhibitors",event?.exhibitors)
+  // console.log("event.gallery",event?.gallery)
   const { token } = useAuth();
   const router = useRouter();
   // console.log("event",event.is_empty_event)
@@ -54,7 +68,41 @@ const EventDetailPage = ({ event, slug }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [appointmentData, setAppointmentData] = useState([]);
   const [currency, setCurrency] = useState("");
-  // console.log("currency",currency);
+
+
+
+  const sliders = (event?.sliders || []).sort(
+    (a, b) => a.sort_order - b.sort_order
+  );
+
+  const gallery = (event?.gallery || []).sort(
+    (a, b) => a.sort_order - b.sort_order
+  );
+  const [isViewerOpen, setIsViewerOpen] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const sortedGallery = (gallery || []).sort(
+    (a, b) => a.sort_order - b.sort_order
+  );
+
+  const images = sortedGallery.map((img) => img.image);
+
+  const openViewer = useCallback((index) => {
+    setCurrentIndex(index);
+    setIsViewerOpen(true);
+  }, []);
+
+  const closeViewer = () => {
+    setIsViewerOpen(false);
+    setCurrentIndex(0);
+  };
+
+  // if (!images.length) return null;
+
+
+
+
+
   const formatTime = (timeString) => {
     if (!timeString) return "";
 
@@ -255,10 +303,52 @@ const EventDetailPage = ({ event, slug }) => {
     <>
       <FrontendHeader backgroundImage={backgroundImage} />
 
+
+
+      {sliders?.length > 0 && (
+        <div className="premium-slider">
+
+          <Swiper
+            modules={[Navigation, Pagination, Autoplay]}
+            navigation
+            pagination={{ clickable: true }}
+            autoplay={{ delay: 3500, disableOnInteraction: false }}
+            loop={true}
+            spaceBetween={0}
+            className="premium-swiper"
+          >
+            {sliders.map((slide, index) => (
+              <SwiperSlide key={slide.id}>
+                <div className="slide-item">
+
+                  {/* Image */}
+                  <img src={slide.image} alt="slider" />
+
+                  {/* Overlay */}
+                  <div className="slide-overlay" />
+
+                  {/* Content */}
+                  {/* <div className="slide-content">
+                    <h2>{event?.name || "Amazing Event"}</h2>
+                    <p>Experience something unforgettable</p>
+
+                    <button className="slide-btn">
+                      Explore Event →
+                    </button>
+                  </div> */}
+
+                </div>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+
+        </div>
+      )}
+
       <section id="event-detail-page">
+
         <div className="container">
           <div className="row">
-
             {/* Left side image */}
             <div className="col-md-5">
               <div className="ticker_img fadeInLeft position-sticky top-0">
@@ -670,6 +760,97 @@ const EventDetailPage = ({ event, slug }) => {
           />
         )
       }
+
+      {/* Event gallery... */}
+      {images.length > 0 && (
+        <div className="premium-grid container mt-5">
+
+          {/* Header */}
+          <div className="d-flex justify-content-between mb-3">
+            <h4 className="fw-bold">Event Gallery</h4>
+            <span className="text-muted">{images.length} Photos</span>
+          </div>
+
+          {/* Grid */}
+          <div className="grid-wrapper">
+            {images.map((img, index) => (
+              <div
+                key={index}
+                className={`grid-item ${index === 0 ? "big" : ""}`}
+                onClick={() => openViewer(index)}
+              >
+                <img src={img} alt="gallery" />
+
+                <div className="overlay">
+                  <span>View</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Lightbox */}
+          {isViewerOpen && (
+            <ImageViewer
+              src={images}
+              currentIndex={currentIndex}
+              disableScroll={true}
+              closeOnClickOutside={true}
+              onClose={closeViewer}
+            />
+          )}
+        </div>
+      )}
+
+
+      {/* ================= EXHIBITORS ================= */}
+      {event?.exhibitors?.length > 0 && (
+        <div className="container mt-5">
+
+          {/* Header */}
+          <div className="d-flex justify-content-between align-items-center mb-4">
+            <h4 className="fw-bold mb-0">Our Exhibitors</h4>
+            <span className="text-muted">
+              {event.exhibitors.length} Companies
+            </span>
+          </div>
+
+          <div className="row g-4">
+            {event.exhibitors.map((ex) => (
+              <div className="col-md-6 col-lg-4" key={ex.id}>
+                <div
+                  className="exhibitor-card h-100"
+                  onClick={() => ex.website && window.open(ex.website, "_blank")}
+                >
+
+                  {/* Logo */}
+                  <div className="logo-box">
+                    <img src={ex.image} alt={ex.name} />
+                  </div>
+
+                  {/* Content */}
+                  <div className="content text-center">
+                    <h6>{ex.name}</h6>
+                    <p>{ex.description}</p>
+
+                    {ex.website && (
+                      <span className="visit-btn">
+                        Visit Website →
+                      </span>
+                    )}
+                  </div>
+
+                </div>
+              </div>
+            ))}
+          </div>
+
+        </div>
+      )}
+
+
+
+
+
       {/* Description */}
       <div className="mt-4">
         <div className="container">

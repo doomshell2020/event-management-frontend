@@ -13,7 +13,11 @@ import {
     CFormCheck,
     CFormTextarea,
 } from "@coreui/react";
-import { Breadcrumb, Card, Col, Form, InputGroup, Row } from "react-bootstrap";
+import {
+    DragDropContext,
+    Droppable,
+    Draggable,
+} from "react-beautiful-dnd";
 import moment from "moment-timezone";
 import Swal from "sweetalert2";
 import api from "@/utils/api";
@@ -84,7 +88,6 @@ const MyEventsPage = () => {
             if (res.data.success && res.data.data.events.length > 0) {
                 const event = res.data.data.events[0];
                 setEventDetails(event);
-
                 // ✅ Set formData state with event details
                 setFormData({
                     name: event.name || "",
@@ -126,6 +129,43 @@ const MyEventsPage = () => {
                         }))
                     );
                 }
+
+                // Exhibitors Prefill
+                const exhibitorData = event.exhibitors || [];
+                if (exhibitorData.length > 0) {
+                    setEnableExhibitors(true);
+
+                    setExhibitors(
+                        exhibitorData.map(ex => ({
+                            id: ex.id, // useful for update later
+                            name: ex.name || "",
+                            image: ex.image || null, // 🔥 string URL
+                            description: ex.description || "",
+                            website: ex.website || ""
+                        }))
+                    );
+                }
+
+                // Gallery Prefill
+                const galleryData = event.gallery || [];
+                if (galleryData.length > 0) {
+                    setEnableGallery(true);
+
+                    setGallery(
+                        galleryData.map(img => img.image) // 🔥 only URL string
+                    );
+                }
+                // Sliders Prefill
+                const sliderData = event.sliders || [];
+
+                if (sliderData.length > 0) {
+                    setEnableSliders(true);
+
+                    setSlider({
+                        images: sliderData.map(slide => slide.image) // 🔥 URL string
+                    });
+                }
+
 
 
             } else {
@@ -268,7 +308,7 @@ const MyEventsPage = () => {
                 fd.append("cancellation_policy", cancellationPolicy);
             }
 
-            fd.append("gates",JSON.stringify(gates))
+            fd.append("gates", JSON.stringify(gates))
 
             const endpoint =
                 formData.is_free == "Y"
@@ -282,6 +322,82 @@ const MyEventsPage = () => {
             const resData = response.data;
 
             if (resData?.success) {
+
+                const eventId = id;
+                // ================= EXHIBITORS UPDATE =================
+                if (enableExhibitors) {
+                    const exhibitorFd = new FormData();
+
+                    exhibitorFd.append("event_id", eventId);
+
+                    // 🔥 remove image from JSON
+                    const payload = exhibitors.map(({ image, ...rest }) => rest);
+
+                    exhibitorFd.append("exhibitors", JSON.stringify(payload));
+
+                    // 🔥 only NEW images send
+                    exhibitors.forEach((ex) => {
+                        if (ex.image && typeof ex.image !== "string") {
+                            exhibitorFd.append("exhibitor_logos", ex.image);
+                        }
+                    });
+
+                    await api.post(
+                        "/api/v1/events/update/event-exhibitors",
+                        exhibitorFd,
+                        { headers: { "Content-Type": "multipart/form-data" } }
+                    );
+                }
+
+                // ================= GALLERY UPDATE =================
+                if (enableGallery) {
+                    const newGalleryFiles = gallery.filter(f => typeof f !== "string");
+
+                    if (newGalleryFiles.length > 0) {
+                        const galleryFd = new FormData();
+                        galleryFd.append("event_id", eventId);
+
+                        newGalleryFiles.forEach((file) => {
+                            galleryFd.append("gallery_images", file);
+                        });
+
+                        await api.post(
+                            "/api/v1/events/update/event-gallery",
+                            galleryFd,
+                            { headers: { "Content-Type": "multipart/form-data" } }
+                        );
+                    }
+                }
+
+            
+                // ================= SLIDER UPDATE =================
+                if (enableSliders) {
+                    const newSliderFiles = slider.images.filter(f => typeof f !== "string");
+
+                    if (newSliderFiles.length > 0) {
+                        const sliderFd = new FormData();
+                        sliderFd.append("event_id", eventId);
+
+                        newSliderFiles.forEach((file) => {
+                            sliderFd.append("slider_images", file);
+                        });
+
+                        await api.post(
+                            "/api/v1/events/update/event-sliders",
+                            sliderFd,
+                            { headers: { "Content-Type": "multipart/form-data" } }
+                        );
+                    }
+                }
+
+
+
+
+
+
+
+
+
                 Swal.fire({
                     icon: "success",
                     title: "Event Updated",
@@ -433,6 +549,113 @@ const MyEventsPage = () => {
             setDateErrors(errors); // replaces old errors (no stuck red)
         }
     };
+
+
+    const [enableExhibitors, setEnableExhibitors] = useState(false);
+
+
+    const [exhibitors, setExhibitors] = useState([
+        { name: "", image: null, description: "", website: "" }
+    ]);
+
+    const handleExhibitorsToggle = () => {
+        setEnableExhibitors(!enableExhibitors);
+        if (!enableExhibitors && exhibitors.length === 0) {
+            setExhibitors([
+                { name: "", logo: null, description: "", website: "" }
+            ]);
+        }
+    };
+    const addExhibitor = () => {
+        setExhibitors([
+            ...exhibitors,
+            { name: "", image: null, description: "", website: "" }
+        ]);
+    };
+
+    const removeExhibitor = (index) => {
+        setExhibitors(exhibitors.filter((_, i) => i !== index));
+    };
+
+    const handleExhibitorChange = (index, field, value) => {
+        const updated = [...exhibitors];
+        updated[index][field] = value;
+        setExhibitors(updated);
+    };
+
+
+    const [enableGallery, setEnableGallery] = useState(false);
+
+    const [gallery, setGallery] = useState([]);
+
+    const handleGalleryToggle = () => {
+        setEnableGallery(!enableGallery);
+    };
+
+    const handleGalleryUpload = (e) => {
+        const files = Array.from(e.target.files);
+        setGallery([...gallery, ...files]);
+    };
+
+    const removeGallery = (index) => {
+        setGallery(gallery.filter((_, i) => i !== index));
+    };
+
+    const [enableSliders, setEnableSliders] = useState(false);
+
+    const [slider, setSlider] = useState({
+        images: [],
+    });
+    // ================= HANDLERS =================
+
+    const handleSlidersToggle = () => {
+        setEnableSliders(!enableSliders);
+    };
+
+    const handleSliderChange = (field, value) => {
+        setSlider({ ...slider, [field]: value });
+    };
+
+    const handleSliderImages = (e) => {
+        const files = Array.from(e.target.files);
+
+        // limit (max 5 at a time)
+        if (files.length > 5) {
+            alert("You can upload max 5 images at a time");
+            return;
+        }
+
+        setSlider({
+            ...slider,
+            images: [...slider.images, ...files],
+        });
+
+        e.target.value = null;
+    };
+
+    const removeSliderImage = (index) => {
+        const updated = slider.images.filter((_, i) => i !== index);
+        setSlider({ ...slider, images: updated });
+    };
+
+    // 🔥 DRAG END FUNCTION
+    const handleDragEnd = (result) => {
+        if (!result.destination) return;
+
+        const items = Array.from(slider.images);
+        const [movedItem] = items.splice(result.source.index, 1);
+        items.splice(result.destination.index, 0, movedItem);
+
+        setSlider({ ...slider, images: items });
+    };
+
+
+
+
+
+
+
+
 
     return (
         <>
@@ -1087,7 +1310,280 @@ const MyEventsPage = () => {
                                                         )}
                                                     </div>
 
+                                                    {/* ================= EXHIBITORS ================= */}
+                                                    <div className="col-12">
+                                                        <div className="form-check mb-3">
+                                                            <input
+                                                                type="checkbox"
+                                                                className="form-check-input"
+                                                                id="gateExhibitors"
+                                                                checked={enableExhibitors}
+                                                                onChange={handleExhibitorsToggle}
+                                                            />
+                                                            <label className="form-check-label fw-semibold" htmlFor="gateExhibitors">
+                                                                Add Exhibitors for this Event
+                                                            </label>
+                                                        </div>
 
+                                                        {enableExhibitors && (
+                                                            <div className="row">
+                                                                {exhibitors.map((ex, index) => (
+                                                                    <div className="col-md-6 mb-3" key={index}>
+                                                                        <div className="border rounded-4 p-4 bg-white shadow-sm">
+
+                                                                            {/* Gate Title */}
+                                                                            <div className="d-flex justify-content-between mb-3">
+                                                                                <label className="fw-semibold">
+                                                                                    Exhibitor {index + 1}
+                                                                                </label>
+
+                                                                                {/* Remove Button */}
+                                                                                {exhibitors.length > 1 && (
+                                                                                    <button
+                                                                                        type="button"
+                                                                                        className="btn btn-sm btn-outline-danger"
+                                                                                        onClick={() => removeExhibitor(index)}
+                                                                                    >
+                                                                                        Remove
+                                                                                    </button>
+                                                                                )}
+                                                                            </div>
+
+                                                                            <input
+                                                                                className="form-control mb-3"
+                                                                                placeholder="Company Name"
+                                                                                value={ex.name}
+                                                                                onChange={(e) =>
+                                                                                    handleExhibitorChange(index, "name", e.target.value)
+                                                                                }
+                                                                            />
+
+                                                                            <input
+                                                                                type="file"
+                                                                                className="form-control mb-3"
+                                                                                onChange={(e) =>
+                                                                                    handleExhibitorChange(index, "image", e.target.files[0])
+                                                                                }
+                                                                            />
+                                                                            {ex.image && (
+                                                                                <div className="position-relative mb-3">
+                                                                                    <img
+                                                                                        src={
+                                                                                            typeof ex.image === "string"
+                                                                                                ? ex.image   // ✅ edit mode (URL from backend)
+                                                                                                : URL.createObjectURL(ex.image) // ✅ new upload
+                                                                                        }
+                                                                                        className="img-fluid rounded"
+                                                                                        style={{ height: "100px", objectFit: "cover", width: "100px" }}
+                                                                                    /></div>
+                                                                            )}
+
+                                                                            <textarea
+                                                                                className="form-control mb-3"
+                                                                                rows="2"
+                                                                                placeholder="Short Description"
+                                                                                value={ex.description}
+                                                                                onChange={(e) =>
+                                                                                    handleExhibitorChange(index, "description", e.target.value)
+                                                                                }
+                                                                            />
+
+                                                                            <input
+                                                                                type="url"
+                                                                                className="form-control"
+                                                                                placeholder="https://company.com"
+                                                                                value={ex.website}
+                                                                                onChange={(e) =>
+                                                                                    handleExhibitorChange(index, "website", e.target.value)
+                                                                                }
+                                                                            />
+                                                                        </div>
+                                                                    </div>
+                                                                ))}
+
+                                                                {/* Bottom Section */}
+                                                                <div className="col-12 mt-2">
+                                                                    <div className="d-flex justify-content-between align-items-center border-top pt-3">
+
+                                                                        <small className="text-muted">
+                                                                            You can add multiple gates for this event
+                                                                        </small>
+
+                                                                        <button
+                                                                            type="button"
+                                                                            className="btn btn-success px-3"
+                                                                            onClick={addExhibitor}
+                                                                        >
+                                                                            + Add Exhibitor
+                                                                        </button>
+
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
+
+                                                    {/* ================= GALLERY ================= */}
+                                                    <div className="col-12">
+                                                        <div className="form-check mb-3">
+                                                            <input
+                                                                type="checkbox"
+                                                                className="form-check-input"
+                                                                id="gallery"
+                                                                checked={enableGallery}
+                                                                onChange={handleGalleryToggle}
+                                                            />
+                                                            <label className="form-check-label fw-semibold" htmlFor="gallery">
+                                                                Add Event Gallery
+                                                            </label>
+                                                        </div>
+
+                                                        {enableGallery && (
+                                                            <div className="row">
+
+                                                                {/* Upload Input */}
+                                                                <div className="col-4 mb-3">
+                                                                    <input
+                                                                        type="file"
+                                                                        multiple
+                                                                        className="form-control"
+                                                                        onChange={handleGalleryUpload}
+                                                                    />
+                                                                </div>
+
+                                                                {/* Images Preview */}
+                                                                {gallery.map((img, index) => (
+                                                                    <div className="col-md-3 mb-3" key={index}>
+                                                                        <div className="position-relative">
+
+                                                                            <img
+                                                                                src={
+                                                                                    typeof img === "string"
+                                                                                        ? img
+                                                                                        : URL.createObjectURL(img)
+                                                                                }
+                                                                                className="img-fluid rounded-3"
+                                                                            />
+
+                                                                            <button
+                                                                                type="button"
+                                                                                className="btn btn-sm btn-danger position-absolute top-0 end-0"
+                                                                                onClick={() => removeGallery(index)}
+                                                                            >
+                                                                                ×
+                                                                            </button>
+
+                                                                        </div>
+                                                                    </div>
+                                                                ))}
+
+
+
+                                                            </div>
+                                                        )}
+                                                    </div>
+
+                                                    {/* ================= SLIDERS ================= */}
+                                                    <div className="col-12">
+                                                        {/* Checkbox */}
+                                                        <div className="form-check mb-3">
+                                                            <input
+                                                                type="checkbox"
+                                                                className="form-check-input"
+                                                                id="sliderCheck"
+                                                                checked={enableSliders}
+                                                                onChange={handleSlidersToggle}
+                                                            />
+                                                            <label className="form-check-label fw-semibold" htmlFor="sliderCheck">
+                                                                Add Slider for this Event
+                                                            </label>
+                                                        </div>
+
+                                                        {enableSliders && (
+                                                            <div className="border rounded-4 p-4 bg-white shadow-sm">
+                                                                {/* <div className="col-4 mb-3"> */}
+                                                                {/* Upload */}
+                                                                <input
+                                                                    type="file"
+                                                                    multiple
+                                                                    accept="image/*"
+                                                                    className="form-control mb-2"
+                                                                    onChange={handleSliderImages}
+                                                                />
+
+                                                                <small className="text-muted">
+                                                                    Drag & drop images to reorder. First image will be primary.
+                                                                </small>
+
+                                                                {/* 🔥 DRAG AREA */}
+                                                                <DragDropContext onDragEnd={handleDragEnd}>
+                                                                    <Droppable droppableId="sliderImages" direction="horizontal">
+                                                                        {(provided) => (
+                                                                            <div
+                                                                                className="row mt-3"
+                                                                                ref={provided.innerRef}
+                                                                                {...provided.droppableProps}
+                                                                            >
+                                                                                {slider.images.map((img, index) => (
+                                                                                    <Draggable
+                                                                                        key={index.toString()}
+                                                                                        draggableId={index.toString()}
+                                                                                        index={index}
+                                                                                    >
+                                                                                        {(provided) => (
+                                                                                            <div
+                                                                                                className="col-md-3 mb-3"
+                                                                                                ref={provided.innerRef}
+                                                                                                {...provided.draggableProps}
+                                                                                                {...provided.dragHandleProps}
+                                                                                            >
+                                                                                                <div className="position-relative border rounded p-2 bg-light">
+
+                                                                                                    {/* Primary Badge */}
+                                                                                                    {index === 0 && (
+                                                                                                        <span className="badge bg-primary position-absolute top-0 start-0">
+                                                                                                            Primary
+                                                                                                        </span>
+                                                                                                    )}
+
+                                                                                                    {/* Image */}
+                                                                                                    <img
+                                                                                                        src={
+                                                                                                            typeof img === "string"
+                                                                                                                ? img
+                                                                                                                : URL.createObjectURL(img)
+                                                                                                        }
+                                                                                                        className="img-fluid rounded mb-2"
+                                                                                                    />
+                                                                                                    {/* <img
+                                                                                                        src={URL.createObjectURL(img)}
+                                                                                                        className="img-fluid rounded mb-2"
+                                                                                                    /> */}
+
+                                                                                                    {/* Remove Button */}
+                                                                                                    <button
+                                                                                                        type="button"
+                                                                                                        className="btn btn-sm btn-danger position-absolute top-0 end-0"
+                                                                                                        onClick={() => removeSliderImage(index)}
+                                                                                                    >
+                                                                                                        ×
+                                                                                                    </button>
+
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        )}
+                                                                                    </Draggable>
+                                                                                ))}
+
+                                                                                {provided.placeholder}
+                                                                            </div>
+                                                                        )}
+                                                                    </Droppable>
+                                                                </DragDropContext>
+
+                                                            </div>
+                                                        )}
+                                                    </div>
 
 
 
