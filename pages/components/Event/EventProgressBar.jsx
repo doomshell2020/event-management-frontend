@@ -1,4 +1,6 @@
 "use client";
+let cachedEvents = null;
+let isFetching = false;
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -12,19 +14,50 @@ const EventHeaderSection = ({ eventDetails, isProgressBarShow }) => {
     const showProgress = isProgressBarShow != false;
 
     // Fetch Event List
+    // const fetchEvents = async () => {
+    //     setLoading(true);
+    //     try {
+    //         const res = await api.post(`/api/v1/events/event-list`);
+    //         if (res.data.success) setEventData(res.data.data.events || []);
+    //         else setEventData([]);
+    //     } catch (error) {
+    //         console.error("Error fetching events:", error);
+    //         setEventData([]);
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
+
     const fetchEvents = async () => {
-        setLoading(true);
-        try {
-            const res = await api.post(`/api/v1/events/event-list`);
-            if (res.data.success) setEventData(res.data.data.events || []);
-            else setEventData([]);
-        } catch (error) {
-            console.error("Error fetching events:", error);
+    // ✅ agar already data hai to reuse karo
+    if (cachedEvents) {
+        setEventData(cachedEvents);
+        return;
+    }
+
+    // ✅ agar request chal rahi hai to skip karo
+    if (isFetching) return;
+
+    isFetching = true;
+    setLoading(true);
+
+    try {
+        const res = await api.post(`/api/v1/events/event-list`);
+
+        if (res.data.success) {
+            cachedEvents = res.data.data.events || [];
+            setEventData(cachedEvents);
+        } else {
             setEventData([]);
-        } finally {
-            setLoading(false);
         }
-    };
+    } catch (error) {
+        console.error("Error fetching events:", error);
+        setEventData([]);
+    } finally {
+        setLoading(false);
+        isFetching = false;
+    }
+};
 
     useEffect(() => {
         fetchEvents();
