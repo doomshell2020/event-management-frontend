@@ -1304,6 +1304,7 @@ const EventDetailsPage = () => {
                                                                         <input
                                                                             className="form-control mb-3"
                                                                             placeholder="Company Name"
+                                                                            required
                                                                             value={ex.name}
                                                                             onChange={(e) =>
                                                                                 handleExhibitorChange(index, "name", e.target.value)
@@ -1313,6 +1314,7 @@ const EventDetailsPage = () => {
                                                                         <input
                                                                             type="file"
                                                                             className="form-control mb-3"
+                                                                            required
                                                                             onChange={(e) =>
                                                                                 handleExhibitorChange(index, "image", e.target.files[0])
                                                                             }
@@ -1334,6 +1336,7 @@ const EventDetailsPage = () => {
                                                                             className="form-control mb-3"
                                                                             rows="2"
                                                                             placeholder="Short Description"
+                                                                            required
                                                                             value={ex.description}
                                                                             onChange={(e) =>
                                                                                 handleExhibitorChange(index, "description", e.target.value)
@@ -1344,6 +1347,7 @@ const EventDetailsPage = () => {
                                                                             type="url"
                                                                             className="form-control"
                                                                             placeholder="https://company.com"
+                                                                            required
                                                                             value={ex.website}
                                                                             onChange={(e) =>
                                                                                 handleExhibitorChange(index, "website", e.target.value)
@@ -1381,7 +1385,7 @@ const EventDetailsPage = () => {
                                                         <input
                                                             type="checkbox"
                                                             className="form-check-input"
-                                                            id="gallery"
+                                                             id="gallery"
                                                             checked={enableGallery}
                                                             onChange={handleGalleryToggle}
                                                         />
@@ -1398,6 +1402,7 @@ const EventDetailsPage = () => {
                                                                 <input
                                                                     type="file"
                                                                     multiple
+                                                                    required
                                                                     className="form-control"
                                                                     onChange={handleGalleryUpload}
                                                                 />
@@ -1458,6 +1463,7 @@ const EventDetailsPage = () => {
                                                             <input
                                                                 type="file"
                                                                 multiple
+                                                                required
                                                                 accept="image/*"
                                                                 className="form-control mb-2"
                                                                 onChange={handleSliderImages}

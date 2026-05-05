@@ -524,8 +524,7 @@ const EventDetailPage = ({ event, slug }) => {
                         {/* IMAGE */}
                         <div className="event-appo-img">
                           <img
-                            // src={w.Image}
-                            src={"https://api.eboxtickets.com/uploads/wellness/wellnessImage-1776413528096-f56a62fb0c385b90.jpg"}
+                            src={w.Image}
                             className="card-img-top"
                             style={{ objectFit: "cover" }}
                             alt={w.name}
@@ -883,11 +882,11 @@ const EventDetailPage = ({ event, slug }) => {
             )}
 
 
-            <p className="mb-0">
+            {/* <p className="mb-0">
               <i>
                 <b>Note: An 8% transaction fee applies to each purchase.</b>
               </i>
-            </p>
+            </p> */}
           </div>
         </div>
       </div>
